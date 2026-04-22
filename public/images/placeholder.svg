@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" viewBox="0 0 400 260" role="img" aria-labelledby="title desc">
+  <title id="title">Placeholder image</title>
+  <desc id="desc">A simple gray placeholder image for travel photography.</desc>
+  <rect width="400" height="260" fill="#cbd5e1" />
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#334155" font-family="Inter, sans-serif" font-size="24">Travel image</text>
+</svg>
