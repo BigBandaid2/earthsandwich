@@ -1,94 +1,209 @@
 # Tasks: World Travelogue
 
 **Input**: Design documents from `specs/001-world-travelogue/`
-**Prerequisites**: `specs/001-world-travelogue/plan.md`, `specs/001-world-travelogue/spec.md`, `specs/001-world-travelogue/research.md`, `specs/001-world-travelogue/data-model.md`
+**Prerequisites**: `specs/001-world-travelogue/plan.md`, `specs/001-world-travelogue/spec.md`, `specs/001-world-travelogue/data-model.md`
 
-## Phase 1: Setup (Shared Infrastructure)
-
-- [x] T001 Create Vite React app skeleton in `package.json`, `vite.config.ts`, `index.html`, and `src/`
-- [x] T002 Create the base source directories `src/assets/`, `src/components/`, `src/data/`, `src/pages/`, and `src/styles/`
-- [x] T003 Add static hosting scripts and build commands in `package.json` for `dev`, `build`, and `preview`
-- [x] T004 Create initial global stylesheet in `src/styles/global.css`
-- [x] T005 Create `public/images/` and add placeholder image assets for travel stops
+**Status**: Updated for flat stop model with dynamic region clustering (2026-04-24)
 
 ---
 
-## Phase 2: Foundational (Blocking Prerequisites)
+## Phase 1: Setup (Project Initialization)
 
-- [x] T006 [P] Define TypeScript itinerary data types in `src/data/types.ts`
-- [x] T007 [P] Implement the hard-coded itinerary data model in `src/data/itinerary.ts` with major stops, visited/planned status, and optional city children
-- [x] T008 [P] Create the base app shell in `src/App.tsx` and set up React routing or view state for the travelogue
-- [x] T009 [P] Create the primary home page component in `src/pages/HomePage.tsx`
-- [x] T010 [P] Create reusable UI components `src/components/MapView.tsx`, `src/components/Sidebar.tsx`, and `src/components/StopDetail.tsx`
-- [x] T011 [P] Configure global responsive layout and map/itinerary styling in `src/styles/global.css`
-- [x] T012 [P] Ensure `src/data/itinerary.ts` includes sample data for at least one city stop with nested child site entries
+**Purpose**: Project initialization and basic structure
 
----
-
-## Phase 3: User Story 1 - Browse trip progress on map (Priority: P1)
-
-**Goal**: Display the world travel route and itinerary sidebar so visitors can see where the trip has been and where it is going.
-
-**Independent Test**: Open the site and confirm the world map displays plotted stops and the sidebar lists stop names, captions, and dates.
-
-- [x] T013 [P] [US1] Render the world map and route overview in `src/components/MapView.tsx`
-- [x] T014 [P] [US1] Render the itinerary stop list in `src/components/Sidebar.tsx`
-- [x] T015 [US1] Implement visited vs planned stop marker styles in `src/components/MapView.tsx`
-- [x] T016 [US1] Wire map selection state into `src/pages/HomePage.tsx` and `src/App.tsx`
-- [x] T017 [US1] Add legend and route summary UI to `src/pages/HomePage.tsx`
-- [x] T018 [US1] Verify the map and sidebar show the top-level route with at least 10 sample stops from `src/data/itinerary.ts`
+- [ ] T001 [P] Initialize Vite React TypeScript project with dependencies in `package.json`
+- [ ] T002 [P] Configure Vite config (`vite.config.ts`) with React plugin
+- [ ] T003 [P] Setup TypeScript configuration (`tsconfig.json`) for React JSX
+- [ ] T004 Create entry point (`index.html` and `src/main.tsx`)
 
 ---
 
-## Phase 4: User Story 2 - Inspect a major stop (Priority: P2)
+## Phase 2: Foundational (Core Data & Types)
 
-**Goal**: Allow visitors to select a stop and view its details, including optional image and blog entry content.
+**Purpose**: Core data structure and shared type definitions for flat stop model
 
-**Independent Test**: Select a stop from the map or sidebar and confirm the detail panel shows location, caption, date, and any optional content.
+**⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [x] T019 [US2] Build `src/components/StopDetail.tsx` to display stop metadata and optional content
-- [x] T020 [P] [US2] Render an optional stop image only when `image` exists in `src/data/itinerary.ts`
-- [x] T021 [P] [US2] Render optional long-form blog content only when `blog` exists in `src/data/itinerary.ts`
-- [x] T022 [P] [US2] Add expand/collapse interaction for blurbs, pictures, and long-form entries in `src/components/StopDetail.tsx`
-- [x] T023 [US2] Integrate `StopDetail` into `src/pages/HomePage.tsx` so selected stop details are displayed on the page
-- [x] T024 [US2] Update at least one major stop in `src/data/itinerary.ts` with an image and one with a blog entry to validate optional rendering
+- [ ] T005 [P] Update Stop type to flat model: id, title, caption, date, coords, status, regionCode, regionName, image?, blog? in `src/data/types.ts`
+- [ ] T006 [P] Add Region type definition: code, name, airportName, country, coords in `src/data/types.ts`
+- [ ] T007 [P] Add Trip Itinerary type: id, title, description, stops[] in `src/data/types.ts`
+- [ ] T008 Refactor hard-coded itinerary data to flat model (remove nested children) in `src/data/itinerary.ts`
+- [ ] T009 [P] Setup global CSS styling framework (map layout, sidebar, panels) in `src/styles/global.css`
+- [ ] T010 [P] Setup responsive grid layout for map and sidebar in `src/styles/layout.css`
+- [ ] T011 Create App.tsx root component with state management for selectedStop and selectedRegion
 
----
-
-## Phase 5: User Story 3 - Drill into city-level itinerary (Priority: P3)
-
-**Goal**: Enable hierarchical city-level drilldown so city stops reveal nested local sites and city-specific content.
-
-**Independent Test**: Select a city stop and confirm the view shows nested city site entries and allows returning to the top-level route.
-
-- [x] T025 [US3] Extend `src/data/itinerary.ts` to include city-level stops with nested `children` entries for local sites
-- [x] T026 [US3] Implement city drilldown navigation in `src/components/Sidebar.tsx` or `src/pages/HomePage.tsx`
-- [x] T027 [P] [US3] Create `src/components/CityDetail.tsx` or reuse `StopDetail.tsx` to render nested city site entries
-- [x] T028 [P] [US3] Render city-level site markers and nested site details when a city stop is selected in `src/components/MapView.tsx`
-- [x] T029 [US3] Add a return control in `src/pages/HomePage.tsx` to go back from city view to the top-level world route
-- [x] T030 [US3] Verify a city stop with nested sites displays correctly and that returning to the top-level route restores the main itinerary
+**Checkpoint**: Data types defined, flat itinerary loaded, App container ready
 
 ---
 
-## Phase 6: Polish & Cross-Cutting Concerns
+## Phase 3: User Story 1 - Browse trip progress on map (Priority: P1) 🎯 MVP
 
-- [x] T031 [P] Update `specs/001-world-travelogue/quickstart.md` with the final project commands and directory notes
-- [x] T032 [P] Review `src/styles/global.css` and adjust responsive breakpoints for mobile, tablet, and desktop
-- [x] T033 [P] Add accessible labels, keyboard focus states, and semantic HTML in `src/components/MapView.tsx`, `src/components/Sidebar.tsx`, and `src/components/StopDetail.tsx`
-- [x] T034 [P] Validate the completed feature against the acceptance criteria in `specs/001-world-travelogue/spec.md`
-- [x] T035 [P] Update `README.md` or project documentation with a note that itinerary content is hard-coded in `src/data/itinerary.ts`
+**Goal**: Visitors can view the round-the-world route on an interactive map with visited/planned stops distinguished, and use the sidebar to jump to stops.
+
+**Independent Test**: Load the site, verify the map renders with all stops plotted, sidebar displays all major stops with location/caption/date, and clicking a stop selects it.
+
+### Implementation for User Story 1
+
+- [ ] T012 [P] [US1] Update MapView component to render flat stops (no nested children) in `src/components/MapView.tsx`
+- [ ] T013 [P] [US1] Add visited (blue) vs planned (red) marker styling in `src/styles/map.css`
+- [ ] T014 [P] [US1] Add legend (visited, planned, selected) to MapView in `src/components/MapView.tsx`
+- [ ] T015 [US1] Draw route polyline connecting stops in order in `src/components/MapView.tsx`
+- [ ] T016 [P] [US1] Update Sidebar component to display flat stop list (no city drill-down) in `src/components/Sidebar.tsx`
+- [ ] T017 [US1] Wire stop selection between MapView and Sidebar in `src/App.tsx`
+- [ ] T018 [US1] Add responsive layout: stack sidebar below map on mobile in `src/styles/layout.css`
+- [ ] T019 [US1] Manual test: Open site, verify map displays all stops, sidebar shows itinerary, selections work
+
+**Checkpoint**: User Story 1 complete - visitors can browse trip and identify major stops
+
+---
+
+## Phase 4: User Story 2 - Explore region clusters on zoomed-out map (Priority: P2)
+
+**Goal**: Visitors zoomed out on the map see nearby stops clustered by region (derived from nearest international airport), and can select a region to see grouped stops.
+
+**Independent Test**: Zoom map out, verify region clusters appear, select a region and confirm the stops assigned to it display.
+
+### Implementation for User Story 2
+
+- [ ] T020 [P] [US2] Implement region derivation utility in `src/utils/regionUtils.ts` to find nearest international airport for each stop
+- [ ] T021 [US2] Add region grouping function to compute regions from flat stop list in `src/utils/regionUtils.ts`
+- [ ] T022 [US2] Implement zoom level detection in MapView (track viewport) in `src/components/MapView.tsx`
+- [ ] T023 [US2] Render region cluster markers (aggregated points) when zoomed out in `src/components/MapView.tsx`
+- [ ] T024 [US2] Add region cluster styling (circle with count badge) in `src/styles/regions.css`
+- [ ] T025 [US2] Implement region selection handler in MapView in `src/components/MapView.tsx`
+- [ ] T026 [US2] Update Sidebar to show stops grouped by region when region is selected in `src/components/Sidebar.tsx`
+- [ ] T027 [US2] Manual test: Zoom out, verify region clustering appears; select region, confirm grouped display works
+
+**Checkpoint**: User Stories 1 & 2 complete - map supports both detailed and clustered views
+
+---
+
+## Phase 5: User Story 3 - Inspect a single stop (Priority: P3)
+
+**Goal**: Visitors click on a stop and see its details: location, caption, date, optional image, optional blog text, and visited/planned status.
+
+**Independent Test**: Click a stop on the map or in sidebar, verify detail panel opens with all required fields, optional fields appear only when present.
+
+### Implementation for User Story 3
+
+- [ ] T028 [P] [US3] Update StopDetail component to display flat stop fields (no nested children) in `src/components/StopDetail.tsx`
+- [ ] T029 [P] [US3] Add conditional rendering for optional image field in `src/components/StopDetail.tsx`
+- [ ] T030 [P] [US3] Add conditional rendering for optional blog/long-form text field in `src/components/StopDetail.tsx`
+- [ ] T031 [US3] Add status badge (visited/planned) styling in `src/styles/stop-detail.css`
+- [ ] T032 [US3] Implement detail panel expand/collapse animation in `src/components/StopDetail.tsx`
+- [ ] T033 [US3] Wire StopDetail into App.tsx and update stop selection state in `src/App.tsx`
+- [ ] T034 [US3] Show StopDetail when stop is selected from map or sidebar in `src/App.tsx`
+- [ ] T035 [US3] Close detail panel when another stop selected or close button clicked in `src/App.tsx`
+- [ ] T036 [US3] Add responsive styling so detail panel works on mobile (slides up from bottom) in `src/styles/layout.css`
+- [ ] T037 [US3] Manual test: Click each stop, verify details display, optional fields appear only when present
+
+**Checkpoint**: All core user stories complete - map browsing, region clustering, and stop inspection working
+
+---
+
+## Phase 6: Decommission Old Features
+
+**Purpose**: Remove nested city/site hierarchy code (from old model)
+
+- [ ] T038 Remove CityDetail component references from App.tsx and components
+- [ ] T038a Remove nested city drilling logic from MapView.tsx (topLevelStops, cityViewId, etc.)
+- [ ] T039 Remove cityChildren or nested stop handling from Sidebar.tsx
+- [ ] T040 Clean up dead code and unused state variables from App.tsx
+
+---
+
+## Phase 7: Polish & Cross-Cutting Concerns
+
+**Purpose**: Enhancements affecting multiple user stories and overall quality
+
+- [ ] T041 [P] Add accessibility labels and ARIA attributes to all interactive elements in `src/components/`
+- [ ] T042 [P] Add keyboard navigation support (arrow keys, Enter, Escape) across map and sidebar in `src/components/`
+- [ ] T043 [P] Test responsive layout on mobile/tablet viewport sizes in `src/styles/`
+- [ ] T044 [P] Optimize map rendering performance for 50+ markers in `src/components/MapView.tsx`
+- [ ] T045 [P] Add visual feedback for map interactions (hover states, animations) in `src/styles/`
+- [ ] T046 [P] Run performance benchmark: ensure initial page load under 3 seconds (npm run build)
+- [ ] T047 Add comprehensive inline documentation to modified components in `src/components/`
+- [ ] T048 Update or create `specs/001-world-travelogue/quickstart.md` with usage examples and local development instructions
+- [ ] T049 Validate all tasks completed and run final browser testing (map, sidebar, detail panel, region clustering)
+- [ ] T050 Test edge cases: stops with missing images/blogs, very long blog text, many stops in one region
+
+**Checkpoint**: Feature complete, polished, and ready for deployment
 
 ---
 
 ## Dependencies & Execution Order
 
-- Setup tasks (T001-T005) must be complete before the Foundational phase begins.
-- Foundational tasks (T006-T012) block all user stories and must complete before story-specific implementation.
-- User stories can be worked on in parallel after foundational work is complete, with priority order P1 → P2 → P3.
-- Polish tasks can start once the core story implementations are available.
+### Phase Dependencies
 
-## Parallel Opportunities
+- **Setup (Phase 1)**: No dependencies - can start immediately
+- **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
+- **User Story 1 (Phase 3)**: Depends on Foundational completion - MVP core
+- **User Story 2 (Phase 4)**: Depends on Phase 3 (region logic builds on US1 map)
+- **User Story 3 (Phase 5)**: Depends on Phase 3 (detail panel independent from clustering)
+- **Decommission (Phase 6)**: After US1/US2/US3 ready, before Polish
+- **Polish (Phase 7)**: Depends on Phases 3-6 completion
 
-- `T006`, `T007`, `T008`, `T009`, `T010`, and `T011` can run in parallel because they target separate files and shared structure.
-- Map rendering, sidebar rendering, and detail component creation can be developed in parallel across user stories where state wiring permits.
-- Review and documentation tasks `T031`–`T035` are parallelizable across the completed implementation.
+### Within Each Phase
+
+- **Phase 1**: All [P] tasks can run in parallel
+- **Phase 2**: T005-T007, T009-T010 [P] tasks can run in parallel; T008 and T011 depend on types from T005-T007
+- **Phase 3**: T012-T014 [P] tasks can run in parallel; T015-T019 depend on component structure being ready
+- **Phase 4**: T020-T021, T024 [P] tasks can run in parallel; T022-T023, T025-T027 depend on core logic
+- **Phase 5**: T028-T030 [P] tasks can run in parallel; T031-T037 depend on component structure
+- **Phase 6**: Sequential cleanup as old code is identified
+- **Phase 7**: All [P] tasks (T041-T046) can run in parallel
+
+### Parallel Opportunities
+
+- All Setup [P] tasks (T001-T003)
+- All Foundational [P] tasks (T005-T007, T009-T010)
+- All US1 [P] component tasks (T012-T014)
+- All US2 [P] utility and clustering tasks (T020-T021, T024)
+- All US3 [P] component fields (T028-T030)
+- All Phase 7 [P] tasks (T041-T046)
+
+---
+
+## Implementation Strategy
+
+### MVP First (User Story 1 Only)
+
+1. Complete Phase 1: Setup (basic project structure)
+2. Complete Phase 2: Foundational (types, flat itinerary data, App container)
+3. Complete Phase 3: User Story 1 (map + sidebar browsing)
+4. **STOP and VALIDATE**: Verify core browsing works independently
+5. Deploy basic MVP
+
+### Incremental Delivery
+
+1. Setup + Foundational → Foundation ready
+2. Add US1 (Browse) → Test independently → Deploy MVP
+3. Add US2 (Regions) → Test independently → Deploy enhancement
+4. Add US3 (Details) → Test independently → Deploy final feature
+5. Decommission old code → Polish → Deploy polished version
+
+### Parallel Team Strategy
+
+With multiple developers:
+
+1. Team completes Setup + Foundational together
+2. Once Foundational is done:
+   - Developer A: User Story 1 (map + sidebar)
+   - Developer B: User Story 2 (region logic + clustering)
+   - Developer C: User Story 3 (detail panel)
+3. Stories complete and integrate with existing app
+4. Team reconvenes for decommissioning and Phase 7 (Polish)
+
+---
+
+## Notes
+
+- [P] tasks can run in parallel (different files, no blocking dependencies)
+- [Story] labels map each task to specific user story for clear traceability
+- Each user story should be independently completable and testable
+- Current components exist but must be updated for the flat stop model (no nested children)
+- Commit after each task or logical group
+- Stop at any checkpoint to validate story independently
+- SVG projection map is acceptable; Google Maps API integration can be an enhancement
+- Hard-coded itinerary data keeps the site static-deployable
+
