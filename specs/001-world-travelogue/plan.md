@@ -7,7 +7,7 @@
 
 ## Summary
 
-Build a static travelogue site using Vite and React with hard-coded itinerary data. The application will render a read-only world map experience with a sidebar itinerary, expandable stop details, and optional city-level drilldown while avoiding databases or server-side data storage.
+Build a static travelogue site using Vite and React with hard-coded itinerary data. The application will render a read-only Google Maps-based world map experience with a sidebar itinerary, expandable stop details, and optional city-level drilldown while avoiding databases or server-side data storage.
 
 ## Technical Context
 
@@ -18,12 +18,12 @@ Build a static travelogue site using Vite and React with hard-coded itinerary da
 -->
 
 **Language/Version**: TypeScript with React 18 and Vite
-**Primary Dependencies**: React, React DOM, Vite, optional lightweight SVG world-map helper packages
+**Primary Dependencies**: React, React DOM, Vite, Google Maps JavaScript API
 **Storage**: N/A (hard-coded data model in source files)
 **Testing**: Manual browser testing for map interaction, responsive layout, and accessibility; Vitest can be added later for component tests
 **Target Platform**: Static web application for modern desktop, tablet, and mobile browsers
 **Project Type**: Frontend-only static web application
-**Performance Goals**: initial page load under 3 seconds on standard connections; keep bundle size small and avoid runtime external map tile requests
+**Performance Goals**: initial page load under 3 seconds on standard connections; keep bundle size small while using Google Maps efficiently
 **Constraints**: no backend database, no server-side rendering, no dynamic runtime data source; all content is compiled into the static build
 **Scale/Scope**: roughly 50 major travel stops and hierarchical city drilldown within a single SPA
 

@@ -33,6 +33,7 @@ npm run preview
 ## Notes
 
 - All itinerary content is hard-coded in `src/data/itinerary.ts`.
-- The interactive world map is implemented in `src/components/MapView.tsx`.
+- The interactive world map is planned to use the Google Maps JavaScript API in `src/components/MapView.tsx`.
 - `src/components/Sidebar.tsx` and `src/components/StopDetail.tsx` provide itinerary and stop detail interactions.
+- Future geocoding may leverage Google Location Search for stop lookup and location search features.
 - Use `specs/001-world-travelogue/data-model.md` for the data shape and `specs/001-world-travelogue/research.md` for design decisions.

@@ -25,4 +25,4 @@ npm run preview
 
 - All itinerary content is hard-coded in `src/data/itinerary.ts`.
 - The project is designed as a static site with no database or server-side rendering.
-- Map and itinerary interactions are implemented in React using a simple world projection.
+- The world map experience is planned to use the Google Maps JavaScript API, with future geocoding via Google Location Search.

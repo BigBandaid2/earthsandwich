@@ -67,6 +67,7 @@ const tokyo: Stop = {
 - `src/data/itinerary.ts` will export the itinerary data structure.
 - `src/components/MapView.tsx` will render markers from the stop coordinate data.
 - `src/components/StopDetail.tsx` will render optional images and blog content when present.
+- Coordinate values may eventually be sourced from Google Location Search geocoding.
 
 ## Notes
 
