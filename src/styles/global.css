@@ -120,168 +120,61 @@ button {
 
 /* ─── Map Canvas ─── */
 
+/* Fills the entire map-pane; Google Maps renders its own background. */
 .map-canvas {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(160deg, #0c4a6e 0%, #075985 30%, #0e7490 60%, #164e63 100%);
-}
-
-.map-canvas-trip {
-  background: linear-gradient(160deg, #0c4a6e 0%, #0369a1 40%, #0e7490 70%, #1e3a5f 100%);
-}
-
-.map-canvas-region {
-  background: linear-gradient(160deg, #1a2744 0%, #1e3a5f 40%, #1e4060 70%, #152c50 100%);
-}
-
-.map-svg {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
 }
 
-/* Route lines (trip overview) */
-.route-segment {
-  stroke: #60a5fa;
-  stroke-width: 0.35;
-  stroke-linecap: round;
-}
+/* ─── Google Maps Custom Markers ─── */
 
-.route-segment.solid {
-  opacity: 0.9;
-}
+/*
+ * AdvancedMarker anchors its content at the bottom-center of the element.
+ * translateY(50%) shifts the element down by half its height so the visual
+ * center of the dot lands on the map coordinate.
+ */
 
-.route-segment.dashed {
-  opacity: 0.5;
-}
-
-/* ─── Region Markers (trip map) ─── */
-
-.region-marker {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  border: none;
-  padding: 0;
-  background: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.region-marker::before {
-  content: '';
-  display: block;
+.gm-region-dot {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.8);
-  transition: transform 0.15s;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transform: translateY(50%);
+  transition: box-shadow 0.15s;
 }
 
-.region-marker.visited::before {
-  background: #22c55e;
+.gm-region-dot:hover {
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2);
 }
 
-.region-marker.planned::before {
-  background: #94a3b8;
-}
+.gm-region-dot.visited { background: #22c55e; }
+.gm-region-dot.planned { background: #94a3b8; }
 
-.region-marker.active-region::before {
-  background: #ef4444;
+.gm-region-dot.active {
   width: 18px;
   height: 18px;
+  background: #ef4444;
+  border-color: rgba(255, 255, 255, 0.9);
 }
 
-.region-marker:hover::before,
-.region-marker:focus::before {
-  transform: scale(1.3);
-}
-
-.active-pin {
-  font-size: 1.4rem;
-  line-height: 1;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
-}
-
-.region-marker-label {
-  background: rgba(15, 23, 42, 0.85);
-  color: #f8fafc;
-  font-size: 0.65rem;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 999px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-}
-
-.region-marker:hover .region-marker-label,
-.region-marker:focus .region-marker-label {
-  opacity: 1;
-}
-
-/* ─── Stop Markers (region map) ─── */
-
-.stop-marker {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  border: none;
-  padding: 0;
-  background: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.stop-marker::before {
-  content: '';
-  display: block;
+.gm-stop-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.7);
-  transition: transform 0.15s;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transform: translateY(50%);
+  transition: box-shadow 0.15s;
 }
 
-.stop-marker.visited::before {
-  background: #22c55e;
+.gm-stop-dot:hover {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
 }
 
-.stop-marker.planned::before {
-  background: #94a3b8;
-}
-
-.stop-marker.open::before {
-  background: #f97316;
-  transform: scale(1.4);
-}
-
-.stop-marker:hover::before,
-.stop-marker:focus::before {
-  transform: scale(1.3);
-}
-
-.stop-marker-label {
-  background: rgba(15, 23, 42, 0.85);
-  color: #f8fafc;
-  font-size: 0.6rem;
-  padding: 2px 5px;
-  border-radius: 999px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-}
-
-.stop-marker:hover .stop-marker-label,
-.stop-marker:focus .stop-marker-label {
-  opacity: 1;
-}
+.gm-stop-dot.visited { background: #22c55e; }
+.gm-stop-dot.planned { background: #94a3b8; }
+.gm-stop-dot.open    { background: #f97316; }
 
 /* ─── Sidebar Pane (28%) ─── */
 

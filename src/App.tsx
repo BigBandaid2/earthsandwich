@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { APIProvider } from '@vis.gl/react-google-maps';
 import { miscellaneousAdventures } from './data/miscellaneous-adventures';
 import { groupStopsByRegion } from './utils/regionUtils';
 import type { Trip } from './data/types';
@@ -71,6 +72,7 @@ function App() {
   };
 
   return (
+    <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY ?? ''}>
     <div className="app-shell">
       <div className="view-layout">
         <div className="map-pane">
@@ -146,6 +148,7 @@ function App() {
         />
       )}
     </div>
+    </APIProvider>
   );
 }
 

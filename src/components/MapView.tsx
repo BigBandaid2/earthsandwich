@@ -1,6 +1,10 @@
+import { useEffect, useMemo } from 'react';
+import { Map, AdvancedMarker, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
 import type { RegionGroup } from '../utils/regionUtils';
-import { equirectangularProject, getActiveRegion, isSegmentSolid } from '../utils/regionUtils';
+import { getActiveRegion, isSegmentSolid } from '../utils/regionUtils';
 import type { ViewMode } from '../App';
+
+const MAP_ID = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID as string | undefined;
 
 interface WorldMapProps {
   regionGroups: RegionGroup[];
@@ -9,6 +13,80 @@ interface WorldMapProps {
   openStopId: string | null;
   onSelectRegion: (regionCode: string) => void;
   onOpenStop: (stopId: string, contextStopIds: string[]) => void;
+}
+
+// Renders a geodesic polyline. Solid or dashed, using the imperative Maps API.
+function MapPolyline({
+  path,
+  solid,
+  strokeColor,
+  strokeWeight = 2.5,
+}: {
+  path: Array<{ lat: number; lng: number }>;
+  solid: boolean;
+  strokeColor: string;
+  strokeWeight?: number;
+}) {
+  const map = useMap();
+  const mapsLib = useMapsLibrary('maps');
+
+  useEffect(() => {
+    if (!map || !mapsLib) return;
+
+    const polyline = new mapsLib.Polyline({
+      map,
+      path,
+      geodesic: true,
+      ...(solid
+        ? { strokeColor, strokeOpacity: 1.0, strokeWeight }
+        : {
+            strokeOpacity: 0,
+            icons: [
+              {
+                icon: {
+                  path: 'M 0,-1 0,1',
+                  strokeOpacity: 1,
+                  strokeWeight: 2,
+                  strokeColor,
+                  scale: strokeWeight,
+                },
+                offset: '0',
+                repeat: '12px',
+              },
+            ],
+          }),
+    });
+
+    return () => polyline.setMap(null);
+  }, [map, mapsLib, path, solid, strokeColor, strokeWeight]);
+
+  return null;
+}
+
+// Fits the map viewport to a set of coordinates once the map and library are ready.
+function FitBounds({
+  coords,
+  padding = 60,
+}: {
+  coords: Array<{ lat: number; lng: number }>;
+  padding?: number;
+}) {
+  const map = useMap();
+  const mapsLib = useMapsLibrary('maps');
+
+  useEffect(() => {
+    if (!map || !mapsLib || coords.length === 0) return;
+    if (coords.length === 1) {
+      map.setCenter(coords[0]);
+      map.setZoom(12);
+      return;
+    }
+    const bounds = new google.maps.LatLngBounds();
+    coords.forEach((c) => bounds.extend(c));
+    map.fitBounds(bounds, padding);
+  }, [map, mapsLib, coords, padding]);
+
+  return null;
 }
 
 function WorldMap({
@@ -23,7 +101,9 @@ function WorldMap({
   const activeGroup = regionGroups.find((g) => g.region.code === activeRegionCode) ?? null;
 
   if (viewMode === 'region' && activeGroup) {
-    return <RegionMap group={activeGroup} openStopId={openStopId} onOpenStop={onOpenStop} />;
+    return (
+      <RegionMap group={activeGroup} openStopId={openStopId} onOpenStop={onOpenStop} />
+    );
   }
 
   return (
@@ -35,7 +115,7 @@ function WorldMap({
   );
 }
 
-// Trip overview map: region markers connected by route line
+// Trip overview: world map with region markers and route line.
 function TripMap({
   regionGroups,
   activeRegion,
@@ -45,53 +125,57 @@ function TripMap({
   activeRegion: RegionGroup | null;
   onSelectRegion: (code: string) => void;
 }) {
-  const routeSegments = regionGroups.slice(0, -1).map((from, i) => {
-    const to = regionGroups[i + 1];
-    const p1 = equirectangularProject(from.region.coords);
-    const p2 = equirectangularProject(to.region.coords);
-    return { p1, p2, solid: isSegmentSolid(from, to), key: `${from.region.code}-${to.region.code}` };
-  });
+  const regionCoords = useMemo(
+    () => regionGroups.map((g) => g.region.coords),
+    [regionGroups],
+  );
 
   return (
     <div className="map-canvas map-canvas-trip" aria-label="World trip overview map">
-      <svg className="map-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        {routeSegments.map((seg) => (
-          <line
-            key={seg.key}
-            x1={seg.p1.x}
-            y1={seg.p1.y}
-            x2={seg.p2.x}
-            y2={seg.p2.y}
-            className={`route-segment ${seg.solid ? 'solid' : 'dashed'}`}
-            strokeDasharray={seg.solid ? undefined : '0.8 0.6'}
-          />
-        ))}
-      </svg>
+      <Map
+        mapId={MAP_ID}
+        defaultCenter={{ lat: 20, lng: -30 }}
+        defaultZoom={2}
+        gestureHandling="greedy"
+        style={{ width: '100%', height: '100%' }}
+      >
+        <FitBounds coords={regionCoords} padding={80} />
 
-      {regionGroups.map((group) => {
-        const { x, y } = equirectangularProject(group.region.coords);
-        const isActive = activeRegion?.region.code === group.region.code;
-        const isVisited = group.overallStatus !== 'planned';
+        {regionGroups.slice(0, -1).map((from, i) => {
+          const to = regionGroups[i + 1];
+          const solid = isSegmentSolid(from, to);
+          return (
+            <MapPolyline
+              key={`${from.region.code}-${to.region.code}`}
+              path={[from.region.coords, to.region.coords]}
+              solid={solid}
+              strokeColor={solid ? '#60a5fa' : '#94a3b8'}
+            />
+          );
+        })}
 
-        return (
-          <button
-            key={group.region.code}
-            type="button"
-            className={`region-marker ${isVisited ? 'visited' : 'planned'} ${isActive ? 'active-region' : ''}`}
-            style={{ left: `${x}%`, top: `${y}%` }}
-            aria-label={`${group.region.name}, ${group.region.country}`}
-            onClick={() => onSelectRegion(group.region.code)}
-          >
-            {isActive && <span className="active-pin" aria-hidden="true">📍</span>}
-            <span className="region-marker-label">{group.region.name}</span>
-          </button>
-        );
-      })}
+        {regionGroups.map((group) => {
+          const isActive = activeRegion?.region.code === group.region.code;
+          const isVisited = group.overallStatus !== 'planned';
+          return (
+            <AdvancedMarker
+              key={group.region.code}
+              position={group.region.coords}
+              title={`${group.region.name}, ${group.region.country}`}
+              onClick={() => onSelectRegion(group.region.code)}
+            >
+              <div
+                className={`gm-region-dot${isVisited ? ' visited' : ' planned'}${isActive ? ' active' : ''}`}
+              />
+            </AdvancedMarker>
+          );
+        })}
+      </Map>
     </div>
   );
 }
 
-// Region drill-down map: stop markers connected by light dashed route
+// Region drill-down: zoomed map with individual stop markers.
 function RegionMap({
   group,
   openStopId,
@@ -101,68 +185,40 @@ function RegionMap({
   openStopId: string | null;
   onOpenStop: (stopId: string, contextStopIds: string[]) => void;
 }) {
-  const stopIds = group.stops.map((s) => s.id);
-
-  // Compute bounding box to center the region view
-  const lats = group.stops.map((s) => s.coords.lat);
-  const lngs = group.stops.map((s) => s.coords.lng);
-  const minLat = Math.min(...lats);
-  const maxLat = Math.max(...lats);
-  const minLng = Math.min(...lngs);
-  const maxLng = Math.max(...lngs);
-
-  // Padding in degrees
-  const padLat = Math.max((maxLat - minLat) * 0.3, 0.5);
-  const padLng = Math.max((maxLng - minLng) * 0.3, 0.5);
-
-  const viewMinLat = minLat - padLat;
-  const viewMaxLat = maxLat + padLat;
-  const viewMinLng = minLng - padLng;
-  const viewMaxLng = maxLng + padLng;
-
-  const projectLocal = (coords: { lat: number; lng: number }) => {
-    const x = ((coords.lng - viewMinLng) / (viewMaxLng - viewMinLng)) * 100;
-    const y = ((viewMaxLat - coords.lat) / (viewMaxLat - viewMinLat)) * 100;
-    return { x, y };
-  };
-
-  const routePoints = group.stops
-    .map((s) => {
-      const { x, y } = projectLocal(s.coords);
-      return `${x},${y}`;
-    })
-    .join(' ');
+  const stopCoords = useMemo(() => group.stops.map((s) => s.coords), [group.stops]);
+  const stopIds = useMemo(() => group.stops.map((s) => s.id), [group.stops]);
 
   return (
     <div className="map-canvas map-canvas-region" aria-label={`${group.region.name} region map`}>
-      <svg className="map-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        <polyline
-          points={routePoints}
-          className="region-route-line"
-          fill="none"
-          stroke="#93c5fd"
-          strokeWidth="0.8"
-          strokeDasharray="1.5 1"
+      <Map
+        mapId={MAP_ID}
+        defaultCenter={group.region.coords}
+        defaultZoom={12}
+        gestureHandling="greedy"
+        style={{ width: '100%', height: '100%' }}
+      >
+        <FitBounds coords={stopCoords} padding={60} />
+
+        <MapPolyline
+          path={stopCoords}
+          solid={false}
+          strokeColor="#93c5fd"
+          strokeWeight={1.5}
         />
-      </svg>
 
-      {group.stops.map((stop) => {
-        const { x, y } = projectLocal(stop.coords);
-        const isOpen = stop.id === openStopId;
-
-        return (
-          <button
+        {group.stops.map((stop) => (
+          <AdvancedMarker
             key={stop.id}
-            type="button"
-            className={`stop-marker ${stop.status} ${isOpen ? 'open' : ''}`}
-            style={{ left: `${x}%`, top: `${y}%` }}
-            aria-label={stop.location}
+            position={stop.coords}
+            title={stop.location}
             onClick={() => onOpenStop(stop.id, stopIds)}
           >
-            <span className="stop-marker-label">{stop.location.split(',')[0]}</span>
-          </button>
-        );
-      })}
+            <div
+              className={`gm-stop-dot ${stop.status}${stop.id === openStopId ? ' open' : ''}`}
+            />
+          </AdvancedMarker>
+        ))}
+      </Map>
     </div>
   );
 }
