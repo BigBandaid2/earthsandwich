@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "PowerShell(.specify/scripts/powershell/setup-plan.ps1 -Json)",
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "Bash(npm run *)",
+      "Bash(npx vite *)"
     ]
   }
 }

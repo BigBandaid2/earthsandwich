@@ -1,4 +1,3 @@
-export type StopType = 'trip' | 'city' | 'site';
 export type StopStatus = 'visited' | 'planned';
 
 export interface Coordinates {
@@ -6,21 +5,43 @@ export interface Coordinates {
   lng: number;
 }
 
-export interface Stop {
-  id: string;
-  type: StopType;
-  title: string;
+export interface InstagramPost {
+  type: 'instagram';
+  image: string;
   caption: string;
-  date: string;
-  coords: Coordinates;
-  status: StopStatus;
-  image?: string;
-  blog?: string;
-  details?: string;
-  children?: Stop[];
+  instagramId?: string;
+  shortcode?: string;
 }
 
-export interface Itinerary {
+export interface SubstackPost {
+  type: 'substack';
+  title: string;
+  subtitle?: string;
+  body: string;
+}
+
+export type StopPost = InstagramPost | SubstackPost;
+
+export interface Stop {
+  id: string;
+  date: string;
+  location: string;
+  coords: Coordinates;
+  status: StopStatus;
+  regionCode: string;
+  post: StopPost;
+}
+
+export interface Region {
+  code: string;
+  name: string;
+  airportName: string;
+  country: string;
+  coords: Coordinates;
+}
+
+export interface Trip {
+  id: string;
   title: string;
   description: string;
   stops: Stop[];

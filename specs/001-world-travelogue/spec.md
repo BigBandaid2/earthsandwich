@@ -15,46 +15,46 @@ Here is a site online that is already very close to what I am envisioning in pre
 
 ### User Story 1 - Browse trip progress on map (Priority: P1)
 
-Travelers and friends/family open the site to see the current round-the-world itinerary, view visited and planned stops on an interactive world map, and use the sidebar to jump to a stop.
+Travelers and friends/family open the site to see the current round-the-world itinerary, view visited and planned regions on an interactive world map, and use the sidebar to jump to a region.
 
 **Why this priority**: This is the core experience that makes the travelogue useful and engaging for both the travelers and their audience.
 
-**Independent Test**: Open the site and verify the world map is visible, stops are plotted, and the sidebar lists major trip stops.
+**Independent Test**: Open the site and verify the world map is visible, region markers are plotted, and the sidebar lists regions grouped by visited/planned status.
 
 **Acceptance Scenarios**:
 
-1. **Given** the site is loaded, **When** the visitor views the homepage, **Then** the world map shows the overall route with visited and planned stops clearly distinguished.
-2. **Given** the site is loaded, **When** the visitor reviews the sidebar, **Then** the sidebar displays the itinerary with location name, caption, and date for each major stop.
+1. **Given** the site is loaded, **When** the visitor views the homepage, **Then** the world map shows the overall route with visited and planned regions clearly distinguished, and the active region (if any) is visually called out.
+2. **Given** the site is loaded, **When** the visitor reviews the sidebar, **Then** the sidebar displays regions grouped into "Visited" and "Planned" sections with region name, country, and date range for each.
 
 ---
 
-### User Story 2 - Explore region clusters on zoomed-out map (Priority: P2)
+### User Story 2 - Explore a region's stops (Priority: P2)
 
-A visitor zooms out on the map and sees nearby stops clustered by dynamically derived regions, where each region is based on the nearest international airport.
+A visitor selects a region from the trip overview to see all stops within that region on a zoomed map, and uses the region sidebar to browse individual stop posts.
 
-**Why this priority**: Region clustering keeps the itinerary legible at continental or country level while preserving the full stop list.
+**Why this priority**: Region drill-down is the primary path from the high-level trip view to individual travel content, making it the key navigation layer between overview and stop detail.
 
-**Independent Test**: Zoom the map out and verify region clusters appear; select a region to see the stops it contains.
+**Independent Test**: From the trip overview, click "Expand Region →" on any region tile and confirm the map zooms to that region's stops, the sidebar switches to region-level view, and individual stop posts are accessible.
 
 **Acceptance Scenarios**:
 
-1. **Given** the visitor is viewing the map at a zoomed-out level, **When** nearby stops are close together, **Then** the stops are grouped into region clusters derived from the nearest international airport.
-2. **Given** a region cluster is visible, **When** the visitor selects it, **Then** the interface reveals the stops assigned to that region without altering the underlying flat itinerary.
+1. **Given** the trip overview is displayed, **When** the visitor clicks "Expand Region →" on a region tile, **Then** the map shows only that region's stops and the sidebar shows that region's stop posts.
+2. **Given** the region view is displayed, **When** the visitor clicks on a different region's collapsed header in the sidebar, **Then** that region becomes active, the map re-focuses to it, and the previous region collapses.
 
 ---
 
 ### User Story 3 - Inspect a single stop (Priority: P3)
 
-A visitor clicks on a stop in the itinerary or on the map and sees its details, including location, caption, date, optional image, and optional travelogue entry.
+A visitor opens a stop post and sees its full content: an Instagram post shows the photo and caption, while a Substack post shows the article title and long-form text.
 
-**Why this priority**: Detailed stop summaries are how friends and family connect with the travel story.
+**Why this priority**: Individual stop content is how friends and family connect with the travel story.
 
-**Independent Test**: Click a stop in the itinerary or on the map and confirm the stop detail panel appears with the required fields.
+**Independent Test**: Click a stop post tile in the region sidebar and confirm the detail pop-up opens with all expected content fields for that post type.
 
 **Acceptance Scenarios**:
 
-1. **Given** a stop is displayed, **When** the visitor selects that stop, **Then** the detail view shows location, caption, date, and any image or long-form blog text available.
-2. **Given** a stop has no image or blog post, **When** the visitor opens the detail view, **Then** the page still shows the required fields and gracefully omits the missing optional content.
+1. **Given** a stop is visible in the sidebar, **When** the visitor clicks the stop tile, **Then** the detail pop-up appears showing all available fields for that post type.
+2. **Given** a stop has no optional content (no image or no long-form text), **When** the visitor opens the detail pop-up, **Then** the required fields display and the missing optional fields are omitted gracefully.
 
 ---
 
@@ -62,115 +62,122 @@ A visitor clicks on a stop in the itinerary or on the map and sees its details, 
 
 - What happens when a stop has only a caption and date but no image or blog post?
 - How does the site behave when the itinerary includes roughly 50 stops and the map becomes dense?
-- How does the site display a region cluster with multiple stops sharing the same nearest international airport?
-- How does the site handle a stop with a very long blog post or caption text?
+- How does the site display a region that contains a mix of Instagram and Substack posts?
+- How does the site handle a stop with a very long caption or article body?
+- What does the sidebar show when a trip has no visited stops at all (all planned)?
+- How is the active region determined when the last visited region is not the final region in the sequence?
+- How is the region end date calculated for the last region in a trip, which has no subsequent region?
+- What happens if a trip contains only one region?
+- What happens when a visitor opens the stop detail pop-up and navigates past the first or last stop?
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-- **FR-001**: The system MUST display a world map with the round-the-world route and all major stops plotted, distinguishing between visited and planned stops.
-- **FR-002**: The system MUST include a sidebar itinerary listing all major stops with location, caption, and date.
-- **FR-003**: The system MUST provide a detail view for each stop that includes location, caption, date, optional image, and optional long-form blog content.
-- **FR-004**: The system MUST support region clustering derived from each stop’s nearest international airport when the map is zoomed out.
-- **FR-005**: The system MUST treat regions as dynamic groupings, not explicit itinerary stops; every stop must belong to one region based on geocoded coordinates.
-- **FR-006**: The system MUST allow visitors to select a region cluster and inspect the stops assigned to that region.
-- **FR-007**: The system MUST render the site as read-only content for this version, with all itinerary and travel content hard-coded.
-- **FR-008**: The system MUST allow visitors to expand or collapse blurbs, pictures, and travelogue entries without requiring content editing.
-- **FR-009**: The system MUST gracefully handle stops missing optional images or blog posts by displaying only available content.
+- **FR-001**: The system MUST display an interactive world map showing the full trip route and one region marker per region, distinguishing visually between visited and planned regions.
+- **FR-002**: The system MUST include a trip feed sidebar that groups regions into two collapsible sections — "Visited" and "Planned". If all regions in the trip share the same status, only that section is shown.
+- **FR-003**: The system MUST provide a stop detail pop-up whose content and layout depend on post type: Instagram posts display location, photo, and caption; Substack posts display title, subtitle, and long-form article body.
+- **FR-004**: The system MUST group stops into regions derived from the nearest international airport and show one region marker per region on the world map rather than individual stop markers.
+- **FR-005**: The system MUST treat regions as dynamic groupings computed from stop coordinates; they are not explicit itinerary entries and carry no separately stored content.
+- **FR-006**: The system MUST allow visitors to navigate from the trip overview to a region-level view by selecting a region tile, where they can browse individual stop posts on a zoomed map.
+- **FR-007**: The system MUST render the site as read-only; all content is hard-coded and no visitor input is saved.
+- **FR-008**: The system MUST allow visitors to expand and collapse region sections in the trip feed without leaving the current view.
+- **FR-009**: The system MUST gracefully handle stops with missing optional content by displaying only the fields that are present.
+- **FR-010**: The system MUST support multiple trip itineraries and show the most recent trip by default on page load; visitors MUST be able to switch between trips.
+- **FR-011**: The system MUST determine the "active region" of a trip as the last region in sequence that contains at least one visited stop. If all regions are visited or none are visited, no active region is designated.
+- **FR-012**: The system MUST render the route line between regions as a solid line for any segment where at least one adjacent region has visited stops, and as a dashed line for segments where both adjacent regions have only planned stops.
+- **FR-013**: The system MUST support two stop post types — Instagram (photo, caption, location, date) and Substack (title, subtitle, long-form text). Each type has a distinct data shape and display format.
+- **FR-014**: The system MUST calculate a region's date range as: start date = date of the first stop in the region; end date = the later of (date of the last stop in the region) or (one day before the first stop of the next region in the trip sequence).
+- **FR-015**: The system MUST enforce that only one region is active at a time in the region view; activating a new region collapses the previously active one and re-centers the map on the newly active region's stops.
+- **FR-016**: The system MUST allow visitors to open the stop detail pop-up from any of these entry points: an Instagram photo thumbnail in the trip overview sidebar, an Instagram or Substack content tile in the region sidebar, or a stop marker on the region map.
 
 ### Key Entities *(include if feature involves data)*
 
-- **Trip Itinerary**: Represents the round-the-world journey as a flat sequence of major stops.
-- **Stop**: Represents a single itinerary entry with location, caption, date, optional image, optional long-form blog, visited/planned status, and region membership.
-- **Region**: Represents a dynamic grouping of nearby stops derived from the nearest international airport; regions are used for clustering on the map and navigation, but are not stored as explicit itinerary entries.
-- **Content Panel**: Represents expandable/display components for blurbs, pictures, and long-form journal entries.
+- **Trip Itinerary**: A named journey composed of an ordered sequence of stops. Multiple itineraries coexist in the site; the most recent by date is shown by default. Each itinerary has a title, description, and an ordered list of stops.
+- **Stop**: A single itinerary entry belonging to exactly one region. Each stop has a date, location string, geocoded coordinates, visited/planned status, and a post type (Instagram or Substack).
+- **Instagram Post**: A stop post type sourced from an Instagram post. Contains: photo URL, caption text, location string, and timestamp. Identified by Instagram media ID and shortcode.
+- **Substack Post**: A stop post type sourced from a Substack article. Contains: title, subtitle, and long-form body text.
+- **Region**: A dynamic grouping of nearby stops derived from the nearest international airport. Computed from stop coordinates at build time; not stored as an explicit entity. Characterized by an airport code, region name, country, and reference coordinates. Date range is derived from the region's stops and the subsequent region's start date (see FR-014).
 
 ## UI Design
 
 **Wireframe reference**: [specs/001-world-travelogue/wireframes/travelogue-wireframes.svg](specs/001-world-travelogue/wireframes/travelogue-wireframes.svg)
 
-The interface has three distinct views that visitors navigate between. Views 1 and 2 share a persistent split layout (map canvas + sidebar); View 3 is a full-page reading layout.
+The interface has three distinct views. Views 1 and 2 share a persistent split layout (map canvas + sidebar). View 3 is a modal pop-up overlay over whichever view is current.
 
 ### View 1: Trip Overview (Continent-Level Map)
 
-The main landing page. The screen is split into a map canvas (approximately 72% width) and a chronological trip feed sidebar (approximately 28% width).
+The main landing page. Screen splits into a map canvas (~72% width) on the left and a trip feed sidebar (~28% width) on the right.
 
 **Map canvas**:
-- Displays the complete round-the-world route as a dashed line connecting all region markers
-- Region markers use a filled gold star for visited regions, an outlined star for planned regions, and a red pulsing circle for the current location
-- Floating card in the top-left: trip title with a hamburger menu and share button
-- Floating legend in the bottom-left: identifies visited, current, and upcoming marker styles
-- Zoom controls (+/−) anchored to the bottom-right
+- Shows the trip route as a line connecting region markers. Visited segments render as a solid line; planned segments render as a dashed line (see FR-012).
+- Each region uses a large filled dot as its marker. The active region uses a teardrop location pin in red.
+- Floating card top-left: trip title and hamburger icon. Clicking the hamburger opens a trip selector list.
+- Zoom controls anchored bottom-right.
+- At this zoom level the map shows city labels and geopolitical boundaries only; road and terrain detail is hidden.
 
 **Trip feed sidebar**:
-- Header shows the trip name label, current day counter (e.g., "Day 18 of 60"), and a live status indicator
-- Body is a scrollable, reverse-chronological feed; each entry shows:
-  - Marker icon (filled gold star for visited, red dot for current)
-  - Region or city name and date
-  - 1–2 line caption
-  - Horizontal strip of photo thumbnails with an overflow count badge (e.g., "+5")
-  - "Explore city →" pill button that navigates to the region-level view
-- The current stop is labeled "Current stop" and distinguished with a red dot
+- Two collapsible sections with headers: "Visited" (above) and "Planned" (below). Sections irrelevant to the current trip are hidden (see FR-002).
+- Within each section, region tiles are listed in reverse-chronological order with no border between tiles.
+- Each region tile contains:
+  - Marker icon matching the map dot, connected to adjacent tiles by a vertical line (solid or dashed, mirroring the route logic).
+  - Region name, country, start date, and end date.
+  - A horizontal row of up to four Instagram photo thumbnails; if more than four exist, a "+X" overlay appears on the fourth.
+  - Up to four Substack post tiles, each showing a small Substack icon, post title, and a 3-line text preview; if more than four exist, a "+X" overlay appears on the fourth.
+  - "Expand Region →" pill button at the bottom of the tile.
 
-### View 2: Region-Level Map (City/Region Drill-Down)
+### View 2: Region-Level Map (Region Drill-Down)
 
-Accessed by selecting "Explore city →" from the trip overview. The same split layout is retained but the map is zoomed to show a single region at street level.
+Accessed by selecting "Expand Region →" from the trip overview. Same split layout; map zooms to the selected region.
 
 **Map canvas**:
-- Shows street grid, waterways, and park areas for spatial context
-- Stops in the region are represented by numbered circle pins (1, 2, 3…):
-  - Visited stops: filled red circles
-  - Planned stops: dashed outlined circles
-- A dashed red line traces the route between visited stops in order
-- Floating card in the top-left: back arrow, "BACK TO TRIP" label, and region/city name
-- Bottom-left legend: visited count and planned count for this region
+- Shows full map detail: roads, terrain, waterways, and parks.
+- Each stop in the region is shown as a standard dot marker.
+- A dashed light-blue route line connects stops in chronological order.
+- Floating card top-left: back arrow and "BACK TO TRIP" label.
 
 **Region sidebar**:
-- Header shows the city/region name, date range, "X of Y sites" progress, and a red horizontal progress bar
-- Each stop entry shows sequence number, name, date, caption, and a photo thumbnail strip
-- The most recent or current stop is highlighted with a warm-tinted card and a "TODAY" badge; it includes a "Read full entry →" link
-- Upcoming planned stops appear below a divider in a muted visual style
+- The active region is expanded: its header shows region name and date range, followed by its stop tiles in reverse-chronological order.
+- All other regions in the trip appear as collapsed header rows below; clicking a header activates that region (see FR-015).
+- Each stop tile shows:
+  - Marker icon with a vertical connector line between adjacent tiles.
+  - Region name, country, and date.
+  - **Instagram stop tile**: small Instagram icon, caption text (up to 3 lines with ellipsis if longer), and a single full-width photo below the caption.
+  - **Substack stop tile**: small Substack icon, post title, and a 3-line text preview.
 
-### View 3: Stop Detail / Full Post
+### View 3: Stop Detail Pop-Up
 
-Accessed by selecting "Read full entry →" from the region view. Full-page reading layout with no map canvas.
+Opens as a modal overlay that dims the background and occupies approximately 80% of the screen width. Entry points are defined in FR-016.
 
-**Top navigation bar**:
-- Left: "← Back to map" link returning to the trip overview
-- Center: trip title
-- Right: current day counter
+**Overlay dim area**:
+- Left side: left-arrow button at vertical mid-point to navigate to the previous stop post.
+- Right side: right-arrow button at vertical mid-point to navigate to the next stop post. X button at the top-right to close.
 
-**Main content column** (~61% of page width, centered):
-- Breadcrumb navigation showing Trip / Region / Post title
-- Article title and subtitle/tagline
-- Author name, date, estimated read time, and location label
-- Full-width hero image with caption
-- Long-form blog body with inline section headings and side-by-side inline image pairs
-
-**Right sidebar** (~15% of page width):
-- "MORE FROM [REGION]" section: 2–3 related stop cards, each with thumbnail, title, and read time
-- "ON THE MAP" mini-map thumbnail pinpointing the stop's location within the region
-
-**Bottom navigation**:
-- Previous stop card (← PREVIOUS) and next stop card (NEXT →), each showing the stop title and date
+**Main content area**:
+- Breadcrumb navigation: Trip / Region / Location · Date.
+- **Instagram post layout**: location as heading, caption as subheading, hero image below.
+- **Substack post layout**: article title as heading, subtitle as subheading, long-form body text with inline section headings below.
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
-- **SC-001**: Visitors can identify the current itinerary and route on the map within 3 interactions.
-- **SC-002**: The site displays at least 50 major stops across the world without losing map clarity or itinerary access.
-- **SC-003**: At least 95% of major stops show required location, caption, and date metadata.
-- **SC-004**: Visitors can use region clustering and then open a stop detail with no more than two navigation actions.
-- **SC-005**: The site shows optional images or blog entries when present and handles missing optional content without layout failure.
-- **SC-006**: The map remains legible at country/continental zoom levels through region-based clustering.
+- **SC-001**: Visitors can identify the current trip's route and active region on the map within 3 interactions.
+- **SC-002**: The site displays all stops across the world without losing map clarity or sidebar usability.
+- **SC-003**: At least 95% of stops display their required location and date metadata.
+- **SC-004**: Visitors can navigate from the trip overview to a stop's full detail in no more than two interactions.
+- **SC-005**: The site handles stops with missing optional content without layout failure.
+- **SC-006**: The map remains legible at trip level by showing region markers rather than individual stop markers.
+- **SC-007**: Visitors can switch between multiple trip itineraries without a page reload.
 
 ## Assumptions
 
-- The initial release is read-only and does not include content editing or posting workflows.
-- All itinerary and travel content is hard-coded into the site.
-- The site will be delivered as a static web application without server-side dynamic content.
-- Region membership is derived dynamically from each stop’s geocoded coordinates and the nearest international airport.
-- The target audience is travelers and their friends/family who need a visual and narrative summary of the journey.
-- Mobile responsiveness is expected, but the primary focus is the interactive map and itinerary experience on desktop and tablet screens.
+- The initial release is read-only; content editing and posting workflows are out of scope.
+- All itinerary and travel content is hard-coded into the site at build time.
+- The site is delivered as a static web application without server-side dynamic content.
+- Region membership is pre-computed from stop coordinates at build time; no runtime geocoding is performed.
+- Content sources are Instagram (photo posts) and Substack (article posts); other content platforms are out of scope for this version.
+- The target audience is travelers and their friends and family.
+- Mobile responsiveness is expected, but desktop and tablet are the primary target.
+- The map component is provided by a third-party mapping service; zoom behavior, map detail levels, and marker rendering are constrained by that service's capabilities.
+- The active region concept (FR-011) is only meaningful for trips with a mix of visited and planned regions.

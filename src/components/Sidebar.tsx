@@ -1,68 +1,162 @@
-import type { Stop } from '../data/types';
+import type { RegionGroup } from '../utils/regionUtils';
+import { formatDateRange } from '../utils/regionUtils';
+import type { Trip, InstagramPost, Stop } from '../data/types';
 
-interface SidebarProps {
-  stops: Stop[];
-  cityViewId: string | null;
-  cityChildren: Stop[];
-  selectedStopId: string | null;
-  onSelectStop: (stopId: string) => void;
-  onSelectCity: (stopId: string) => void;
-  onExitCityView: () => void;
+interface TripFeedProps {
+  regionGroups: RegionGroup[];
+  trip: Trip;
+  onExpandRegion: (regionCode: string) => void;
+  onOpenStop: (stopId: string, contextStopIds: string[]) => void;
 }
 
-function Sidebar({
-  stops,
-  cityViewId,
-  cityChildren,
-  selectedStopId,
-  onSelectStop,
-  onSelectCity,
-  onExitCityView,
-}: SidebarProps) {
+function TripFeed({ regionGroups, onExpandRegion, onOpenStop }: TripFeedProps) {
+  const visited = regionGroups.filter((g) => g.overallStatus !== 'planned');
+  const planned = regionGroups.filter((g) => g.overallStatus === 'planned');
+
   return (
-    <div className="sidebar">
-      <div className="sidebar-header">
-        <h2>Itinerary</h2>
-        {cityViewId ? (
-          <button type="button" className="secondary-button" onClick={onExitCityView}>
-            Back to world route
-          </button>
-        ) : null}
-      </div>
-      <ul className="stop-list">
-        {stops.map((stop) => (
-          <li key={stop.id}>
-            <button
-              type="button"
-              className={`stop-item ${stop.id === selectedStopId ? 'active' : ''}`}
-              onClick={() => (stop.type === 'city' ? onSelectCity(stop.id) : onSelectStop(stop.id))}
-              aria-pressed={stop.id === selectedStopId}
-            >
-              <span className="stop-title">{stop.title}</span>
-              <span className="stop-meta">{stop.caption}</span>
-              <span className="stop-date">{stop.date}</span>
-            </button>
-            {cityViewId === stop.id && cityChildren.length > 0 ? (
-              <ul className="child-list">
-                {cityChildren.map((child) => (
-                  <li key={child.id}>
-                    <button
-                      type="button"
-                      className={`child-item ${child.id === selectedStopId ? 'active' : ''}`}
-                      onClick={() => onSelectStop(child.id)}
-                      aria-pressed={child.id === selectedStopId}
-                    >
-                      {child.title}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </li>
-        ))}
-      </ul>
+    <div className="trip-feed">
+      {visited.length > 0 && (
+        <section className="feed-section">
+          <h2 className="feed-section-title">Visited</h2>
+          <div className="region-list">
+            {[...visited].reverse().map((group, idx, arr) => (
+              <RegionTile
+                key={group.region.code}
+                group={group}
+                isLast={idx === arr.length - 1}
+                onExpand={() => onExpandRegion(group.region.code)}
+                onOpenStop={onOpenStop}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+      {planned.length > 0 && (
+        <section className="feed-section">
+          <h2 className="feed-section-title">Planned</h2>
+          <div className="region-list">
+            {[...planned].reverse().map((group, idx, arr) => (
+              <RegionTile
+                key={group.region.code}
+                group={group}
+                isLast={idx === arr.length - 1}
+                onExpand={() => onExpandRegion(group.region.code)}
+                onOpenStop={onOpenStop}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
 
-export default Sidebar;
+interface RegionTileProps {
+  group: RegionGroup;
+  isLast: boolean;
+  onExpand: () => void;
+  onOpenStop: (stopId: string, contextStopIds: string[]) => void;
+}
+
+function RegionTile({ group, isLast, onExpand, onOpenStop }: RegionTileProps) {
+  const allStopIds = group.stops.map((s) => s.id);
+  const instagramStops = group.stops.filter((s) => s.post.type === 'instagram');
+  const substackStops = group.stops.filter((s) => s.post.type === 'substack');
+  const visiblePhotos = instagramStops.slice(0, 4);
+  const extraPhotos = instagramStops.length > 4 ? instagramStops.length - 4 : 0;
+  const visibleSubstack = substackStops.slice(0, 4);
+  const extraSubstack = substackStops.length > 4 ? substackStops.length - 4 : 0;
+
+  return (
+    <div className={`region-tile ${isLast ? 'last' : ''}`}>
+      <div className="region-tile-connector">
+        <div className={`connector-dot ${group.overallStatus !== 'planned' ? 'visited' : 'planned'}`} />
+        {!isLast && <div className="connector-line" />}
+      </div>
+
+      <div className="region-tile-content">
+        <div className="region-tile-header">
+          <strong className="region-name">{group.region.name}</strong>
+          <span className="region-country">{group.region.country}</span>
+          <span className="region-dates">{formatDateRange(group.startDate, group.endDate)}</span>
+        </div>
+
+        {visiblePhotos.length > 0 && (
+          <div className="photo-strip">
+            {visiblePhotos.map((stop, idx) => {
+              const post = stop.post as InstagramPost;
+              const isLast4 = idx === 3 && extraPhotos > 0;
+              return (
+                <button
+                  key={stop.id}
+                  type="button"
+                  className="photo-thumb-btn"
+                  onClick={() => onOpenStop(stop.id, allStopIds)}
+                  aria-label={`View: ${post.caption.slice(0, 60)}`}
+                >
+                  <img
+                    src={post.image}
+                    alt={post.caption.slice(0, 60)}
+                    className="photo-thumb"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                  {isLast4 && (
+                    <span className="photo-overflow">+{extraPhotos}</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {visibleSubstack.length > 0 && (
+          <div className="substack-tiles">
+            {visibleSubstack.map((stop, idx) => {
+              const isLast4 = idx === 3 && extraSubstack > 0;
+              return (
+                <SubstackTileItem
+                  key={stop.id}
+                  stop={stop}
+                  extra={isLast4 ? extraSubstack : 0}
+                  onClick={() => onOpenStop(stop.id, allStopIds)}
+                />
+              );
+            })}
+          </div>
+        )}
+
+        <button type="button" className="expand-region-btn" onClick={onExpand}>
+          Expand Region →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function SubstackTileItem({
+  stop,
+  extra,
+  onClick,
+}: {
+  stop: Stop;
+  extra: number;
+  onClick: () => void;
+}) {
+  if (stop.post.type !== 'substack') return null;
+  const post = stop.post;
+
+  return (
+    <button type="button" className="substack-tile" onClick={onClick}>
+      <span className="substack-icon" aria-hidden="true">📝</span>
+      <div className="substack-tile-text">
+        <span className="substack-title">{post.title}</span>
+        {post.subtitle && <span className="substack-preview">{post.subtitle}</span>}
+      </div>
+      {extra > 0 && <span className="substack-overflow">+{extra}</span>}
+    </button>
+  );
+}
+
+export default TripFeed;
