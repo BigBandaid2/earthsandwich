@@ -18,6 +18,11 @@ function StopModal({ stop, stopList, regionGroups, onClose, onNav }: StopModalPr
 
   const regionGroup = regionGroups.find((g) => g.region.code === stop.regionCode);
 
+  const igUrl =
+    stop.post.type === 'instagram'
+      ? `https://www.instagram.com/p/${stop.post.shortcode}/`
+      : null;
+
   const breadcrumb = [
     regionGroup?.region.name ?? stop.regionCode,
     stop.location.split(',')[0],
@@ -47,13 +52,15 @@ function StopModal({ stop, stopList, regionGroups, onClose, onNav }: StopModalPr
           {breadcrumb.map((crumb, i) => (
             <span key={i}>
               {i > 0 && <span className="breadcrumb-sep"> / </span>}
-              {crumb}
+              {i === 2 && igUrl ? (
+                <a href={igUrl} target="_blank" rel="noopener noreferrer" className="breadcrumb-ig-link">{crumb}</a>
+              ) : crumb}
             </span>
           ))}
         </nav>
 
         {stop.post.type === 'instagram' ? (
-          <InstagramPostView stop={stop} />
+          <InstagramPostView stop={stop} igUrl={igUrl!} />
         ) : (
           <SubstackPostView stop={stop} />
         )}
@@ -72,7 +79,7 @@ function StopModal({ stop, stopList, regionGroups, onClose, onNav }: StopModalPr
   );
 }
 
-function InstagramPostView({ stop }: { stop: Stop }) {
+function InstagramPostView({ stop, igUrl }: { stop: Stop; igUrl: string }) {
   if (stop.post.type !== 'instagram') return null;
   const post = stop.post;
 
@@ -80,18 +87,20 @@ function InstagramPostView({ stop }: { stop: Stop }) {
     <article className="post-instagram">
       <h1 className="post-heading">{stop.location}</h1>
       <p className="post-subheading">{post.caption}</p>
-      <img
-        src={post.image}
-        alt={post.caption.slice(0, 80)}
-        className="post-hero-image"
-        onError={(e) => {
-          (e.currentTarget as HTMLImageElement).parentElement!.insertAdjacentHTML(
-            'beforeend',
-            '<p class="image-unavailable">Image no longer available</p>'
-          );
-          (e.currentTarget as HTMLImageElement).style.display = 'none';
-        }}
-      />
+      <a href={igUrl} target="_blank" rel="noopener noreferrer" className="post-hero-link">
+        <img
+          src={post.image}
+          alt={post.caption.slice(0, 80)}
+          className="post-hero-image"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).parentElement!.parentElement!.insertAdjacentHTML(
+              'beforeend',
+              '<p class="image-unavailable">Image no longer available</p>'
+            );
+            (e.currentTarget as HTMLImageElement).parentElement!.style.display = 'none';
+          }}
+        />
+      </a>
     </article>
   );
 }
