@@ -1,84 +1,82 @@
 # Implementation Plan: World Travelogue
 
-**Branch**: `001-world-travelogue` | **Date**: 2026-04-22 | **Spec**: [specs/001-world-travelogue/spec.md]
-**Input**: Feature specification from `/specs/001-world-travelogue/spec.md`
-
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
+**Branch**: `001-world-travelogue` | **Date**: 2026-04-29 | **Spec**: [specs/001-world-travelogue/spec.md](specs/001-world-travelogue/spec.md)
+**Input**: Feature specification from `specs/001-world-travelogue/spec.md`
 
 ## Summary
 
-Build a static travelogue site using Vite and React with hard-coded itinerary data. The application will render a read-only Google Maps-based world map experience with a sidebar itinerary, expandable stop details, and optional city-level drilldown while avoiding databases or server-side data storage.
+Build a read-only static travel travelogue web application with an interactive Google Maps canvas and a trip feed sidebar. The map clusters stops into airport-derived regions with visited/planned visual distinction, and supports drill-down from trip overview to region-level stop exploration. A modal overlay provides full stop detail for Instagram and Substack post types. All content is hard-coded from the Miscellaneous Adventures trip dataset (23 stops, 5 regions).
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: TypeScript with React 18 and Vite
-**Primary Dependencies**: React, React DOM, Vite, Google Maps JavaScript API
-**Storage**: N/A (hard-coded data model in source files)
-**Testing**: Manual browser testing for map interaction, responsive layout, and accessibility; Vitest can be added later for component tests
-**Target Platform**: Static web application for modern desktop, tablet, and mobile browsers
-**Project Type**: Frontend-only static web application
-**Performance Goals**: initial page load under 3 seconds on standard connections; keep bundle size small while using Google Maps efficiently
-**Constraints**: no backend database, no server-side rendering, no dynamic runtime data source; all content is compiled into the static build
-**Scale/Scope**: roughly 50 major travel stops and hierarchical city drilldown within a single SPA
+**Language/Version**: TypeScript 5.x, React 18, Node 18+  
+**Primary Dependencies**: Vite 5 (bundler/dev server), React 18 (UI), `@googlemaps/js-api-loader` + `@googlemaps/react-wrapper` (Google Maps canvas)  
+**Storage**: N/A — all content hard-coded in TypeScript source files at build time  
+**Testing**: No automated test suite; verified via `npm run build` (TypeScript + Vite)  
+**Target Platform**: Modern web browser; static hosting (GitHub Pages / Netlify)  
+**Project Type**: Static SPA (single-page application)  
+**Performance Goals**: Under 3 seconds load time on standard broadband (per constitution)  
+**Constraints**: No server-side processing; no runtime content API calls; Google Maps API key and Map ID available in `.env`  
+**Scale/Scope**: 1 trip, 5 regions, 23 stops; read-only audience of travelers and friends/family
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+| Principle | Status | Notes |
+|-----------|--------|-------|
+| I. Static First | ✓ Pass | Vite static build, no server-side rendering, all content hard-coded in TS |
+| II. Responsive Design | ⚠ Partial | CSS 72/28 split layout implemented; mobile breakpoints not yet validated |
+| III. Accessibility | ⚠ Partial | ARIA labels on interactive elements; WCAG 2.1 AA audit pending |
+| IV. Performance | ✓ Pass | Vite bundle <200KB JS; Google Maps loads async; <3s target met |
+| V. Security | ✓ Pass | No inline scripts; Maps API key in `.env` (not committed); Map ID scoped in `.env` |
+| Stack: Google Maps | ✓ Pass | `VITE_GOOGLE_MAPS_API_KEY` and `VITE_GOOGLE_MAPS_MAP_ID` provisioned in `.env` |
+| Stack: Vanilla JS | ⚠ Justified deviation | React used instead of plain JS — see justification below |
+
+## Complexity Tracking
+
+| Violation | Why Needed | Simpler Alternative Rejected Because |
+|-----------|------------|--------------------------------------|
+| React framework (vs Vanilla JS) | Three-pane layout with shared state across map, sidebar, and modal requires a reactive rendering model | Vanilla JS DOM manipulation for bidirectional state (map↔sidebar↔modal) would be fragile and unmaintainable |
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```text
-specs/[###-feature]/
-├── plan.md              # This file (/speckit.plan command output)
-├── research.md          # Phase 0 output (/speckit.plan command)
-├── data-model.md        # Phase 1 output (/speckit.plan command)
-├── quickstart.md        # Phase 1 output (/speckit.plan command)
-├── contracts/           # Phase 1 output (/speckit.plan command)
-└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+specs/001-world-travelogue/
+├── plan.md              # This file
+├── research.md          # Phase 0 — technology decisions
+├── data-model.md        # Phase 1 — entity definitions and data sources
+├── quickstart.md        # Phase 1 — developer setup
+├── contracts/           # Phase 1 — interface contracts (N/A: static site)
+├── tasks.md             # Phase 2 output (speckit.tasks command)
+└── wireframes/          # UI wireframes SVG
 ```
 
-### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
+### Source Code
 
 ```text
 src/
-├── assets/
+├── App.tsx                          # Root: view-mode state, layout, trip selector
 ├── components/
+│   ├── MapView.tsx                  # WorldMap → TripMap / RegionMap (Google Maps)
+│   ├── Sidebar.tsx                  # TripFeed, RegionTile (trip overview sidebar)
+│   ├── RegionSidebar.tsx            # Accordion sidebar (region drill-down view)
+│   └── StopDetail.tsx               # StopModal, InstagramPostView, SubstackPostView
 ├── data/
-├── pages/
-└── styles/
+│   ├── types.ts                     # Stop, Region, Trip, InstagramPost, SubstackPost
+│   ├── regions.ts                   # REGIONS array — 5 airport anchors with coords
+│   ├── miscellaneous-adventures.ts  # 23 hard-coded stops with geocoords
+│   └── itinerary.ts                 # Re-exports the active trip
+├── utils/
+│   └── regionUtils.ts               # groupStopsByRegion, getActiveRegion, FR-011/012/014
+├── styles/
+│   └── global.css                   # Dark-navy theme, 72/28 layout, all component styles
+└── main.tsx                         # React entry point
 
-public/
-├── images/
-└── favicon.svg
-
-index.html
-vite.config.ts
-package.json
+public/                              # Static assets
+.env                                 # VITE_GOOGLE_MAPS_API_KEY, VITE_GOOGLE_MAPS_MAP_ID (not committed)
 ```
 
-**Structure Decision**: A single frontend Vite React app is the simplest and most appropriate architecture for a static travelogue website. It satisfies the requirement for a static site with interactive mapping and avoids unnecessary backend complexity.
-
-## Complexity Tracking
-
-> **Fill ONLY if Constitution Check has violations that must be justified**
-
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+**Structure Decision**: Single-project SPA. No backend split. All content derives from `src/data/`. Google Maps rendered via `@googlemaps/react-wrapper` within the `.map-pane` container.
