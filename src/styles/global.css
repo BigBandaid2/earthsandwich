@@ -126,55 +126,6 @@ button {
   inset: 0;
 }
 
-/* ─── Google Maps Custom Markers ─── */
-
-/*
- * AdvancedMarker anchors its content at the bottom-center of the element.
- * translateY(50%) shifts the element down by half its height so the visual
- * center of the dot lands on the map coordinate.
- */
-
-.gm-region-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  cursor: pointer;
-  transform: translateY(50%);
-  transition: box-shadow 0.15s;
-}
-
-.gm-region-dot:hover {
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2);
-}
-
-.gm-region-dot.visited { background: #22c55e; }
-.gm-region-dot.planned { background: #94a3b8; }
-
-.gm-region-dot.active {
-  width: 18px;
-  height: 18px;
-  background: #ef4444;
-  border-color: rgba(255, 255, 255, 0.9);
-}
-
-.gm-stop-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  transform: translateY(50%);
-  transition: box-shadow 0.15s;
-}
-
-.gm-stop-dot:hover {
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
-}
-
-.gm-stop-dot.visited { background: #22c55e; }
-.gm-stop-dot.planned { background: #94a3b8; }
-.gm-stop-dot.open    { background: #f97316; }
 
 /* ─── Sidebar Pane (28%) ─── */
 
@@ -710,6 +661,73 @@ button {
 
 .post-body p {
   margin: 0;
+}
+
+/* ─── Stop Thumbnail Marker ─── */
+
+.stop-thumb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+}
+
+.stop-thumb-stack {
+  position: relative;
+  width: 52px;
+  height: 52px;
+}
+
+.stop-thumb-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: #94a3b8;
+  border: 2px solid #fff;
+  transform: rotate(5deg) translate(3px, -2px);
+}
+
+.stop-thumb-front {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #fff;
+  background: #1e293b;
+}
+
+.stop-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.stop-thumb-count {
+  position: absolute;
+  bottom: 3px;
+  right: 4px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+.stop-thumb-tip {
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 9px solid #fff;
+  margin-top: -1px;
+}
+
+.stop-thumb--open .stop-thumb-front {
+  border-color: #f97316;
+}
+
+.stop-thumb--open .stop-thumb-tip {
+  border-top-color: #f97316;
 }
 
 /* ─── Scrollbar ─── */

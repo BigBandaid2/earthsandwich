@@ -1,8 +1,9 @@
 import { useEffect, useMemo } from 'react';
-import { Map, AdvancedMarker, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
+import { Map, AdvancedMarker, Pin, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
 import type { RegionGroup } from '../utils/regionUtils';
 import { getActiveRegion, isSegmentSolid } from '../utils/regionUtils';
 import type { ViewMode } from '../App';
+import type { Stop } from '../data/types';
 
 const MAP_ID = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID as string | undefined;
 
@@ -89,6 +90,43 @@ function FitBounds({
   return null;
 }
 
+function getStopImages(stop: Stop): string[] {
+  if (stop.post.type === 'instagram' && stop.post.image) return [stop.post.image];
+  return [];
+}
+
+// Custom map marker for region view: photo thumbnail with pointer tip.
+// Falls back to a Pin when no image is available.
+function StopMarker({ stop, isOpen }: { stop: Stop; isOpen: boolean }) {
+  const images = getStopImages(stop);
+  const isVisited = stop.status === 'visited';
+
+  if (images.length === 0) {
+    return (
+      <Pin
+        background={isOpen ? '#f97316' : isVisited ? '#ea4335' : '#9aa0a6'}
+        borderColor={isOpen ? '#ea580c' : isVisited ? '#c5221f' : '#6b7280'}
+        glyphColor="#ffffff"
+        scale={isOpen ? 1.1 : 0.8}
+      />
+    );
+  }
+
+  const extra = images.length - 1;
+  return (
+    <div className={`stop-thumb${isOpen ? ' stop-thumb--open' : ''}`}>
+      <div className="stop-thumb-stack">
+        {extra > 0 && <div className="stop-thumb-back" />}
+        <div className="stop-thumb-front">
+          <img src={images[0]} alt={stop.location} className="stop-thumb-img" />
+          {extra > 0 && <span className="stop-thumb-count">+{extra}</span>}
+        </div>
+      </div>
+      <div className="stop-thumb-tip" />
+    </div>
+  );
+}
+
 function WorldMap({
   regionGroups,
   viewMode,
@@ -149,7 +187,8 @@ function TripMap({
               key={`${from.region.code}-${to.region.code}`}
               path={[from.region.coords, to.region.coords]}
               solid={solid}
-              strokeColor={solid ? '#60a5fa' : '#94a3b8'}
+              strokeColor={solid ? '#1a73e8' : '#70757a'}
+            strokeWeight={solid ? 3.5 : 2}
             />
           );
         })}
@@ -164,8 +203,11 @@ function TripMap({
               title={`${group.region.name}, ${group.region.country}`}
               onClick={() => onSelectRegion(group.region.code)}
             >
-              <div
-                className={`gm-region-dot${isVisited ? ' visited' : ' planned'}${isActive ? ' active' : ''}`}
+              <Pin
+                background={isVisited ? '#ea4335' : '#9aa0a6'}
+                borderColor={isVisited ? '#c5221f' : '#6b7280'}
+                glyphColor="#ffffff"
+                scale={isActive ? 1.3 : 1.0}
               />
             </AdvancedMarker>
           );
@@ -202,22 +244,23 @@ function RegionMap({
         <MapPolyline
           path={stopCoords}
           solid={false}
-          strokeColor="#93c5fd"
-          strokeWeight={1.5}
+          strokeColor="#1a73e8"
+          strokeWeight={2.5}
         />
 
-        {group.stops.map((stop) => (
-          <AdvancedMarker
-            key={stop.id}
-            position={stop.coords}
-            title={stop.location}
-            onClick={() => onOpenStop(stop.id, stopIds)}
-          >
-            <div
-              className={`gm-stop-dot ${stop.status}${stop.id === openStopId ? ' open' : ''}`}
-            />
-          </AdvancedMarker>
-        ))}
+        {group.stops.map((stop) => {
+          const isOpen = stop.id === openStopId;
+          return (
+            <AdvancedMarker
+              key={stop.id}
+              position={stop.coords}
+              title={stop.location}
+              onClick={() => onOpenStop(stop.id, stopIds)}
+            >
+              <StopMarker stop={stop} isOpen={isOpen} />
+            </AdvancedMarker>
+          );
+        })}
       </Map>
     </div>
   );
