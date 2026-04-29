@@ -50,6 +50,13 @@ hooks:
     prompt: Commit outstanding changes before implementation?
     description: Auto-commit before implementation
     condition: null
+  - extension: onboard
+    command: speckit.onboard.before-implement
+    enabled: true
+    optional: true
+    prompt: Execute speckit.onboard.before-implement?
+    description: ''
+    condition: null
   before_checklist:
   - extension: git
     command: speckit.git.commit
@@ -122,6 +129,20 @@ hooks:
     prompt: Commit implementation changes?
     description: Auto-commit after implementation
     condition: null
+  - extension: learn
+    command: speckit.learn.review
+    enabled: true
+    optional: true
+    prompt: Generate a learning guide from this implementation?
+    description: ''
+    condition: null
+  - extension: onboard
+    command: speckit.onboard.after-implement
+    enabled: true
+    optional: true
+    prompt: Execute speckit.onboard.after-implement?
+    description: ''
+    condition: null
   after_checklist:
   - extension: git
     command: speckit.git.commit
@@ -145,4 +166,12 @@ hooks:
     optional: true
     prompt: Commit after syncing issues?
     description: Auto-commit after tasks-to-issues conversion
+    condition: null
+  after_explain:
+  - extension: onboard
+    command: speckit.onboard.after-explain
+    enabled: true
+    optional: true
+    prompt: Execute speckit.onboard.after-explain?
+    description: ''
     condition: null
