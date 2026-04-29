@@ -3,6 +3,7 @@ import { Map, AdvancedMarker, Pin, useMap, useMapsLibrary } from '@vis.gl/react-
 import type { RegionGroup } from '../utils/regionUtils';
 import { getActiveRegion, isSegmentSolid } from '../utils/regionUtils';
 import type { ViewMode } from '../App';
+import type { Stop } from '../data/types';
 
 const MAP_ID = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID as string | undefined;
 
@@ -87,6 +88,43 @@ function FitBounds({
   }, [map, mapsLib, coords, padding]);
 
   return null;
+}
+
+function getStopImages(stop: Stop): string[] {
+  if (stop.post.type === 'instagram' && stop.post.image) return [stop.post.image];
+  return [];
+}
+
+// Custom map marker for region view: photo thumbnail with pointer tip.
+// Falls back to a Pin when no image is available.
+function StopMarker({ stop, isOpen }: { stop: Stop; isOpen: boolean }) {
+  const images = getStopImages(stop);
+  const isVisited = stop.status === 'visited';
+
+  if (images.length === 0) {
+    return (
+      <Pin
+        background={isOpen ? '#f97316' : isVisited ? '#ea4335' : '#9aa0a6'}
+        borderColor={isOpen ? '#ea580c' : isVisited ? '#c5221f' : '#6b7280'}
+        glyphColor="#ffffff"
+        scale={isOpen ? 1.1 : 0.8}
+      />
+    );
+  }
+
+  const extra = images.length - 1;
+  return (
+    <div className={`stop-thumb${isOpen ? ' stop-thumb--open' : ''}`}>
+      <div className="stop-thumb-stack">
+        {extra > 0 && <div className="stop-thumb-back" />}
+        <div className="stop-thumb-front">
+          <img src={images[0]} alt={stop.location} className="stop-thumb-img" />
+          {extra > 0 && <span className="stop-thumb-count">+{extra}</span>}
+        </div>
+      </div>
+      <div className="stop-thumb-tip" />
+    </div>
+  );
 }
 
 function WorldMap({
@@ -212,7 +250,6 @@ function RegionMap({
 
         {group.stops.map((stop) => {
           const isOpen = stop.id === openStopId;
-          const isVisited = stop.status === 'visited';
           return (
             <AdvancedMarker
               key={stop.id}
@@ -220,12 +257,7 @@ function RegionMap({
               title={stop.location}
               onClick={() => onOpenStop(stop.id, stopIds)}
             >
-              <Pin
-                background={isOpen ? '#f97316' : isVisited ? '#ea4335' : '#9aa0a6'}
-                borderColor={isOpen ? '#ea580c' : isVisited ? '#c5221f' : '#6b7280'}
-                glyphColor="#ffffff"
-                scale={isOpen ? 1.1 : 0.8}
-              />
+              <StopMarker stop={stop} isOpen={isOpen} />
             </AdvancedMarker>
           );
         })}
