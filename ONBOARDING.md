@@ -1,17 +1,19 @@
-# Welcome to [Team Name]
+# Welcome to Earthsandwich
 
 ## How We Use Claude
 
-Based on BigBandaid2's usage over the last 30 days (1 session — early data):
+Based on BigBandaid2's usage over the last 30 days:
 
 Work Type Breakdown:
-  Build Feature  ████████████████████  100%
+  Build Feature  ██████████░░░░░░░░░░  50%
+  Write Docs     ██████████░░░░░░░░░░  50%
 
 Top Skills & Commands:
-  /compact  █░░░░░░░░░░░░░░░░░░░  1x/month
+  /compact          ████████████████████  1x/month
+  /team-onboarding  ████████████████████  1x/month
 
 Top MCP Servers:
-  _None configured yet_
+  (none configured yet)
 
 ## Your Setup Checklist
 
@@ -19,15 +21,17 @@ Top MCP Servers:
 - [ ] earthsandwich — https://github.com/bigbandaid2/earthsandwich
 
 ### MCP Servers to Activate
-_None in use yet — check back as the team's workflow evolves._
+  (none in use — check back as the team expands its tooling)
 
 ### Skills to Know About
-- `/compact` — Compresses conversation context when Claude is running low. Use it mid-session on long builds or debugging runs to keep going without starting over.
-- `/speckit.specify` — Turn a feature description into a structured spec. The team uses Spec Kit for the full feature workflow: specify → plan → tasks → implement.
-- `/speckit.plan` — Generate design artifacts (architecture, component diagrams, system design) from a spec.
-- `/speckit.tasks` — Break a plan into a dependency-ordered task list ready for implementation.
-- `/speckit.implement` — Execute the tasks in tasks.md one by one, with Claude doing the actual coding.
-- `/speckit.clarify` — Ask Claude to surface underspecified areas in a spec before you commit to building.
+- `/compact` — compresses conversation context when sessions get long; use it when Claude starts hitting context limits in big feature builds
+- `/team-onboarding` — generates this onboarding guide; useful when a new teammate joins
+- `/speckit.specify` — creates or updates the feature spec from a natural language description; used to kick off new features in this repo
+- `/speckit.plan` — generates the implementation plan from the spec; run after `specify`
+- `/speckit.tasks` — produces a dependency-ordered `tasks.md` from the plan
+- `/speckit.implement` — executes the tasks in `tasks.md` one by one
+- `/speckit.clarify` — surfaces ambiguities in the spec before you start building
+- `/speckit.analyze` — cross-checks spec, plan, and tasks for consistency
 
 ## Team Tips
 

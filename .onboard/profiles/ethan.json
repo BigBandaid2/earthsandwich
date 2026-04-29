@@ -1,0 +1,54 @@
+{
+  "developer": {
+    "name": "Ethan",
+    "level": "junior",
+    "onboarded_at": "2026-04-29T00:00:00.000Z"
+  },
+  "last_updated": "2026-04-29T00:00:00.000Z",
+  "progress": {},
+  "trails_generated": ["001-world-travelogue"],
+  "badges": {
+    "earned": ["navigator", "map-reader"],
+    "locked": ["trail-blazer", "architect", "mentor"]
+  },
+  "quiz_history": [
+    {
+      "date": "2026-04-29T00:00:00.000Z",
+      "score": 5,
+      "total": 5,
+      "gaps": []
+    }
+  ],
+  "quiz_questions_history": [
+    {
+      "question_id": "spec-fr004-region-derivation",
+      "artifact": "specs/001-world-travelogue/spec.md",
+      "topic": "FR-004 region derivation from nearest international airport",
+      "asked_on": "2026-04-29T00:00:00.000Z"
+    },
+    {
+      "question_id": "tasks-phase2-critical-gate",
+      "artifact": "specs/001-world-travelogue/tasks.md",
+      "topic": "Phase 2 Foundational critical gate blocking user story work",
+      "asked_on": "2026-04-29T00:00:00.000Z"
+    },
+    {
+      "question_id": "spec-fr013-post-types",
+      "artifact": "specs/001-world-travelogue/spec.md",
+      "topic": "FR-013 two supported stop post types (Instagram and Substack)",
+      "asked_on": "2026-04-29T00:00:00.000Z"
+    },
+    {
+      "question_id": "tasks-t008-dependency-t005-t007",
+      "artifact": "specs/001-world-travelogue/tasks.md",
+      "topic": "T008 dependency on type definitions from T005–T007",
+      "asked_on": "2026-04-29T00:00:00.000Z"
+    },
+    {
+      "question_id": "spec-fr011-active-region-red-pin",
+      "artifact": "specs/001-world-travelogue/spec.md",
+      "topic": "FR-011 active region red teardrop pin in View 1 UI Design",
+      "asked_on": "2026-04-29T00:00:00.000Z"
+    }
+  ]
+}
