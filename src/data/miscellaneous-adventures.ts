@@ -15,7 +15,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'MDE',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-1.cdninstagram.com/v/t51.82787-15/626262180_18356267338200451_466681949716390046_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=XfiiJwDKD1UQ7kNvwHjwwpY&_nc_oc=AdqzvXGEootgUVB4T4zbODp9lwxSw6t52K7ipqnavauKUpXnIsras149OVXOcn2-V8U&_nc_zt=23&_nc_ht=scontent-lga3-1.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af2vJYf3GZHeo0DjuifmRcb61CsmunZbcWj2jOPfmx4dAg&oe=69EDF6BA',
+        image: '/media/23.jpg',
         caption: '700 steps up a vertical monolith. They thoughtfully built a second set of stairs so that the descending traffic wouldn\'t demotivate the upward climbers',
         instagramId: '18001223977200451',
         shortcode: 'BxZ6Y-Zh1jC',
@@ -30,7 +30,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'MDE',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-1.cdninstagram.com/v/t51.82787-15/627405269_18300810532278385_297894928337892323_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=qBQEYlvSGD0Q7kNvwGB3gSb&_nc_oc=AdqZjGh_4LoP2mOBYg52ayATuJ_PwoiPzpQBWa2hm_OwXc_cAm_jtrJzp6jhRg09zAM&_nc_zt=23&_nc_ht=scontent-lga3-1.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af1S7Rtzn6GWbK4JRn5hhXDkEEpLBjbBgvrCFM4kCJiTxw&oe=69EE0CF5',
+        image: '/media/22.jpg',
         caption: 'Only got to overlap a couple days with my bro. Parents baton is yours now, good luck!',
         instagramId: '17954371129278385',
         shortcode: 'BxaGGFohpKw',
@@ -45,7 +45,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'MDE',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-1.cdninstagram.com/v/t51.82787-15/631052161_18447841450101320_5050169625711709649_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=zjNjic623-MQ7kNvwGWTSe3&_nc_oc=AdoGTaPPEgtwVaLbJJKeK3wcFbEuQZWonHw-ZaIIa1ssOVj_jwNitcUCtPHr9KORAQ8&_nc_zt=23&_nc_ht=scontent-lga3-1.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af1lgTc87uUZAQSOW_HqUG1YZGbEtRICYR2eKLEFz222ZA&oe=69EE1157',
+        image: '/media/21.jpg',
         caption: 'That is some admirably succinct visual symbolgy',
         instagramId: '18048308524101320',
         shortcode: 'BxbL5AoBPfV',
@@ -60,7 +60,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'MDE',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-1.cdninstagram.com/v/t51.82787-15/628096408_18451644802100653_7937661314579954926_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=C9pNmd6t-o4Q7kNvwHrM1QK&_nc_oc=AdpwdIrSEQjr5kL33amlkK0F-v_v87GNbkm_aVXKOAJmttFYTJZDlg435O47_bvKbAQ&_nc_zt=23&_nc_ht=scontent-lga3-1.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af1GA-nshBzR1vdU6Rgs_RpQB4KmgGlutm0n4atlMlOwVA&oe=69EDFAA5',
+        image: '/media/20.jpg',
         caption: 'Mom being casually fabulous',
         instagramId: '18049782940100653',
         shortcode: 'BxbM1kQBraE',
@@ -75,7 +75,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'MDE',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-2.cdninstagram.com/v/t51.82787-15/629785959_18328696573174262_4920125762487692973_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=101&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMiJ9&_nc_ohc=h6XxKPyGGrEQ7kNvwFuAzS2&_nc_oc=Ado3WwYpgCGRNp_D1Cl8gYndLuVokeqxsWlD_J82Gsy7HL9MnzELA-c1BTB-Poz6tmw&_nc_zt=23&_nc_ht=scontent-lga3-2.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af3JjOZnUjNwiB8BbRfUn9e-XLoyEYMlmD641utnVNXZRg&oe=69EDEFD7',
+        image: '/media/19.jpg',
         caption: 'Botched translation or profound truth, I genuinely cannot say.',
         instagramId: '18023902987174262',
         shortcode: 'BxbPatKBeTk',
@@ -91,7 +91,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'JFK',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-1.cdninstagram.com/v/t51.82787-15/621402108_18207511978321881_8817757874198636146_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=lkjD4sKDuC4Q7kNvwFtUdWP&_nc_oc=Adr61PUQ6EVnBGEj8LijnuXxcTCxb60fFIhLwMDp843dk3T6JogfOX8HzsSDAR2xWfQ&_nc_zt=23&_nc_ht=scontent-lga3-1.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af10M8p-HBFDkfyPwcULstESw3a4Cv5DxGJ1BtXVbveuZQ&oe=69EDEBFC',
+        image: '/media/18.jpg',
         caption: 'Thanks for the memories 540. Onward and upward!',
         instagramId: '17927644093321881',
         shortcode: 'B2paAgIh_Pv',
@@ -107,7 +107,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'ARN',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-2.cdninstagram.com/v/t51.82787-15/640980493_18561580438036950_2939248026817503808_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=101&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=k2FKZCCqcZQQ7kNvwEVOY7X&_nc_oc=Ado-HEbb2Eo8w9h4n0YVkY2Xi9EA925WUBfg73kOUSIzro1ZvtgfGi3axgDMTsILu9Y&_nc_zt=23&_nc_ht=scontent-lga3-2.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af0qcRx5qPXazFgwmbHkamr2tilROsYdL8jv1VRa06razQ&oe=69EDE9B0',
+        image: '/media/17.jpg',
         caption: 'Soft serve and plywood. Our pilgrimage to the OG temple of Swedish culture is truly complete.',
         instagramId: '18104787694036950',
         shortcode: 'B3T7cNwjiCd',
@@ -123,7 +123,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'JFK',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-3.cdninstagram.com/v/t51.82787-15/629957396_18419370454187059_966929171336115448_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=5ftNfOxgGp4Q7kNvwFACtxN&_nc_oc=Adp1pqRYoPiplr5sTvL4GBO3axTIdvaK0O1kaZ6ea3nKSPDQl2VFyzLB00VRyCTZcpg&_nc_zt=23&_nc_ht=scontent-lga3-3.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af1BWgeKu31Ffrf5xWjCNsavX7D4oF86jq-anCs2sLHVYQ&oe=69EDF008',
+        image: '/media/16.jpg',
         caption: 'Courtesy of the most passionate volunteer iphone photographer ever. Really brought the levity to an evening with adolf',
         instagramId: '18078166936187059',
         shortcode: 'B4BrPSyDgSn',
@@ -139,7 +139,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'MEX',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-3.cdninstagram.com/v/t51.82787-15/624184210_18122873950562956_4761041264294309260_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=cPl0bm9s660Q7kNvwEZmfWN&_nc_oc=Adqf6LQErmurlAREDgrbL1hnE2YujBJKxq1E-KHxAFplBJXDjvDlsThJp-evDDBAeXg&_nc_zt=23&_nc_ht=scontent-lga3-3.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af3pdZ4o-35KKBGGtNeKe6NrpMA4oAzPXHjlXEtdOTqe4Q&oe=69EE156C',
+        image: '/media/15.jpg',
         caption: 'Feliz Dia de los Muertos!',
         instagramId: '17860734715562956',
         shortcode: 'B4Y42VQDVCO',
@@ -154,7 +154,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'MEX',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-3.cdninstagram.com/v/t51.82787-15/640281641_18573306163007109_3980861801149196648_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=iOk89f9iXWQQ7kNvwFeiWW_&_nc_oc=AdrwniA8Wj7FM-uuAEMB8v_6hY8Y8e9yW-Zs0yaqLO8Vq_06UpcHsfn9Oz4x2x-MTKM&_nc_zt=23&_nc_ht=scontent-lga3-3.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af32DA9NflAGmJb2Y8YGCkWZsZyJI1fZ3A8gOAnVx6qVXw&oe=69EE0048',
+        image: '/media/14.jpg',
         caption: 'Enjoy your coffee, Cthulhu watches over you',
         instagramId: '18112431550007109',
         shortcode: 'B4akEkeBpI_',
@@ -169,7 +169,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'MEX',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-3.cdninstagram.com/v/t51.82787-15/630884094_18379293970093695_2484908765148236911_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=b7AzJBmJrJ0Q7kNvwFaSkrS&_nc_oc=AdogCdgTXhNn3HDxyAtxMaMRR_mqyIxHo2IOMkondrPlCE8SV4PXXSOLJ6QdGirFflw&_nc_zt=23&_nc_ht=scontent-lga3-3.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af2X4MQV06RmWS6GQmY9QC8ZrgdfhVkJtQktF_U1opLu8A&oe=69EDF6EC',
+        image: '/media/13.jpg',
         caption: 'The magical floating stacks blur a library visit with a trip through the Matrix',
         instagramId: '18079018615093695',
         shortcode: 'B4eJItyjLl4',
@@ -184,7 +184,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'MEX',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-3.cdninstagram.com/v/t51.82787-15/625039042_18325350706217175_6959831103561041652_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=EcIhgoCt3rMQ7kNvwERQoM6&_nc_oc=AdoBYIzmupk3IE5CPvuhxoEiNs5ilBVmis6PSjMNeMCJC1MFnGMiMlhmOk6IZUroEyY&_nc_zt=23&_nc_ht=scontent-lga3-3.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af2-oGfbXHFKlLXHEXUEUy7I3XhhBi11uPjtsYoX6mHgyw&oe=69EE1A27',
+        image: '/media/12.jpg',
         caption: 'In Mexico, Beijing duck roasts with all the fiery drama of a ritual fit for Montezuma',
         instagramId: '18037151035217175',
         shortcode: 'B4gp4YxDDJP',
@@ -199,7 +199,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'MEX',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-3.cdninstagram.com/v/t51.82787-15/627802284_18390910585196282_182279505608368352_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=mz8ji4FUq5UQ7kNvwFpZ-eL&_nc_oc=AdrwsHgHupSSjvOb1b4B3qc9Dx1wludI-CnLMwSN-uzw6QqhhP3surP6FegNoB3s8Fk&_nc_zt=23&_nc_ht=scontent-lga3-3.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af0gd9Pa-jYrc6WK4mF14NVvQdL6mWgfamZAI_KoRsdOLA&oe=69EE07BE',
+        image: '/media/11.jpg',
         caption: 'Sometimes, someone hands you a poncho and some props, and all your thoughtful cultural appreciation goes out the window',
         instagramId: '18063726055196282',
         shortcode: 'B4jSd1mDW2H',
@@ -214,7 +214,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'MEX',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-3.cdninstagram.com/v/t51.82787-15/631349340_18379509643086659_2732900425591189032_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=yBfOf6I_s64Q7kNvwHhp9Cj&_nc_oc=Adr_ugkgQh_ZdLHLaeSQrV2HhWNCt7_2RGzb7Ka1x19wImUAq_jFyQVoalV0s4i_4XA&_nc_zt=23&_nc_ht=scontent-lga3-3.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af00JbkuYF2wZUisFlYjWoqVyzy8B2OQrzOXDPuAL-rv0w&oe=69EE1AFB',
+        image: '/media/10.jpg',
         caption: "On top of everything else, an exhibit of Asian ivories more spectacular than anything I've seen in China or Taiwan. This city should be said in the same breath as London or LA",
         instagramId: '18079533163086659',
         shortcode: 'B4lJJw-DDKt',
@@ -229,7 +229,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'MEX',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-3.cdninstagram.com/v/t51.82787-15/627706062_18360922111160606_4903323261810970177_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=tJuDRpevQygQ7kNvwEtx63E&_nc_oc=AdpGE2v8HJvBuHhOkcS4vC83hr2bktg46mQ1fPfs5_ITJx04NFY4j_t3o7Hezmh3DW8&_nc_zt=23&_nc_ht=scontent-lga3-3.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af0-ypyo1T5DT73r17haX5_N-UYnVCJihV9vD1ZZ3FyVsg&oe=69EE0C04',
+        image: '/media/9.jpg',
         caption: 'High brow vandalism',
         instagramId: '18069544879160606',
         shortcode: 'B4ofJptjTsA',
@@ -244,7 +244,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'MEX',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-1.cdninstagram.com/v/t51.82787-15/618445078_18108165109588653_785139431390545777_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=111&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=wzfGRYUsJKQQ7kNvwHNEcwE&_nc_oc=Adp-d8v2Q-wEyv5sRcBEmPNAvhGzbAWlFE9HJnj5H41lJfwHFYxnVI91duKwqUcBQZ4&_nc_zt=23&_nc_ht=scontent-lga3-1.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af3jRkQfbSaizpLEMnVh5OYNJ6qPdFNfIujpaywMlSLNHQ&oe=69EDEC7E',
+        image: '/media/8.jpg',
         caption: 'Fun fact from Lucha arena: Spanish for little person is "enano"',
         instagramId: '17858594914588653',
         shortcode: 'B4rDVUQjQby',
@@ -260,7 +260,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'JFK',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-3.cdninstagram.com/v/t51.82787-15/636515227_18534960361071254_7021543667862636725_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=6FBF4OvcNh0Q7kNvwECTroX&_nc_oc=AdrLB5LgpYXxFUlIPGbE9J3KBLc1GKl7ipzTAXDK6MbgYVC_9jpgfDptnMd7iVJz8NI&_nc_zt=23&_nc_ht=scontent-lga3-3.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af0an9M-jg6ErRD9ZSh88ETQAGHF_xB4L5Dc6GkSJN3nyw&oe=69EDE56E',
+        image: '/media/7.jpg',
         caption: 'Essential',
         instagramId: '18132090181071254',
         shortcode: 'B_c4XQiDMy3',
@@ -276,7 +276,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'OAX',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-1.cdninstagram.com/v/t51.82787-15/623260652_18123183961493455_641234445550738698_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=111&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=v6rZ58gK--IQ7kNvwFJOPNn&_nc_oc=AdqS4ewyTADW1PgpnuujUPZcljxJRX0uS9ekI1P5rBRxPlrogRoX0PAfezlDul72WWE&_nc_zt=23&_nc_ht=scontent-lga3-1.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af0RVB9p7PAE2tYnc9YNRxpuOaJjYPR2yOXdolNWWLpasg&oe=69EDE3EB',
+        image: '/media/6.jpg',
         caption: 'Where even a cooking school is beautiful.',
         instagramId: '18055230940493455',
         shortcode: 'C3dp3LnPeQ1',
@@ -291,7 +291,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'OAX',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-3.cdninstagram.com/v/t51.82787-15/623916698_18071347808411635_1661302107522095270_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=ubP_pfWUmXMQ7kNvwGnKid9&_nc_oc=AdpNkQ9V7nVYxs3x68Qad6SQ6KX83mVxAZdEE9izLbP0vCVEwwwcAYLKVGskgSMkUo8&_nc_zt=23&_nc_ht=scontent-lga3-3.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af0_3Pe0ApF9dWj7AwCREC7kkAVZVNhHALS6nlQ3hdAPdw&oe=69EDEC79',
+        image: '/media/5.jpg',
         caption: 'Some places can find the joy in anything',
         instagramId: '17999829707411635',
         shortcode: 'C3dqXOPvNKQ',
@@ -306,7 +306,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'OAX',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-1.cdninstagram.com/v/t51.82787-15/621565403_18053735741404883_3288697368414786804_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=RGyUu_T-W24Q7kNvwHEP_uT&_nc_oc=AdrIV2I-85KbwXFA5GD-kL7Ke8_xCMkS--QBrc02raltjMTdVaEJGu08A0yqwq2bR2M&_nc_zt=23&_nc_ht=scontent-lga3-1.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af0K-uhhsUi2ztBcIKYe81vepLCKC0iXr9rDUnwnsefmyw&oe=69EDF3EF',
+        image: '/media/4.jpg',
         caption: 'Cthulhu in tree form. Reaching through the millennia.',
         instagramId: '17987675498404883',
         shortcode: 'C3g2CZGMyYy',
@@ -321,7 +321,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'OAX',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-2.cdninstagram.com/v/t51.82787-15/628005451_18096463261939141_7254908210391454549_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=107&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=SUofOs4MbJ4Q7kNvwG4C44D&_nc_oc=Adq30tgtz3sQCwcE5pym2Ts_k7Wi60Snw-irVfawJW_x2OdB3MhTvBC5FUhjrFMyCcc&_nc_zt=23&_nc_ht=scontent-lga3-2.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af0nYfs2nz77ICKdwoKI4qoaIF7nhE4iysjSjm_RM8Z8XQ&oe=69EDE3CE',
+        image: '/media/3.jpg',
         caption: '"For your safety, do not approach the abyss."',
         instagramId: '18025886506939141',
         shortcode: 'C3g2YOHMR-r',
@@ -336,7 +336,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'OAX',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-1.cdninstagram.com/v/t51.82787-15/625950664_18063446381305682_6617682150776089945_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=KUUYGwd2FfAQ7kNvwF3VGQQ&_nc_oc=AdqJkwomi5KyybkAMOUPNCxSdRnO1jWSBzndBV9-GMkLIOfmSxzqjvJ9LspPov5KCLM&_nc_zt=23&_nc_ht=scontent-lga3-1.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af349tXwBkKrh0a5Hml3GT0x4rtTptU-RnN0mHdcRobIDg&oe=69EDFC74',
+        image: '/media/2.jpg',
         caption: 'Never a wrong time or place for hot chocolate',
         instagramId: '17996821559305682',
         shortcode: 'C3jJxkzMGvi',
@@ -351,7 +351,7 @@ export const miscellaneousAdventures: Trip = {
       regionCode: 'OAX',
       post: {
         type: 'instagram',
-        image: 'https://scontent-lga3-3.cdninstagram.com/v/t51.82787-15/625491050_18056999051376031_6495127282858401964_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=O0EpvoDWhRAQ7kNvwF8kUs7&_nc_oc=AdoIbLW7pvwZgcfmH7VeftPm0I7OCj6dEsIGdkiQT_VNs7i8in8Wlzx11iYeIMc7IkM&_nc_zt=23&_nc_ht=scontent-lga3-3.cdninstagram.com&edm=ANQ71j8EAAAA&oh=00_Af2907yWtynujMkl7aPNWzzGLFIFqAasCNQ_jkU-ID6nYQ&oe=69EE1861',
+        image: '/media/1.jpg',
         caption: 'East meets Southwest',
         instagramId: '17990443415376031',
         shortcode: 'C3jXFRlMZoJ',

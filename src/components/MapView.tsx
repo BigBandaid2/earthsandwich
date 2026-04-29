@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { Map, AdvancedMarker, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
+import { Map, AdvancedMarker, Pin, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
 import type { RegionGroup } from '../utils/regionUtils';
 import { getActiveRegion, isSegmentSolid } from '../utils/regionUtils';
 import type { ViewMode } from '../App';
@@ -149,7 +149,8 @@ function TripMap({
               key={`${from.region.code}-${to.region.code}`}
               path={[from.region.coords, to.region.coords]}
               solid={solid}
-              strokeColor={solid ? '#60a5fa' : '#94a3b8'}
+              strokeColor={solid ? '#1a73e8' : '#70757a'}
+            strokeWeight={solid ? 3.5 : 2}
             />
           );
         })}
@@ -164,8 +165,11 @@ function TripMap({
               title={`${group.region.name}, ${group.region.country}`}
               onClick={() => onSelectRegion(group.region.code)}
             >
-              <div
-                className={`gm-region-dot${isVisited ? ' visited' : ' planned'}${isActive ? ' active' : ''}`}
+              <Pin
+                background={isVisited ? '#ea4335' : '#9aa0a6'}
+                borderColor={isVisited ? '#c5221f' : '#6b7280'}
+                glyphColor="#ffffff"
+                scale={isActive ? 1.3 : 1.0}
               />
             </AdvancedMarker>
           );
@@ -202,22 +206,29 @@ function RegionMap({
         <MapPolyline
           path={stopCoords}
           solid={false}
-          strokeColor="#93c5fd"
-          strokeWeight={1.5}
+          strokeColor="#1a73e8"
+          strokeWeight={2.5}
         />
 
-        {group.stops.map((stop) => (
-          <AdvancedMarker
-            key={stop.id}
-            position={stop.coords}
-            title={stop.location}
-            onClick={() => onOpenStop(stop.id, stopIds)}
-          >
-            <div
-              className={`gm-stop-dot ${stop.status}${stop.id === openStopId ? ' open' : ''}`}
-            />
-          </AdvancedMarker>
-        ))}
+        {group.stops.map((stop) => {
+          const isOpen = stop.id === openStopId;
+          const isVisited = stop.status === 'visited';
+          return (
+            <AdvancedMarker
+              key={stop.id}
+              position={stop.coords}
+              title={stop.location}
+              onClick={() => onOpenStop(stop.id, stopIds)}
+            >
+              <Pin
+                background={isOpen ? '#f97316' : isVisited ? '#ea4335' : '#9aa0a6'}
+                borderColor={isOpen ? '#ea580c' : isVisited ? '#c5221f' : '#6b7280'}
+                glyphColor="#ffffff"
+                scale={isOpen ? 1.1 : 0.8}
+              />
+            </AdvancedMarker>
+          );
+        })}
       </Map>
     </div>
   );
