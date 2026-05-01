@@ -114,6 +114,11 @@ A visitor viewing a trip whose stops have no photo or article content (only loca
 - **FR-019**: The system MUST NOT open a stop detail pop-up when a visitor clicks a Planned stop marker or tile; clicking a Planned stop takes no action.
 - **FR-020**: The system MUST include hard-coded itinerary data for two additional trips: "Earth Sandwich 2015" (82 stops, July 2015 – August 2016) and "Earth Club Sandwich 2027" (30 stops, March 2027 – May 2028). All stops in both trips use the Planned post type.
 - **FR-021**: The trip overview sidebar region tile MUST omit the Instagram thumbnail row and Substack tile row for regions that contain only Planned stops, showing only the region header, date range, and "Expand Region →" button.
+- **FR-022**: Both the trip feed sidebar (View 1) and the region sidebar (View 2) MUST be independently scrollable with a visible scrollbar that is clearly distinguishable against the sidebar background.
+- **FR-023**: When a region becomes the active region in the region view (either by drilling in from the trip overview or by selecting another region's collapsed header), the region sidebar MUST scroll so that the newly active region's header is positioned as close to the top of the sidebar as possible, keeping its expanded stop list visible below.
+- **FR-024**: Both the trip feed sidebar (View 1) and the region sidebar (View 2) MUST share the same fixed pixel width, sized to fit four 60px Instagram thumbnails with 4px gaps plus the connector column and feed padding in a single row. Below the mobile breakpoint (≤768px) the sidebar continues to stack under the map and span full width per existing responsive rules.
+- **FR-025**: Instagram images in the region sidebar stop tile (View 2) and in the stop detail pop-up (View 3) MUST render at their original aspect ratio. No fixed crop height or `object-fit: cover` cropping is applied.
+- **FR-026**: The stop detail pop-up (View 3) MUST occupy most of the screen height (up to 95vh) and MUST never trigger vertical scrolling caused by the Instagram hero image. If a portrait image would exceed the available vertical space, its rendered width MUST shrink (preserving aspect ratio) until both image and surrounding text fit within the modal without scrolling. Long-form Substack body text MAY still scroll inside the modal.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -162,18 +167,21 @@ Accessed by selecting "Expand Region →" from the trip overview. Same split lay
 - Floating card top-left: back arrow and "BACK TO TRIP" label.
 
 **Region sidebar**:
+- Regions are listed in reverse-chronological order (most recent first), matching the trip overview sidebar ordering.
 - The active region is expanded: its header shows region name and date range, followed by its stop tiles in reverse-chronological order.
-- All other regions in the trip appear as collapsed header rows below; clicking a header activates that region (see FR-015).
+- All other regions in the trip appear as collapsed header rows above and below the active region; clicking a header activates that region (see FR-015).
+- The sidebar scrolls so the active region's header is anchored near the top whenever the active region changes (see FR-023).
+- The sidebar uses its own visible scrollbar independent from the map pane (see FR-022).
 - Each stop tile shows:
   - Marker icon with a vertical connector line between adjacent tiles.
   - Region name, country, and date.
-  - **Instagram stop tile**: small Instagram icon, caption text (up to 3 lines with ellipsis if longer), and a single full-width photo below the caption.
+  - **Instagram stop tile**: small Instagram icon, caption text (up to 3 lines with ellipsis if longer), and the Instagram photo below the caption rendered full-width at its original aspect ratio (square, portrait, or landscape — no cropping; see FR-025).
   - **Substack stop tile**: small Substack icon, post title, and a 3-line text preview.
   - **Planned stop tile**: shown only when the region has no Instagram or Substack stops (see FR-018). Displays location and date; caption shown if present. No clickable action.
 
 ### View 3: Stop Detail Pop-Up
 
-Opens as a modal overlay that dims the background and occupies approximately 80% of the screen width. Entry points are defined in FR-016.
+Opens as a modal overlay that dims the background and occupies approximately 80% of the screen width and most of the screen height (up to 95vh). Entry points are defined in FR-016.
 
 **Overlay dim area**:
 - Left side: left-arrow button at vertical mid-point to navigate to the previous stop post.
@@ -181,7 +189,7 @@ Opens as a modal overlay that dims the background and occupies approximately 80%
 
 **Main content area**:
 - Breadcrumb navigation: Trip / Region / Location · Date.
-- **Instagram post layout**: location as heading, caption as subheading, hero image below.
+- **Instagram post layout**: location as heading, caption as subheading, hero image below rendered at its original aspect ratio. The image is sized to fit within the modal without ever causing vertical scroll — if too tall, its rendered width shrinks to keep the image height within the available space (see FR-026).
 - **Substack post layout**: article title as heading, subtitle as subheading, long-form body text with inline section headings below.
 
 ## Success Criteria *(mandatory)*

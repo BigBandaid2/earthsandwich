@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import type { RegionGroup } from '../utils/regionUtils';
 import { formatDateRange, formatDate } from '../utils/regionUtils';
 import type { Stop, InstagramPost, SubstackPost, PlannedPost } from '../data/types';
@@ -15,12 +16,28 @@ function RegionSidebar({
   onSelectRegion,
   onOpenStop,
 }: RegionSidebarProps) {
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const activeAccordionRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!activeRegionCode) return;
+    const container = scrollContainerRef.current;
+    const target = activeAccordionRef.current;
+    if (!container || !target) return;
+    const offset = target.offsetTop - container.offsetTop;
+    container.scrollTo({ top: offset, behavior: 'smooth' });
+  }, [activeRegionCode]);
+
   return (
-    <div className="region-sidebar">
-      {regionGroups.map((group) => {
+    <div className="region-sidebar" ref={scrollContainerRef}>
+      {[...regionGroups].reverse().map((group) => {
         const isActive = group.region.code === activeRegionCode;
         return (
-          <div key={group.region.code} className={`region-accordion ${isActive ? 'expanded' : 'collapsed'}`}>
+          <div
+            key={group.region.code}
+            className={`region-accordion ${isActive ? 'expanded' : 'collapsed'}`}
+            ref={isActive ? activeAccordionRef : undefined}
+          >
             <button
               type="button"
               className="region-accordion-header"

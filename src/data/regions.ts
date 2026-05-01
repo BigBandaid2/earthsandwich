@@ -54,6 +54,9 @@ export const REGIONS: Region[] = [
   // ── Turkey & Greece ───────────────────────────────────────
   { code: 'IST', name: 'Istanbul', airportName: 'Istanbul Airport', country: 'Turkey', coords: { lat: 41.2753, lng: 28.7519 } },
   { code: 'ADB', name: 'Izmir (Aegean Coast)', airportName: 'Adnan Menderes Airport', country: 'Turkey', coords: { lat: 38.2924, lng: 27.1570 } },
+  { code: 'DNZ', name: 'Pamukkale (Denizli)', airportName: 'Çardak Airport', country: 'Turkey', coords: { lat: 37.7856, lng: 29.7013 } },
+  { code: 'AYT', name: 'Antalya (Mediterranean Coast)', airportName: 'Antalya Airport', country: 'Turkey', coords: { lat: 36.8987, lng: 30.8005 } },
+  { code: 'ASR', name: 'Cappadocia (Kayseri)', airportName: 'Kayseri Erkilet International Airport', country: 'Turkey', coords: { lat: 38.7704, lng: 35.4954 } },
   { code: 'JTR', name: 'Santorini (Greek Islands)', airportName: 'Santorini (Thira) National Airport', country: 'Greece', coords: { lat: 36.3992, lng: 25.4793 } },
   { code: 'ATH', name: 'Athens', airportName: 'Athens International Airport Eleftherios Venizelos', country: 'Greece', coords: { lat: 37.9364, lng: 23.9445 } },
 
