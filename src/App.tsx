@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { APIProvider } from '@vis.gl/react-google-maps';
-import { miscellaneousAdventures } from './data/miscellaneous-adventures';
+import { trips } from './data/itinerary';
 import { groupStopsByRegion } from './utils/regionUtils';
 import type { Trip } from './data/types';
 import WorldMap from './components/MapView';
@@ -10,10 +10,16 @@ import StopModal from './components/StopDetail';
 
 export type ViewMode = 'trip' | 'region';
 
-const TRIPS: Trip[] = [miscellaneousAdventures];
+function firstStopDate(trip: Trip): string {
+  return trip.stops.reduce((min, s) => (s.date < min ? s.date : min), trip.stops[0]?.date ?? '');
+}
+
+const TRIPS: Trip[] = [...trips].sort((a, b) =>
+  firstStopDate(b).localeCompare(firstStopDate(a))
+);
 
 function App() {
-  const [activeTrip, setActiveTrip] = useState<Trip>(TRIPS[0]);
+  const [activeTrip, setActiveTrip] = useState<Trip>(TRIPS[0]); // TRIPS[0] = most recent by first stop date
   const [viewMode, setViewMode] = useState<ViewMode>('trip');
   const [activeRegionCode, setActiveRegionCode] = useState<string | null>(null);
   const [openStopId, setOpenStopId] = useState<string | null>(null);

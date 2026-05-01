@@ -112,6 +112,28 @@
 
 ---
 
+## Phase 8: Planned Stop Type & New Trip Data
+
+**Purpose**: Implement the Planned post type, load two new trips, and add the region-view suppression logic
+
+**Status**: Partially complete — types and data files created; UI display logic pending
+
+- [x] T051 Add `PlannedPost` interface and update `StopPost` union in `src/data/types.ts`
+- [x] T052 Create `src/data/earth-sandwich-2015.ts` with 82 hard-coded planned stops (geocoords pre-computed)
+- [x] T053 Create `src/data/earth-club-sandwich-2027.ts` with 30 hard-coded planned stops (geocoords pre-computed)
+- [x] T054 Expand `src/data/regions.ts` with all new airport anchor entries (~100 regions total)
+- [x] T055 Update `src/data/itinerary.ts` to export `trips: Trip[]` array and default `itinerary` (Earth Club Sandwich 2027)
+- [ ] T056 [US4] Implement planned stop suppression filter in `src/components/RegionSidebar.tsx`: hide Planned tiles when any Instagram or Substack stop exists in the same region (FR-018)
+- [ ] T057 [US4] Render Planned stop tiles in region sidebar when the region contains only Planned stops: show location, date, and optional caption (FR-018)
+- [ ] T058 [US4] Suppress stop detail pop-up for Planned stops: clicking a Planned marker or tile takes no action (FR-019)
+- [ ] T059 [US4] Omit Instagram thumbnail row and Substack tile row from trip overview region tile when all stops in that region are Planned (FR-021)
+- [ ] T060 Update `src/App.tsx` to consume `trips` array from `itinerary.ts` and wire the trip selector to all three trips
+- [ ] T061 Manual test: load each of the three trips, verify map route, sidebar display, and planned stop suppression logic
+
+**Checkpoint**: All three trips render; planned stop suppression and no-pop-up behavior verified
+
+---
+
 ## Phase 7: Polish & Cross-Cutting Concerns
 
 **Purpose**: Enhancements affecting multiple user stories and overall quality

@@ -8,6 +8,7 @@ created: 2026-04-24
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-04-24
+**Updated**: 2026-04-29 (added Planned stop type + two new trips)
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -44,4 +45,4 @@ created: 2026-04-24
 
 ## Notes
 
-All items pass. Spec is ready for `/speckit.plan`.
+All items pass. Spec updated 2026-04-29 to add: Planned post type (FR-017–FR-021), User Story 4, SC-008–SC-009, two new hard-coded trips, and corresponding data model entries. Checklist re-validated — all items still pass.

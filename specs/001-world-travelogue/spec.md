@@ -2,6 +2,7 @@
 
 **Feature Branch**: `001-world-travelogue`
 **Created**: 2026-04-22
+**Updated**: 2026-04-29
 **Status**: Draft
 **Input**: User description: "I am building a travel website that will show the trip itinerary of an upcoming round-the-world trip with roughly 50 major stop. Each stop will have a location, caption, date, image (optional), and long form blog post (optional).
 
@@ -58,6 +59,22 @@ A visitor opens a stop post and sees its full content: an Instagram post shows t
 
 ---
 
+### User Story 4 - View a planned-only itinerary (Priority: P3)
+
+A visitor viewing a trip whose stops have no photo or article content (only location, date, and optional caption) can still see the full route on the map and browse stop tiles in the region view, getting a preview of the journey without rich media.
+
+**Why this priority**: Planned stops are necessary for trips that have a defined itinerary but no published Instagram or Substack content. They provide route context without requiring photos or articles.
+
+**Independent Test**: Load a trip where all stops are of the Planned type. Verify the route appears on the map, planned stop tiles appear in the region sidebar (since no other stop types exist in those regions), and clicking a planned stop does not open a detail pop-up.
+
+**Acceptance Scenarios**:
+
+1. **Given** a region that contains only Planned stops, **When** the visitor drills into that region, **Then** the Planned stop tiles are shown in the region sidebar with location, date, and optional caption.
+2. **Given** a region that contains at least one Instagram or Substack stop, **When** the visitor drills into that region, **Then** no Planned stop tiles are shown in the region sidebar.
+3. **Given** a visitor clicks a Planned stop marker on the map or a Planned stop tile in the sidebar, **When** the click event fires, **Then** no stop detail pop-up opens.
+
+---
+
 ### Edge Cases
 
 - What happens when a stop has only a caption and date but no image or blog post?
@@ -69,6 +86,8 @@ A visitor opens a stop post and sees its full content: an Instagram post shows t
 - How is the region end date calculated for the last region in a trip, which has no subsequent region?
 - What happens if a trip contains only one region?
 - What happens when a visitor opens the stop detail pop-up and navigates past the first or last stop?
+- What does the trip overview sidebar show for a region whose stops are all of the Planned type? (No Instagram thumbnails or Substack tiles — just the region header, date range, and Expand button.)
+- How does the site behave when a trip spans more than 80 stops across 60+ regions?
 
 ## Requirements *(mandatory)*
 
@@ -83,20 +102,26 @@ A visitor opens a stop post and sees its full content: an Instagram post shows t
 - **FR-007**: The system MUST render the site as read-only; all content is hard-coded and no visitor input is saved.
 - **FR-008**: The system MUST allow visitors to expand and collapse region sections in the trip feed without leaving the current view.
 - **FR-009**: The system MUST gracefully handle stops with missing optional content by displaying only the fields that are present.
-- **FR-010**: The system MUST support multiple trip itineraries and show the most recent trip by default on page load; visitors MUST be able to switch between trips.
+- **FR-010**: The system MUST support multiple trip itineraries and show the most recent trip by default on page load. The trip selector list MUST display all available itineraries in reverse chronological order, sorted by the date of each trip's earliest stop. Visitors MUST be able to switch between trips by selecting from this list.
 - **FR-011**: The system MUST determine the "active region" of a trip as the last region in sequence that contains at least one visited stop. If all regions are visited or none are visited, no active region is designated.
 - **FR-012**: The system MUST render the route line between regions as a solid line for any segment where at least one adjacent region has visited stops, and as a dashed line for segments where both adjacent regions have only planned stops.
-- **FR-013**: The system MUST support two stop post types — Instagram (photo, caption, location, date) and Substack (title, subtitle, long-form text). Each type has a distinct data shape and display format.
+- **FR-013**: The system MUST support three stop post types — Instagram (photo, caption, location, date), Substack (title, subtitle, long-form text), and Planned (location, date, optional caption, no photo). Each type has a distinct data shape and display format.
 - **FR-014**: The system MUST calculate a region's date range as: start date = date of the first stop in the region; end date = the later of (date of the last stop in the region) or (one day before the first stop of the next region in the trip sequence).
 - **FR-015**: The system MUST enforce that only one region is active at a time in the region view; activating a new region collapses the previously active one and re-centers the map on the newly active region's stops.
 - **FR-016**: The system MUST allow visitors to open the stop detail pop-up from any of these entry points: an Instagram photo thumbnail in the trip overview sidebar, an Instagram or Substack content tile in the region sidebar, or a stop marker on the region map.
+- **FR-017**: Planned stops MUST always carry `status: "planned"` and never carry a photo. An optional caption field may provide brief context for the stop.
+- **FR-018**: The system MUST suppress Planned stop tiles from the region sidebar when any Instagram or Substack stop exists in the same region. If a region contains only Planned stops, those tiles MUST be shown.
+- **FR-019**: The system MUST NOT open a stop detail pop-up when a visitor clicks a Planned stop marker or tile; clicking a Planned stop takes no action.
+- **FR-020**: The system MUST include hard-coded itinerary data for two additional trips: "Earth Sandwich 2015" (82 stops, July 2015 – August 2016) and "Earth Club Sandwich 2027" (30 stops, March 2027 – May 2028). All stops in both trips use the Planned post type.
+- **FR-021**: The trip overview sidebar region tile MUST omit the Instagram thumbnail row and Substack tile row for regions that contain only Planned stops, showing only the region header, date range, and "Expand Region →" button.
 
 ### Key Entities *(include if feature involves data)*
 
 - **Trip Itinerary**: A named journey composed of an ordered sequence of stops. Multiple itineraries coexist in the site; the most recent by date is shown by default. Each itinerary has a title, description, and an ordered list of stops.
-- **Stop**: A single itinerary entry belonging to exactly one region. Each stop has a date, location string, geocoded coordinates, visited/planned status, and a post type (Instagram or Substack).
-- **Instagram Post**: A stop post type sourced from an Instagram post. Contains: photo URL, caption text, location string, and timestamp. Identified by Instagram media ID and shortcode.
-- **Substack Post**: A stop post type sourced from a Substack article. Contains: title, subtitle, and long-form body text.
+- **Stop**: A single itinerary entry belonging to exactly one region. Each stop has a date, location string, geocoded coordinates, a status (visited or planned), and a post type (Instagram, Substack, or Planned).
+- **Instagram Post**: A stop post type sourced from an Instagram post. Always carries `status: "visited"`. Contains: photo URL, caption text, location string, and timestamp. Identified by Instagram media ID and shortcode.
+- **Substack Post**: A stop post type sourced from a Substack article. Always carries `status: "visited"`. Contains: title, subtitle, and long-form body text.
+- **Planned Post**: A stop post type representing a planned itinerary entry with no published content. Always carries `status: "planned"`. Contains: location, date, and an optional caption. Has no photo and no detail pop-up.
 - **Region**: A dynamic grouping of nearby stops derived from the nearest international airport. Computed from stop coordinates at build time; not stored as an explicit entity. Characterized by an airport code, region name, country, and reference coordinates. Date range is derived from the region's stops and the subsequent region's start date (see FR-014).
 
 ## UI Design
@@ -144,6 +169,7 @@ Accessed by selecting "Expand Region →" from the trip overview. Same split lay
   - Region name, country, and date.
   - **Instagram stop tile**: small Instagram icon, caption text (up to 3 lines with ellipsis if longer), and a single full-width photo below the caption.
   - **Substack stop tile**: small Substack icon, post title, and a 3-line text preview.
+  - **Planned stop tile**: shown only when the region has no Instagram or Substack stops (see FR-018). Displays location and date; caption shown if present. No clickable action.
 
 ### View 3: Stop Detail Pop-Up
 
@@ -169,6 +195,8 @@ Opens as a modal overlay that dims the background and occupies approximately 80%
 - **SC-005**: The site handles stops with missing optional content without layout failure.
 - **SC-006**: The map remains legible at trip level by showing region markers rather than individual stop markers.
 - **SC-007**: Visitors can switch between multiple trip itineraries without a page reload.
+- **SC-008**: All 82 Earth Sandwich 2015 stops and all 30 Earth Club Sandwich 2027 stops are present in the data and render on the map without errors.
+- **SC-009**: In any region that mixes Planned stops with Instagram or Substack stops, zero Planned stop tiles appear in the region sidebar.
 
 ## Assumptions
 
@@ -176,7 +204,11 @@ Opens as a modal overlay that dims the background and occupies approximately 80%
 - All itinerary and travel content is hard-coded into the site at build time.
 - The site is delivered as a static web application without server-side dynamic content.
 - Region membership is pre-computed from stop coordinates at build time; no runtime geocoding is performed.
-- Content sources are Instagram (photo posts) and Substack (article posts); other content platforms are out of scope for this version.
+- Content sources are Instagram (photo posts), Substack (article posts), and Planned (itinerary entries with no rich content). Other content platforms are out of scope for this version.
+- The Earth Sandwich 2015 trip (July 2015 – August 2016) is a completed trip represented entirely with Planned stops, as no Instagram or Substack content has been attached to those itinerary entries.
+- The Earth Club Sandwich 2027 trip (March 2027 – May 2028) is a future trip represented entirely with Planned stops.
+- Planned stop coordinates are pre-geocoded at build time using well-known city coordinates; no runtime geocoding is performed.
+- The "Sofia, Belarus" entry in the Earth Sandwich 2015 CSV is a data error; the correct location is Sofia, Bulgaria.
 - The target audience is travelers and their friends and family.
 - Mobile responsiveness is expected, but desktop and tablet are the primary target.
 - The map component is provided by a third-party mapping service; zoom behavior, map detail levels, and marker rendering are constrained by that service's capabilities.

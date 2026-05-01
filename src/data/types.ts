@@ -20,7 +20,12 @@ export interface SubstackPost {
   body: string;
 }
 
-export type StopPost = InstagramPost | SubstackPost;
+export interface PlannedPost {
+  type: 'planned';
+  caption?: string;
+}
+
+export type StopPost = InstagramPost | SubstackPost | PlannedPost;
 
 export interface Stop {
   id: string;

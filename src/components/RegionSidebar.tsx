@@ -1,6 +1,6 @@
 import type { RegionGroup } from '../utils/regionUtils';
 import { formatDateRange, formatDate } from '../utils/regionUtils';
-import type { Stop, InstagramPost, SubstackPost } from '../data/types';
+import type { Stop, InstagramPost, SubstackPost, PlannedPost } from '../data/types';
 
 interface RegionSidebarProps {
   regionGroups: RegionGroup[];
@@ -70,8 +70,10 @@ function StopTile({ stop, isLast, onClick }: { stop: Stop; isLast: boolean; onCl
         </div>
         {stop.post.type === 'instagram' ? (
           <InstagramTileContent post={stop.post} />
-        ) : (
+        ) : stop.post.type === 'substack' ? (
           <SubstackTileContent post={stop.post} />
+        ) : (
+          <PlannedTileContent post={stop.post} />
         )}
       </button>
     </div>
@@ -108,6 +110,14 @@ function SubstackTileContent({ post }: { post: SubstackPost }) {
           <p className="stop-tile-article-preview">{post.body.slice(0, 120)}{post.body.length > 120 ? '…' : ''}</p>
         )}
       </div>
+    </div>
+  );
+}
+
+function PlannedTileContent({ post }: { post: PlannedPost }) {
+  return (
+    <div className="stop-tile-planned">
+      {post.caption && <p className="stop-tile-caption">{post.caption}</p>}
     </div>
   );
 }
