@@ -35,7 +35,8 @@ Represents a single itinerary entry belonging to a region.
   Geocoded from the stop's location string. Required for map rendering and region assignment.
 - `location`: string  
   Human-readable address string (e.g., `"Oaxaca Centro, Mexico"`). Source of truth for geocoding.
-- `status`: `"visited" | "planned"`
+- `status`: `"visited" | "planned"`  
+  Stored authored status. At render time a derived status of `"abandoned"` is computed for any stop whose stored status is `"planned"` and whose `date` is strictly before today. The stored value is never changed by this derivation.
 - `regionCode`: string  
   The nearest international airport code used to derive region membership.
 - `regionName?`: string  
@@ -64,6 +65,15 @@ Regions are derived dynamically from each stop’s geocoded coordinates by selec
 - Each stop belongs to exactly one region.
 - Regions are used for grouping and navigation, not as itinerary entries.
 - Stop coordinates are the primary source of truth for region assignment.
+
+### Derived effective status
+
+The `status` field on a Stop is the authored value. The view layer computes an effective status per stop and per region:
+
+- A stop's effective status is `"abandoned"` if its stored status is `"planned"` and `date < today_UTC` (today's date in UTC). Otherwise the effective status equals the stored status.
+- A region's overall effective status is `"abandoned"` if every stop in the region is abandoned. Otherwise the region's status is computed from its non-abandoned stops as `visited`, `planned`, or `mixed` of those two.
+- Fully-abandoned regions are excluded from the route polyline so segments connect across them, but their markers still render on the map.
+- Abandoned regions are also skipped when computing the FR-014 "next region" anchor for date-range extension; their own end date is simply their last stop date (no extension).
 
 ## Example stop structure
 

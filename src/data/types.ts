@@ -1,4 +1,8 @@
+// Stored status authored on each stop. The view layer derives a third
+// effective status, "abandoned", for planned stops whose date is in the past
+// (see FR-028). The stored value is never reclassified.
 export type StopStatus = 'visited' | 'planned';
+export type EffectiveStopStatus = 'visited' | 'planned' | 'abandoned';
 
 export interface Coordinates {
   lat: number;

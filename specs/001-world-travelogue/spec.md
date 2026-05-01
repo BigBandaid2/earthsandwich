@@ -12,6 +12,16 @@ There are two types of users who will use the site: One are the travelers themse
 
 Here is a site online that is already very close to what I am envisioning in presentation format, if you would like to use it as a reference. The main feature it does not have that I want is the ability to designate content as trip level or city level and doing the zoomed in city view. https://clem.travelmap.net/cycling-around-australia"
 
+## Clarifications
+
+### Session 2026-05-01
+
+- Q: Timezone basis for the "is the stop's date in the past?" comparison that derives `abandoned` (FR-028) → A: UTC — the comparison uses the current UTC date so classification is identical for every visitor regardless of timezone.
+- Q: Should abandoned stop tiles be suppressed from the region sidebar when the same region also contains Instagram or Substack stops (mirroring FR-018's behavior for planned tiles)? → A: Yes — abandoned tiles follow the same suppression rule as planned tiles (FR-018 extended to abandoned).
+- Q: Display order of the trip feed sidebar's three status sections (FR-031)? → A: Visited (top) → Planned (middle) → Abandoned (bottom).
+- Q: Visual treatment of abandoned stops and regions (FR-029, FR-030)? → A: Strike-through location/region name + faded grey color + dashed connector dot. Abandoned stops/regions render with NO connector line (vertical or horizontal) joining them to any neighbor — they stand alone in the sidebar list and have no polyline edge on the map.
+- Q: For FR-014 region end-date computation, what is the "next region" when the immediate next region is abandoned? → A: Use the next non-abandoned region as the anchor (skip abandoned regions for date-range purposes, matching the route-line skip in FR-030). An abandoned region's own end date is just its last stop date (no extension).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Browse trip progress on map (Priority: P1)
@@ -75,6 +85,22 @@ A visitor viewing a trip whose stops have no photo or article content (only loca
 
 ---
 
+### User Story 5 - See abandoned plans alongside the active itinerary (Priority: P3)
+
+A visitor viewing a trip can see stops that were planned but never visited (their planned date is in the past) called out separately as "abandoned". These stops still appear on the map and in the sidebar so the visitor sees the original intention, but they are visually disconnected from the active route — no line is drawn between an abandoned stop and its neighbors.
+
+**Why this priority**: Real itineraries shift. Plans get dropped — destinations skipped, side trips canceled. Showing abandoned stops preserves a faithful record of what was planned versus what actually happened, without distorting the route line through places the travelers did not go.
+
+**Independent Test**: Load a trip that contains at least one planned stop with a past date. Confirm the stop is labeled as abandoned (its status displays as "abandoned") in the sidebar under a dedicated "Abandoned" section, the stop's region marker still appears on the map, and the route line skips over the abandoned region rather than detouring through it.
+
+**Acceptance Scenarios**:
+
+1. **Given** a trip contains a stop with `status: "planned"` whose date is earlier than today, **When** the trip is rendered, **Then** that stop's effective status is "abandoned" and it is grouped under an "Abandoned" sidebar section separate from "Visited" and "Planned".
+2. **Given** an abandoned stop sits sequentially between two non-abandoned stops in the trip, **When** the route line is drawn, **Then** the line connects the two non-abandoned stops directly and does not connect to or pass through the abandoned stop's region.
+3. **Given** an abandoned region is shown on the map, **When** the visitor expands the region, **Then** the abandoned stops appear in the region sidebar with their location, date, and optional caption, and (consistent with planned stops) clicking them does not open a stop detail pop-up.
+
+---
+
 ### Edge Cases
 
 - What happens when a stop has only a caption and date but no image or blog post?
@@ -88,6 +114,8 @@ A visitor viewing a trip whose stops have no photo or article content (only loca
 - What happens when a visitor opens the stop detail pop-up and navigates past the first or last stop?
 - What does the trip overview sidebar show for a region whose stops are all of the Planned type? (No Instagram thumbnails or Substack tiles — just the region header, date range, and Expand button.)
 - How does the site behave when a trip spans more than 80 stops across 60+ regions?
+- What happens to a region whose stops are a mix of abandoned and non-abandoned? (The region is grouped under whichever non-abandoned status applies; only fully-abandoned regions are hoisted into the "Abandoned" sidebar section, and only fully-abandoned regions are skipped by the route line.)
+- What happens to a planned stop whose date is exactly today? (Today is not "in the past" — the stop remains "planned".)
 
 ## Requirements *(mandatory)*
 
@@ -106,11 +134,11 @@ A visitor viewing a trip whose stops have no photo or article content (only loca
 - **FR-011**: The system MUST determine the "active region" of a trip as the last region in sequence that contains at least one visited stop. If all regions are visited or none are visited, no active region is designated.
 - **FR-012**: The system MUST render the route line between regions as a solid line for any segment where at least one adjacent region has visited stops, and as a dashed line for segments where both adjacent regions have only planned stops.
 - **FR-013**: The system MUST support three stop post types — Instagram (photo, caption, location, date), Substack (title, subtitle, long-form text), and Planned (location, date, optional caption, no photo). Each type has a distinct data shape and display format.
-- **FR-014**: The system MUST calculate a region's date range as: start date = date of the first stop in the region; end date = the later of (date of the last stop in the region) or (one day before the first stop of the next region in the trip sequence).
+- **FR-014**: The system MUST calculate a region's date range as: start date = date of the first stop in the region; end date = the later of (date of the last stop in the region) or (one day before the first stop of the next non-abandoned region in the trip sequence). Abandoned regions are skipped when locating the "next region" anchor (consistent with FR-030's route-line skip). An abandoned region itself receives no end-date extension — its end date is simply the date of its last stop.
 - **FR-015**: The system MUST enforce that only one region is active at a time in the region view; activating a new region collapses the previously active one and re-centers the map on the newly active region's stops.
 - **FR-016**: The system MUST allow visitors to open the stop detail pop-up from any of these entry points: an Instagram photo thumbnail in the trip overview sidebar, an Instagram or Substack content tile in the region sidebar, or a stop marker on the region map.
 - **FR-017**: Planned stops MUST always carry `status: "planned"` and never carry a photo. An optional caption field may provide brief context for the stop.
-- **FR-018**: The system MUST suppress Planned stop tiles from the region sidebar when any Instagram or Substack stop exists in the same region. If a region contains only Planned stops, those tiles MUST be shown.
+- **FR-018**: The system MUST suppress Planned and Abandoned stop tiles from the region sidebar when any Instagram or Substack stop exists in the same region. If a region contains only Planned and/or Abandoned stops, those tiles MUST be shown.
 - **FR-019**: The system MUST NOT open a stop detail pop-up when a visitor clicks a Planned stop marker or tile; clicking a Planned stop takes no action.
 - **FR-020**: The system MUST include hard-coded itinerary data for two additional trips: "Earth Sandwich 2015" (82 stops, July 2015 – August 2016) and "Earth Club Sandwich 2027" (30 stops, March 2027 – May 2028). All stops in both trips use the Planned post type.
 - **FR-021**: The trip overview sidebar region tile MUST omit the Instagram thumbnail row and Substack tile row for regions that contain only Planned stops, showing only the region header, date range, and "Expand Region →" button.
@@ -119,15 +147,21 @@ A visitor viewing a trip whose stops have no photo or article content (only loca
 - **FR-024**: Both the trip feed sidebar (View 1) and the region sidebar (View 2) MUST share the same fixed pixel width, sized to fit four 60px Instagram thumbnails with 4px gaps plus the connector column and feed padding in a single row. Below the mobile breakpoint (≤768px) the sidebar continues to stack under the map and span full width per existing responsive rules.
 - **FR-025**: Instagram images in the region sidebar stop tile (View 2) and in the stop detail pop-up (View 3) MUST render at their original aspect ratio. No fixed crop height or `object-fit: cover` cropping is applied.
 - **FR-026**: The stop detail pop-up (View 3) MUST occupy most of the screen height (up to 95vh) and MUST never trigger vertical scrolling caused by the Instagram hero image. If a portrait image would exceed the available vertical space, its rendered width MUST shrink (preserving aspect ratio) until both image and surrounding text fit within the modal without scrolling. Long-form Substack body text MAY still scroll inside the modal.
+- **FR-027**: Each trip itinerary MUST have its own shareable URL of the form `#/trip/{tripId}` where `{tripId}` is the trip's stable id (e.g. `earth-sandwich-2015`). On page load the system MUST read this hash and activate the matching trip; if no hash is present or the id is unknown, the default trip (most recent by start date) is shown. Switching trips via the selector MUST update the URL hash, and browser back/forward navigation MUST switch between trips accordingly. The implementation MUST use the URL hash (not History API path routing) so that the site remains a fully static SPA without server-side rewrites.
+- **FR-028**: The system MUST recognize a third stop status, "abandoned", in addition to "visited" and "planned". A stop's effective status is derived: any stop authored with `status: "planned"` whose `date` is strictly before the current UTC date (today's date in UTC, computed at render time) is treated as "abandoned". Using UTC ensures every visitor classifies the same stop identically regardless of their local timezone. Stops authored as `"visited"` are never reclassified. The underlying stop data continues to carry only `"visited"` or `"planned"`; the "abandoned" classification is a derived, time-dependent view layer.
+- **FR-029**: A region's overall status MUST extend to include "abandoned". A region is "abandoned" if all of its stops are abandoned. A region with any non-abandoned stop retains its previous classification (visited / planned / mixed of those two), with abandoned stops within it ignored for the purpose of choosing visited-vs-planned status.
+- **FR-030**: The route line connecting regions MUST skip fully-abandoned regions entirely: the polyline is drawn over the sequence of non-abandoned regions only, so two non-abandoned regions on either side of an abandoned region connect directly to each other. Abandoned region markers MUST still appear on the map (so the visitor sees the abandoned plan), but they are not endpoints of any segment. In the sidebar, abandoned region tiles and abandoned stop tiles MUST omit the vertical connector line that joins adjacent tiles — abandoned items stand visually disconnected from the rest of the itinerary on every surface (map polyline, sidebar connector, region drill-down stop list).
+- **FR-031**: The trip feed sidebar MUST add a third collapsible section, "Abandoned", to the existing "Visited" and "Planned" sections. The three sections are rendered in a fixed top-to-bottom order: Visited → Planned → Abandoned. Fully-abandoned regions are listed in the Abandoned section and are excluded from the Visited and Planned sections. Sections that contain no regions for the current trip remain hidden (consistent with FR-002).
+- **FR-032**: Abandoned stops MUST follow the same interaction and suppression rules as Planned stops: clicking an abandoned stop marker on the map or an abandoned stop tile in the sidebar MUST NOT open the stop detail pop-up; and abandoned stop tiles MUST be suppressed from the region sidebar whenever any Instagram or Substack stop exists in the same region (per FR-018). When shown, abandoned stop tiles display location, date, and optional caption.
 
 ### Key Entities *(include if feature involves data)*
 
 - **Trip Itinerary**: A named journey composed of an ordered sequence of stops. Multiple itineraries coexist in the site; the most recent by date is shown by default. Each itinerary has a title, description, and an ordered list of stops.
-- **Stop**: A single itinerary entry belonging to exactly one region. Each stop has a date, location string, geocoded coordinates, a status (visited or planned), and a post type (Instagram, Substack, or Planned).
+- **Stop**: A single itinerary entry belonging to exactly one region. Each stop has a date, location string, geocoded coordinates, a stored status (visited or planned), and a post type (Instagram, Substack, or Planned). At render time a third effective status, "abandoned", is derived for any planned stop whose date has passed (see FR-028).
 - **Instagram Post**: A stop post type sourced from an Instagram post. Always carries `status: "visited"`. Contains: photo URL, caption text, location string, and timestamp. Identified by Instagram media ID and shortcode.
 - **Substack Post**: A stop post type sourced from a Substack article. Always carries `status: "visited"`. Contains: title, subtitle, and long-form body text.
 - **Planned Post**: A stop post type representing a planned itinerary entry with no published content. Always carries `status: "planned"`. Contains: location, date, and an optional caption. Has no photo and no detail pop-up.
-- **Region**: A dynamic grouping of nearby stops derived from the nearest international airport. Computed from stop coordinates at build time; not stored as an explicit entity. Characterized by an airport code, region name, country, and reference coordinates. Date range is derived from the region's stops and the subsequent region's start date (see FR-014).
+- **Region**: A dynamic grouping of nearby stops derived from the nearest international airport. Computed from stop coordinates at build time; not stored as an explicit entity. Characterized by an airport code, region name, country, and reference coordinates. Date range is derived from the region's stops and the subsequent region's start date (see FR-014). A region's overall status is one of visited, planned, mixed, or abandoned (see FR-029).
 
 ## UI Design
 

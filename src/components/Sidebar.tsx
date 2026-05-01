@@ -10,8 +10,13 @@ interface TripFeedProps {
 }
 
 function TripFeed({ regionGroups, onExpandRegion, onOpenStop }: TripFeedProps) {
-  const visited = regionGroups.filter((g) => g.overallStatus !== 'planned');
+  // FR-031: split into Visited / Planned / Abandoned sections. Mixed regions
+  // count as visited; fully-abandoned regions get their own section.
+  const visited = regionGroups.filter(
+    (g) => g.overallStatus === 'visited' || g.overallStatus === 'mixed'
+  );
   const planned = regionGroups.filter((g) => g.overallStatus === 'planned');
+  const abandoned = regionGroups.filter((g) => g.overallStatus === 'abandoned');
 
   return (
     <div className="trip-feed">
@@ -47,6 +52,22 @@ function TripFeed({ regionGroups, onExpandRegion, onOpenStop }: TripFeedProps) {
           </div>
         </section>
       )}
+      {abandoned.length > 0 && (
+        <section className="feed-section">
+          <h2 className="feed-section-title">Abandoned</h2>
+          <div className="region-list">
+            {[...abandoned].reverse().map((group, idx, arr) => (
+              <RegionTile
+                key={group.region.code}
+                group={group}
+                isLast={idx === arr.length - 1}
+                onExpand={() => onExpandRegion(group.region.code)}
+                onOpenStop={onOpenStop}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
@@ -68,15 +89,18 @@ function RegionTile({ group, isLast, onExpand, onOpenStop }: RegionTileProps) {
   const extraSubstack = substackStops.length > 4 ? substackStops.length - 4 : 0;
 
   return (
-    <div className={`region-tile ${isLast ? 'last' : ''}`}>
+    <div className={`region-tile ${isLast ? 'last' : ''} ${group.overallStatus === 'abandoned' ? 'abandoned' : ''}`}>
       <div className="region-tile-connector">
-        <div className={`connector-dot ${group.overallStatus !== 'planned' ? 'visited' : 'planned'}`} />
-        {!isLast && <div className="connector-line" />}
+        <div className={`connector-dot ${group.overallStatus === 'abandoned' ? 'abandoned' : group.overallStatus === 'planned' ? 'planned' : 'visited'}`} />
+        {!isLast && group.overallStatus !== 'abandoned' && <div className="connector-line" />}
       </div>
 
       <div className="region-tile-content">
         <div className="region-tile-header">
           <strong className="region-name">{group.region.name}</strong>
+          <button type="button" className="expand-region-btn inline" onClick={onExpand}>
+            Expand →
+          </button>
           <span className="region-country">{group.region.country}</span>
           <span className="region-dates">{formatDateRange(group.startDate, group.endDate)}</span>
         </div>
@@ -127,9 +151,6 @@ function RegionTile({ group, isLast, onExpand, onOpenStop }: RegionTileProps) {
           </div>
         )}
 
-        <button type="button" className="expand-region-btn" onClick={onExpand}>
-          Expand Region →
-        </button>
       </div>
     </div>
   );

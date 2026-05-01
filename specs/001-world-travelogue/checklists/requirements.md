@@ -8,7 +8,7 @@ created: 2026-04-24
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-04-24
-**Updated**: 2026-04-29 (added Planned stop type + two new trips)
+**Updated**: 2026-05-01 (added Abandoned stop status — FR-028–FR-032, User Story 5)
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -46,3 +46,5 @@ created: 2026-04-24
 ## Notes
 
 All items pass. Spec updated 2026-04-29 to add: Planned post type (FR-017–FR-021), User Story 4, SC-008–SC-009, two new hard-coded trips, and corresponding data model entries. Checklist re-validated — all items still pass.
+
+Spec updated 2026-05-01 to add: Abandoned status (FR-028–FR-032), User Story 5, two new edge cases, and updated Stop / Region entity descriptions. Checklist re-validated — all items still pass.

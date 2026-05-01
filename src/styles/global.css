@@ -198,6 +198,19 @@ button {
   border-color: #334155;
 }
 
+.connector-dot.abandoned {
+  background: transparent;
+  border-color: #94a3b8;
+  border-style: dashed;
+}
+
+.region-tile.abandoned .region-name,
+.stop-tile.abandoned .stop-tile-location {
+  color: #94a3b8;
+  text-decoration: line-through;
+  text-decoration-color: rgba(148, 163, 184, 0.6);
+}
+
 .connector-line {
   flex: 1;
   width: 2px;
@@ -213,15 +226,30 @@ button {
 }
 
 .region-tile-header {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 8px;
+  row-gap: 2px;
   margin-bottom: 10px;
+  align-items: center;
 }
 
 .region-name {
   font-size: 0.95rem;
   color: #f1f5f9;
+  grid-column: 1;
+}
+
+.region-tile-header .expand-region-btn.inline {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  margin-top: 0;
+}
+
+.region-country,
+.region-dates {
+  grid-column: 1 / -1;
 }
 
 .region-country {

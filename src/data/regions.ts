@@ -98,6 +98,12 @@ export const REGIONS: Region[] = [
   { code: 'IAH', name: 'Houston', airportName: 'George Bush Intercontinental Airport', country: 'USA', coords: { lat: 29.9902, lng: -95.3368 } },
   { code: 'MSY', name: 'New Orleans', airportName: 'Louis Armstrong New Orleans International Airport', country: 'USA', coords: { lat: 29.9934, lng: -90.2580 } },
   { code: 'HAV', name: 'Havana', airportName: 'José Martí International Airport', country: 'Cuba', coords: { lat: 22.9892, lng: -82.4091 } },
+  { code: 'YYZ', name: 'Toronto', airportName: 'Toronto Pearson International Airport', country: 'Canada', coords: { lat: 43.6777, lng: -79.6248 } },
+  { code: 'NAS', name: 'Nassau (Bahamas)', airportName: 'Lynden Pindling International Airport', country: 'Bahamas', coords: { lat: 25.0390, lng: -77.4660 } },
+  { code: 'SEA', name: 'Seattle', airportName: 'Seattle–Tacoma International Airport', country: 'USA', coords: { lat: 47.4502, lng: -122.3088 } },
+  { code: 'YVR', name: 'Vancouver', airportName: 'Vancouver International Airport', country: 'Canada', coords: { lat: 49.1939, lng: -123.1844 } },
+  { code: 'LAS', name: 'Las Vegas', airportName: 'Harry Reid International Airport', country: 'USA', coords: { lat: 36.0840, lng: -115.1537 } },
+  { code: 'SFO', name: 'San Francisco', airportName: 'San Francisco International Airport', country: 'USA', coords: { lat: 37.6213, lng: -122.3790 } },
 
   // ── South America ─────────────────────────────────────────
   { code: 'BOG', name: 'Bogotá', airportName: 'El Dorado International Airport', country: 'Colombia', coords: { lat: 4.7016, lng: -74.1469 } },
