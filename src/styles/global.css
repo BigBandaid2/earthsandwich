@@ -621,6 +621,20 @@ button {
   color: #334155;
 }
 
+.breadcrumb-ig-link {
+  color: #93c5fd;
+  text-decoration: none;
+}
+
+.breadcrumb-ig-link:hover {
+  text-decoration: underline;
+}
+
+.post-hero-link {
+  display: block;
+  cursor: pointer;
+}
+
 .post-heading {
   margin: 0;
   font-size: 1.4rem;
