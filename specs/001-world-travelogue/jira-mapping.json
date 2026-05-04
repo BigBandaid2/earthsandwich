@@ -61,6 +61,54 @@
       "tasks": []
     },
     {
+      "key": "OCS-49",
+      "summary": "Phase 9: Multi-Trip URL Routing",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-49",
+      "status": "completed",
+      "sprint": "OCS Sprint 1",
+      "tasks": []
+    },
+    {
+      "key": "OCS-50",
+      "summary": "Phase 10: Abandoned Stop Status",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-50",
+      "status": "completed",
+      "sprint": "OCS Sprint 1",
+      "tasks": []
+    },
+    {
+      "key": "OCS-51",
+      "summary": "Phase 11: Substack Post Integration",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-51",
+      "status": "completed",
+      "sprint": "OCS Sprint 1",
+      "tasks": []
+    },
+    {
+      "key": "OCS-52",
+      "summary": "Phase 12: Stop Data Backfill (Earth Sandwich 2015)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-52",
+      "status": "completed",
+      "sprint": "OCS Sprint 1",
+      "tasks": []
+    },
+    {
+      "key": "OCS-53",
+      "summary": "Phase 13: Map and Sidebar UX Refinements",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-53",
+      "status": "completed",
+      "sprint": "OCS Sprint 1",
+      "tasks": []
+    },
+    {
+      "key": "OCS-54",
+      "summary": "Phase 14: Spec-Kit / JIRA Integration",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-54",
+      "status": "completed",
+      "sprint": "OCS Sprint 1",
+      "tasks": []
+    },
+    {
       "key": "OCS-19",
       "summary": "Phase 7: Polish & Cross-Cutting Concerns",
       "url": "https://datacommlab.atlassian.net/browse/OCS-19",
@@ -80,15 +128,15 @@
     }
   ],
   "summary": {
-    "total_stories": 8,
-    "completed_stories": 7,
+    "total_stories": 14,
+    "completed_stories": 13,
     "active_stories": 1,
     "total_tasks": 10,
     "pending_tasks": 10,
     "completed_tasks": 0
   },
   "notes": [
-    "Phases 1-6 and 8 are represented at the Story level only; their per-task records are not in JIRA (the tasks are completed historic work).",
-    "If the 19 stale historic Subtasks (OCS-20 through OCS-38) still exist in JIRA, they should be bulk-deleted via the JIRA UI using the JQL filter: project = OCS AND issuekey >= OCS-20 AND issuekey <= OCS-38."
+    "All historic phases (1-6, 8, 9-14) are represented at the Story level only. Per-task records exist only for the active Phase 7 polish backlog.",
+    "Phases 9-14 (OCS-49 through OCS-54) are placed in OCS Sprint 1 (id 1, ends 2026-05-11) for accurate velocity attribution of the work shipped this week."
   ]
 }

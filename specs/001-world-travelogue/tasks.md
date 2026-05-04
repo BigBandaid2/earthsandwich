@@ -153,6 +153,76 @@
 
 ---
 
+## Phase 9: Multi-Trip URL Routing
+
+**Status**: Shipped 2026-05-01. New phase appended after work was completed; not in original plan.
+
+- [x] T062 Add FR-027 (hash routing `#/trip/{tripId}`) to `specs/001-world-travelogue/spec.md`
+- [x] T063 Implement hash parsing + `tripFromHash()` in `src/App.tsx`
+- [x] T064 Wire trip selector to push history state on switch
+- [x] T065 Listen for `hashchange`/`popstate` events to handle browser back/forward navigation
+
+---
+
+## Phase 10: Abandoned Stop Status
+
+**Status**: Shipped 2026-05-01.
+
+- [x] T066 Add FR-028–FR-032 + User Story 5 + edge cases to `spec.md`; update `data-model.md` notes
+- [x] T067 Add `EffectiveStopStatus` type and `getEffectiveStopStatus()` helper in `src/utils/regionUtils.ts`
+- [x] T068 Update region rollup logic for abandoned classification (FR-029) in `src/utils/regionUtils.ts`
+- [x] T069 Implement `getRoutedGroups()` to skip fully-abandoned regions in route polyline (FR-030)
+- [x] T070 Add Abandoned section to trip feed sidebar (FR-031) in `src/components/Sidebar.tsx`
+- [x] T071 Apply visual treatment: strike-through + faded grey + dashed dot, no connector line in `src/styles/global.css`
+- [x] T072 Adjust FR-014 region end-date computation to skip abandoned regions
+
+---
+
+## Phase 11: Substack Post Integration
+
+**Status**: Shipped 2026-05-01.
+
+- [x] T073 Parse `wela-posts.txt` and add 14 Substack stops to `src/data/earth-sandwich-2015.ts`
+- [x] T074 Add FR-033 to `spec.md`: exclude Substack dates from region date-range bounds; implement filter in `groupStopsByRegion()`
+- [x] T075 Update Substack Post entity description in `spec.md` to clarify date represents publication, not visit
+
+---
+
+## Phase 12: Stop Data Backfill (Earth Sandwich 2015)
+
+**Status**: Shipped 2026-05-01.
+
+- [x] T076 Add 178 Instagram stops to `src/data/earth-sandwich-2015.ts` from `posts.local.tsv`
+- [x] T077 Geocode/location-fill ~30 posts in `posts.local.tsv` that lacked location metadata; delete invalid (non-JPG) media files
+- [x] T078 Add YYZ, NAS, SEA, YVR, LAS, SFO regions to `src/data/regions.ts` for the pre-trip North American leg
+- [x] T079 Validate trip data via `npx tsc --noEmit -p .`
+
+---
+
+## Phase 13: Map and Sidebar UX Refinements
+
+**Status**: Shipped 2026-05-01.
+
+- [x] T080 Enable Google Maps `zoomControl` on both trip and region map views in `src/components/MapView.tsx`
+- [x] T081 Bump default zoom +0.4 above `fitBounds` default for continental view
+- [x] T082 Move "Expand Region" button inline with region title; shorten label to "Expand →" in `src/components/Sidebar.tsx`
+- [x] T083 Include day (not just month/year) in `formatDateRange()` output
+
+---
+
+## Phase 14: Spec-Kit / JIRA Integration
+
+**Status**: Shipped 2026-05-04.
+
+- [x] T084 Install `mbachorik/spec-kit-jira` extension via custom catalog override (`.specify/extension-catalogs.yml`)
+- [x] T085 Configure OCS project: Epic > Story > Subtask hierarchy with parent-field linkage in `.specify/extensions/jira/jira-config.yml`
+- [x] T086 Discover JIRA custom fields (Story Points, Sprint, Priority, Team) via Atlassian MCP and record in `discovered-fields.json`
+- [x] T087 Run smoke test: `999-jira-integration-test` push and sync round-trip; verify Story → Subtask hierarchy works
+- [x] T088 Push `001-world-travelogue` Epic and 8 Phase Stories to OCS-11 through OCS-19
+- [x] T089 Push Phase 7 polish backlog as Subtasks OCS-39 through OCS-48 (active work for forward sprints)
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

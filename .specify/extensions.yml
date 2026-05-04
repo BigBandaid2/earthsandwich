@@ -54,8 +54,8 @@ hooks:
     command: speckit.onboard.before-implement
     enabled: true
     optional: true
-    prompt: Execute speckit.onboard.before-implement?
-    description: ''
+    prompt: Skim recent project changes before implementing?
+    description: Show a digest of new/changed files since last implement so you can refresh your mental model before touching code.
     condition: null
   before_checklist:
   - extension: git
