@@ -65,7 +65,6 @@
       "summary": "Phase 9: Multi-Trip URL Routing",
       "url": "https://datacommlab.atlassian.net/browse/OCS-49",
       "status": "completed",
-      "sprint": "OCS Sprint 1",
       "tasks": []
     },
     {
@@ -73,7 +72,6 @@
       "summary": "Phase 10: Abandoned Stop Status",
       "url": "https://datacommlab.atlassian.net/browse/OCS-50",
       "status": "completed",
-      "sprint": "OCS Sprint 1",
       "tasks": []
     },
     {
@@ -81,7 +79,6 @@
       "summary": "Phase 11: Substack Post Integration",
       "url": "https://datacommlab.atlassian.net/browse/OCS-51",
       "status": "completed",
-      "sprint": "OCS Sprint 1",
       "tasks": []
     },
     {
@@ -89,7 +86,6 @@
       "summary": "Phase 12: Stop Data Backfill (Earth Sandwich 2015)",
       "url": "https://datacommlab.atlassian.net/browse/OCS-52",
       "status": "completed",
-      "sprint": "OCS Sprint 1",
       "tasks": []
     },
     {
@@ -97,7 +93,6 @@
       "summary": "Phase 13: Map and Sidebar UX Refinements",
       "url": "https://datacommlab.atlassian.net/browse/OCS-53",
       "status": "completed",
-      "sprint": "OCS Sprint 1",
       "tasks": []
     },
     {
@@ -105,7 +100,13 @@
       "summary": "Phase 14: Spec-Kit / JIRA Integration",
       "url": "https://datacommlab.atlassian.net/browse/OCS-54",
       "status": "completed",
-      "sprint": "OCS Sprint 1",
+      "tasks": []
+    },
+    {
+      "key": "OCS-55",
+      "summary": "Phase 15: Drift Reconciliation (2026-05-04 weekly scan)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-55",
+      "status": "completed",
       "tasks": []
     },
     {
@@ -123,20 +124,25 @@
         { "key": "OCS-45", "id": "T047", "summary": "Add comprehensive inline documentation to modified components", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-45" },
         { "key": "OCS-46", "id": "T048", "summary": "Update quickstart.md with usage examples and local dev instructions", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-46" },
         { "key": "OCS-47", "id": "T049", "summary": "Final browser testing (map, sidebar, detail panel, region clustering)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-47" },
-        { "key": "OCS-48", "id": "T050", "summary": "Test edge cases (missing images/blogs, very long blog text, dense regions)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-48" }
+        { "key": "OCS-48", "id": "T050", "summary": "Test edge cases (missing images/blogs, very long blog text, dense regions)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-48" },
+        { "key": "OCS-56", "id": "T093", "summary": "Replace continental-view map pin with country flag (fallback: smaller push-pin)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-56", "source": "stakeholder-meeting-2026-05-04" },
+        { "key": "OCS-57", "id": "T094", "summary": "Add directional arrowheads to the route polyline", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-57", "source": "stakeholder-meeting-2026-05-04" },
+        { "key": "OCS-58", "id": "T095", "summary": "Distinct Start and Finish pins for first/last trip stop", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-58", "source": "stakeholder-meeting-2026-05-04" },
+        { "key": "OCS-59", "id": "T096", "summary": "Vintage postcard map skin for continental view (no labels, no terrain)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-59", "source": "stakeholder-meeting-2026-05-04" }
       ]
     }
   ],
   "summary": {
-    "total_stories": 14,
-    "completed_stories": 13,
+    "total_stories": 15,
+    "completed_stories": 14,
     "active_stories": 1,
-    "total_tasks": 10,
-    "pending_tasks": 10,
+    "total_tasks": 14,
+    "pending_tasks": 14,
     "completed_tasks": 0
   },
   "notes": [
-    "All historic phases (1-6, 8, 9-14) are represented at the Story level only. Per-task records exist only for the active Phase 7 polish backlog.",
-    "Phases 9-14 (OCS-49 through OCS-54) are placed in OCS Sprint 1 (id 1, ends 2026-05-11) for accurate velocity attribution of the work shipped this week."
+    "All historic phases (1-6, 8, 9-15) are represented at the Story level only. Per-task records exist only for the active Phase 7 polish backlog.",
+    "Sprint assignment, owner, story points, and priority for these issues live exclusively in JIRA. Per docs/workflow.md, no sprint state is recorded in this repository.",
+    "Phase 15 (OCS-55) was created via the docs/workflow.md drift-scan procedure on 2026-05-04 to backfill commits c24c263..650040b that lacked task entries."
   ]
 }

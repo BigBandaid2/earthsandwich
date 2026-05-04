@@ -149,6 +149,13 @@
 - [ ] T049 Validate all tasks completed and run final browser testing (map, sidebar, detail panel, region clustering)
 - [ ] T050 Test edge cases: stops with missing images/blogs, very long blog text, many stops in one region
 
+### Stakeholder visual feedback (added 2026-05-04, not yet sprinted)
+
+- [ ] T093 [US-Polish] Replace large default Google Maps pin in continental view with a country-flag pin of similar size (decorative + informational about each stop's country) in `src/components/MapView.tsx`. If the flag pin is judged visually overwhelming after a side-by-side review, fall back to a smaller profile push-pin instead.
+- [ ] T094 [US-Polish] Add directional arrowheads to the route polyline connecting region pins so the trip direction is visually unambiguous in `src/components/MapView.tsx`.
+- [ ] T095 [US-Polish] Add distinct Start and Finish pins for the first and last stop of each trip so big trips have an obvious visual focal point in `src/components/MapView.tsx`. Today, large trips read as a tangle of lines with no anchor for the eye.
+- [ ] T096 [US-Polish] Apply a vintage postcard-style map skin to the continental view: simpler palette, no country labels, no desert/mountain terrain detail. Likely via a custom Google Maps style or `mapId`. Region drill-down view should retain current full detail.
+
 **Checkpoint**: Feature complete, polished, and ready for deployment
 
 ---
@@ -220,6 +227,16 @@
 - [x] T087 Run smoke test: `999-jira-integration-test` push and sync round-trip; verify Story → Subtask hierarchy works
 - [x] T088 Push `001-world-travelogue` Epic and 8 Phase Stories to OCS-11 through OCS-19
 - [x] T089 Push Phase 7 polish backlog as Subtasks OCS-39 through OCS-48 (active work for forward sprints)
+
+---
+
+## Phase 15: Drift Reconciliation (2026-05-04 weekly scan)
+
+**Status**: Backfill of work that shipped between commits `c24c263` (Photo pins) and `650040b` (workflow-guide draft) without a prior task entry. Identified by a `docs/workflow.md` §Reconciliation drift scan.
+
+- [x] T090 Rename media files that were actually videos from `.jpg` to `.mp4` extension in `public/media/` — affects posts 35, 62, 83, 91, 99, 106, 153, 171, 212, 314. Commit: `06de9d5`.
+- [x] T091 Add Instagram deep-link to the stop detail modal for Instagram-typed posts in `src/components/StopDetail.tsx` and `src/styles/global.css`. Commit: `ad19e4e`.
+- [x] T092 Bulk-upload 299 Earth Sandwich 2015 post images to `public/media/`. Commit: `d1ed59f`. (Implicit under T076 but recorded explicitly per team convention.)
 
 ---
 

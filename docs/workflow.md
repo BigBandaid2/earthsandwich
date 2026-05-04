@@ -27,6 +27,7 @@ If you're ever unsure which system to update, ask yourself which question your c
 3. **One Spec Kit feature = one JIRA Epic. One Phase = one JIRA Story.** Subtasks exist in JIRA only for genuinely active phases. Completed phases get represented at the Story level only.
 4. **Default branch is the source of truth for shipped work.** Anything that hasn't merged isn't shipped, regardless of how good the demo was.
 5. **One-way sync: Spec Kit → JIRA, never the reverse.** PM fields (sprint, owner, priority, points) are author-time inputs in JIRA's UI. Don't try to mirror them into the repo.
+6. **Synced artifacts carry identity, not state.** Files that the `spec-kit-jira` commands read or write — primarily `specs/<spec>/jira-mapping.json` — must not record sprint, owner, status, story points, or priority for any issue. They store only durable identity: key, summary, URL, the parent/child structure, and the local task id. PM state lives exclusively in JIRA. The reasoning: when a synced file mirrors a field that JIRA's UI also writes, you have two writers and one reader, and drift is guaranteed. Narrative artifacts that humans read but tools don't sync — `docs/planning/YYYY-WW.md`, this `workflow.md`, ad-hoc design notes — are exempt and may reference sprint/status/owners freely as historical record. The test: "If both this file and JIRA's UI can write this field, can they disagree?" If yes, the field doesn't belong in this file.
 
 ---
 
