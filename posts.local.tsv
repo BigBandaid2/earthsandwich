@@ -33,7 +33,7 @@ id	instagram_id	shortcode	media_url	caption	timestamp	location
 32	17974110343066471	Bnnk_KHBJUS	public/media/32.jpg	Pergolas are out. My future mountain side retreat needs a full blown lounging chapel	2018-09-12T07:54:12+0000	Tbilisi, Georgia
 33	17949277381088150	BmZiAmUBHE8	public/media/33.jpg	A fast learner, look at that form!	2018-08-13T00:27:25+0000	New York Renaissance Faire
 34	17934642367136896	BlPL1MZhTHN	public/media/34.jpg	I wasn't sure whether to throw my arm around ol' Joseph, but the phophet led the way	2018-07-15T03:29:49+0000	The Hill Cumorah Pageant
-35	17956605919012316	BksqDueB-Fp	public/media/35.jpg	Another country mouse in London moment - baby grand to soothe the terminal blues	2018-07-01T17:44:03+0000	Heathrow Airport
+35	17956605919012316	BksqDueB-Fp	public/media/35.mp4	Another country mouse in London moment - baby grand to soothe the terminal blues	2018-07-01T17:44:03+0000	Heathrow Airport
 36	17957167483025736	BkqlIzABJvk	public/media/36.jpg	There's an enclave of 800 hippies squatting in the middle of Copenhagen since the 70's, still promoting free love and selling weed to tourists	2018-06-30T22:19:03+0000	Freetown Christiania
 37	17931582790136551	Bkqf9gIBDEB	public/media/37.jpg	An artistic warning in a department store that can make a New Yorker feel like a country mouse. No joke, they sold Picasso's here.	2018-06-30T21:33:49+0000	Harrods
 38	17884034233230910	BkpD7uzhr4H	public/media/38.jpg	Posh graffiti in the other Soho	2018-06-30T08:09:40+0000	SoHo
@@ -60,7 +60,7 @@ id	instagram_id	shortcode	media_url	caption	timestamp	location
 59	17864140882047400	BMZgSVmhTmR	public/media/59.jpg	um, I don't think that's what I ordered...	2016-11-04T18:36:07+0000	Seattle, Washington
 60	17843714491170471	BMFsW9thGGT	public/media/60.jpg	Big grape or little watermelon?	2016-10-28T01:56:47+0000	Seattle, Washington
 61	17851578094083275	BKB1gIKhaeh	public/media/61.jpg	If you throw away all of your old luggage in a sweeping fit of Japanese minimalism, sometimes there can be consequences	2016-09-06T20:56:56+0000	Seattle-Tacoma International Airport
-62	17842152916170511	BKBy0TNB2Ha	public/media/62.jpg	We ate this half a gallon of molten cheese and then slept for 14 hours straight, au revoir Switzerland!	2016-09-06T20:33:28+0000	Geneva, Switzerland
+62	17842152916170511	BKBy0TNB2Ha	public/media/62.mp4	We ate this half a gallon of molten cheese and then slept for 14 hours straight, au revoir Switzerland!	2016-09-06T20:33:28+0000	Geneva, Switzerland
 63	17842149598193270	BKBxxm8hgv3	public/media/63.jpg	Almost bought this but couldn't get reasonable assurance that it wouldn't have been an inadvertent campaign donation	2016-09-06T20:24:22+0000	Washington Dulles International Airport, Dulles, VA
 64	17862330631033423	BJh2296hn6u	public/media/64.jpg	Don't you ever forget	2016-08-25T10:53:06+0000	Newark Liberty International Airport
 65	17850619084083653	BJGdT9-BYeE	public/media/65.jpg	Cheetos, at least they're gluten free...	2016-08-14T19:30:22+0000	Seattle, Washington
@@ -81,7 +81,7 @@ id	instagram_id	shortcode	media_url	caption	timestamp	location
 80	17858135377041516	BGRhG3AlnEe	public/media/80.jpg	Excellent recycling	2016-06-05T13:01:00+0000	Military Museum, Kalemegdan, Belgrade
 81	17850873469065313	BGQCWNplnGb	public/media/81.jpg	This bridge is where WWI began. Prince Franz Ferdinand of Austria was assassinated here by a teenager, setting in motion the events that ended the age of empires and created almost all the modern political nations and boundaries as we know them.	2016-06-04T23:12:58+0000	Latin Bridge, Sarajevo
 82	17848040506108168	BGKaWx0lnLO	public/media/82.jpg	Nothing lasts forever, except for stone arches. It is now on my life to-do's to build at least one on this earth	2016-06-02T18:47:19+0000	Trsteno Arboretum
-83	17848712908076832	BGHLPwKlnF4	public/media/83.jpg	Ah, romance...	2016-06-01T12:37:34+0000	Dubrovnik, Croatia
+83	17848712908076832	BGHLPwKlnF4	public/media/83.mp4	Ah, romance...	2016-06-01T12:37:34+0000	Dubrovnik, Croatia
 84	17857211344056932	BGGiHiblnN1	public/media/84.jpg	I had thought there was nothing more lovely in life than having a beer by the sea, then a pirate ship showed up	2016-06-01T06:38:11+0000	Dubrovnik Old Town City Wall
 85	17847844552091932	BF92a0iFnBw	public/media/85.jpg	Really hoping I get to throw a Molotov or flip a car before we leave Greece. That's a centaur btw.	2016-05-28T21:42:25+0000	Victoria Park, Athens
 86	17847802783089117	BF3tRL3lnLE	public/media/86.jpg	Welcome to Greece	2016-05-26T12:27:00+0000	Athens International Airport "Eleftherios Venizelos"
@@ -89,7 +89,7 @@ id	instagram_id	shortcode	media_url	caption	timestamp	location
 88	17856992914054703	BF273hSFnAq	public/media/88.jpg	Turkey spells borrowed words like a precocious three-year-old. This has been a continuous source of joy for us and a reminder of how arbitrary English's phonetic rules are.	2016-05-26T05:15:20+0000	İstanbul Sabiha Gökçen International Airport
 89	17847889960094001	BF1x3C7FnHe	public/media/89.jpg	Bold, very bold.	2016-05-25T18:28:39+0000	Hagia Sophia
 90	17850986311065455	BFzfRBlFnNq	public/media/90.jpg	Faraway place, faraway look	2016-05-24T21:07:41+0000	Istanbul, Turkey
-91	17847895447117568	BFzY7ggFnN-	public/media/91.jpg	Baklava is just a gateway to the hard stuff	2016-05-24T20:12:19+0000	Istiklal Street, Istanbul, Turkey
+91	17847895447117568	BFzY7ggFnN-	public/media/91.mp4	Baklava is just a gateway to the hard stuff	2016-05-24T20:12:19+0000	Istiklal Street, Istanbul, Turkey
 92	17856791818001514	BFtSJJYFnMT	public/media/92.jpg	Some things we know about Turkey: 1. They love their country 2. Phenomenal horticulturalists	2016-05-22T11:17:34+0000	Pamukkale, Turkey
 93	17856539566028875	BFtQVuDFnH_	public/media/93.jpg	Any journey in Turkey exceeding 90 minutes requires at least one stop for a cup of apple tea and a thorough cleaning of the vehicle. We are not barbarians.	2016-05-22T11:01:49+0000	Pamukkale, Turkey
 94	17855702398024402	BFk8lUclnF0	public/media/94.jpg	I wonder if it's a rough neighborhood	2016-05-19T05:35:15+0000	Uchisar, Cappadocia, Turkey
@@ -97,14 +97,14 @@ id	instagram_id	shortcode	media_url	caption	timestamp	location
 96	17857049914017425	BFgrsuwlnEz	public/media/96.jpg	Put a helmet on her and Wela has no fear, taunting the 7th story of a canyon-side dwelling like a Eyrie sky cell	2016-05-17T13:50:46+0000	Zelve Valley, Cappadocia
 97	17856796867025882	BFgoDnNlnLu	public/media/97.jpg	Jordan had some crazy rocks, but Turkey is giving it a run	2016-05-17T13:18:56+0000	Paşabağ, Ürgüp
 98	17850667522064656	BFgmAFmFnG-	public/media/98.jpg	This ventilation shaft descends 85 meters into a Tolkien-esque underground city that could once shelter 30,000 people. Not a very photogenic place but mind-blowing	2016-05-17T13:00:58+0000	Derinkuyu Underground City
-99	17850333787068558	BFUFgmklnPJ	public/media/99.jpg	Saying hello to the locals	2016-05-12T16:26:10+0000	Kekova Island
+99	17850333787068558	BFUFgmklnPJ	public/media/99.mp4	Saying hello to the locals	2016-05-12T16:26:10+0000	Kekova Island
 100	17857251190002804	BFJu2Y8lnBK	public/media/100.jpg	Standing in for some absentee statues	2016-05-08T15:55:46+0000	Perge Ancient City, Antalya, Turkey
 101	17856392107061919	BE_ilZHlnCk	public/media/101.jpg	Third holiest site in Islam, vigilantly policed by volunteers who dinged us for holding hands	2016-05-04T16:56:11+0000	Dome of the Rock, Temple Mount, Jerusalem
 102	17848078849076509	BE_gbGSFnNl	public/media/102.jpg	In commemoration for Ted Cruz's valiant last stand, L'chaim.	2016-05-04T16:37:18+0000	Jerusalem, Israel
 103	17847146626080468	BE_eyHyFnJQ	public/media/103.jpg	A rebellious Israeli teenager chose to express his angst and deface the boardwalk by drawing this kitty, shittily.	2016-05-04T16:22:58+0000	Tel Aviv, Israel
 104	17847885544078535	BE31dU0lnAU	public/media/104.jpg	This undercover IDF officer and I are about equally skilled at being inconspicuos. #nailedit	2016-05-01T17:07:11+0000	Jerusalem Central Bus Station
 105	17847878359075335	BExyAP_lnAP	public/media/105.jpg	Just like in the movie!	2016-04-29T08:41:33+0000	Mount Zion, Jerusalem
-106	17855472355029527	BEohmBYFnE8	public/media/106.jpg	Grumpy grumps	2016-04-25T18:25:00+0000	Wadi Rum, Jordan
+106	17855472355029527	BEohmBYFnE8	public/media/106.mp4	Grumpy grumps	2016-04-25T18:25:00+0000	Wadi Rum, Jordan
 107	17855354293025101	BEmGJ16lnJq	public/media/107.jpg	OSHA is for pussies	2016-04-24T19:46:44+0000	Wadi Rum, Jordan
 108	17849620600070079	BEmEvnOFnGN	public/media/108.jpg	Eat hearty my friend, tonight we dine in hell!	2016-04-24T19:34:25+0000	Wadi Rum, Jordan
 109	17855365486032193	BEl_V0cFnHz	public/media/109.jpg	Fun with buoyancy at 34% salinity. Don't let it touch your eyes or mouth or you will start to die immediately.	2016-04-24T18:47:12+0000	Dead Sea, Jordan
@@ -151,6 +151,7 @@ id	instagram_id	shortcode	media_url	caption	timestamp	location
 150	17844707533115207	BCPotg3FnPM	public/media/150.jpg	Embracing cultural nuance	2016-02-26T09:23:23+0000	Auckland Museum
 151	17854353184008220	BCPoLdOFnOl	public/media/151.jpg	I'm confident only good things can come of this	2016-02-26T09:18:44+0000	Ace Rental Cars, Auckland
 152	17853683359020200	BCPnnQmFnN9	public/media/152.jpg	Kiwis are very trusting about leaving their things around	2016-02-26T09:13:47+0000	Kitekite Falls, Piha, New Zealand
+153	17853274732042302	BCIK3K9FnG5	public/media/153.mp4	An old friend shows up to see us off. Thanks big J!	2016-02-23T11:47:52+0000	Buenos Aires, Argentina
 154	17853926197039229	BBy08ZNlnC1	public/media/154.jpg	In Argentina, they call this a municipal water pumping station	2016-02-15T04:52:18+0000	Palacio de las Aguas Corrientes, Buenos Aires
 155	17849325040075543	BBvtN0qlnK7	public/media/155.jpg	I wonder if she was actually this haunting in life or if they amped it up for the cemetery so she wouldn't get picked on by the other ghouls	2016-02-13T23:47:03+0000	Cementerio de la Recoleta, Buenos Aires
 156	17853589381025349	BBkTiCdlnKY	public/media/156.jpg	Close enough	2016-02-09T13:30:58+0000	Puerto Iguazú, Argentina
@@ -168,7 +169,7 @@ id	instagram_id	shortcode	media_url	caption	timestamp	location
 168	17847018424064841	BBBeVJulnGl	public/media/168.jpg	The imperial accounting system of the Incans recorded in knots	2016-01-27T00:51:55+0000	Museo Chileno de Arte Precolombino, Santiago
 169	17844020167105373	BAxP7OxlnGu	public/media/169.jpg	I'm Hans, unt I'm Frans. And vee are goona Pump! You Aup! 	2016-01-20T17:38:11+0000	Ensenada, Los Lagos, Chile
 170	17853153064044785	BAeiPA4FnC0	public/media/170.jpg	Adios Bolivia, you magnificently weird duck	2016-01-13T11:12:36+0000	Sopocachi, La Paz, Bolivia
-171	17844595819072055	BAZ1ZUPlnC7	public/media/171.jpg	Bolivian Cholita Wrestling. We watched 4 hours of this. I am hoarse from shouting	2016-01-11T15:23:50+0000	
+171	17844595819072055	BAZ1ZUPlnC7	public/media/171.mp4	Bolivian Cholita Wrestling. We watched 4 hours of this. I am hoarse from shouting	2016-01-11T15:23:50+0000	
 172	17843909839106927	BAYeCuSFnBs	public/media/172.jpg	The Temptation of Christ	2016-01-11T02:40:32+0000	El Alto, Bolivia
 173	17843916694086207	BAYdU8zFnAH	public/media/173.jpg	Can there be too much of a good thing? Answer is no.	2016-01-11T02:34:17+0000	La Paz, Bolivia
 174	17852936779011226	BAXMWQjFnNq	public/media/174.jpg	The Rock is going to look so bad ass power drifting these in Fast and Furious 8	2016-01-10T14:46:40+0000	Copacabana, Bolivia
@@ -209,7 +210,7 @@ id	instagram_id	shortcode	media_url	caption	timestamp	location
 209	17846448709007959	9-CrGulnJR	public/media/209.jpg	Our first 10 minutes in Havana and we couldn't have found a more Cubano character if we were casting a movie	2015-11-12T03:18:20+0000	Havana, Cuba
 210	17843500477064436	9o20UHFnI8	public/media/210.jpg	Edible Arrangements have been trying to branch out lately	2015-11-03T21:50:41+0000	Wangfujing Night Market, Beijing
 211	17843500342064436	9o1sA3FnHK	public/media/211.jpg	Yay adventure, Yay friendship, Yay good feeling!	2015-11-03T21:40:49+0000	Great Wall of China, Jinshanling
-212	17843500201064436	9o1A7EFnGD	public/media/212.jpg	Rock out buddy, how do I get your confidence?	2015-11-03T21:34:56+0000	Taipei 101 Mall, Taipei
+212	17843500201064436	9o1A7EFnGD	public/media/212.mp4	Rock out buddy, how do I get your confidence?	2015-11-03T21:34:56+0000	Taipei 101 Mall, Taipei
 213	17843500072064436	9o0RRNlnFD	public/media/213.jpg	Late night shrimpin'	2015-11-03T21:28:25+0000	Taipei, Taiwan
 214	17843500018064436	9oz7qEFnEl	public/media/214.jpg	Fabulous lady of mystery contemplates her next adventure	2015-11-03T21:25:28+0000	New Orleans, Louisiana, USA
 215	17843304730064436	9Q1Lf9lnOV	public/media/215.jpg	For 3 bucks, you get a bunch of fragile tissue paper nets, and every fish you catch is yours. I didn't need new pets so I ate mine.	2015-10-25T13:54:36+0000	Sanho Night Market, Taipei
@@ -311,7 +312,7 @@ id	instagram_id	shortcode	media_url	caption	timestamp	location
 311	17841712021064436	45EA90FnDO	public/media/311.jpg	Ah Costco, where else could I get two liters of ranch dressing, a diamond ring, and agoraphobia all in one stop? #capitalism	2015-07-08T22:16:53+0000	
 312	17841707071064436	42c_5ClnEN	public/media/312.jpg	This is also how I hug Wela #lennypetting	2015-07-07T21:57:28+0000	
 313	17841685192064436	4sf-_dlnMv	public/media/313.jpg	Impressive, Canada. The student has become the teacher #americafuckyeah #imlovinit	2015-07-04T01:11:09+0000	
-314	17841678652064436	4pjpz6lnAR	public/media/314.jpg	That's what commitment looks like	2015-07-02T21:45:30+0000	
+314	17841678652064436	4pjpz6lnAR	public/media/314.mp4	That's what commitment looks like	2015-07-02T21:45:30+0000	
 315	17841658441064436	4gN0y0lnII	public/media/315.jpg	Maybe the wine cellars at the Bellagio, or maybe a strip mall Thai joint with a killer duck panang for $10, #vegas has no rules	2015-06-29T06:41:36+0000	
 316	17841650464064436	4cKiSglnJf	public/media/316.jpg	Wtf kind of bruise is this? Either I got kicked by a pony or I clotheslined an octopus last night #animalcontrol #vegas	2015-06-27T16:55:53+0000	
 317	17841645937064436	4aCGbhlnDv	public/media/317.jpg	Virgin airlines is all about fun. That's why we played chicken at SFO for the right to land and live #radical	2015-06-26T21:03:42+0000	
