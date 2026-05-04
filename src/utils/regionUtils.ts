@@ -60,11 +60,17 @@ export function groupStopsByRegion(trip: Trip): RegionGroup[] {
       overallStatus = hasVisited && hasPlanned ? 'mixed' : hasVisited ? 'visited' : 'planned';
     }
 
+    // FR-033: Substack post dates represent publication, not presence. Exclude
+    // them from the region's date range when any non-Substack stop exists.
+    // Fall back to all stops if the region is Substack-only.
+    const dateBearing = sorted.filter((s) => s.post.type !== 'substack');
+    const datedSet = dateBearing.length > 0 ? dateBearing : sorted;
+
     groups.push({
       region,
       stops: sorted,
-      startDate: sorted[0].date,
-      endDate: sorted[sorted.length - 1].date,
+      startDate: datedSet[0].date,
+      endDate: datedSet[datedSet.length - 1].date,
       overallStatus,
     });
   }

@@ -74,6 +74,7 @@ The `status` field on a Stop is the authored value. The view layer computes an e
 - A region's overall effective status is `"abandoned"` if every stop in the region is abandoned. Otherwise the region's status is computed from its non-abandoned stops as `visited`, `planned`, or `mixed` of those two.
 - Fully-abandoned regions are excluded from the route polyline so segments connect across them, but their markers still render on the map.
 - Abandoned regions are also skipped when computing the FR-014 "next region" anchor for date-range extension; their own end date is simply their last stop date (no extension).
+- Substack stops are excluded from a region's start/end date computation when any non-Substack stop is present (see FR-033). Substack stops still appear within their region; only their dates are ignored for date-range bounds. If a region contains only Substack stops, those dates are used as a fallback.
 
 ## Example stop structure
 
