@@ -121,6 +121,13 @@ hooks:
     prompt: Commit task changes?
     description: Auto-commit after task generation
     condition: null
+  - extension: jira
+    command: speckit.jira.specstoissues
+    enabled: true
+    optional: true
+    prompt: Create Jira issues from tasks?
+    description: Automatically create Jira hierarchy after task generation
+    condition: null
   after_implement:
   - extension: git
     command: speckit.git.commit

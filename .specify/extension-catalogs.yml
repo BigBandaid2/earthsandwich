@@ -1,0 +1,13 @@
+# Extension catalogs for this repo.
+# The default and community catalogs are inherited from spec-kit upstream;
+# we override `community` to allow installation (off by default).
+catalogs:
+  - name: default
+    priority: 1
+    url: https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.json
+    install_allowed: true
+
+  - name: community
+    priority: 2
+    url: https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.community.json
+    install_allowed: true

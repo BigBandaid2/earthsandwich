@@ -54,6 +54,23 @@
       },
       "registered_skills": [],
       "installed_at": "2026-04-29T16:50:56.720349+00:00"
+    },
+    "jira": {
+      "version": "2.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:5d5bdc26ee4af105f1734c29dde9fe0f432e9125a42314201ff04c75ca349bf9",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "copilot": [
+          "speckit.jira.specstoissues",
+          "speckit.specstoissues",
+          "speckit.jira.discover-fields",
+          "speckit.jira.sync-status"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-05-04T16:03:31.648876+00:00"
     }
   }
 }

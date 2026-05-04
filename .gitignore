@@ -5,3 +5,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .env
+
+# Per-developer overrides for the spec-kit-jira extension (custom field
+# overrides, alternate project keys, etc.) — never commit. The shared
+# config (jira-config.yml) and discovered-fields.json ARE committed so the
+# whole team conforms to the same JIRA mappings.
+.specify/extensions/jira/jira-config.local.yml

@@ -5,7 +5,9 @@
       "Bash(git checkout *)",
       "Bash(npm run *)",
       "Bash(npx vite *)",
-      "WebFetch(domain:www.instagram.com)"
+      "WebFetch(domain:www.instagram.com)",
+      "mcp__claude_ai_Atlassian__transitionJiraIssue",
+      "mcp__claude_ai_Atlassian__createJiraIssue"
     ]
   }
 }

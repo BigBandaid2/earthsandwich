@@ -1,0 +1,94 @@
+{
+  "created_at": "2026-05-04T00:00:00Z",
+  "updated_at": "2026-05-04T00:00:00Z",
+  "spec": "001-world-travelogue",
+  "project": "OCS",
+  "jira_base_url": "https://datacommlab.atlassian.net",
+  "mode": "3-level",
+  "epic": {
+    "key": "OCS-11",
+    "summary": "World Travelogue",
+    "url": "https://datacommlab.atlassian.net/browse/OCS-11"
+  },
+  "stories": [
+    {
+      "key": "OCS-12",
+      "summary": "Phase 1: Setup (Project Initialization)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-12",
+      "status": "completed",
+      "tasks": []
+    },
+    {
+      "key": "OCS-13",
+      "summary": "Phase 2: Foundational (Core Data & Types)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-13",
+      "status": "completed",
+      "tasks": []
+    },
+    {
+      "key": "OCS-14",
+      "summary": "Phase 3: US1 - Browse trip progress on map (P1, MVP)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-14",
+      "status": "completed",
+      "tasks": []
+    },
+    {
+      "key": "OCS-15",
+      "summary": "Phase 4: US2 - Explore region clusters on zoomed-out map (P2)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-15",
+      "status": "completed",
+      "tasks": []
+    },
+    {
+      "key": "OCS-16",
+      "summary": "Phase 5: US3 - Inspect a single stop (P3)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-16",
+      "status": "completed",
+      "tasks": []
+    },
+    {
+      "key": "OCS-17",
+      "summary": "Phase 6: Decommission Old Features",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-17",
+      "status": "completed",
+      "tasks": []
+    },
+    {
+      "key": "OCS-18",
+      "summary": "Phase 8: Planned Stop Type & New Trip Data",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-18",
+      "status": "completed",
+      "tasks": []
+    },
+    {
+      "key": "OCS-19",
+      "summary": "Phase 7: Polish & Cross-Cutting Concerns",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-19",
+      "status": "pending",
+      "tasks": [
+        { "key": "OCS-39", "id": "T041", "summary": "Add accessibility labels and ARIA attributes to all interactive elements", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-39" },
+        { "key": "OCS-40", "id": "T042", "summary": "Add keyboard navigation support (arrow keys, Enter, Escape)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-40" },
+        { "key": "OCS-41", "id": "T043", "summary": "Test responsive layout on mobile/tablet viewport sizes", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-41" },
+        { "key": "OCS-42", "id": "T044", "summary": "Optimize map rendering performance for 50+ markers", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-42" },
+        { "key": "OCS-43", "id": "T045", "summary": "Add visual feedback for map interactions (hover states, animations)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-43" },
+        { "key": "OCS-44", "id": "T046", "summary": "Run performance benchmark — initial page load under 3 seconds", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-44" },
+        { "key": "OCS-45", "id": "T047", "summary": "Add comprehensive inline documentation to modified components", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-45" },
+        { "key": "OCS-46", "id": "T048", "summary": "Update quickstart.md with usage examples and local dev instructions", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-46" },
+        { "key": "OCS-47", "id": "T049", "summary": "Final browser testing (map, sidebar, detail panel, region clustering)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-47" },
+        { "key": "OCS-48", "id": "T050", "summary": "Test edge cases (missing images/blogs, very long blog text, dense regions)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-48" }
+      ]
+    }
+  ],
+  "summary": {
+    "total_stories": 8,
+    "completed_stories": 7,
+    "active_stories": 1,
+    "total_tasks": 10,
+    "pending_tasks": 10,
+    "completed_tasks": 0
+  },
+  "notes": [
+    "Phases 1-6 and 8 are represented at the Story level only; their per-task records are not in JIRA (the tasks are completed historic work).",
+    "If the 19 stale historic Subtasks (OCS-20 through OCS-38) still exist in JIRA, they should be bulk-deleted via the JIRA UI using the JQL filter: project = OCS AND issuekey >= OCS-20 AND issuekey <= OCS-38."
+  ]
+}
