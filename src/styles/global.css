@@ -37,11 +37,12 @@ button {
   overflow: hidden;
 }
 
-/* ─── Map Pane (72%) ─── */
+/* ─── Map Pane (fills remaining width) ─── */
 
 .map-pane {
   position: relative;
-  flex: 0 0 72%;
+  flex: 1 1 auto;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -127,10 +128,13 @@ button {
 }
 
 
-/* ─── Sidebar Pane (28%) ─── */
+/* ─── Sidebar Pane (fixed 320px) ─── */
+/* Width is sized to fit 4 × 60px Instagram thumbnails with 4px gaps,
+   plus the 12px connector column, 12px region-tile gap, and 16px+16px
+   trip-feed padding (308px minimum, rounded to 320px). */
 
 .sidebar-pane {
-  flex: 0 0 28%;
+  flex: 0 0 320px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -194,6 +198,19 @@ button {
   border-color: #334155;
 }
 
+.connector-dot.abandoned {
+  background: transparent;
+  border-color: #94a3b8;
+  border-style: dashed;
+}
+
+.region-tile.abandoned .region-name,
+.stop-tile.abandoned .stop-tile-location {
+  color: #94a3b8;
+  text-decoration: line-through;
+  text-decoration-color: rgba(148, 163, 184, 0.6);
+}
+
 .connector-line {
   flex: 1;
   width: 2px;
@@ -209,15 +226,30 @@ button {
 }
 
 .region-tile-header {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 8px;
+  row-gap: 2px;
   margin-bottom: 10px;
+  align-items: center;
 }
 
 .region-name {
   font-size: 0.95rem;
   color: #f1f5f9;
+  grid-column: 1;
+}
+
+.region-tile-header .expand-region-btn.inline {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  margin-top: 0;
+}
+
+.region-country,
+.region-dates {
+  grid-column: 1 / -1;
 }
 
 .region-country {
@@ -226,8 +258,9 @@ button {
 }
 
 .region-dates {
-  font-size: 0.75rem;
-  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #94a3b8;
 }
 
 /* Photo strip */
@@ -460,8 +493,9 @@ button {
 }
 
 .stop-tile-date {
-  font-size: 0.7rem;
-  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #94a3b8;
   flex-shrink: 0;
 }
 
@@ -495,8 +529,7 @@ button {
 
 .stop-tile-photo {
   width: 100%;
-  max-height: 160px;
-  object-fit: cover;
+  height: auto;
   border-radius: 6px;
   display: block;
 }
@@ -553,7 +586,7 @@ button {
   z-index: 1;
   width: 80%;
   max-width: 720px;
-  max-height: 85vh;
+  max-height: 95vh;
   background: #0f172a;
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 20px;
@@ -650,10 +683,12 @@ button {
 }
 
 .post-hero-image {
-  width: 100%;
+  max-width: 100%;
+  max-height: 70vh;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
   border-radius: 12px;
-  object-fit: cover;
-  max-height: 420px;
   display: block;
 }
 
@@ -746,23 +781,37 @@ button {
 
 /* ─── Scrollbar ─── */
 
+.trip-feed,
+.region-sidebar,
+.modal-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.25) rgba(255,255,255,0.04);
+}
+
 .trip-feed::-webkit-scrollbar,
 .region-sidebar::-webkit-scrollbar,
 .modal-content::-webkit-scrollbar {
-  width: 4px;
+  width: 10px;
 }
 
 .trip-feed::-webkit-scrollbar-track,
 .region-sidebar::-webkit-scrollbar-track,
 .modal-content::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(255,255,255,0.04);
 }
 
 .trip-feed::-webkit-scrollbar-thumb,
 .region-sidebar::-webkit-scrollbar-thumb,
 .modal-content::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.1);
-  border-radius: 2px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 5px;
+  border: 2px solid #0f172a;
+}
+
+.trip-feed::-webkit-scrollbar-thumb:hover,
+.region-sidebar::-webkit-scrollbar-thumb:hover,
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.4);
 }
 
 /* ─── Responsive ─── */

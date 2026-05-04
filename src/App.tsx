@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { APIProvider } from '@vis.gl/react-google-maps';
-import { miscellaneousAdventures } from './data/miscellaneous-adventures';
+import { trips } from './data/itinerary';
 import { groupStopsByRegion } from './utils/regionUtils';
 import type { Trip } from './data/types';
 import WorldMap from './components/MapView';
@@ -10,10 +10,29 @@ import StopModal from './components/StopDetail';
 
 export type ViewMode = 'trip' | 'region';
 
-const TRIPS: Trip[] = [miscellaneousAdventures];
+function firstStopDate(trip: Trip): string {
+  return trip.stops.reduce((min, s) => (s.date < min ? s.date : min), trip.stops[0]?.date ?? '');
+}
+
+const TRIPS: Trip[] = [...trips].sort((a, b) =>
+  firstStopDate(b).localeCompare(firstStopDate(a))
+);
+
+// FR-027: Parse `#/trip/{tripId}` from the URL hash and resolve to a Trip,
+// falling back to TRIPS[0] (most recent) when the hash is absent or unknown.
+function tripFromHash(hash: string): Trip {
+  const match = hash.match(/^#\/trip\/([^/?#]+)/);
+  if (match) {
+    const found = TRIPS.find((t) => t.id === match[1]);
+    if (found) return found;
+  }
+  return TRIPS[0];
+}
 
 function App() {
-  const [activeTrip, setActiveTrip] = useState<Trip>(TRIPS[0]);
+  const [activeTrip, setActiveTrip] = useState<Trip>(() =>
+    typeof window !== 'undefined' ? tripFromHash(window.location.hash) : TRIPS[0]
+  );
   const [viewMode, setViewMode] = useState<ViewMode>('trip');
   const [activeRegionCode, setActiveRegionCode] = useState<string | null>(null);
   const [openStopId, setOpenStopId] = useState<string | null>(null);
@@ -69,7 +88,37 @@ function App() {
     setActiveRegionCode(null);
     setOpenStopId(null);
     setTripSelectorOpen(false);
+    const newHash = `#/trip/${trip.id}`;
+    if (window.location.hash !== newHash) {
+      window.history.pushState(null, '', newHash);
+    }
   };
+
+  // FR-027: react to back/forward navigation by re-resolving the hash.
+  useEffect(() => {
+    const onHashChange = () => {
+      const next = tripFromHash(window.location.hash);
+      if (next.id !== activeTrip.id) {
+        setActiveTrip(next);
+        setViewMode('trip');
+        setActiveRegionCode(null);
+        setOpenStopId(null);
+      }
+    };
+    window.addEventListener('hashchange', onHashChange);
+    window.addEventListener('popstate', onHashChange);
+    return () => {
+      window.removeEventListener('hashchange', onHashChange);
+      window.removeEventListener('popstate', onHashChange);
+    };
+  }, [activeTrip.id]);
+
+  // Keep the URL in sync on first load when no hash was provided.
+  useEffect(() => {
+    if (!window.location.hash) {
+      window.history.replaceState(null, '', `#/trip/${activeTrip.id}`);
+    }
+  }, [activeTrip.id]);
 
   return (
     <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY ?? ''}>
