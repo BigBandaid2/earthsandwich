@@ -755,7 +755,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'PRG',
       post: {
         type: 'instagram',
-        image: 'public/media/74.jpg',
+        image: '/media/74.jpg',
         caption: 'All we really needed #ourearthsandwich',
         instagramId: '17857579060038514',
         shortcode: 'BGsJV0PlnJc',
@@ -770,7 +770,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'PRG',
       post: {
         type: 'instagram',
-        image: 'public/media/75.jpg',
+        image: '/media/75.jpg',
         caption: 'The Czechs are the original Bohemians, and their hipster descendants flourish in the bosom of the earth mother',
         instagramId: '17857643959054487',
         shortcode: 'BGsB0KRFnGC',
@@ -785,7 +785,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'PRG',
       post: {
         type: 'instagram',
-        image: 'public/media/76.jpg',
+        image: '/media/76.jpg',
         caption: 'The decoratively arranged remains of 40,000 souls make a haunting hell-scape, but the company of field-tripping school children helps fortify the courage',
         instagramId: '17848468447124117',
         shortcode: 'BGo9Dl7lnCR',
@@ -800,7 +800,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'BUD',
       post: {
         type: 'instagram',
-        image: 'public/media/77.jpg',
+        image: '/media/77.jpg',
         caption: 'I wonder how many people have dropped their phone taking this exact picture',
         instagramId: '17849722585075649',
         shortcode: 'BGh-AxAFnLs',
@@ -815,7 +815,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'BUD',
       post: {
         type: 'instagram',
-        image: 'public/media/78.jpg',
+        image: '/media/78.jpg',
         caption: 'Winter is coming',
         instagramId: '17856928993029128',
         shortcode: 'BGh9bBSlnKI',
@@ -830,7 +830,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'VIE',
       post: {
         type: 'instagram',
-        image: 'public/media/79.jpg',
+        image: '/media/79.jpg',
         caption: 'I thought I caught an opera singer on a surreptitious cigarette break, turns out it was just a flamboyant ticket scalper',
         instagramId: '17848276447096151',
         shortcode: 'BGbP9N6FnGa',
@@ -845,7 +845,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SJJ',
       post: {
         type: 'instagram',
-        image: 'public/media/81.jpg',
+        image: '/media/81.jpg',
         caption: 'This bridge is where WWI began. Prince Franz Ferdinand of Austria was assassinated here by a teenager, setting in motion the events that ended the age of empires and created almost all the modern political nations and boundaries as we know them.',
         instagramId: '17850873469065313',
         shortcode: 'BGQCWNplnGb',
@@ -860,7 +860,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'DBV',
       post: {
         type: 'instagram',
-        image: 'public/media/82.jpg',
+        image: '/media/82.jpg',
         caption: "Nothing lasts forever, except for stone arches. It is now on my life to-do's to build at least one on this earth",
         instagramId: '17848040506108168',
         shortcode: 'BGKaWx0lnLO',
@@ -875,7 +875,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'DBV',
       post: {
         type: 'instagram',
-        image: 'public/media/83.jpg',
+        image: '/media/83.jpg',
         caption: 'Ah, romance...',
         instagramId: '17848712908076832',
         shortcode: 'BGHLPwKlnF4',
@@ -890,7 +890,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'DBV',
       post: {
         type: 'instagram',
-        image: 'public/media/84.jpg',
+        image: '/media/84.jpg',
         caption: 'I had thought there was nothing more lovely in life than having a beer by the sea, then a pirate ship showed up',
         instagramId: '17857211344056932',
         shortcode: 'BGGiHiblnN1',
@@ -905,7 +905,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ATH',
       post: {
         type: 'instagram',
-        image: 'public/media/85.jpg',
+        image: '/media/85.jpg',
         caption: "Really hoping I get to throw a Molotov or flip a car before we leave Greece. That's a centaur btw.",
         instagramId: '17847844552091932',
         shortcode: 'BF92a0iFnBw',
@@ -920,7 +920,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ATH',
       post: {
         type: 'instagram',
-        image: 'public/media/86.jpg',
+        image: '/media/86.jpg',
         caption: 'Welcome to Greece',
         instagramId: '17847802783089117',
         shortcode: 'BF3tRL3lnLE',
@@ -935,7 +935,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'IST',
       post: {
         type: 'instagram',
-        image: 'public/media/87.jpg',
+        image: '/media/87.jpg',
         caption: 'If we ever achieve world peace through global cultural homogenization, it will be the Selfie that blazes the path',
         instagramId: '17857721230026150',
         shortcode: 'BF2-KC3FnEJ',
@@ -950,7 +950,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'IST',
       post: {
         type: 'instagram',
-        image: 'public/media/88.jpg',
+        image: '/media/88.jpg',
         caption: "Turkey spells borrowed words like a precocious three-year-old. This has been a continuous source of joy for us and a reminder of how arbitrary English's phonetic rules are.",
         instagramId: '17856992914054703',
         shortcode: 'BF273hSFnAq',
@@ -965,7 +965,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'IST',
       post: {
         type: 'instagram',
-        image: 'public/media/89.jpg',
+        image: '/media/89.jpg',
         caption: 'Bold, very bold.',
         instagramId: '17847889960094001',
         shortcode: 'BF1x3C7FnHe',
@@ -980,7 +980,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'IST',
       post: {
         type: 'instagram',
-        image: 'public/media/91.jpg',
+        image: '/media/91.jpg',
         caption: 'Baklava is just a gateway to the hard stuff',
         instagramId: '17847895447117568',
         shortcode: 'BFzY7ggFnN-',
@@ -995,7 +995,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'DNZ',
       post: {
         type: 'instagram',
-        image: 'public/media/92.jpg',
+        image: '/media/92.jpg',
         caption: 'Some things we know about Turkey: 1. They love their country 2. Phenomenal horticulturalists',
         instagramId: '17856791818001514',
         shortcode: 'BFtSJJYFnMT',
@@ -1010,7 +1010,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'DNZ',
       post: {
         type: 'instagram',
-        image: 'public/media/93.jpg',
+        image: '/media/93.jpg',
         caption: 'Any journey in Turkey exceeding 90 minutes requires at least one stop for a cup of apple tea and a thorough cleaning of the vehicle. We are not barbarians.',
         instagramId: '17856539566028875',
         shortcode: 'BFtQVuDFnH_',
@@ -1025,7 +1025,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ASR',
       post: {
         type: 'instagram',
-        image: 'public/media/94.jpg',
+        image: '/media/94.jpg',
         caption: "I wonder if it's a rough neighborhood",
         instagramId: '17855702398024402',
         shortcode: 'BFk8lUclnF0',
@@ -1040,7 +1040,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ASR',
       post: {
         type: 'instagram',
-        image: 'public/media/95.jpg',
+        image: '/media/95.jpg',
         caption: 'Troglodyte castle',
         instagramId: '17857176352062063',
         shortcode: 'BFk67c3FnDY',
@@ -1055,7 +1055,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ASR',
       post: {
         type: 'instagram',
-        image: 'public/media/96.jpg',
+        image: '/media/96.jpg',
         caption: 'Put a helmet on her and Wela has no fear, taunting the 7th story of a canyon-side dwelling like a Eyrie sky cell',
         instagramId: '17857049914017425',
         shortcode: 'BFgrsuwlnEz',
@@ -1070,7 +1070,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ASR',
       post: {
         type: 'instagram',
-        image: 'public/media/97.jpg',
+        image: '/media/97.jpg',
         caption: 'Jordan had some crazy rocks, but Turkey is giving it a run',
         instagramId: '17856796867025882',
         shortcode: 'BFgoDnNlnLu',
@@ -1085,7 +1085,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ASR',
       post: {
         type: 'instagram',
-        image: 'public/media/98.jpg',
+        image: '/media/98.jpg',
         caption: 'This ventilation shaft descends 85 meters into a Tolkien-esque underground city that could once shelter 30,000 people. Not a very photogenic place but mind-blowing',
         instagramId: '17850667522064656',
         shortcode: 'BFgmAFmFnG-',
@@ -1100,7 +1100,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'AYT',
       post: {
         type: 'instagram',
-        image: 'public/media/99.jpg',
+        image: '/media/99.jpg',
         caption: 'Saying hello to the locals',
         instagramId: '17850333787068558',
         shortcode: 'BFUFgmklnPJ',
@@ -1115,7 +1115,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'TLV',
       post: {
         type: 'instagram',
-        image: 'public/media/102.jpg',
+        image: '/media/102.jpg',
         caption: "In commemoration for Ted Cruz's valiant last stand, L'chaim.",
         instagramId: '17848078849076509',
         shortcode: 'BE_gbGSFnNl',
@@ -1130,7 +1130,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'TLV',
       post: {
         type: 'instagram',
-        image: 'public/media/103.jpg',
+        image: '/media/103.jpg',
         caption: 'A rebellious Israeli teenager chose to express his angst and deface the boardwalk by drawing this kitty, shittily.',
         instagramId: '17847146626080468',
         shortcode: 'BE_eyHyFnJQ',
@@ -1145,7 +1145,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'TLV',
       post: {
         type: 'instagram',
-        image: 'public/media/104.jpg',
+        image: '/media/104.jpg',
         caption: 'This undercover IDF officer and I are about equally skilled at being inconspicuos. #nailedit',
         instagramId: '17847885544078535',
         shortcode: 'BE31dU0lnAU',
@@ -1160,7 +1160,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'TLV',
       post: {
         type: 'instagram',
-        image: 'public/media/105.jpg',
+        image: '/media/105.jpg',
         caption: 'Just like in the movie!',
         instagramId: '17847878359075335',
         shortcode: 'BExyAP_lnAP',
@@ -1175,7 +1175,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'AMM',
       post: {
         type: 'instagram',
-        image: 'public/media/106.jpg',
+        image: '/media/106.jpg',
         caption: 'Grumpy grumps',
         instagramId: '17855472355029527',
         shortcode: 'BEohmBYFnE8',
@@ -1190,7 +1190,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'AMM',
       post: {
         type: 'instagram',
-        image: 'public/media/107.jpg',
+        image: '/media/107.jpg',
         caption: 'OSHA is for pussies',
         instagramId: '17855354293025101',
         shortcode: 'BEmGJ16lnJq',
@@ -1205,7 +1205,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'AMM',
       post: {
         type: 'instagram',
-        image: 'public/media/108.jpg',
+        image: '/media/108.jpg',
         caption: 'Eat hearty my friend, tonight we dine in hell!',
         instagramId: '17849620600070079',
         shortcode: 'BEmEvnOFnGN',
@@ -1220,7 +1220,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'AMM',
       post: {
         type: 'instagram',
-        image: 'public/media/109.jpg',
+        image: '/media/109.jpg',
         caption: "Fun with buoyancy at 34% salinity. Don't let it touch your eyes or mouth or you will start to die immediately.",
         instagramId: '17855365486032193',
         shortcode: 'BEl_V0cFnHz',
@@ -1235,7 +1235,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'AMM',
       post: {
         type: 'instagram',
-        image: 'public/media/110.jpg',
+        image: '/media/110.jpg',
         caption: 'American cheese whiz, Mexican themed, manufactured in Greece, sold in Jordan',
         instagramId: '17846940433109582',
         shortcode: 'BEi0g9pFnGq',
@@ -1250,7 +1250,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'AMM',
       post: {
         type: 'instagram',
-        image: 'public/media/111.jpg',
+        image: '/media/111.jpg',
         caption: 'Grazing in a lost city',
         instagramId: '17846863882080189',
         shortcode: 'BEhEUy4FnGs',
@@ -1265,7 +1265,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'AMM',
       post: {
         type: 'instagram',
-        image: 'public/media/112.jpg',
+        image: '/media/112.jpg',
         caption: "I like Jordan's version of the Middle East. Same same, but different, but still same!",
         instagramId: '17856451831033618',
         shortcode: 'BEg8C31lnGU',
@@ -1280,7 +1280,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LXR',
       post: {
         type: 'instagram',
-        image: 'public/media/113.jpg',
+        image: '/media/113.jpg',
         caption: "It's comforting to know that there were also pudgy pharaohs",
         instagramId: '17856147592043504',
         shortcode: 'BETC9sOFnEQ',
@@ -1295,7 +1295,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LXR',
       post: {
         type: 'instagram',
-        image: 'public/media/114.jpg',
+        image: '/media/114.jpg',
         caption: "We just got scolded for hanging out our laundry line at a classy resort. It's nice to take a break from hostel deprivations, but damned if I'm paying hotel laundry prices ever.",
         instagramId: '17855970868059237',
         shortcode: 'BEImhc8FnEq',
@@ -1310,7 +1310,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ASW',
       post: {
         type: 'instagram',
-        image: 'public/media/115.jpg',
+        image: '/media/115.jpg',
         caption: 'The sailors on our river cruise had some pretty hardcore Pirates of the Caribbean moves',
         instagramId: '17847358624074933',
         shortcode: 'BEGsqnzFnIv',
@@ -1325,7 +1325,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ASW',
       post: {
         type: 'instagram',
-        image: 'public/media/116.jpg',
+        image: '/media/116.jpg',
         caption: '#thefifthelement',
         instagramId: '17846595700098605',
         shortcode: 'BD_AUkzFnHY',
@@ -1340,7 +1340,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'CAI',
       post: {
         type: 'instagram',
-        image: 'public/media/117.jpg',
+        image: '/media/117.jpg',
         caption: 'Fun with multicuturalism',
         instagramId: '17855473153043414',
         shortcode: 'BD7MxxtlnG9',
@@ -1355,7 +1355,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'CAI',
       post: {
         type: 'instagram',
-        image: 'public/media/118.jpg',
+        image: '/media/118.jpg',
         caption: "Hope and resourcefulness in Mansheya Nasir, minority Christian neighborhood where all of Cairo's garbage is collected and processed by manual pickers",
         instagramId: '17847258136073666',
         shortcode: 'BD6QLYKFnKi',
@@ -1370,7 +1370,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'CAI',
       post: {
         type: 'instagram',
-        image: 'public/media/119.jpg',
+        image: '/media/119.jpg',
         caption: 'Mosques of Cairo invite casual loungers to relax in cool airy halls among the more devout',
         instagramId: '17846494801088235',
         shortcode: 'BD2h3_ulnPC',
@@ -1385,7 +1385,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'CAI',
       post: {
         type: 'instagram',
-        image: 'public/media/120.jpg',
+        image: '/media/120.jpg',
         caption: 'Pretty colors',
         instagramId: '17846523664104920',
         shortcode: 'BD1YMKvFnEu',
@@ -1400,7 +1400,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'CAI',
       post: {
         type: 'instagram',
-        image: 'public/media/121.jpg',
+        image: '/media/121.jpg',
         caption: 'Those ancients knew how to party',
         instagramId: '17857653982058092',
         shortcode: 'BDzs6dvlnHv',
@@ -1415,7 +1415,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'CAI',
       post: {
         type: 'instagram',
-        image: 'public/media/122.jpg',
+        image: '/media/122.jpg',
         caption: 'Welcome to Egypt',
         instagramId: '17856523312031162',
         shortcode: 'BDyfOxzFnAi',
@@ -1430,7 +1430,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'CAI',
       post: {
         type: 'instagram',
-        image: 'public/media/123.jpg',
+        image: '/media/123.jpg',
         caption: 'A young family teaches me how to cross streets in Cairo',
         instagramId: '17856054124063959',
         shortcode: 'BDyec8OFnPA',
@@ -1445,7 +1445,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ZQN',
       post: {
         type: 'instagram',
-        image: 'public/media/124.jpg',
+        image: '/media/124.jpg',
         caption: 'Waterfall so majestic it has a rainbow boner',
         instagramId: '17846373844112638',
         shortcode: 'BDvcYJ_lnH7',
@@ -1460,7 +1460,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'CNS',
       post: {
         type: 'instagram',
-        image: 'public/media/125.jpg',
+        image: '/media/125.jpg',
         caption: 'Beware of dismemberment by squid',
         instagramId: '17846374750083276',
         shortcode: 'BDuP1hoFnKN',
@@ -1475,7 +1475,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'CNS',
       post: {
         type: 'instagram',
-        image: 'public/media/126.jpg',
+        image: '/media/126.jpg',
         caption: 'Mighty Atlas',
         instagramId: '17846360998118486',
         shortcode: 'BDuPbYWFnJg',
@@ -1490,7 +1490,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'CNS',
       post: {
         type: 'instagram',
-        image: 'public/media/127.jpg',
+        image: '/media/127.jpg',
         caption: 'Up up and away! Nice flying dad!',
         instagramId: '17849339593069444',
         shortcode: 'BDss2u6FnN4',
@@ -1505,7 +1505,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'CNS',
       post: {
         type: 'instagram',
-        image: 'public/media/128.jpg',
+        image: '/media/128.jpg',
         caption: 'Protected from jelly fish and enemy ninjas',
         instagramId: '17855414146032158',
         shortcode: 'BDsozuFFnFe',
@@ -1520,7 +1520,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ZQN',
       post: {
         type: 'instagram',
-        image: 'public/media/129.jpg',
+        image: '/media/129.jpg',
         caption: 'The taste of victory is sweet',
         instagramId: '17856258676008841',
         shortcode: 'BDiXi4hFnLn',
@@ -1535,7 +1535,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SYD',
       post: {
         type: 'instagram',
-        image: 'public/media/130.jpg',
+        image: '/media/130.jpg',
         caption: "Sunrise at Sydney's beaches. Aussies play hard, 6:30am on a weekday and folks are out surfing",
         instagramId: '17857902703051080',
         shortcode: 'BDiVNA2lnGx',
@@ -1550,7 +1550,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'CNS',
       post: {
         type: 'instagram',
-        image: 'public/media/131.jpg',
+        image: '/media/131.jpg',
         caption: 'Uncertain if this wallaby is having an much fun as us... Welcome to Australia bro!',
         instagramId: '17846289007103049',
         shortcode: 'BDiT1KdlnDv',
@@ -1565,7 +1565,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SYD',
       post: {
         type: 'instagram',
-        image: 'public/media/132.jpg',
+        image: '/media/132.jpg',
         caption: 'Helmet = safe',
         instagramId: '17847023473078403',
         shortcode: 'BDgy1jjlnMz',
@@ -1580,7 +1580,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SYD',
       post: {
         type: 'instagram',
-        image: 'public/media/133.jpg',
+        image: '/media/133.jpg',
         caption: 'Practicing for the real deal',
         instagramId: '17855077864035983',
         shortcode: 'BDapWGnlnKw',
@@ -1595,7 +1595,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SYD',
       post: {
         type: 'instagram',
-        image: 'public/media/134.jpg',
+        image: '/media/134.jpg',
         caption: 'That about sums up my tenuous connection to the real world',
         instagramId: '17854202461003647',
         shortcode: 'BDOus1_FnGc',
@@ -1610,7 +1610,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ZQN',
       post: {
         type: 'instagram',
-        image: 'public/media/135.jpg',
+        image: '/media/135.jpg',
         caption: "I've never seen such a perfect caricature of an apple. All its missing is a cartoon worm wearing reading glasses sticking out the side",
         instagramId: '17854878133050032',
         shortcode: 'BDIIek_FnEA',
@@ -1625,7 +1625,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ZQN',
       post: {
         type: 'instagram',
-        image: 'public/media/136.jpg',
+        image: '/media/136.jpg',
         caption: 'Second biggest pigeon species in the world, tiniest head',
         instagramId: '17845824817081810',
         shortcode: 'BDG1exzFnJH',
@@ -1640,7 +1640,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ZQN',
       post: {
         type: 'instagram',
-        image: 'public/media/137.jpg',
+        image: '/media/137.jpg',
         caption: 'Airplane mode',
         instagramId: '17855552305037425',
         shortcode: 'BDDGZH5lnAv',
@@ -1655,7 +1655,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ZQN',
       post: {
         type: 'instagram',
-        image: 'public/media/140.jpg',
+        image: '/media/140.jpg',
         caption: 'Jabba the Hut and his bodyguards',
         instagramId: '17845801633083438',
         shortcode: 'BC9ILeElnIA',
@@ -1670,7 +1670,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'CHC',
       post: {
         type: 'instagram',
-        image: 'public/media/141.jpg',
+        image: '/media/141.jpg',
         caption: 'No predators on this island so the sheep here are beyond indifferent',
         instagramId: '17845727443102801',
         shortcode: 'BC9GHZVFnE9',
@@ -1685,7 +1685,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'CHC',
       post: {
         type: 'instagram',
-        image: 'public/media/142.jpg',
+        image: '/media/142.jpg',
         caption: 'Adventure awaits',
         instagramId: '17846285596078879',
         shortcode: 'BC9FzR0FnEg',
@@ -1700,7 +1700,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'CHC',
       post: {
         type: 'instagram',
-        image: 'public/media/143.jpg',
+        image: '/media/143.jpg',
         caption: 'Serenely peaceful even though it looks like the vox of a badass dub step',
         instagramId: '17845524184128569',
         shortcode: 'BC9CveQFnPm',
@@ -1715,7 +1715,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ZQN',
       post: {
         type: 'instagram',
-        image: 'public/media/144.jpg',
+        image: '/media/144.jpg',
         caption: 'Tricked by metric eggs',
         instagramId: '17854964749028233',
         shortcode: 'BC9BeL3FnM-',
@@ -1730,7 +1730,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'BEG',
       post: {
         type: 'instagram',
-        image: 'public/media/80.jpg',
+        image: '/media/80.jpg',
         caption: 'Excellent recycling',
         instagramId: '17858135377041516',
         shortcode: 'BGRhG3AlnEe',
@@ -1745,7 +1745,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'IST',
       post: {
         type: 'instagram',
-        image: 'public/media/90.jpg',
+        image: '/media/90.jpg',
         caption: 'Faraway place, faraway look',
         instagramId: '17850986311065455',
         shortcode: 'BFzfRBlFnNq',
@@ -1760,7 +1760,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'AYT',
       post: {
         type: 'instagram',
-        image: 'public/media/100.jpg',
+        image: '/media/100.jpg',
         caption: 'Standing in for some absentee statues',
         instagramId: '17857251190002804',
         shortcode: 'BFJu2Y8lnBK',
@@ -1775,7 +1775,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'TLV',
       post: {
         type: 'instagram',
-        image: 'public/media/101.jpg',
+        image: '/media/101.jpg',
         caption: 'Third holiest site in Islam, vigilantly policed by volunteers who dinged us for holding hands',
         instagramId: '17856392107061919',
         shortcode: 'BE_ilZHlnCk',
@@ -1790,7 +1790,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ZQN',
       post: {
         type: 'instagram',
-        image: 'public/media/138.jpg',
+        image: '/media/138.jpg',
         caption: 'Ground zero for #ourearthsandwich',
         instagramId: '17854382950055643',
         shortcode: 'BDAVzMklnKI',
@@ -1805,7 +1805,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'ZQN',
       post: {
         type: 'instagram',
-        image: 'public/media/139.jpg',
+        image: '/media/139.jpg',
         caption: 'Through the looking glass at the wonderland garden',
         instagramId: '17855441224009700',
         shortcode: 'BDAUJNoFnIs',
@@ -1820,7 +1820,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'WLG',
       post: {
         type: 'instagram',
-        image: 'public/media/145.jpg',
+        image: '/media/145.jpg',
         caption: 'Close but no cigar',
         instagramId: '17845603714079409',
         shortcode: 'BChkf3kFnEA',
@@ -1835,7 +1835,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'WLG',
       post: {
         type: 'instagram',
-        image: 'public/media/146.jpg',
+        image: '/media/146.jpg',
         caption: 'High five bro!',
         instagramId: '17853647512011797',
         shortcode: 'BChkQ6tlnDx',
@@ -1850,7 +1850,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'AKL',
       post: {
         type: 'instagram',
-        image: 'public/media/147.jpg',
+        image: '/media/147.jpg',
         caption: "Suddenly being a black sheep doesn't sound so bad...",
         instagramId: '17844849784100988',
         shortcode: 'BCg0NZxlnEl',
@@ -1865,7 +1865,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'AKL',
       post: {
         type: 'instagram',
-        image: 'public/media/148.jpg',
+        image: '/media/148.jpg',
         caption: "I'm going to wager that exactly zero black people have ever stayed at this bed & breakfast",
         instagramId: '17844884827087766',
         shortcode: 'BCgzSa7lnDd',
@@ -1880,7 +1880,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'TRG',
       post: {
         type: 'instagram',
-        image: 'public/media/149.jpg',
+        image: '/media/149.jpg',
         caption: 'A bit of geology porn at the top of Mt Doom',
         instagramId: '17845547590077738',
         shortcode: 'BCgxyUClnBV',
@@ -1895,7 +1895,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'AKL',
       post: {
         type: 'instagram',
-        image: 'public/media/150.jpg',
+        image: '/media/150.jpg',
         caption: 'Embracing cultural nuance',
         instagramId: '17844707533115207',
         shortcode: 'BCPotg3FnPM',
@@ -1910,7 +1910,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'AKL',
       post: {
         type: 'instagram',
-        image: 'public/media/151.jpg',
+        image: '/media/151.jpg',
         caption: "I'm confident only good things can come of this",
         instagramId: '17854353184008220',
         shortcode: 'BCPoLdOFnOl',
@@ -1925,7 +1925,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'AKL',
       post: {
         type: 'instagram',
-        image: 'public/media/152.jpg',
+        image: '/media/152.jpg',
         caption: 'Kiwis are very trusting about leaving their things around',
         instagramId: '17853683359020200',
         shortcode: 'BCPnnQmFnN9',
@@ -1940,7 +1940,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'GIG',
       post: {
         type: 'instagram',
-        image: 'public/media/153.jpg',
+        image: '/media/153.jpg',
         caption: 'An old friend shows up to see us off. Thanks big J!',
         instagramId: '17853274732042302',
         shortcode: 'BCIK3K9FnG5',
@@ -1955,7 +1955,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'EZE',
       post: {
         type: 'instagram',
-        image: 'public/media/154.jpg',
+        image: '/media/154.jpg',
         caption: 'In Argentina, they call this a municipal water pumping station',
         instagramId: '17853926197039229',
         shortcode: 'BBy08ZNlnC1',
@@ -1970,7 +1970,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'EZE',
       post: {
         type: 'instagram',
-        image: 'public/media/155.jpg',
+        image: '/media/155.jpg',
         caption: "I wonder if she was actually this haunting in life or if they amped it up for the cemetery so she wouldn't get picked on by the other ghouls",
         instagramId: '17849325040075543',
         shortcode: 'BBvtN0qlnK7',
@@ -1985,7 +1985,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'EZE',
       post: {
         type: 'instagram',
-        image: 'public/media/156.jpg',
+        image: '/media/156.jpg',
         caption: 'Close enough',
         instagramId: '17853589381025349',
         shortcode: 'BBkTiCdlnKY',
@@ -2000,7 +2000,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'EZE',
       post: {
         type: 'instagram',
-        image: 'public/media/157.jpg',
+        image: '/media/157.jpg',
         caption: 'Protesting human right violations and Attaining enlightenment, #stuffwhitepeoplelike is the same everywhere',
         instagramId: '17844259963093660',
         shortcode: 'BBkTHzMFnJd',
@@ -2015,7 +2015,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'EZE',
       post: {
         type: 'instagram',
-        image: 'public/media/158.jpg',
+        image: '/media/158.jpg',
         caption: 'Warming up for a good old fashioned game of father-daughter polo',
         instagramId: '17852778934061514',
         shortcode: 'BBjUXaxlnDq',
@@ -2030,7 +2030,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'EZE',
       post: {
         type: 'instagram',
-        image: 'public/media/159.jpg',
+        image: '/media/159.jpg',
         caption: "I always wondered what it would look like if Jesus gave Alec Baldwin's brass balls speech dressed as a pirate",
         instagramId: '17856125623059604',
         shortcode: 'BBVxP7ZFnMZ',
@@ -2045,7 +2045,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'EZE',
       post: {
         type: 'instagram',
-        image: 'public/media/160.jpg',
+        image: '/media/160.jpg',
         caption: "Now that's what I call an idyllic country cottage",
         instagramId: '17844223978090747',
         shortcode: 'BBVwC2alnKZ',
@@ -2060,7 +2060,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'MDZ',
       post: {
         type: 'instagram',
-        image: 'public/media/161.jpg',
+        image: '/media/161.jpg',
         caption: 'Travel tip no. 42: When crossing mountains by land, the changing air pressure may or may not implode your bus like a sinking submarine',
         instagramId: '17853413674003723',
         shortcode: 'BBOuBTvlnKH',
@@ -2075,7 +2075,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SCL',
       post: {
         type: 'instagram',
-        image: 'public/media/162.jpg',
+        image: '/media/162.jpg',
         caption: 'The Supreme Leader inspects another bountiful harvest',
         instagramId: '17844218560114470',
         shortcode: 'BBOtF1QFnIm',
@@ -2090,7 +2090,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'MDZ',
       post: {
         type: 'instagram',
-        image: 'public/media/163.jpg',
+        image: '/media/163.jpg',
         caption: 'I wonder what this button does...',
         instagramId: '17844875899075185',
         shortcode: 'BBOsiIMlnHr',
@@ -2105,7 +2105,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SCL',
       post: {
         type: 'instagram',
-        image: 'public/media/164.jpg',
+        image: '/media/164.jpg',
         caption: "Discovered by the Germans in 1904, they named it Santiago, which of course in German means ‘a whale’s vagina'.",
         instagramId: '17844155383108194',
         shortcode: 'BBOrulpFnGI',
@@ -2120,7 +2120,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'PMC',
       post: {
         type: 'instagram',
-        image: 'public/media/165.jpg',
+        image: '/media/165.jpg',
         caption: "It's a bird! It's a plane!",
         instagramId: '17844086338121492',
         shortcode: 'BBBhww9lnNE',
@@ -2135,7 +2135,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SCL',
       post: {
         type: 'instagram',
-        image: 'public/media/166.jpg',
+        image: '/media/166.jpg',
         caption: "Sometimes nothing makes me happier than seeing little affirmations of America's all-pervasive cultural dominance #americafuckyeah",
         instagramId: '17852760409010689',
         shortcode: 'BBBgI_YFnJv',
@@ -2150,7 +2150,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SCL',
       post: {
         type: 'instagram',
-        image: 'public/media/167.jpg',
+        image: '/media/167.jpg',
         caption: "Now it's a party!",
         instagramId: '17844117046105614',
         shortcode: 'BBBfS74lnIK',
@@ -2165,7 +2165,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SCL',
       post: {
         type: 'instagram',
-        image: 'public/media/168.jpg',
+        image: '/media/168.jpg',
         caption: 'The imperial accounting system of the Incans recorded in knots',
         instagramId: '17847018424064841',
         shortcode: 'BBBeVJulnGl',
@@ -2180,7 +2180,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'PMC',
       post: {
         type: 'instagram',
-        image: 'public/media/169.jpg',
+        image: '/media/169.jpg',
         caption: "I'm Hans, unt I'm Frans. And vee are goona Pump! You Aup!",
         instagramId: '17844020167105373',
         shortcode: 'BAxP7OxlnGu',
@@ -2195,7 +2195,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LPB',
       post: {
         type: 'instagram',
-        image: 'public/media/170.jpg',
+        image: '/media/170.jpg',
         caption: 'Adios Bolivia, you magnificently weird duck',
         instagramId: '17853153064044785',
         shortcode: 'BAeiPA4FnC0',
@@ -2210,7 +2210,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LPB',
       post: {
         type: 'instagram',
-        image: 'public/media/172.jpg',
+        image: '/media/172.jpg',
         caption: 'The Temptation of Christ',
         instagramId: '17843909839106927',
         shortcode: 'BAYeCuSFnBs',
@@ -2225,7 +2225,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LPB',
       post: {
         type: 'instagram',
-        image: 'public/media/173.jpg',
+        image: '/media/173.jpg',
         caption: 'Can there be too much of a good thing? Answer is no.',
         instagramId: '17843916694086207',
         shortcode: 'BAYdU8zFnAH',
@@ -2240,7 +2240,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LPB',
       post: {
         type: 'instagram',
-        image: 'public/media/174.jpg',
+        image: '/media/174.jpg',
         caption: 'The Rock is going to look so bad ass power drifting these in Fast and Furious 8',
         instagramId: '17852936779011226',
         shortcode: 'BAXMWQjFnNq',
@@ -2255,7 +2255,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LPB',
       post: {
         type: 'instagram',
-        image: 'public/media/175.jpg',
+        image: '/media/175.jpg',
         caption: 'Bolivia has some bumpy-ass roads. This was by far the most comfortable part of our journey to Lake Titicaca',
         instagramId: '17853446587048078',
         shortcode: 'BAXKqr9FnKQ',
@@ -2270,7 +2270,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LPB',
       post: {
         type: 'instagram',
-        image: 'public/media/176.jpg',
+        image: '/media/176.jpg',
         caption: "There is no corner on earth where people don't love Korean soaps",
         instagramId: '17852580307038419',
         shortcode: 'BAXICkWFnE9',
@@ -2285,7 +2285,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'GRU',
       post: {
         type: 'instagram',
-        image: 'public/media/177.jpg',
+        image: '/media/177.jpg',
         caption: '3000 miles to end up right back in Brooklyn #nycisthenewrome',
         instagramId: '17843893009085176',
         shortcode: 'BAM5rTYFnCy',
@@ -2300,7 +2300,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'GRU',
       post: {
         type: 'instagram',
-        image: 'public/media/178.jpg',
+        image: '/media/178.jpg',
         caption: "Brazilian water-heating shower head. Sounds like an amazing innovation until you realize it's a wet 220 volt appliance plugged in right above your naked body",
         instagramId: '17843892214123295',
         shortcode: 'BAM4Rm5FnP3',
@@ -2315,7 +2315,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SRE',
       post: {
         type: 'instagram',
-        image: 'public/media/179.jpg',
+        image: '/media/179.jpg',
         caption: 'Our kickass Bolivian Spanish teacher, Shirley',
         instagramId: '17852542504049639',
         shortcode: 'BAM2VCIFnMe',
@@ -2330,7 +2330,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SRE',
       post: {
         type: 'instagram',
-        image: 'public/media/180.jpg',
+        image: '/media/180.jpg',
         caption: "In my book, train cemetery comes in solidly above 'pet' and just a little below 'haunted'",
         instagramId: '17844101635126933',
         shortcode: 'BAM1A7CFnJ4',
@@ -2345,7 +2345,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SRE',
       post: {
         type: 'instagram',
-        image: 'public/media/181.jpg',
+        image: '/media/181.jpg',
         caption: "Wela's surrealist interpretation of the Dali Desert",
         instagramId: '17843897125126457',
         shortcode: 'BAMxmiDlnC2',
@@ -2360,7 +2360,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LPB',
       post: {
         type: 'instagram',
-        image: 'public/media/182.jpg',
+        image: '/media/182.jpg',
         caption: "It's not called the Death Road for nothin'",
         instagramId: '17854310356049606',
         shortcode: 'BAMw0balnBU',
@@ -2375,7 +2375,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LPB',
       post: {
         type: 'instagram',
-        image: 'public/media/183.jpg',
+        image: '/media/183.jpg',
         caption: 'Watch out X-Games, your new star has arrived',
         instagramId: '17852594608048272',
         shortcode: 'BALfnv7FnBG',
@@ -2390,7 +2390,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SRE',
       post: {
         type: 'instagram',
-        image: 'public/media/184.jpg',
+        image: '/media/184.jpg',
         caption: "I don't have to outrun the dinosaur...",
         instagramId: '17843859973103377',
         shortcode: 'BAH7keKlnGc',
@@ -2405,7 +2405,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SRE',
       post: {
         type: 'instagram',
-        image: 'public/media/185.jpg',
+        image: '/media/185.jpg',
         caption: 'Come to me llamas, I only want to love you',
         instagramId: '17846442787070700',
         shortcode: 'BAH7i4gFnGZ',
@@ -2420,7 +2420,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SRE',
       post: {
         type: 'instagram',
-        image: 'public/media/186.jpg',
+        image: '/media/186.jpg',
         caption: 'Onward to victory brave patriot',
         instagramId: '17846824885065812',
         shortcode: '_75XEMFnKx',
@@ -2435,7 +2435,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SRE',
       post: {
         type: 'instagram',
-        image: 'public/media/187.jpg',
+        image: '/media/187.jpg',
         caption: 'My window buddy enroute to the Salt Flats',
         instagramId: '17852944534057279',
         shortcode: '_75Dn1FnKO',
@@ -2450,7 +2450,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SRE',
       post: {
         type: 'instagram',
-        image: 'public/media/188.jpg',
+        image: '/media/188.jpg',
         caption: "Wayward Amish clan contemplate taking the airport escalator because, fuck it, they're about to board a sky-buggy of damnation anyways",
         instagramId: '17853312478019075',
         shortcode: '_nfyScFnBX',
@@ -2465,7 +2465,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'MAO',
       post: {
         type: 'instagram',
-        image: 'public/media/189.jpg',
+        image: '/media/189.jpg',
         caption: "Hey little buddy, whatcha doin' down there?",
         instagramId: '17844157597077804',
         shortcode: '_DY8DslnF2',
@@ -2480,7 +2480,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'MAO',
       post: {
         type: 'instagram',
-        image: 'public/media/190.jpg',
+        image: '/media/190.jpg',
         caption: 'Practicing for our inevitable encounter with giant tarantulas, river sharks, and Farc guerrillas',
         instagramId: '17850917368044068',
         shortcode: '_DWDIOlnBH',
@@ -2495,7 +2495,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'MAO',
       post: {
         type: 'instagram',
-        image: 'public/media/191.jpg',
+        image: '/media/191.jpg',
         caption: 'Oh piranhas, how quickly the tables turn',
         instagramId: '17843579293105595',
         shortcode: '_DU5XpFnPQ',
@@ -2510,7 +2510,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'MAO',
       post: {
         type: 'instagram',
-        image: 'public/media/192.jpg',
+        image: '/media/192.jpg',
         caption: 'Thanks team! For not letting us die in the jungle',
         instagramId: '17850285760063735',
         shortcode: '_DUk6ZFnOx',
@@ -2525,7 +2525,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LET',
       post: {
         type: 'instagram',
-        image: 'public/media/193.jpg',
+        image: '/media/193.jpg',
         caption: 'Peruvian side of the Amazon river is rather less developed, as attested by the the logs lashed together as a dock gang plank',
         instagramId: '17843525428113747',
         shortcode: '_DS3iZlnL-',
@@ -2540,7 +2540,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'MAO',
       post: {
         type: 'instagram',
-        image: 'public/media/194.jpg',
+        image: '/media/194.jpg',
         caption: 'OK, so maybe don\'t go right then...',
         instagramId: '17851314046046723',
         shortcode: '_DRpzAlnJr',
@@ -2555,7 +2555,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'GIG',
       post: {
         type: 'instagram',
-        image: 'public/media/195.jpg',
+        image: '/media/195.jpg',
         caption: "For some reason there's a vending machine selling impotence pills behind the grumpy cashier at this fancy coffee shop",
         instagramId: '17850834646015734',
         shortcode: '_DQ2LxFnIH',
@@ -2570,7 +2570,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'GIG',
       post: {
         type: 'instagram',
-        image: 'public/media/196.jpg',
+        image: '/media/196.jpg',
         caption: "Each of those tiles is from some city/state/country in the world. Didn't find Texas so I'll have to send one in when I get home",
         instagramId: '17843531455129604',
         shortcode: '_DP7A4FnGf',
@@ -2585,7 +2585,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'CTG',
       post: {
         type: 'instagram',
-        image: 'public/media/197.jpg',
+        image: '/media/197.jpg',
         caption: 'Corn hole + Explosives = Tejo. Playing a few rounds with my taxi driver. This game is coming home with me',
         instagramId: '17844464305066168',
         shortcode: '-XbXXalnLE',
@@ -2600,7 +2600,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'CTG',
       post: {
         type: 'instagram',
-        image: 'public/media/198.jpg',
+        image: '/media/198.jpg',
         caption: 'A random Russian bar in the Caribbean, complete with bartenders dressed like Xenia Onatopp',
         instagramId: '17843421703074779',
         shortcode: '-Xaa6sFnJO',
@@ -2615,7 +2615,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'PEI',
       post: {
         type: 'instagram',
-        image: 'public/media/199.jpg',
+        image: '/media/199.jpg',
         caption: "You don't fool me banana tree, I know what I'm looking at...",
         instagramId: '17842666129105122',
         shortcode: '-RMFY8FnOQ',
@@ -2630,7 +2630,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'PEI',
       post: {
         type: 'instagram',
-        image: 'public/media/200.jpg',
+        image: '/media/200.jpg',
         caption: 'Not a bad way to check email',
         instagramId: '17847831604019879',
         shortcode: '-RLt1zlnNk',
@@ -2645,7 +2645,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'PEI',
       post: {
         type: 'instagram',
-        image: 'public/media/201.jpg',
+        image: '/media/201.jpg',
         caption: 'Cloud forest! A great view in many ways',
         instagramId: '17847500632048089',
         shortcode: '-RLZjwFnNE',
@@ -2660,7 +2660,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'BOG',
       post: {
         type: 'instagram',
-        image: 'public/media/202.jpg',
+        image: '/media/202.jpg',
         caption: "Hi ho! Hi ho! It's off to work we go!",
         instagramId: '17842374907081961',
         shortcode: '-FxdjNFnEK',
@@ -2675,7 +2675,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'HAV',
       post: {
         type: 'instagram',
-        image: 'public/media/203.jpg',
+        image: '/media/203.jpg',
         caption: "Internet is not allowed in homes so people congregate in parks where Wi-Fi is dealt out like crack. Cuba is a weird place and outside the resorts it's short on a lot of material comforts. I wanted to see what a place outside the global consensus looks like and Cuba delivered in spades. Its not always sweet, but this place has flavor.",
         instagramId: '17845831912047607',
         shortcode: '9-IKirFnCv',
@@ -2690,7 +2690,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'HAV',
       post: {
         type: 'instagram',
-        image: 'public/media/204.jpg',
+        image: '/media/204.jpg',
         caption: 'Stumbled on a qualifier match for the provincial championships. Apparently Cubans love boxing and ballet because of the Soviets. Ivan would be proud',
         instagramId: '17845378867026200',
         shortcode: '9-G9ECFnBD',
@@ -2705,7 +2705,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'HAV',
       post: {
         type: 'instagram',
-        image: 'public/media/205.jpg',
+        image: '/media/205.jpg',
         caption: 'In Cuba, even Jesus is smoking a cigar and holding a martini',
         instagramId: '17842166767091705',
         shortcode: '9-EpyIlnNN',
@@ -2720,7 +2720,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'HAV',
       post: {
         type: 'instagram',
-        image: 'public/media/206.jpg',
+        image: '/media/206.jpg',
         caption: "'Fidel' by Banksy",
         instagramId: '17846043265037240',
         shortcode: '9-EK7ulnMV',
@@ -2735,7 +2735,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'HAV',
       post: {
         type: 'instagram',
-        image: 'public/media/207.jpg',
+        image: '/media/207.jpg',
         caption: 'Leg room in these old Chevys was insane. Now I finally get why losing your virginity in a car is an American thing',
         instagramId: '17845432549032110',
         shortcode: '9-DvX0FnLe',
@@ -2750,7 +2750,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'HAV',
       post: {
         type: 'instagram',
-        image: 'public/media/208.jpg',
+        image: '/media/208.jpg',
         caption: 'No matter what corner of the world you go, there will always be a Chinatown',
         instagramId: '17846235196007265',
         shortcode: '9-DGlLlnKR',
@@ -2765,7 +2765,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'HAV',
       post: {
         type: 'instagram',
-        image: 'public/media/209.jpg',
+        image: '/media/209.jpg',
         caption: "Our first 10 minutes in Havana and we couldn't have found a more Cubano character if we were casting a movie",
         instagramId: '17846448709007959',
         shortcode: '9-CrGulnJR',
@@ -2780,7 +2780,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'PEK',
       post: {
         type: 'instagram',
-        image: 'public/media/210.jpg',
+        image: '/media/210.jpg',
         caption: 'Edible Arrangements have been trying to branch out lately',
         instagramId: '17843500477064436',
         shortcode: '9o20UHFnI8',
@@ -2795,7 +2795,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'PEK',
       post: {
         type: 'instagram',
-        image: 'public/media/211.jpg',
+        image: '/media/211.jpg',
         caption: 'Yay adventure, Yay friendship, Yay good feeling!',
         instagramId: '17843500342064436',
         shortcode: '9o1sA3FnHK',
@@ -2810,7 +2810,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'TPE',
       post: {
         type: 'instagram',
-        image: 'public/media/212.jpg',
+        image: '/media/212.jpg',
         caption: 'Rock out buddy, how do I get your confidence?',
         instagramId: '17843500201064436',
         shortcode: '9o1A7EFnGD',
@@ -2825,7 +2825,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'TPE',
       post: {
         type: 'instagram',
-        image: 'public/media/213.jpg',
+        image: '/media/213.jpg',
         caption: "Late night shrimpin'",
         instagramId: '17843500072064436',
         shortcode: '9o0RRNlnFD',
@@ -2840,7 +2840,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'MSY',
       post: {
         type: 'instagram',
-        image: 'public/media/214.jpg',
+        image: '/media/214.jpg',
         caption: 'Fabulous lady of mystery contemplates her next adventure',
         instagramId: '17843500018064436',
         shortcode: '9oz7qEFnEl',
@@ -2855,7 +2855,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'TPE',
       post: {
         type: 'instagram',
-        image: 'public/media/215.jpg',
+        image: '/media/215.jpg',
         caption: "For 3 bucks, you get a bunch of fragile tissue paper nets, and every fish you catch is yours. I didn't need new pets so I ate mine.",
         instagramId: '17843304730064436',
         shortcode: '9Q1Lf9lnOV',
@@ -2870,7 +2870,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'TPE',
       post: {
         type: 'instagram',
-        image: 'public/media/216.jpg',
+        image: '/media/216.jpg',
         caption: "You don't fool me cubism, I know what I'm looking at",
         instagramId: '17843294104064436',
         shortcode: '9Pid74FnI6',
@@ -2885,7 +2885,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'TPE',
       post: {
         type: 'instagram',
-        image: 'public/media/217.jpg',
+        image: '/media/217.jpg',
         caption: 'Joined a political rally yesterday because I love chanting mobs. Also they had free ice cream',
         instagramId: '17843294056064436',
         shortcode: '9PhvblFnHo',
@@ -2900,7 +2900,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'TPE',
       post: {
         type: 'instagram',
-        image: 'public/media/218.jpg',
+        image: '/media/218.jpg',
         caption: 'Blatant copyright infringement and careless appropriation of religious symbology all to sell some fried chicken. I like it.',
         instagramId: '17843293963064436',
         shortcode: '9Pgq_hFnFq',
@@ -2915,7 +2915,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'KWL',
       post: {
         type: 'instagram',
-        image: 'public/media/219.jpg',
+        image: '/media/219.jpg',
         caption: 'I want this jolly windswept fellow for my living room. Wela said "We\'ll see..."',
         instagramId: '17843234383064436',
         shortcode: '9H6fIqlnIR',
@@ -2930,7 +2930,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'KWL',
       post: {
         type: 'instagram',
-        image: 'public/media/220.jpg',
+        image: '/media/220.jpg',
         caption: 'Steak restaurant with authentic cowboy!',
         instagramId: '17843208961064436',
         shortcode: '9FIn05lnNh',
@@ -2945,7 +2945,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'PVG',
       post: {
         type: 'instagram',
-        image: 'public/media/221.jpg',
+        image: '/media/221.jpg',
         caption: 'Paying for a wedding in China is like prepping for a drug deal, my Glock is just off-camera',
         instagramId: '17843127322064436',
         shortcode: '9Ckqx1FnGb',
@@ -2960,7 +2960,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'PEK',
       post: {
         type: 'instagram',
-        image: 'public/media/222.jpg',
+        image: '/media/222.jpg',
         caption: 'Disability access ramp in China, "A" for effort',
         instagramId: '17843126758064436',
         shortcode: '9Cj6H8FnFJ',
@@ -2975,7 +2975,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'PEK',
       post: {
         type: 'instagram',
-        image: 'public/media/223.jpg',
+        image: '/media/223.jpg',
         caption: "Caption reads: You may live like a pig, but you won't achieve a pig's happiness. Inspiration from the back of a Chinese beer bottle",
         instagramId: '17843125684064436',
         shortcode: '9CiXJGlnCw',
@@ -2990,7 +2990,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FCO',
       post: {
         type: 'instagram',
-        image: 'public/media/224.jpg',
+        image: '/media/224.jpg',
         caption: 'Though in all seriousness, no one does awe-inspiring like Catholics. Sometimes gaudy, sometimes overwhelming beautiful.',
         instagramId: '17842644322064436',
         shortcode: '8RJyChFnOD',
@@ -3005,7 +3005,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FCO',
       post: {
         type: 'instagram',
-        image: 'public/media/225.jpg',
+        image: '/media/225.jpg',
         caption: 'Are you not entertained!?!',
         instagramId: '17842644043064436',
         shortcode: '8RIA48lnKW',
@@ -3020,7 +3020,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FCO',
       post: {
         type: 'instagram',
-        image: 'public/media/226.jpg',
+        image: '/media/226.jpg',
         caption: 'I believe this panel depicts how God escapes awkward situations',
         instagramId: '17842643989064436',
         shortcode: '8RHwTOlnJ1',
@@ -3035,7 +3035,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FCO',
       post: {
         type: 'instagram',
-        image: 'public/media/227.jpg',
+        image: '/media/227.jpg',
         caption: 'I forgot maps had this function. St. Peter looks over Rome, and so do Sergie and Larry.',
         instagramId: '17842643794064436',
         shortcode: '8RGkcWlnHW',
@@ -3050,7 +3050,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FCO',
       post: {
         type: 'instagram',
-        image: 'public/media/228.jpg',
+        image: '/media/228.jpg',
         caption: 'Yes to all of those things.',
         instagramId: '17842643461064436',
         shortcode: '8RE38RFnDx',
@@ -3065,7 +3065,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FCO',
       post: {
         type: 'instagram',
-        image: 'public/media/229.jpg',
+        image: '/media/229.jpg',
         caption: 'Architectural drawings from ancient times. Somehow it never occurred to me that they didn\'t just grab a chisel and go at it',
         instagramId: '17842547719064436',
         shortcode: '8HGzZZFnDm',
@@ -3080,7 +3080,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FCO',
       post: {
         type: 'instagram',
-        image: 'public/media/230.jpg',
+        image: '/media/230.jpg',
         caption: "Inspired by Michelangelo's David...",
         instagramId: '17842547629064436',
         shortcode: '8HFm5ulnBV',
@@ -3095,7 +3095,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FLR',
       post: {
         type: 'instagram',
-        image: 'public/media/231.jpg',
+        image: '/media/231.jpg',
         caption: "Sometimes there's no reason to resist indulging in a classic",
         instagramId: '17842466359064436',
         shortcode: '78uIebFnGN',
@@ -3110,7 +3110,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FLR',
       post: {
         type: 'instagram',
-        image: 'public/media/232.jpg',
+        image: '/media/232.jpg',
         caption: 'An escapee from the little shop of horrors',
         instagramId: '17842466089064436',
         shortcode: '78s_fBlnEU',
@@ -3125,7 +3125,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FLR',
       post: {
         type: 'instagram',
-        image: 'public/media/233.jpg',
+        image: '/media/233.jpg',
         caption: "Dave's really been trying to find himself",
         instagramId: '17842428487064436',
         shortcode: '73aLrBFnM6',
@@ -3140,7 +3140,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FLR',
       post: {
         type: 'instagram',
-        image: 'public/media/234.jpg',
+        image: '/media/234.jpg',
         caption: 'It looks like Leonardo was the original #leanstartup',
         instagramId: '17842428373064436',
         shortcode: '73Zpu-lnLq',
@@ -3155,7 +3155,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'BLQ',
       post: {
         type: 'instagram',
-        image: 'public/media/235.jpg',
+        image: '/media/235.jpg',
         caption: 'This smile is from before climbing the 500 steps to the top.',
         instagramId: '17842408936064436',
         shortcode: '70s_qoFnFh',
@@ -3170,7 +3170,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'BLQ',
       post: {
         type: 'instagram',
-        image: 'public/media/236.jpg',
+        image: '/media/236.jpg',
         caption: 'She handles her business like a lady, dat ass tho!',
         instagramId: '17842408774064436',
         shortcode: '70r2T-lnDG',
@@ -3185,7 +3185,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'BLQ',
       post: {
         type: 'instagram',
-        image: 'public/media/237.jpg',
+        image: '/media/237.jpg',
         caption: 'The Pope is not impressed by your little Basilica',
         instagramId: '17842407436064436',
         shortcode: '70hwVvlnHL',
@@ -3200,7 +3200,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'BLQ',
       post: {
         type: 'instagram',
-        image: 'public/media/238.jpg',
+        image: '/media/238.jpg',
         caption: 'This is, without question, the greatest nativity scene ever',
         instagramId: '17842403734064436',
         shortcode: '70DXlclnPZ',
@@ -3215,7 +3215,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'BLQ',
       post: {
         type: 'instagram',
-        image: 'public/media/239.jpg',
+        image: '/media/239.jpg',
         caption: "I've learned that Pisa is only the best known of hundreds of leaning towers in Italy. Evidently, they are just bad at this particular task",
         instagramId: '17842340515064436',
         shortcode: '7p03X2lnIW',
@@ -3230,7 +3230,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'VCE',
       post: {
         type: 'instagram',
-        image: 'public/media/240.jpg',
+        image: '/media/240.jpg',
         caption: "It's nice that some things transcend all cultural boundaries",
         instagramId: '17842338745064436',
         shortcode: '7plyT5FnPS',
@@ -3245,7 +3245,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'VCE',
       post: {
         type: 'instagram',
-        image: 'public/media/241.jpg',
+        image: '/media/241.jpg',
         caption: 'What does the fox say?',
         instagramId: '17842307590064436',
         shortcode: '7lZA2MFnPn',
@@ -3260,7 +3260,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SZG',
       post: {
         type: 'instagram',
-        image: 'public/media/242.jpg',
+        image: '/media/242.jpg',
         caption: 'This is where Redbull keeps all their toys. In the top right corner is a badass glass conference room suspended above the hanger',
         instagramId: '17842285489064436',
         shortcode: '7i6CtNFnKv',
@@ -3275,7 +3275,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SZG',
       post: {
         type: 'instagram',
-        image: 'public/media/243.jpg',
+        image: '/media/243.jpg',
         caption: 'Do, a deer a female deer. Re, a drop of golden sun!',
         instagramId: '17842285366064436',
         shortcode: '7i5Kr6lnIp',
@@ -3290,7 +3290,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'MUC',
       post: {
         type: 'instagram',
-        image: 'public/media/244.jpg',
+        image: '/media/244.jpg',
         caption: 'Clearly, I love rowboats',
         instagramId: '17842250362064436',
         shortcode: '7cQxgLlnPy',
@@ -3305,7 +3305,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'MUC',
       post: {
         type: 'instagram',
-        image: 'public/media/245.jpg',
+        image: '/media/245.jpg',
         caption: "Not usually into filters, but Cinderella's castle deserves a little magic",
         instagramId: '17842250323064436',
         shortcode: '7cP1hcFnOx',
@@ -3320,7 +3320,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'MUC',
       post: {
         type: 'instagram',
-        image: 'public/media/246.jpg',
+        image: '/media/246.jpg',
         caption: 'This just got added to my list of things to do in life. Now I just have to learn to surf (and speak German and move to Munich)',
         instagramId: '17842250293064436',
         shortcode: '7cO6OIFnNy',
@@ -3335,7 +3335,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'BRU',
       post: {
         type: 'instagram',
-        image: 'public/media/247.jpg',
+        image: '/media/247.jpg',
         caption: "Now that's what I call biscuits and gravy!",
         instagramId: '17842217641064436',
         shortcode: '7ShPyYFnD2',
@@ -3350,7 +3350,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'BRU',
       post: {
         type: 'instagram',
-        image: 'public/media/248.jpg',
+        image: '/media/248.jpg',
         caption: 'I spent 20 minutes trying to get mugged so I could see them spring into action',
         instagramId: '17842217485064436',
         shortcode: '7SdtbVFnMS',
@@ -3365,7 +3365,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LUX',
       post: {
         type: 'instagram',
-        image: 'public/media/249.jpg',
+        image: '/media/249.jpg',
         caption: 'Hold on! You have so much to live for!',
         instagramId: '17842217461064436',
         shortcode: '7SdN4UFnLk',
@@ -3380,7 +3380,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LUX',
       post: {
         type: 'instagram',
-        image: 'public/media/250.jpg',
+        image: '/media/250.jpg',
         caption: 'Good old fashioned fun at a 600 year old carnival',
         instagramId: '17842217449064436',
         shortcode: '7Sc8sclnLF',
@@ -3395,7 +3395,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FRA',
       post: {
         type: 'instagram',
-        image: 'public/media/251.jpg',
+        image: '/media/251.jpg',
         caption: 'Tower ripped asunder',
         instagramId: '17842217398064436',
         shortcode: '7ScG0MlnJ1',
@@ -3410,7 +3410,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FRA',
       post: {
         type: 'instagram',
-        image: 'public/media/252.jpg',
+        image: '/media/252.jpg',
         caption: 'Foreign languages are a total scam',
         instagramId: '17842217320064436',
         shortcode: '7Sa-ONFnH8',
@@ -3425,7 +3425,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'AMS',
       post: {
         type: 'instagram',
-        image: 'public/media/253.jpg',
+        image: '/media/253.jpg',
         caption: 'Oh please do tell',
         instagramId: '17842086382064436',
         shortcode: '68W2JvlnLo',
@@ -3440,7 +3440,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'AMS',
       post: {
         type: 'instagram',
-        image: 'public/media/254.jpg',
+        image: '/media/254.jpg',
         caption: 'Oh Holland, have you learned nothing?',
         instagramId: '17842086352064436',
         shortcode: '68WgY3FnK_',
@@ -3455,7 +3455,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'RAK',
       post: {
         type: 'instagram',
-        image: 'public/media/255.jpg',
+        image: '/media/255.jpg',
         caption: 'Motherfucka lunged me',
         instagramId: '17842061335064436',
         shortcode: '62g1tGFnJG',
@@ -3470,7 +3470,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'RAK',
       post: {
         type: 'instagram',
-        image: 'public/media/256.jpg',
+        image: '/media/256.jpg',
         caption: 'The ruthless Khaleesi, leading her hoard to its next plunder',
         instagramId: '17842055791064436',
         shortcode: '60yLk7FnOn',
@@ -3485,7 +3485,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'RAK',
       post: {
         type: 'instagram',
-        image: 'public/media/257.jpg',
+        image: '/media/257.jpg',
         caption: 'Partaking in the ancient and long revered Berber tradition of sandboarding',
         instagramId: '17842044238064436',
         shortcode: '6x8KBBFnKW',
@@ -3500,7 +3500,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FEZ',
       post: {
         type: 'instagram',
-        image: 'public/media/258.jpg',
+        image: '/media/258.jpg',
         caption: 'Chaos and sublime in the winding bazaars',
         instagramId: '17842026724064436',
         shortcode: '6txb7VlnPN',
@@ -3515,7 +3515,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FEZ',
       post: {
         type: 'instagram',
-        image: 'public/media/259.jpg',
+        image: '/media/259.jpg',
         caption: 'Iron chef Morocco',
         instagramId: '17842014331064436',
         shortcode: '6pmrY9FnFa',
@@ -3530,7 +3530,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'TNG',
       post: {
         type: 'instagram',
-        image: 'public/media/260.jpg',
+        image: '/media/260.jpg',
         caption: 'Moroccan chutes and ladders is serious business',
         instagramId: '17842008022064436',
         shortcode: '6nubLTlnAf',
@@ -3545,7 +3545,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FEZ',
       post: {
         type: 'instagram',
-        image: 'public/media/261.jpg',
+        image: '/media/261.jpg',
         caption: '@demianfaulkner I have this amazing place for you to try',
         instagramId: '17841999703064436',
         shortcode: '6k61ISFnBy',
@@ -3560,7 +3560,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'TNG',
       post: {
         type: 'instagram',
-        image: 'public/media/262.jpg',
+        image: '/media/262.jpg',
         caption: 'Good afternoon, Africa',
         instagramId: '17841992557064436',
         shortcode: '6io-7FFnOi',
@@ -3575,7 +3575,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'TNG',
       post: {
         type: 'instagram',
-        image: 'public/media/263.jpg',
+        image: '/media/263.jpg',
         caption: "Lose your remote? It's here in Morocco",
         instagramId: '17841992536064436',
         shortcode: '6iorSelnON',
@@ -3590,7 +3590,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'AGP',
       post: {
         type: 'instagram',
-        image: 'public/media/264.jpg',
+        image: '/media/264.jpg',
         caption: "See you later Europe, I'll catch you on the flip side.",
         instagramId: '17841988345064436',
         shortcode: '6hcMk9lnK-',
@@ -3605,7 +3605,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'GRX',
       post: {
         type: 'instagram',
-        image: 'public/media/265.jpg',
+        image: '/media/265.jpg',
         caption: 'Granada as seen by the Moorish sultans of old',
         instagramId: '17841981940064436',
         shortcode: '6fSguQlnAl',
@@ -3620,7 +3620,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'GRX',
       post: {
         type: 'instagram',
-        image: 'public/media/266.jpg',
+        image: '/media/266.jpg',
         caption: "Spain's Duck-alope, ancestor to our Jackalope",
         instagramId: '17841981871064436',
         shortcode: '6fRKqGlnNs',
@@ -3635,7 +3635,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'GRX',
       post: {
         type: 'instagram',
-        image: 'public/media/267.jpg',
+        image: '/media/267.jpg',
         caption: 'They take cockoo for cocoa puffs to the next level here',
         instagramId: '17841970108064436',
         shortcode: '6cWDFlFnM4',
@@ -3650,7 +3650,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'GRX',
       post: {
         type: 'instagram',
-        image: 'public/media/268.jpg',
+        image: '/media/268.jpg',
         caption: '"Closed for vacation, back in September. Happy summer!" - your move France...',
         instagramId: '17841966490064436',
         shortcode: '6bArkrlnCr',
@@ -3665,7 +3665,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'GRX',
       post: {
         type: 'instagram',
-        image: 'public/media/269.jpg',
+        image: '/media/269.jpg',
         caption: 'One of these was less than a dollar',
         instagramId: '17841962050064436',
         shortcode: '6Zu6UrFnNO',
@@ -3680,7 +3680,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SVQ',
       post: {
         type: 'instagram',
-        image: 'public/media/270.jpg',
+        image: '/media/270.jpg',
         caption: "I'm fighting a bull, obviously. #nailedit",
         instagramId: '17841951118064436',
         shortcode: '6WD06KlnM5',
@@ -3695,7 +3695,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SVQ',
       post: {
         type: 'instagram',
-        image: 'public/media/271.jpg',
+        image: '/media/271.jpg',
         caption: "I think you never really get away until you're on a boat",
         instagramId: '17841951064064436',
         shortcode: '6WC7_yFnLF',
@@ -3710,7 +3710,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SVQ',
       post: {
         type: 'instagram',
-        image: 'public/media/272.jpg',
+        image: '/media/272.jpg',
         caption: 'The Spanish have style, these canopied daybeds are just part of a municipal park',
         instagramId: '17841935890064436',
         shortcode: '6QtCK7FnDN',
@@ -3725,7 +3725,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SVQ',
       post: {
         type: 'instagram',
-        image: 'public/media/273.jpg',
+        image: '/media/273.jpg',
         caption: 'Yes, that is an ice cream cone of meat',
         instagramId: '17841935833064436',
         shortcode: '6QrzP8lnA-',
@@ -3740,7 +3740,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SVQ',
       post: {
         type: 'instagram',
-        image: 'public/media/274.jpg',
+        image: '/media/274.jpg',
         caption: "The largest Gothic cathedral in the world so I'm told",
         instagramId: '17841935812064436',
         shortcode: '6QrTtRFnAM',
@@ -3755,7 +3755,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FAO',
       post: {
         type: 'instagram',
-        image: 'public/media/275.jpg',
+        image: '/media/275.jpg',
         caption: 'Always sit on the left side of an eastbound bus, because science. (reversed for southern hemisphere)',
         instagramId: '17841924409064436',
         shortcode: '6NgZgjFnCm',
@@ -3770,7 +3770,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SVQ',
       post: {
         type: 'instagram',
-        image: 'public/media/276.jpg',
+        image: '/media/276.jpg',
         caption: "This blows my mind everytime. Put me in a polka dot dress, I'll shill for them any day #tmobile #productplacement",
         instagramId: '17841924172064436',
         shortcode: '6Ndp8DFnOI',
@@ -3785,7 +3785,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'FAO',
       post: {
         type: 'instagram',
-        image: 'public/media/277.jpg',
+        image: '/media/277.jpg',
         caption: 'Excuse me while I go fetch my Millennium Falcon',
         instagramId: '17841914938064436',
         shortcode: '6KLD-XlnEC',
@@ -3800,7 +3800,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LIS',
       post: {
         type: 'instagram',
-        image: 'public/media/278.jpg',
+        image: '/media/278.jpg',
         caption: 'The most adorable volunteer fire station ever',
         instagramId: '17841894166064436',
         shortcode: '6DlaPzFnDj',
@@ -3815,7 +3815,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LIS',
       post: {
         type: 'instagram',
-        image: 'public/media/279.jpg',
+        image: '/media/279.jpg',
         caption: 'The manliest picnic table ever made',
         instagramId: '17841887479064436',
         shortcode: '6BDYzLFnMv',
@@ -3830,7 +3830,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LIS',
       post: {
         type: 'instagram',
-        image: 'public/media/280.jpg',
+        image: '/media/280.jpg',
         caption: "It's nice, but how about more thorns?",
         instagramId: '17841887467064436',
         shortcode: '6BC2zyFnLg',
@@ -3845,7 +3845,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LIS',
       post: {
         type: 'instagram',
-        image: 'public/media/281.jpg',
+        image: '/media/281.jpg',
         caption: 'Oh that old thing? Just a Moorish castle left over from the Reconquista #nbd',
         instagramId: '17841887416064436',
         shortcode: '6BBVdKlnIh',
@@ -3860,7 +3860,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LIS',
       post: {
         type: 'instagram',
-        image: 'public/media/282.jpg',
+        image: '/media/282.jpg',
         caption: 'Posiden smash!',
         instagramId: '17841886474064436',
         shortcode: '6AwZefFnGJ',
@@ -3875,7 +3875,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LIS',
       post: {
         type: 'instagram',
-        image: 'public/media/283.jpg',
+        image: '/media/283.jpg',
         caption: "No food, no flash, and no f'in selfie stick",
         instagramId: '17841886426064436',
         shortcode: '6AvJSglnEB',
@@ -3890,7 +3890,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LIS',
       post: {
         type: 'instagram',
-        image: 'public/media/284.jpg',
+        image: '/media/284.jpg',
         caption: 'Welcome to the labyrinth. Dance magic, dance! #ourearthsandwich',
         instagramId: '17841880240064436',
         shortcode: '5-tEZAFnJI',
@@ -3905,7 +3905,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LIS',
       post: {
         type: 'instagram',
-        image: 'public/media/285.jpg',
+        image: '/media/285.jpg',
         caption: "I'd be offended, but they just seem to be getting along so well #multiculturalism",
         instagramId: '17841880189064436',
         shortcode: '5-rW2KlnF7',
@@ -3920,7 +3920,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LIS',
       post: {
         type: 'instagram',
-        image: 'public/media/286.jpg',
+        image: '/media/286.jpg',
         caption: 'Heading home for siesta after a morning of exploring. I assume they do that here too.',
         instagramId: '17841880138064436',
         shortcode: '5-qW_7lnEh',
@@ -3935,7 +3935,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LIS',
       post: {
         type: 'instagram',
-        image: 'public/media/287.jpg',
+        image: '/media/287.jpg',
         caption: 'Mind the gap',
         instagramId: '17841874300064436',
         shortcode: '58Dx3vlnHK',
@@ -3950,7 +3950,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'DUB',
       post: {
         type: 'instagram',
-        image: 'public/media/288.jpg',
+        image: '/media/288.jpg',
         caption: 'My fairest damsel, let down your hair!',
         instagramId: '17841863338064436',
         shortcode: '548ERElnEY',
@@ -3965,7 +3965,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'DUB',
       post: {
         type: 'instagram',
-        image: 'public/media/289.jpg',
+        image: '/media/289.jpg',
         caption: 'Irish Cinnabun',
         instagramId: '17841862795064436',
         shortcode: '547dePlnC7',
@@ -3980,7 +3980,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'DUB',
       post: {
         type: 'instagram',
-        image: 'public/media/290.jpg',
+        image: '/media/290.jpg',
         caption: "It's a matter of principle really",
         instagramId: '17841854506064436',
         shortcode: '51XnncFnD1',
@@ -3995,7 +3995,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'DUB',
       post: {
         type: 'instagram',
-        image: 'public/media/291.jpg',
+        image: '/media/291.jpg',
         caption: 'Irish people suck at walking',
         instagramId: '17841852844064436',
         shortcode: '50dqxiFnIq',
@@ -4010,7 +4010,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'DUB',
       post: {
         type: 'instagram',
-        image: 'public/media/292.jpg',
+        image: '/media/292.jpg',
         caption: 'Even in 8th century manuscripts, there are still poems about cats #pangurban #bookofkells',
         instagramId: '17841852754064436',
         shortcode: '50acq0lnDR',
@@ -4025,7 +4025,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'DUB',
       post: {
         type: 'instagram',
-        image: 'public/media/293.jpg',
+        image: '/media/293.jpg',
         caption: 'While they threw in an authentic Irish jig every few sets, these folks were predominantly an One Direction cover band',
         instagramId: '17841844747064436',
         shortcode: '5x58KzlnLa',
@@ -4040,7 +4040,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'DUB',
       post: {
         type: 'instagram',
-        image: 'public/media/294.jpg',
+        image: '/media/294.jpg',
         caption: 'Kiss me under the light of a thousand stars...',
         instagramId: '17841841987064436',
         shortcode: '5xcgVKFnP9',
@@ -4055,7 +4055,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'DUB',
       post: {
         type: 'instagram',
-        image: 'public/media/295.jpg',
+        image: '/media/295.jpg',
         caption: "I like Ireland's binary approach to banking: Money is Yes",
         instagramId: '17841841933064436',
         shortcode: '5xbqoxlnOJ',
@@ -4070,7 +4070,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'DUB',
       post: {
         type: 'instagram',
-        image: 'public/media/296.jpg',
+        image: '/media/296.jpg',
         caption: "I'm gonna guess 2 Michelin stars",
         instagramId: '17841833605064436',
         shortcode: '5t7qpalnJj',
@@ -4085,7 +4085,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'DUB',
       post: {
         type: 'instagram',
-        image: 'public/media/297.jpg',
+        image: '/media/297.jpg',
         caption: "There was a lot controversy when St. Patrick's Cathedral selected Dr Suess as their landscaper, nonetheless the archdiocese has stood steadfast by their choice",
         instagramId: '17841833278064436',
         shortcode: '5tvsUJlnIg',
@@ -4100,7 +4100,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'DUB',
       post: {
         type: 'instagram',
-        image: 'public/media/298.jpg',
+        image: '/media/298.jpg',
         caption: 'A cobblestone passage through a medieval city wall, complete with a bar and a drunk stumbling home on a Wednesday morning, everything I ever hoped Ireland would be',
         instagramId: '17841833260064436',
         shortcode: '5tu_ZOlnHf',
@@ -4115,7 +4115,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'DUB',
       post: {
         type: 'instagram',
-        image: 'public/media/299.jpg',
+        image: '/media/299.jpg',
         caption: 'Some street art and political commentary in a Dublin back alley, right outside a bar of course',
         instagramId: '17841833236064436',
         shortcode: '5tuSCulnGh',
@@ -4130,7 +4130,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'YYZ',
       post: {
         type: 'instagram',
-        image: 'public/media/300.jpg',
+        image: '/media/300.jpg',
         caption: 'After an aborted attempt to break into the particle physics game, Toronto cleverly refit their Hadron Collider into an efficient transit solution',
         instagramId: '17841819085064436',
         shortcode: '5osaSrFnA5',
@@ -4145,7 +4145,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'NAS',
       post: {
         type: 'instagram',
-        image: 'public/media/301.jpg',
+        image: '/media/301.jpg',
         caption: 'Let there be no doubt which table was the most rocking last night',
         instagramId: '17841816202064436',
         shortcode: '5nM0rkFnGg',
@@ -4160,7 +4160,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'NAS',
       post: {
         type: 'instagram',
-        image: 'public/media/302.jpg',
+        image: '/media/302.jpg',
         caption: 'Congrats to the beautiful new Mr. and Mrs. Wissman',
         instagramId: '17841814108064436',
         shortcode: '5mctThFnIX',
@@ -4175,7 +4175,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'NAS',
       post: {
         type: 'instagram',
-        image: 'public/media/303.jpg',
+        image: '/media/303.jpg',
         caption: 'Open bar and sharks, a winning combination',
         instagramId: '17841798058064436',
         shortcode: '5fuI_0FnCe',
@@ -4190,7 +4190,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SEA',
       post: {
         type: 'instagram',
-        image: 'public/media/304.jpg',
+        image: '/media/304.jpg',
         caption: '2015 finalists in the western conference tree pose championships',
         instagramId: '17841757846064436',
         shortcode: '5Ot-OTFnMy',
@@ -4205,7 +4205,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SEA',
       post: {
         type: 'instagram',
-        image: 'public/media/305.jpg',
+        image: '/media/305.jpg',
         caption: 'Next stop, Atlantis',
         instagramId: '17841757828064436',
         shortcode: '5OtXvIFnME',
@@ -4220,7 +4220,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SEA',
       post: {
         type: 'instagram',
-        image: 'public/media/306.jpg',
+        image: '/media/306.jpg',
         caption: "The green wizard's neighborhood is really getting gentrified",
         instagramId: '17841757816064436',
         shortcode: '5OtGZYlnLm',
@@ -4235,7 +4235,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SEA',
       post: {
         type: 'instagram',
-        image: 'public/media/307.jpg',
+        image: '/media/307.jpg',
         caption: 'Reservoir Dogs on holiday',
         instagramId: '17841757804064436',
         shortcode: '5OssbxFnLD',
@@ -4250,7 +4250,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'YVR',
       post: {
         type: 'instagram',
-        image: 'public/media/308.jpg',
+        image: '/media/308.jpg',
         caption: 'I always feel like a rock star when I walk out on the tarmac, even though this is also how refugees board planes',
         instagramId: '17841745525064436',
         shortcode: '5IzQD2FnNR',
@@ -4265,7 +4265,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SEA',
       post: {
         type: 'instagram',
-        image: 'public/media/309.jpg',
+        image: '/media/309.jpg',
         caption: "You win this round, child's plaything",
         instagramId: '17841727267064436',
         shortcode: '5A0VYXlnIW',
@@ -4280,7 +4280,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SEA',
       post: {
         type: 'instagram',
-        image: 'public/media/310.jpg',
+        image: '/media/310.jpg',
         caption: "I'm so glad there are still restaurants that give you crayons #idontwannagrowup",
         instagramId: '17841723541064436',
         shortcode: '4-vKLiFnHN',
@@ -4295,7 +4295,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SEA',
       post: {
         type: 'instagram',
-        image: 'public/media/311.jpg',
+        image: '/media/311.jpg',
         caption: 'Ah Costco, where else could I get two liters of ranch dressing, a diamond ring, and agoraphobia all in one stop? #capitalism',
         instagramId: '17841712021064436',
         shortcode: '45EA90FnDO',
@@ -4310,7 +4310,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SEA',
       post: {
         type: 'instagram',
-        image: 'public/media/312.jpg',
+        image: '/media/312.jpg',
         caption: 'This is also how I hug Wela #lennypetting',
         instagramId: '17841707071064436',
         shortcode: '42c_5ClnEN',
@@ -4325,7 +4325,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'YVR',
       post: {
         type: 'instagram',
-        image: 'public/media/313.jpg',
+        image: '/media/313.jpg',
         caption: 'Impressive, Canada. The student has become the teacher #americafuckyeah #imlovinit',
         instagramId: '17841685192064436',
         shortcode: '4sf-_dlnMv',
@@ -4340,7 +4340,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LAS',
       post: {
         type: 'instagram',
-        image: 'public/media/315.jpg',
+        image: '/media/315.jpg',
         caption: 'Maybe the wine cellars at the Bellagio, or maybe a strip mall Thai joint with a killer duck panang for $10, #vegas has no rules',
         instagramId: '17841658441064436',
         shortcode: '4gN0y0lnII',
@@ -4355,7 +4355,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'LAS',
       post: {
         type: 'instagram',
-        image: 'public/media/316.jpg',
+        image: '/media/316.jpg',
         caption: 'Wtf kind of bruise is this? Either I got kicked by a pony or I clotheslined an octopus last night #animalcontrol #vegas',
         instagramId: '17841650464064436',
         shortcode: '4cKiSglnJf',
@@ -4370,7 +4370,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'SFO',
       post: {
         type: 'instagram',
-        image: 'public/media/317.jpg',
+        image: '/media/317.jpg',
         caption: "Virgin airlines is all about fun. That's why we played chicken at SFO for the right to land and live #radical",
         instagramId: '17841645937064436',
         shortcode: '4aCGbhlnDv',
@@ -4385,7 +4385,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'JFK',
       post: {
         type: 'instagram',
-        image: 'public/media/318.jpg',
+        image: '/media/318.jpg',
         caption: "Guess I won't be needing this anymore #adiosamigos",
         instagramId: '17841643114064436',
         shortcode: '4ZTJ3DFnDY',
@@ -4400,7 +4400,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'JFK',
       post: {
         type: 'instagram',
-        image: 'public/media/319.jpg',
+        image: '/media/319.jpg',
         caption: 'All you really need',
         instagramId: '17841641542064436',
         shortcode: '4YTqPjlnFf',
@@ -4415,7 +4415,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'JFK',
       post: {
         type: 'instagram',
-        image: 'public/media/320.jpg',
+        image: '/media/320.jpg',
         caption: "There's now a voodoo doll of me getting jabbed somewhere in the upper west side #craigslist #grrmondays",
         instagramId: '17841639481064436',
         shortcode: '4XH8OvFnGe',
@@ -4430,7 +4430,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'JFK',
       post: {
         type: 'instagram',
-        image: 'public/media/321.jpg',
+        image: '/media/321.jpg',
         caption: "We've been staring at this map on our wall for 4 years",
         instagramId: '17841638716064436',
         shortcode: '4WuYp6lnF0',
@@ -4445,7 +4445,7 @@ export const earthSandwich2015: Trip = {
       regionCode: 'JFK',
       post: {
         type: 'instagram',
-        image: 'public/media/322.jpg',
+        image: '/media/322.jpg',
         caption: 'Avast me mateys, thar yonder port be a ripe for the taking!',
         instagramId: '17841609787064436',
         shortcode: '4MgtN7FnOe',
