@@ -11,10 +11,10 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 [P] Initialize Vite React TypeScript project with dependencies in `package.json`
-- [ ] T002 [P] Configure Vite config (`vite.config.ts`) with React plugin
-- [ ] T003 [P] Setup TypeScript configuration (`tsconfig.json`) for React JSX
-- [ ] T004 Create entry point (`index.html` and `src/main.tsx`)
+- [x] T001 [P] Initialize Vite React TypeScript project with dependencies in `package.json`
+- [x] T002 [P] Configure Vite config (`vite.config.ts`) with React plugin
+- [x] T003 [P] Setup TypeScript configuration (`tsconfig.json`) for React JSX
+- [x] T004 Create entry point (`index.html` and `src/main.tsx`)
 
 ---
 
@@ -24,13 +24,13 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 [P] Update Stop type to flat model: id, title, caption, date, coords, status, regionCode, regionName, image?, blog? in `src/data/types.ts`
-- [ ] T006 [P] Add Region type definition: code, name, airportName, country, coords in `src/data/types.ts`
-- [ ] T007 [P] Add Trip Itinerary type: id, title, description, stops[] in `src/data/types.ts`
-- [ ] T008 Refactor hard-coded itinerary data to flat model (remove nested children) in `src/data/itinerary.ts`
-- [ ] T009 [P] Setup global CSS styling framework (map layout, sidebar, panels) in `src/styles/global.css`
-- [ ] T010 [P] Setup responsive grid layout for map and sidebar in `src/styles/layout.css`
-- [ ] T011 Create App.tsx root component with state management for selectedStop and selectedRegion
+- [x] T005 [P] Update Stop type to flat model: id, title, caption, date, coords, status, regionCode, regionName, image?, blog? in `src/data/types.ts`
+- [x] T006 [P] Add Region type definition: code, name, airportName, country, coords in `src/data/types.ts`
+- [x] T007 [P] Add Trip Itinerary type: id, title, description, stops[] in `src/data/types.ts`
+- [x] T008 Refactor hard-coded itinerary data to flat model (remove nested children) in `src/data/itinerary.ts`
+- [x] T009 [P] Setup global CSS styling framework (map layout, sidebar, panels) in `src/styles/global.css`
+- [x] T010 [P] Setup responsive grid layout for map and sidebar in `src/styles/layout.css`
+- [x] T011 Create App.tsx root component with state management for selectedStop and selectedRegion
 
 **Checkpoint**: Data types defined, flat itinerary loaded, App container ready
 
@@ -44,14 +44,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Update MapView component to render flat stops (no nested children) in `src/components/MapView.tsx`
-- [ ] T013 [P] [US1] Add visited (blue) vs planned (red) marker styling in `src/styles/map.css`
-- [ ] T014 [P] [US1] Add legend (visited, planned, selected) to MapView in `src/components/MapView.tsx`
-- [ ] T015 [US1] Draw route polyline connecting stops in order in `src/components/MapView.tsx`
-- [ ] T016 [P] [US1] Update Sidebar component to display flat stop list (no city drill-down) in `src/components/Sidebar.tsx`
-- [ ] T017 [US1] Wire stop selection between MapView and Sidebar in `src/App.tsx`
-- [ ] T018 [US1] Add responsive layout: stack sidebar below map on mobile in `src/styles/layout.css`
-- [ ] T019 [US1] Manual test: Open site, verify map displays all stops, sidebar shows itinerary, selections work
+- [x] T012 [P] [US1] Update MapView component to render flat stops (no nested children) in `src/components/MapView.tsx`
+- [x] T013 [P] [US1] Add visited (blue) vs planned (red) marker styling in `src/styles/map.css`
+- [x] T014 [P] [US1] Add legend (visited, planned, selected) to MapView in `src/components/MapView.tsx`
+- [x] T015 [US1] Draw route polyline connecting stops in order in `src/components/MapView.tsx`
+- [x] T016 [P] [US1] Update Sidebar component to display flat stop list (no city drill-down) in `src/components/Sidebar.tsx`
+- [x] T017 [US1] Wire stop selection between MapView and Sidebar in `src/App.tsx`
+- [x] T018 [US1] Add responsive layout: stack sidebar below map on mobile in `src/styles/layout.css`
+- [x] T019 [US1] Manual test: Open site, verify map displays all stops, sidebar shows itinerary, selections work
 
 **Checkpoint**: User Story 1 complete - visitors can browse trip and identify major stops
 
@@ -65,14 +65,14 @@
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Implement region derivation utility in `src/utils/regionUtils.ts` to find nearest international airport for each stop
-- [ ] T021 [US2] Add region grouping function to compute regions from flat stop list in `src/utils/regionUtils.ts`
-- [ ] T022 [US2] Implement zoom level detection in MapView (track viewport) in `src/components/MapView.tsx`
-- [ ] T023 [US2] Render region cluster markers (aggregated points) when zoomed out in `src/components/MapView.tsx`
-- [ ] T024 [US2] Add region cluster styling (circle with count badge) in `src/styles/regions.css`
-- [ ] T025 [US2] Implement region selection handler in MapView in `src/components/MapView.tsx`
-- [ ] T026 [US2] Update Sidebar to show stops grouped by region when region is selected in `src/components/Sidebar.tsx`
-- [ ] T027 [US2] Manual test: Zoom out, verify region clustering appears; select region, confirm grouped display works
+- [x] T020 [P] [US2] Implement region derivation utility in `src/utils/regionUtils.ts` to find nearest international airport for each stop
+- [x] T021 [US2] Add region grouping function to compute regions from flat stop list in `src/utils/regionUtils.ts`
+- [x] T022 [US2] Implement zoom level detection in MapView (track viewport) in `src/components/MapView.tsx`
+- [x] T023 [US2] Render region cluster markers (aggregated points) when zoomed out in `src/components/MapView.tsx`
+- [x] T024 [US2] Add region cluster styling (circle with count badge) in `src/styles/regions.css`
+- [x] T025 [US2] Implement region selection handler in MapView in `src/components/MapView.tsx`
+- [x] T026 [US2] Update Sidebar to show stops grouped by region when region is selected in `src/components/Sidebar.tsx`
+- [x] T027 [US2] Manual test: Zoom out, verify region clustering appears; select region, confirm grouped display works
 
 **Checkpoint**: User Stories 1 & 2 complete - map supports both detailed and clustered views
 
@@ -86,16 +86,16 @@
 
 ### Implementation for User Story 3
 
-- [ ] T028 [P] [US3] Update StopDetail component to display flat stop fields (no nested children) in `src/components/StopDetail.tsx`
-- [ ] T029 [P] [US3] Add conditional rendering for optional image field in `src/components/StopDetail.tsx`
-- [ ] T030 [P] [US3] Add conditional rendering for optional blog/long-form text field in `src/components/StopDetail.tsx`
-- [ ] T031 [US3] Add status badge (visited/planned) styling in `src/styles/stop-detail.css`
-- [ ] T032 [US3] Implement detail panel expand/collapse animation in `src/components/StopDetail.tsx`
-- [ ] T033 [US3] Wire StopDetail into App.tsx and update stop selection state in `src/App.tsx`
-- [ ] T034 [US3] Show StopDetail when stop is selected from map or sidebar in `src/App.tsx`
-- [ ] T035 [US3] Close detail panel when another stop selected or close button clicked in `src/App.tsx`
-- [ ] T036 [US3] Add responsive styling so detail panel works on mobile (slides up from bottom) in `src/styles/layout.css`
-- [ ] T037 [US3] Manual test: Click each stop, verify details display, optional fields appear only when present
+- [x] T028 [P] [US3] Update StopDetail component to display flat stop fields (no nested children) in `src/components/StopDetail.tsx`
+- [x] T029 [P] [US3] Add conditional rendering for optional image field in `src/components/StopDetail.tsx`
+- [x] T030 [P] [US3] Add conditional rendering for optional blog/long-form text field in `src/components/StopDetail.tsx`
+- [x] T031 [US3] Add status badge (visited/planned) styling in `src/styles/stop-detail.css`
+- [x] T032 [US3] Implement detail panel expand/collapse animation in `src/components/StopDetail.tsx`
+- [x] T033 [US3] Wire StopDetail into App.tsx and update stop selection state in `src/App.tsx`
+- [x] T034 [US3] Show StopDetail when stop is selected from map or sidebar in `src/App.tsx`
+- [x] T035 [US3] Close detail panel when another stop selected or close button clicked in `src/App.tsx`
+- [x] T036 [US3] Add responsive styling so detail panel works on mobile (slides up from bottom) in `src/styles/layout.css`
+- [x] T037 [US3] Manual test: Click each stop, verify details display, optional fields appear only when present
 
 **Checkpoint**: All core user stories complete - map browsing, region clustering, and stop inspection working
 
@@ -105,10 +105,10 @@
 
 **Purpose**: Remove nested city/site hierarchy code (from old model)
 
-- [ ] T038 Remove CityDetail component references from App.tsx and components
-- [ ] T038a Remove nested city drilling logic from MapView.tsx (topLevelStops, cityViewId, etc.)
-- [ ] T039 Remove cityChildren or nested stop handling from Sidebar.tsx
-- [ ] T040 Clean up dead code and unused state variables from App.tsx
+- [x] T038 Remove CityDetail component references from App.tsx and components
+- [x] T038a Remove nested city drilling logic from MapView.tsx (topLevelStops, cityViewId, etc.)
+- [x] T039 Remove cityChildren or nested stop handling from Sidebar.tsx
+- [x] T040 Clean up dead code and unused state variables from App.tsx
 
 ---
 
@@ -123,12 +123,12 @@
 - [x] T053 Create `src/data/earth-club-sandwich-2027.ts` with 30 hard-coded planned stops (geocoords pre-computed)
 - [x] T054 Expand `src/data/regions.ts` with all new airport anchor entries (~100 regions total)
 - [x] T055 Update `src/data/itinerary.ts` to export `trips: Trip[]` array and default `itinerary` (Earth Club Sandwich 2027)
-- [ ] T056 [US4] Implement planned stop suppression filter in `src/components/RegionSidebar.tsx`: hide Planned tiles when any Instagram or Substack stop exists in the same region (FR-018)
-- [ ] T057 [US4] Render Planned stop tiles in region sidebar when the region contains only Planned stops: show location, date, and optional caption (FR-018)
-- [ ] T058 [US4] Suppress stop detail pop-up for Planned stops: clicking a Planned marker or tile takes no action (FR-019)
-- [ ] T059 [US4] Omit Instagram thumbnail row and Substack tile row from trip overview region tile when all stops in that region are Planned (FR-021)
-- [ ] T060 Update `src/App.tsx` to consume `trips` array from `itinerary.ts` and wire the trip selector to all three trips
-- [ ] T061 Manual test: load each of the three trips, verify map route, sidebar display, and planned stop suppression logic
+- [x] T056 [US4] Implement planned stop suppression filter in `src/components/RegionSidebar.tsx`: hide Planned tiles when any Instagram or Substack stop exists in the same region (FR-018)
+- [x] T057 [US4] Render Planned stop tiles in region sidebar when the region contains only Planned stops: show location, date, and optional caption (FR-018)
+- [x] T058 [US4] Suppress stop detail pop-up for Planned stops: clicking a Planned marker or tile takes no action (FR-019)
+- [x] T059 [US4] Omit Instagram thumbnail row and Substack tile row from trip overview region tile when all stops in that region are Planned (FR-021)
+- [x] T060 Update `src/App.tsx` to consume `trips` array from `itinerary.ts` and wire the trip selector to all three trips
+- [x] T061 Manual test: load each of the three trips, verify map route, sidebar display, and planned stop suppression logic
 
 **Checkpoint**: All three trips render; planned stop suppression and no-pop-up behavior verified
 
@@ -149,7 +149,94 @@
 - [ ] T049 Validate all tasks completed and run final browser testing (map, sidebar, detail panel, region clustering)
 - [ ] T050 Test edge cases: stops with missing images/blogs, very long blog text, many stops in one region
 
+### Stakeholder visual feedback (added 2026-05-04, not yet sprinted)
+
+- [ ] T093 [US-Polish] Replace large default Google Maps pin in continental view with a country-flag pin of similar size (decorative + informational about each stop's country) in `src/components/MapView.tsx`. If the flag pin is judged visually overwhelming after a side-by-side review, fall back to a smaller profile push-pin instead.
+- [ ] T094 [US-Polish] Add directional arrowheads to the route polyline connecting region pins so the trip direction is visually unambiguous in `src/components/MapView.tsx`.
+- [ ] T095 [US-Polish] Add distinct Start and Finish pins for the first and last stop of each trip so big trips have an obvious visual focal point in `src/components/MapView.tsx`. Today, large trips read as a tangle of lines with no anchor for the eye.
+- [ ] T096 [US-Polish] Apply a vintage postcard-style map skin to the continental view: simpler palette, no country labels, no desert/mountain terrain detail. Likely via a custom Google Maps style or `mapId`. Region drill-down view should retain current full detail.
+
 **Checkpoint**: Feature complete, polished, and ready for deployment
+
+---
+
+## Phase 9: Multi-Trip URL Routing
+
+**Status**: Shipped 2026-05-01. New phase appended after work was completed; not in original plan.
+
+- [x] T062 Add FR-027 (hash routing `#/trip/{tripId}`) to `specs/001-world-travelogue/spec.md`
+- [x] T063 Implement hash parsing + `tripFromHash()` in `src/App.tsx`
+- [x] T064 Wire trip selector to push history state on switch
+- [x] T065 Listen for `hashchange`/`popstate` events to handle browser back/forward navigation
+
+---
+
+## Phase 10: Abandoned Stop Status
+
+**Status**: Shipped 2026-05-01.
+
+- [x] T066 Add FR-028–FR-032 + User Story 5 + edge cases to `spec.md`; update `data-model.md` notes
+- [x] T067 Add `EffectiveStopStatus` type and `getEffectiveStopStatus()` helper in `src/utils/regionUtils.ts`
+- [x] T068 Update region rollup logic for abandoned classification (FR-029) in `src/utils/regionUtils.ts`
+- [x] T069 Implement `getRoutedGroups()` to skip fully-abandoned regions in route polyline (FR-030)
+- [x] T070 Add Abandoned section to trip feed sidebar (FR-031) in `src/components/Sidebar.tsx`
+- [x] T071 Apply visual treatment: strike-through + faded grey + dashed dot, no connector line in `src/styles/global.css`
+- [x] T072 Adjust FR-014 region end-date computation to skip abandoned regions
+
+---
+
+## Phase 11: Substack Post Integration
+
+**Status**: Shipped 2026-05-01.
+
+- [x] T073 Parse `wela-posts.txt` and add 14 Substack stops to `src/data/earth-sandwich-2015.ts`
+- [x] T074 Add FR-033 to `spec.md`: exclude Substack dates from region date-range bounds; implement filter in `groupStopsByRegion()`
+- [x] T075 Update Substack Post entity description in `spec.md` to clarify date represents publication, not visit
+
+---
+
+## Phase 12: Stop Data Backfill (Earth Sandwich 2015)
+
+**Status**: Shipped 2026-05-01.
+
+- [x] T076 Add 178 Instagram stops to `src/data/earth-sandwich-2015.ts` from `posts.local.tsv`
+- [x] T077 Geocode/location-fill ~30 posts in `posts.local.tsv` that lacked location metadata; delete invalid (non-JPG) media files
+- [x] T078 Add YYZ, NAS, SEA, YVR, LAS, SFO regions to `src/data/regions.ts` for the pre-trip North American leg
+- [x] T079 Validate trip data via `npx tsc --noEmit -p .`
+
+---
+
+## Phase 13: Map and Sidebar UX Refinements
+
+**Status**: Shipped 2026-05-01.
+
+- [x] T080 Enable Google Maps `zoomControl` on both trip and region map views in `src/components/MapView.tsx`
+- [x] T081 Bump default zoom +0.4 above `fitBounds` default for continental view
+- [x] T082 Move "Expand Region" button inline with region title; shorten label to "Expand →" in `src/components/Sidebar.tsx`
+- [x] T083 Include day (not just month/year) in `formatDateRange()` output
+
+---
+
+## Phase 14: Spec-Kit / JIRA Integration
+
+**Status**: Shipped 2026-05-04.
+
+- [x] T084 Install `mbachorik/spec-kit-jira` extension via custom catalog override (`.specify/extension-catalogs.yml`)
+- [x] T085 Configure OCS project: Epic > Story > Subtask hierarchy with parent-field linkage in `.specify/extensions/jira/jira-config.yml`
+- [x] T086 Discover JIRA custom fields (Story Points, Sprint, Priority, Team) via Atlassian MCP and record in `discovered-fields.json`
+- [x] T087 Run smoke test: `999-jira-integration-test` push and sync round-trip; verify Story → Subtask hierarchy works
+- [x] T088 Push `001-world-travelogue` Epic and 8 Phase Stories to OCS-11 through OCS-19
+- [x] T089 Push Phase 7 polish backlog as Subtasks OCS-39 through OCS-48 (active work for forward sprints)
+
+---
+
+## Phase 15: Drift Reconciliation (2026-05-04 weekly scan)
+
+**Status**: Backfill of work that shipped between commits `c24c263` (Photo pins) and `650040b` (workflow-guide draft) without a prior task entry. Identified by a `docs/workflow.md` §Reconciliation drift scan.
+
+- [x] T090 Rename media files that were actually videos from `.jpg` to `.mp4` extension in `public/media/` — affects posts 35, 62, 83, 91, 99, 106, 153, 171, 212, 314. Commit: `06de9d5`.
+- [x] T091 Add Instagram deep-link to the stop detail modal for Instagram-typed posts in `src/components/StopDetail.tsx` and `src/styles/global.css`. Commit: `ad19e4e`.
+- [x] T092 Bulk-upload 299 Earth Sandwich 2015 post images to `public/media/`. Commit: `d1ed59f`. (Implicit under T076 but recorded explicitly per team convention.)
 
 ---
 

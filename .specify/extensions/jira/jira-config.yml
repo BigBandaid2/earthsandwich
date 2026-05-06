@@ -1,0 +1,58 @@
+# Jira integration configuration for the earthsandwich repo.
+# Generated 2026-05-04. Project: OCS — "Our Club Sandwich" on
+# https://datacommlab.atlassian.net/.
+#
+# Local per-developer overrides go in jira-config.local.yml (gitignored).
+
+mcp_server: "atlassian"
+
+project:
+  key: "OCS"
+
+hierarchy:
+  epic_type: "Epic"
+  story_type: "Story"
+  # Three-tier hierarchy: Epic > Story > Subtask. We use Subtask (not Task) at
+  # the leaf because JIRA Free/Standard only allows the `parent` field to
+  # point to a strictly higher hierarchy level. Story and Task are both
+  # hierarchy_level 0 (peers); only Subtask (level -1) can be parented to a
+  # Story. Task as a top-level issue type is intentionally unused for
+  # spec-kit-driven content. Re-evaluate if/when OCS upgrades to JIRA Premium
+  # and gains custom hierarchy levels.
+  task_type: "Subtask"
+
+  relationships:
+    epic_story: "Epic Link"
+    # Subtask -> Story uses JIRA's native parent field automatically.
+    story_task: "Parent"
+    # No direct Subtask -> Epic link; Subtasks reach the Epic transitively
+    # through their parent Story.
+    epic_task: "none"
+
+defaults:
+  epic:
+    labels: ["spec-kit"]
+    custom_fields: {}
+  story:
+    labels: ["spec-kit"]
+    custom_fields: {}
+  task:
+    labels: ["spec-kit"]
+    custom_fields: {}
+
+# Field mappings discovered 2026-05-04 via the Atlassian MCP. See
+# discovered-fields.json for the full inventory.
+#
+# Sprint and Story Points are author-time inputs in Jira — Spec Kit doesn't
+# provide them. We expose the field IDs here so the extension *can* set them
+# when needed, but day-to-day they're managed in Jira's UI by PM/leads.
+field_mappings:
+  team: "customfield_10001"
+  start_date: "customfield_10015"
+  story_points: "customfield_10016"
+  sprint: "customfield_10020"
+
+status_mapping:
+  completed: "Done"
+  pending: "To Do"
+  in_progress: "In Progress"
