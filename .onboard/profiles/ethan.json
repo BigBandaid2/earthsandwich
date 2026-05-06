@@ -1,10 +1,10 @@
 {
   "developer": {
     "name": "Ethan",
-    "level": "junior",
+    "level": "mid",
     "onboarded_at": "2026-04-29T00:00:00.000Z"
   },
-  "last_updated": "2026-04-29T00:00:00.000Z",
+  "last_updated": "2026-05-06T00:00:00.000Z",
   "progress": {},
   "trails_generated": ["001-world-travelogue"],
   "badges": {
@@ -14,6 +14,12 @@
   "quiz_history": [
     {
       "date": "2026-04-29T00:00:00.000Z",
+      "score": 5,
+      "total": 5,
+      "gaps": []
+    },
+    {
+      "date": "2026-05-06T00:00:00.000Z",
       "score": 5,
       "total": 5,
       "gaps": []
@@ -49,6 +55,36 @@
       "artifact": "specs/001-world-travelogue/spec.md",
       "topic": "FR-011 active region red teardrop pin in View 1 UI Design",
       "asked_on": "2026-04-29T00:00:00.000Z"
+    },
+    {
+      "question_id": "spec-fr031-sidebar-section-order",
+      "artifact": "specs/001-world-travelogue/spec.md",
+      "topic": "FR-031 fixed top-to-bottom order Visited > Planned > Abandoned for trip feed sidebar sections",
+      "asked_on": "2026-05-06T00:00:00.000Z"
+    },
+    {
+      "question_id": "tasks-total-phase-count-15",
+      "artifact": "specs/001-world-travelogue/tasks.md",
+      "topic": "Total of 15 phases currently present after backfilled drift phases (1-15)",
+      "asked_on": "2026-05-06T00:00:00.000Z"
+    },
+    {
+      "question_id": "jira-mapping-epic-key-ocs-11",
+      "artifact": "specs/001-world-travelogue/jira-mapping.json",
+      "topic": "Epic key OCS-11 parents all 15 Phase Stories for 001-world-travelogue",
+      "asked_on": "2026-05-06T00:00:00.000Z"
+    },
+    {
+      "question_id": "spec-fr033-substack-date-exclusion",
+      "artifact": "specs/001-world-travelogue/spec.md",
+      "topic": "FR-033 Substack stop dates excluded from region start/end date computation with fallback for Substack-only regions",
+      "asked_on": "2026-05-06T00:00:00.000Z"
+    },
+    {
+      "question_id": "workflow-cardinal-rule-6-identity-not-state",
+      "artifact": "docs/workflow.md",
+      "topic": "Cardinal Rule 6 synced artifacts carry identity not state - two writers one reader drift principle",
+      "asked_on": "2026-05-06T00:00:00.000Z"
     }
   ]
 }
