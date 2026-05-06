@@ -2,7 +2,7 @@
 
 **Feature Branch**: `001-world-travelogue`
 **Created**: 2026-04-22
-**Updated**: 2026-04-29
+**Updated**: 2026-05-05
 **Status**: Draft
 **Input**: User description: "I am building a travel website that will show the trip itinerary of an upcoming round-the-world trip with roughly 50 major stop. Each stop will have a location, caption, date, image (optional), and long form blog post (optional).
 
@@ -101,6 +101,24 @@ A visitor viewing a trip can see stops that were planned but never visited (thei
 
 ---
 
+### User Story 6 - Ingest new Instagram posts into the travelogue (Priority: P2)
+
+The ingestion script runs automatically on the hosting server as a scheduled cronjob (approximately once per hour). On each run it fetches only new posts since the last known timestamp, downloads each post's media, asks Claude to infer the location, and appends the results to `posts.local.tsv` on the server — keeping the site's content up to date without any manual intervention by the travelers.
+
+**Why this priority**: Instagram posts are the primary source of visited stop content. Without a repeatable ingestion workflow, new travel content cannot enter the site data.
+
+**Independent Test**: With a valid `.env` on the server and at least one new Instagram post, trigger the cronjob (or run `python load_posts_tsv.py` manually) and verify that new rows are appended to `posts.local.tsv`, that corresponding media files appear in `public/media/`, and that each new row carries a non-empty `location`, `lat`, and `lng`.
+
+**Acceptance Scenarios**:
+
+1. **Given** `posts.local.tsv` contains at least one row and one or more new Instagram posts exist since that row's timestamp, **When** the script is run, **Then** it appends one new TSV row per new post (oldest-new first) with all nine columns populated.
+2. **Given** no new posts exist since the last known timestamp, **When** the script is run, **Then** it exits cleanly with a "No new posts found" message and does not modify the TSV.
+3. **Given** a new IMAGE post is ingested, **When** the script processes it, **Then** the image is saved as `public/media/<local_id>.jpg` and the `media_url` column stores a POSIX-relative path to that file.
+4. **Given** a new VIDEO post is ingested, **When** the script processes it, **Then** the video is saved as `public/media/<local_id>.mp4` and the `media_url` column stores the corresponding path.
+5. **Given** `posts.local.tsv` does not exist or contains no rows, **When** the script is run, **Then** it exits immediately with an error directing the user to run the initial load step first.
+
+---
+
 ### Edge Cases
 
 - What happens when a stop has only a caption and date but no image or blog post?
@@ -118,6 +136,12 @@ A visitor viewing a trip can see stops that were planned but never visited (thei
 - What happens to a planned stop whose date is exactly today? (Today is not "in the past" — the stop remains "planned".)
 - What happens when a Substack post is dated months after the actual visit? (The Substack stop still appears in its region, but its date does not pull the region's date range forward — see FR-033.)
 - What happens when a region contains only Substack stops and no Instagram/Planned/Abandoned stops? (The region falls back to using the Substack dates for its date range, since no other dates are available.)
+- What happens when the ingestion script cannot reach the Instagram Graph API? (The script prints the HTTP error and exits non-zero; no partial row is written for the failed page.)
+- What happens when the ingestion script fails to download a post's media? (The row is still written with an empty `media_url`; the failure is logged but does not abort remaining posts.)
+- What happens when Claude returns malformed JSON for a location? (The script falls back to treating the raw response as a location name string with empty lat/lng, then continues.)
+- What happens when multiple new posts share the same timestamp? (All are ingested; the script processes them in the order returned by the API after reversing to oldest-first.)
+- What happens when `INSTA_ACCESS_TOKEN` or `ANTHROPIC_API_KEY` is missing from `.env`? (Python raises a `KeyError` on startup; the script exits before touching the TSV or making any network calls.)
+- What happens when the TSV's most recent row has a malformed or missing timestamp? (The script exits with an error rather than querying with an incorrect `since` parameter.)
 
 ## Requirements *(mandatory)*
 
@@ -156,6 +180,14 @@ A visitor viewing a trip can see stops that were planned but never visited (thei
 - **FR-031**: The trip feed sidebar MUST add a third collapsible section, "Abandoned", to the existing "Visited" and "Planned" sections. The three sections are rendered in a fixed top-to-bottom order: Visited → Planned → Abandoned. Fully-abandoned regions are listed in the Abandoned section and are excluded from the Visited and Planned sections. Sections that contain no regions for the current trip remain hidden (consistent with FR-002).
 - **FR-032**: Abandoned stops MUST follow the same interaction and suppression rules as Planned stops: clicking an abandoned stop marker on the map or an abandoned stop tile in the sidebar MUST NOT open the stop detail pop-up; and abandoned stop tiles MUST be suppressed from the region sidebar whenever any Instagram or Substack stop exists in the same region (per FR-018). When shown, abandoned stop tiles display location, date, and optional caption.
 - **FR-033**: The system MUST exclude Substack stop dates from a region's start-date and end-date computation (FR-014) when the region contains any non-Substack stop. Rationale: Substack articles are typically authored after the visit, so their dates represent publication, not presence. The Substack stop itself MUST still appear within the region (on the map and in the region sidebar); only its date is excluded from the date-range bounds. If a region contains only Substack stops, the system falls back to those stops' dates so the region still displays a date range.
+- **FR-034**: The system MUST include an incremental ingestion script (`scripts/instagram-fetch-latest/load_posts_tsv.py`) intended to be scheduled as a server-side cronjob (default cadence: approximately once per hour, configurable). On each execution it reads `posts.local.tsv` to determine the most recent known post timestamp and fetches only new posts from the Instagram Graph API (`/me/media`) using `since`/`until` Unix timestamp parameters, paginating through all result pages before processing.
+- **FR-035**: The ingestion script MUST download each new post's media from the Instagram CDN and save it into `public/media/` using the post's local numeric ID as the filename: `.jpg` for IMAGE posts and `.mp4` for VIDEO posts. If the media download fails, the row MUST still be written with an empty `media_url` and the failure logged; remaining posts MUST continue to be processed.
+- **FR-036**: The ingestion script MUST call Claude (`claude-opus-4-5`) for each new post to infer the human-readable location name and decimal latitude/longitude. The request MUST include: the post caption, the base64-encoded image (for IMAGE posts only), and the locations of up to the 5 most-recently-processed posts as contextual hints. Claude MUST be prompted to return a single JSON object with keys `location`, `lat`, and `lng`; if it returns malformed JSON the script MUST fall back to using the raw text as `location` with empty `lat`/`lng`.
+- **FR-037**: The ingestion script MUST append new rows to `posts.local.tsv` in oldest-first order (the newest post becomes the last row) so that the final row always identifies the most recently ingested post. Each row MUST contain exactly these nine tab-separated columns in order: `id`, `instagram_id`, `shortcode`, `media_url`, `caption`, `timestamp`, `location`, `lat`, `lng`. The `id` column MUST be a locally assigned sequential integer derived by incrementing the maximum existing `id` value.
+- **FR-038**: The ingestion script MUST load `INSTA_ACCESS_TOKEN` and `ANTHROPIC_API_KEY` from the project-root `.env` file at startup. If either variable is absent the script MUST exit immediately with a `KeyError` before making any network calls or modifying any file.
+- **FR-039**: Media paths stored in the `media_url` TSV column MUST be relative to the project root and normalized to POSIX-style forward slashes (`/`) for cross-platform consistency. This normalization MUST be applied after downloading, even when the script is run on Windows.
+- **FR-040**: The ingestion script MUST be idempotent with respect to existing data: it appends only posts whose timestamps are strictly after the most-recent existing row's timestamp. It MUST NOT re-process or duplicate existing rows. If no new posts are found the script exits cleanly with a "No new posts found" message.
+- **FR-041**: If `posts.local.tsv` does not exist or contains no rows at script startup, the ingestion script MUST exit immediately with an error message instructing the user to run the initial load script first; it MUST NOT create a new TSV or write any rows.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -165,6 +197,8 @@ A visitor viewing a trip can see stops that were planned but never visited (thei
 - **Substack Post**: A stop post type sourced from a Substack article. Always carries `status: "visited"`. Contains: title, subtitle, and long-form body text. Note: a Substack stop's `date` represents the article's publication date and is typically later than the actual visit; it is therefore excluded from region date-range computation (see FR-033).
 - **Planned Post**: A stop post type representing a planned itinerary entry with no published content. Always carries `status: "planned"`. Contains: location, date, and an optional caption. Has no photo and no detail pop-up.
 - **Region**: A dynamic grouping of nearby stops derived from the nearest international airport. Computed from stop coordinates at build time; not stored as an explicit entity. Characterized by an airport code, region name, country, and reference coordinates. Date range is derived from the region's stops and the subsequent region's start date (see FR-014). A region's overall status is one of visited, planned, mixed, or abandoned (see FR-029).
+- **TSV Post Record**: A single row in `posts.local.tsv` representing one ingested Instagram post. Columns: `id` (sequentially assigned integer), `instagram_id` (Instagram media ID), `shortcode`, `media_url` (POSIX-relative path to downloaded media, e.g. `public/media/42.jpg`), `caption`, `timestamp` (ISO 8601 UTC), `location` (Claude-inferred human-readable name), `lat` (decimal latitude string), `lng` (decimal longitude string). This file lives on the hosting server and is updated by the cronjob; it is not committed to source control.
+- **Instagram Graph API**: The external REST API used by the ingestion script to retrieve the traveler's own Instagram posts. Accessed via `/me/media` with `since`/`until` Unix timestamp pagination. Requires a long-lived personal access token (`INSTA_ACCESS_TOKEN`) stored in `.env`.
 
 ## UI Design
 
@@ -258,3 +292,9 @@ Opens as a modal overlay that dims the background and occupies approximately 80%
 - Mobile responsiveness is expected, but desktop and tablet are the primary target.
 - The map component is provided by a third-party mapping service; zoom behavior, map detail levels, and marker rendering are constrained by that service's capabilities.
 - The active region concept (FR-011) is only meaningful for trips with a mix of visited and planned regions.
+- The ingestion script (`load_posts_tsv.py`) is scheduled as a server-side cronjob on the hosting server, running approximately once per hour. It is not part of the static site build or deployment pipeline and does not require any action from the travelers.
+- `posts.local.tsv` lives on the hosting server and is written and read exclusively by the cronjob; it is not committed to source control. `posts.tsv` may serve as the curated, committed version used at build time.
+- The Instagram Graph API is accessed with the traveler's own long-lived personal access token; the script operates only on the authenticated user's own media.
+- Claude (`claude-opus-4-5`) is used solely for location inference during ingestion; it is not invoked at site render time. Location inferences are stored in the TSV and treated as authoritative for display purposes.
+- The ingestion script requires Python 3.10+ and the packages listed in `scripts/instagram-fetch-latest/requirements.txt` (`anthropic`, `requests`, `python-dotenv`) to be installed on the hosting server.
+- An initial load of historical posts (bootstrapping `posts.local.tsv`) is handled by a separate process; `load_posts_tsv.py` handles only incremental updates from an already-populated TSV.
