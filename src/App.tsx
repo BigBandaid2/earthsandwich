@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { APIProvider } from '@vis.gl/react-google-maps';
 import { trips } from './data/itinerary';
 import { groupStopsByRegion } from './utils/regionUtils';
-import type { Trip } from './data/types';
+import type { InstagramPost, Trip } from './data/types';
+import { usePosts } from './hooks/usePosts';
 import WorldMap from './components/MapView';
 import TripFeed from './components/Sidebar';
 import RegionSidebar from './components/RegionSidebar';
@@ -39,16 +40,27 @@ function App() {
   const [modalStopList, setModalStopList] = useState<string[]>([]);
   const [tripSelectorOpen, setTripSelectorOpen] = useState(false);
 
-  const regionGroups = useMemo(() => groupStopsByRegion(activeTrip), [activeTrip]);
+  const liveStops = usePosts();
 
-  const activeGroup = useMemo(
-    () => regionGroups.find((g) => g.region.code === activeRegionCode) ?? null,
-    [regionGroups, activeRegionCode]
-  );
+  const effectiveActiveTrip = useMemo(() => {
+    if (activeTrip.id !== 'miscellaneous-adventures' || liveStops.length === 0) return activeTrip;
+    const existingInstagramIds = new Set(
+      activeTrip.stops.flatMap((s) =>
+        s.post.type === 'instagram' && s.post.instagramId ? [s.post.instagramId] : []
+      )
+    );
+    const newStops = liveStops.filter(
+      (s) => s.post.type !== 'instagram' ||
+        !existingInstagramIds.has((s.post as InstagramPost).instagramId ?? '')
+    );
+    return { ...activeTrip, stops: [...activeTrip.stops, ...newStops] };
+  }, [activeTrip, liveStops]);
+
+  const regionGroups = useMemo(() => groupStopsByRegion(effectiveActiveTrip), [effectiveActiveTrip]);
 
   const openStop = useMemo(
-    () => activeTrip.stops.find((s) => s.id === openStopId) ?? null,
-    [activeTrip.stops, openStopId]
+    () => effectiveActiveTrip.stops.find((s) => s.id === openStopId) ?? null,
+    [effectiveActiveTrip.stops, openStopId]
   );
 
   const handleExpandRegion = (regionCode: string) => {
@@ -171,7 +183,7 @@ function App() {
           {viewMode === 'trip' ? (
             <TripFeed
               regionGroups={regionGroups}
-              trip={activeTrip}
+              trip={effectiveActiveTrip}
               onExpandRegion={handleExpandRegion}
               onOpenStop={handleOpenStop}
             />
@@ -190,7 +202,7 @@ function App() {
         <StopModal
           stop={openStop}
           stopList={modalStopList}
-          allStops={activeTrip.stops}
+          allStops={effectiveActiveTrip.stops}
           regionGroups={regionGroups}
           onClose={handleCloseStop}
           onNav={handleModalNav}
