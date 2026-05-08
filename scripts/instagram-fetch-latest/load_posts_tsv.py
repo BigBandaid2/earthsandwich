@@ -34,6 +34,8 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..
 load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
 
 ACCESS_TOKEN = os.environ["INSTA_ACCESS_TOKEN"]
+ACCESS_TOKEN_2 = os.environ.get("INSTA_ACCESS_TOKEN_2", "")
+TOKENS = [t for t in [ACCESS_TOKEN, ACCESS_TOKEN_2] if t]
 ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 BASE_URL = "https://graph.instagram.com/v25.0"
 POST_FIELDS = "caption,media_type,media_url,shortcode,timestamp"
@@ -73,10 +75,10 @@ def fetch_media_page(url: str) -> dict:
     return resp.json()
 
 
-def fetch_post_details(post_id: str) -> dict:
+def fetch_post_details(post_id: str, access_token: str) -> dict:
     resp = requests.get(
         f"{BASE_URL}/{post_id}",
-        params={"fields": POST_FIELDS, "access_token": ACCESS_TOKEN},
+        params={"fields": POST_FIELDS, "access_token": access_token},
         timeout=30,
     )
     resp.raise_for_status()
@@ -180,6 +182,34 @@ def get_location_via_claude(
         return (raw, "", "", "")
 
 
+def fetch_new_post_ids(access_token: str, since_ts: int, until_ts: int) -> list[str]:
+    """Return all new post IDs for one account since since_ts, newest-first."""
+    next_url: str | None = (
+        f"{BASE_URL}/me/media"
+        f"?access_token={access_token}"
+        f"&since={since_ts}"
+        f"&until={until_ts}"
+    )
+    all_ids: list[str] = []
+    page_num = 0
+    while next_url:
+        page_num += 1
+        print(f"  [page {page_num}] {next_url[:80]}...")
+        try:
+            page = fetch_media_page(next_url)
+        except requests.HTTPError as exc:
+            print(f"\nERROR: page {page_num} fetch failed — {exc}")
+            sys.exit(1)
+        except requests.RequestException as exc:
+            print(f"\nERROR: network error on page {page_num} — {exc}")
+            sys.exit(1)
+        ids = [item["id"] for item in page.get("data", [])]
+        all_ids.extend(ids)
+        print(f"  {len(ids)} posts")
+        next_url = page.get("paging", {}).get("next")
+    return all_ids
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Fetch new Instagram posts and append to TSV.")
     parser.add_argument(
@@ -222,65 +252,34 @@ def main() -> None:
     except (ValueError, KeyError):
         next_id = len(existing_rows) + 1
 
-    # Build initial API URL with since/until time-based params
-    next_url: str | None = (
-        f"{BASE_URL}/me/media"
-        f"?access_token={ACCESS_TOKEN}"
-        f"&since={since_ts}"
-        f"&until={until_ts}"
-    )
-
     print(f"Fetching posts since {last_timestamp_str} (unix: {since_ts})")
 
-    # Collect all new post IDs across pages (API returns newest-first)
-    all_new_ids: list[str] = []
-    page_num = 0
+    # Collect new post IDs from all accounts, paired with their token.
+    # Each account's IDs are reversed so oldest-new comes first per account.
+    all_new_posts: list[tuple[str, str]] = []  # (post_id, access_token)
+    for i, token in enumerate(TOKENS, start=1):
+        print(f"\nAccount {i}:")
+        ids = fetch_new_post_ids(token, since_ts, until_ts)
+        ids.reverse()  # oldest-new first; newest ends up last appended
+        all_new_posts.extend((pid, token) for pid in ids)
 
-    while next_url:
-        page_num += 1
-        print(f"[page {page_num}] {next_url[:80]}...")
-
-        try:
-            page = fetch_media_page(next_url)
-        except requests.HTTPError as exc:
-            print(f"\nERROR: page {page_num} fetch failed — {exc}")
-            sys.exit(1)
-        except requests.RequestException as exc:
-            print(f"\nERROR: network error on page {page_num} — {exc}")
-            sys.exit(1)
-
-        ids = [item["id"] for item in page.get("data", [])]
-        all_new_ids.extend(ids)
-        print(f"  {len(ids)} posts")
-        next_url = page.get("paging", {}).get("next")
-
-    if not all_new_ids:
+    if not all_new_posts:
         print("No new posts found.")
         return
-
-    # Reverse so we append oldest-new-post first; newest ends up as the last row
-    all_new_ids.reverse()
 
     # Seed Claude location context with the most recent existing posts
     sorted_rows = sorted(timestamped, key=lambda r: r["timestamp"], reverse=True)
     recent_locations = [r.get("location", "") for r in sorted_rows[:RECENT_LOCATION_COUNT]]
 
     with open(args.output, "a", newline="", encoding="utf-8") as out_file:
-        # Ensure the file ends with a newline before appending new rows
-        # out_file.seek(0, 2)  # seek to end
-        # if out_file.tell() > 0:
-        #     out_file.seek(out_file.tell() - 1)
-        #     if out_file.read(1) != "\n":
-        #         out_file.write("\n")
-
         writer = csv.DictWriter(out_file, fieldnames=TSV_COLUMNS, delimiter="\t")
 
         total_written = 0
-        for post_id in all_new_ids:
+        for post_id, token in all_new_posts:
             local_id = next_id
 
             try:
-                details = fetch_post_details(post_id)
+                details = fetch_post_details(post_id, token)
             except requests.RequestException as exc:
                 print(f"  ! {post_id}  detail fetch failed ({exc}) — writing partial row")
                 writer.writerow({

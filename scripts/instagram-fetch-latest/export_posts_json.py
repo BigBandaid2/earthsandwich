@@ -15,7 +15,7 @@ import csv
 import json
 import os
 
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 DEFAULT_INPUT = os.path.join(PROJECT_ROOT, "posts.local.tsv")
 DEFAULT_OUTPUT = os.path.join(PROJECT_ROOT, "public", "posts.json")
 
