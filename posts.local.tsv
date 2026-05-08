@@ -1,7 +1,7 @@
-id	instagram_id	shortcode	media_url	caption	timestamp	location
-1	17990443415376031	C3jXFRlMZoJ	public/media/1.jpg	East meets Southwest	2024-02-20 02:27:16+00	"Oaxaca Centro, Mexico"
-2	17996821559305682	C3jJxkzMGvi	public/media/2.jpg	Never a wrong time or place for hot chocolate	2024-02-20 00:30:59+00	"Oxaca, Mexico"
-3	18025886506939141	C3g2YOHMR-r	public/media/3.jpg	"For your safety, do not approach the abyss."	2024-02-19 03:03:01+00	"Hierve el Agua, Oaxaca, Mexico"
+id	instagram_id	shortcode	media_url	caption	timestamp	location	lat	lng	region
+1	17990443415376031	C3jXFRlMZoJ	public/media/1.jpg	East meets Southwest	2024-02-20T02:27:16+0000	Oaxaca City, Oaxaca, Mexico	17.0732	-96.7266	OAX
+2	17996821559305682	C3jJxkzMGvi	public/media/2.jpg	Never a wrong time or place for hot chocolate	2024-02-20T00:30:59+0000	Oaxaca City, Oaxaca, Mexico	17.0732	-96.7266	OAX
+3	18025886506939141	C3g2YOHMR-r	public/media/3.jpg	For your safety, do not approach the abyss.	2024-02-19T03:03:01+0000	Hierve el Agua, Oaxaca, Mexico	16.8656	-96.2753	OAX
 4	17987675498404883	C3g2CZGMyYy	public/media/4.jpg	Cthulhu in tree form. Reaching through the millennia.	2024-02-19 03:00:02+00	"El Arbol Del Tule, Sta Maria Del Tule Oaxaca, Mexico"
 5	17999829707411635	C3dqXOPvNKQ	public/media/5.jpg	Some places can find the joy in anything	2024-02-17 21:20:18+00	"Oaxaca Centro, Mexico"
 6	18055230940493455	C3dp3LnPeQ1	public/media/6.jpg	Where even a cooking school is beautiful.	2024-02-17 21:15:55+00	"Centro Acad�mico y Cultural San Pablo (Antiguo Callej�n de San Pablo), Oaxaca de Ju�rez, Mexico"

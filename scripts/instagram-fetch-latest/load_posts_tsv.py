@@ -38,7 +38,7 @@ ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 BASE_URL = "https://graph.instagram.com/v25.0"
 POST_FIELDS = "caption,media_type,media_url,shortcode,timestamp"
 
-TSV_COLUMNS = ["id", "instagram_id", "shortcode", "media_url", "caption", "timestamp", "location", "lat", "lng"]
+TSV_COLUMNS = ["id", "instagram_id", "shortcode", "media_url", "caption", "timestamp", "location", "lat", "lng", "region"]
 DEFAULT_OUTPUT = os.path.join(PROJECT_ROOT, "posts.local.tsv")
 DEFAULT_MEDIA_DIR = os.path.join(PROJECT_ROOT, "public/media")
 RECENT_LOCATION_COUNT = 5
@@ -103,14 +103,15 @@ def download_media(media_url: str, local_id: int, media_type: str, media_dir: st
 
 
 def get_location_via_claude(
+    url: str,
     caption: str,
     local_media_path: str,
     media_type: str,
     recent_locations: list[str],
-) -> tuple[str, str, str]:
+) -> tuple[str, str, str, str]:
     """Use Claude to determine the location, latitude, and longitude of a post.
 
-    Returns a (location, lat, lng) tuple. Any field may be an empty string if
+    Returns a (location, lat, lng, region) tuple. Any field may be an empty string if
     undetermined.
     """
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
@@ -122,17 +123,23 @@ def get_location_via_claude(
         recent_loc_text = f"\n\nLocations of recent nearby posts (for context):\n{loc_list}"
 
     prompt = (
+        f"Instagram URL: {url}\n"
         f"Caption: {caption or '(none)'}"
         f"{recent_loc_text}\n\n"
         "Based on the caption, image content, and the locations of recent posts, "
         "what is the location of this Instagram post? "
+        "Additionally, return the latitude, longitude, and airport code of the nearest international airport where possible. "
+        "First, try to pull up the Instagram post using the URL and see if it has an explicitly geotagged location. "
         "If a location is explicitly tagged or clearly stated in the caption, use that. "
-        "Otherwise, estimate based on visual cues and the context of nearby posts. "
-        "Respond with only a JSON object with three keys: "
+        "Otherwise, estimate based on visual cues and the context of recent posts. "
+        "Respond with only a JSON object with four keys: "
         '"location" (human-readable name, e.g. \'Times Square, New York, USA\'), '
         '"lat" (decimal latitude as a string, e.g. \'40.7580\'), '
-        'and "lng" (decimal longitude as a string, e.g. \'-73.9855\'). '
-        "If you cannot determine the location, set all three values to empty strings. "
+        '"lng" (decimal longitude as a string, e.g. \'-73.9855\'), '
+        'and "region" (code of the nearest international airport, e.g. \'JFK\'). '
+        "If you cannot determine the location, set all four values to empty strings. "
+        "If you cannot determine the lat/lng, provide the location and region but leave lat and lng as empty strings. "
+        "If you cannot determine the nearest international airport, provide the location and lat/lng but leave region as an empty string. "
         "Do not include any text outside the JSON object."
     )
 
@@ -166,10 +173,11 @@ def get_location_via_claude(
             str(data.get("location", "")),
             str(data.get("lat", "")),
             str(data.get("lng", "")),
+            str(data.get("region", "")),
         )
     except (json.JSONDecodeError, AttributeError):
         # Fallback: treat the raw text as just a location name
-        return (raw, "", "")
+        return (raw, "", "", "")
 
 
 def main() -> None:
@@ -285,6 +293,7 @@ def main() -> None:
                     "location": "",
                     "lat": "",
                     "lng": "",
+                    "region": "",
                 })
                 out_file.flush()
                 next_id += 1
@@ -305,15 +314,21 @@ def main() -> None:
                     print(f"  ! {post_id}  media download failed ({exc})")
 
             # Ask Claude for the location, lat, and lng
-            location, lat, lng = "", "", ""
+            location, lat, lng, region = "", "", "", ""
+
+            # Include Instagram URL in the prompt so Claude can use it as a clue (e.g. for geotagged posts or if the location is mentioned in the caption). This is especially helpful for older posts that may not have media URLs that work anymore, since Claude can use the URL as a hint to look up the post's location from other sources.
+            url = ""
+            if details.get("shortcode"):
+                url = f"https://www.instagram.com/p/{details.get('shortcode', '')}/"
             try:
-                location, lat, lng = get_location_via_claude(
+                location, lat, lng, region = get_location_via_claude(
+                    url=url,
                     caption=details.get("caption", ""),
                     local_media_path=local_media_path,
                     media_type=media_type,
                     recent_locations=recent_locations,
                 )
-                print(f"  location: {location or '(undetermined)'}  lat={lat}  lng={lng}")
+                print(f"  location: {location or '(undetermined)'}  lat={lat}  lng={lng}  region: {region or '(undetermined)'}")
             except Exception as exc:
                 print(f"  ! {post_id}  Claude location lookup failed ({exc})")
 
@@ -334,6 +349,7 @@ def main() -> None:
                 "location": location,
                 "lat": lat,
                 "lng": lng,
+                "region": region,
             })
             out_file.flush()
 
