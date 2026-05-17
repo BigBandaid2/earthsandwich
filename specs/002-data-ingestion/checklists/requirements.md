@@ -35,3 +35,5 @@
 - The choice of Python backend framework and specific database engine are deferred to the planning phase (plan.md) per spec guidelines.
 - instagrapi session management (2FA, refresh) is scoped out of v1 and documented in Assumptions.
 - The frontend update to consume the API (replacing hardcoded imports) is tracked in spec 001 as a follow-on; this spec covers the backend only.
+- **2026-05-15 update**: Location fetching now uses Claude AI exclusively for all IATA code determination; the Airlabs external API and `AIRPORT_API_KEY` are removed from scope. Prompt engineering to prevent generic location estimates is a required task in implementation planning.
+- **2026-05-15 update**: FR-045 (region end-date endpoint) is added with preliminary requirements; full contract and data model details are TBD and MUST be resolved in `contracts/api.md` before implementation begins.
