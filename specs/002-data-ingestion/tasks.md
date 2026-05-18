@@ -21,10 +21,10 @@
 **Purpose**: Create the directory skeleton and base configuration files before any implementation begins.
 
 - [x] T001 Create backend/ directory structure: app/, app/models/, app/schemas/, app/api/, app/ingestion/, app/cli/, alembic/versions/, tests/unit/, tests/integration/, tests/contract/ with __init__.py files per plan.md
-- [x] T002 Move all frontend-specific files and folders from the project root into a new frontend/ directory: src/ (React source code and data files), public/ (Vite static assets — note: public/media/ stores backend-downloaded Instagram media and will need a separate serving strategy after this move), index.html, vite.config.ts, tsconfig.json, tsconfig.app.json, tsconfig.node.json, and any frontend-scoped eslint/prettier configuration files; update Dockerfile.frontend COPY paths and any build context references in docker-compose.yml; keep package.json, package-lock.json, and scripts/ at the project root for shared tooling
-- [ ] T003 [P] Create backend/requirements.txt with all dependencies: fastapi==0.115.*, uvicorn[standard], sqlalchemy==2.0.*, asyncpg, alembic, apscheduler==3.*, instagrapi, feedparser, anthropic, slowapi, structlog, pydantic-settings, httpx, pytest, pytest-asyncio
-- [ ] T004 [P] Add tsx to package.json devDependencies for the TypeScript seed export script
-- [ ] T005 [P] Create .env.example listing all required variables from contracts/api.md (ANTHROPIC_API_KEY required for all location logic; AIRPORT_API_KEY excluded per updated spec)
+- [x] T002 Move all frontend-specific files and folders from the project root into a new frontend/ directory: src/, index.html, vite.config.ts, tsconfig.json, tsconfig.node.json, public/images/, public/posts.json; keep public/media/ at project root (backend writes Instagram media here); package.json and package-lock.json live in frontend/ (backend is Python — no shared JS tooling at root); scripts/ stays at project root
+- [x] T003 [P] Create backend/requirements.txt with all dependencies: fastapi==0.115.*, uvicorn[standard], sqlalchemy==2.0.*, asyncpg, alembic, apscheduler==3.*, instagrapi, feedparser, anthropic, slowapi, structlog, pydantic-settings, httpx, pytest, pytest-asyncio
+- [x] T004 [P] Add tsx to package.json devDependencies for the TypeScript seed export script
+- [x] T005 [P] Create .env.example listing all required variables from contracts/api.md (ANTHROPIC_API_KEY required for all location logic; AIRPORT_API_KEY excluded per updated spec)
 
 ---
 
