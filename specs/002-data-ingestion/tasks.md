@@ -34,7 +34,7 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T006 Create backend/app/config.py with pydantic-settings BaseSettings; validate all required env vars at startup (INSTA_USERNAME, INSTA_PASSWORD, ANTHROPIC_API_KEY, DATABASE_URL, API_SECRET_KEY, SUBSTACK_RSS_URL, FRONTEND_ORIGIN, INSTAGRAPI_SESSION_FILE); optional vars with defaults (INSTAGRAM_POLL_INTERVAL_MINUTES=60, SUBSTACK_POLL_INTERVAL_MINUTES=60, SMTP_*, LOG_LEVEL, ENVIRONMENT); raise clear ValidationError on missing required vars
+- [x] T006 Create backend/app/config.py with pydantic-settings BaseSettings; validate all required env vars at startup (INSTA_USERNAME, INSTA_PASSWORD, ANTHROPIC_API_KEY, DATABASE_URL, API_SECRET_KEY, SUBSTACK_RSS_URL, FRONTEND_ORIGIN, INSTAGRAPI_SESSION_FILE); optional vars with defaults (INSTAGRAM_POLL_INTERVAL_MINUTES=60, SUBSTACK_POLL_INTERVAL_MINUTES=60, SMTP_*, LOG_LEVEL, ENVIRONMENT); raise clear ValidationError on missing required vars
 - [ ] T007 [P] Create backend/app/database.py with SQLAlchemy 2.0 async engine (asyncpg), AsyncSession factory, and get_db dependency for FastAPI injection
 - [ ] T008 Create backend/app/main.py with FastAPI app, lifespan hook (scheduler start/stop), CORS middleware (FRONTEND_ORIGIN), slowapi rate limiter (60 req/min per IP → 429), and structlog setup (JSONRenderer in production, ConsoleRenderer in development)
 - [ ] T009 Create backend/app/models/trip.py with Trip SQLAlchemy ORM model: id VARCHAR(100) PK, title, description, start_date DATE, end_date DATE, created_at TIMESTAMPTZ, updated_at TIMESTAMPTZ; index on (start_date, end_date)
