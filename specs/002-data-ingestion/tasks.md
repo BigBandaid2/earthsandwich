@@ -59,7 +59,7 @@
 **Independent Test**: Run `npx tsx scripts/export-seed-data.ts` → confirm JSON files appear in scripts/seed-data/. Run `python scripts/seed.py` against a fresh DB → inspect record counts match the TS source arrays. Re-run → verify no duplicates. Confirm scripts/seed-dump.sql is generated.
 
 - [x] T019 [US1] Create scripts/export-seed-data.ts using tsx: import src/data/miscellaneous-adventures.ts, earth-sandwich-2015.ts, earth-club-sandwich-2027.ts (update import paths if frontend/ move in T002 changed these locations); serialize trips, stops, instagram_posts, and substack_posts to scripts/seed-data/{trips,stops,instagram_posts,substack_posts}.json preserving all fields and array ordering
-- [ ] T020 [US1] Create scripts/seed.py: read the four JSON files from scripts/seed-data/; insert records into PostgreSQL in FK order (trips first, then stops, then instagram_posts and substack_posts) using `INSERT ... ON CONFLICT DO NOTHING` on all primary keys and unique indexes
+- [x] T020 [US1] Create scripts/seed.py: read the four JSON files from scripts/seed-data/; insert records into PostgreSQL in FK order (trips first, then stops, then instagram_posts and substack_posts) using `INSERT ... ON CONFLICT DO NOTHING` on all primary keys and unique indexes
 - [ ] T021 [US1] Add sequence_order assignment to scripts/seed.py: derive each stop's sequence_order from its array index in the TS source data so ordered retrieval per trip matches the original frontend ordering
 - [ ] T022 [US1] Add pg_dump invocation to scripts/seed.py after successful seeding: call `pg_dump` via subprocess using DATABASE_URL env var; write output to scripts/seed-dump.sql; log the dump path on completion
 
