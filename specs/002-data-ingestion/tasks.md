@@ -44,7 +44,7 @@
 - [x] T013 Update backend/app/models/__init__.py to import Trip, Stop, InstagramPost, SubstackPost so Alembic autogenerate detects all tables
 - [x] T014 Initialize Alembic in backend/ (alembic.ini, alembic/env.py); configure env.py for async SQLAlchemy using asyncpg and target_metadata from app.models
 - [x] T015 Generate initial Alembic migration (`alembic revision --autogenerate -m "initial schema"`) creating all four tables with all columns, constraints, and indexes from data-model.md; apply with `alembic upgrade head`
-- [ ] T016 [P] Create backend/app/schemas/trip.py with Pydantic v2 TripBase, TripCreate (id + title + description + start_date + end_date), TripUpdate (all optional), TripResponse (adds created_at, updated_at), TripDetailResponse (adds stops list)
+- [x] T016 [P] Create backend/app/schemas/trip.py with Pydantic v2 TripBase, TripCreate (id + title + description + start_date + end_date), TripUpdate (all optional), TripResponse (adds created_at, updated_at), TripDetailResponse (adds stops list)
 - [ ] T017 [P] Create backend/app/schemas/stop.py with StopResponse including all stop fields and a nullable post field (InstagramPostResponse | SubstackPostResponse | None)
 - [ ] T018 [P] Create backend/app/schemas/post.py with InstagramPostResponse and SubstackPostResponse matching the shapes in contracts/api.md
 
