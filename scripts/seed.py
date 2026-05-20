@@ -12,6 +12,7 @@ All inserts use ON CONFLICT DO NOTHING so the script is safe to re-run.
 import asyncio
 import json
 import os
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -131,6 +132,22 @@ async def seed(conn: asyncpg.Connection) -> None:
     print(f"substack_posts:  {len(substack_posts)} records processed  ({result})")
 
 
+def _dump(database_url: str) -> None:
+    dump_path = SCRIPTS_DIR / "seed-dump.sql"
+    # pg_dump expects a plain postgresql:// URL
+    pg_url = _pg_url(database_url)
+    result = subprocess.run(
+        ["pg_dump", "--no-owner", "--no-acl", pg_url],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        print(f"WARNING: pg_dump failed:\n{result.stderr}", file=sys.stderr)
+        return
+    dump_path.write_text(result.stdout, encoding="utf-8")
+    print(f"Dump written → {dump_path}")
+
+
 async def main() -> None:
     # Load DATABASE_URL — check backend/.env first, then environment
     env_path = SCRIPTS_DIR.parent / "backend" / ".env"
@@ -142,13 +159,15 @@ async def main() -> None:
         print("ERROR: DATABASE_URL is not set.", file=sys.stderr)
         sys.exit(1)
 
-    print(f"Connecting to database...")
+    print("Connecting to database...")
     conn = await asyncpg.connect(_pg_url(database_url))
     try:
         await seed(conn)
         print("Seed complete.")
     finally:
         await conn.close()
+
+    _dump(database_url)
 
 
 if __name__ == "__main__":
