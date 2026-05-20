@@ -16,7 +16,6 @@ class StopResponse(BaseModel):
     status: str
     region_code: str | None
     post_type: str
-    sequence_order: int
     caption: str | None
     # Populated only in GET /trips/:id; null/absent in list responses
     post: InstagramPostResponse | SubstackPostResponse | None = None  # type: ignore[name-defined]

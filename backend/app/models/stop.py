@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from decimal import Decimal
 
-from sqlalchemy import DATE, TEXT, VARCHAR, CheckConstraint, ForeignKey, Index, Integer
+from sqlalchemy import DATE, TEXT, VARCHAR, CheckConstraint, ForeignKey, Index
 from sqlalchemy import DECIMAL as SA_DECIMAL
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
@@ -23,7 +23,6 @@ class Stop(Base):
     status: Mapped[str] = mapped_column(VARCHAR(20), nullable=False)
     region_code: Mapped[str | None] = mapped_column(VARCHAR(10), nullable=True)
     post_type: Mapped[str] = mapped_column(VARCHAR(20), nullable=False)
-    sequence_order: Mapped[int] = mapped_column(Integer, nullable=False)
     caption: Mapped[str | None] = mapped_column(TEXT, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         nullable=False, server_default=func.now()
@@ -43,7 +42,7 @@ class Stop(Base):
             "post_type IN ('instagram', 'substack', 'planned')",
             name="ck_stops_post_type",
         ),
-        Index("ix_stops_trip_sequence", "trip_id", "sequence_order"),
+        Index("ix_stops_trip_date", "trip_id", "date"),
         Index("ix_stops_trip_status", "trip_id", "status"),
         Index("ix_stops_trip_region", "trip_id", "region_code"),
         Index("ix_stops_date", "date"),

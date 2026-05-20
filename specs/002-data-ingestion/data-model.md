@@ -48,12 +48,11 @@ Maps to `Stop` in `src/data/types.ts`.
 | `status` | `VARCHAR(20)` | NOT NULL, CHECK IN ('visited','planned') | |
 | `region_code` | `VARCHAR(10)` | NULLABLE | IATA code of nearest in-country international airport; null if lookup fails |
 | `post_type` | `VARCHAR(20)` | NOT NULL, CHECK IN ('instagram','substack','planned') | |
-| `sequence_order` | `INTEGER` | NOT NULL | Mirrors array index from TS source at seed time; auto-assigned for ingested stops |
 | `caption` | `TEXT` | NULLABLE | Used for `post_type = 'planned'` only |
 | `created_at` | `TIMESTAMPTZ` | NOT NULL, DEFAULT now() | |
 
 **Indexes**:
-- `(trip_id, sequence_order)` for ordered stop retrieval per trip
+- `(trip_id, date)` for ordered stop retrieval per trip
 - `(trip_id, status)` for status-filtered queries
 - `(trip_id, region_code)` for region-filtered queries
 - `(date)` for date-range filters

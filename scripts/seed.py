@@ -64,8 +64,8 @@ async def seed(conn: asyncpg.Connection) -> None:
         """
         INSERT INTO stops
             (id, trip_id, date, location, lat, lng, status,
-             region_code, post_type, sequence_order, caption)
-        VALUES ($1, $2, $3::date, $4, $5, $6, $7, $8, $9, $10, $11)
+             region_code, post_type, caption)
+        VALUES ($1, $2, $3::date, $4, $5, $6, $7, $8, $9, $10)
         ON CONFLICT DO NOTHING
         """,
         [
@@ -79,7 +79,6 @@ async def seed(conn: asyncpg.Connection) -> None:
                 s["status"],
                 s["region_code"],
                 s["post_type"],
-                s["sequence_order"],
                 s["caption"],
             )
             for s in stops

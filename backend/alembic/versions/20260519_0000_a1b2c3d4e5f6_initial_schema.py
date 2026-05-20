@@ -52,7 +52,6 @@ def upgrade() -> None:
         sa.Column("status", sa.VARCHAR(20), nullable=False),
         sa.Column("region_code", sa.VARCHAR(10), nullable=True),
         sa.Column("post_type", sa.VARCHAR(20), nullable=False),
-        sa.Column("sequence_order", sa.Integer(), nullable=False),
         sa.Column("caption", sa.Text(), nullable=True),
         sa.Column(
             "created_at",
@@ -68,7 +67,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["trip_id"], ["trips.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_stops_trip_sequence", "stops", ["trip_id", "sequence_order"])
+    op.create_index("ix_stops_trip_date", "stops", ["trip_id", "date"])
     op.create_index("ix_stops_trip_status", "stops", ["trip_id", "status"])
     op.create_index("ix_stops_trip_region", "stops", ["trip_id", "region_code"])
     op.create_index("ix_stops_date", "stops", ["date"])

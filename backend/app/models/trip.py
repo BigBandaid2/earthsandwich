@@ -22,7 +22,7 @@ class Trip(Base):
         nullable=False, server_default=func.now(), onupdate=func.now()
     )
 
-    stops = relationship("Stop", back_populates="trip", order_by="Stop.sequence_order")
+    stops = relationship("Stop", back_populates="trip", order_by="Stop.date")
 
     __table_args__ = (
         Index("ix_trips_start_end_date", "start_date", "end_date"),

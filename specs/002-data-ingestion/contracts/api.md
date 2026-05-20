@@ -88,7 +88,6 @@ Returns the full trip including all stops and each stop's post data.
       "status": "visited",
       "region_code": "MDE",
       "post_type": "instagram",
-      "sequence_order": 0,
       "caption": null,
       "post": {
         "id": "550e8400-e29b-41d4-a716-446655440000",
@@ -198,7 +197,6 @@ Returns stops with optional filters.
     "status": "visited",
     "region_code": "MDE",
     "post_type": "instagram",
-    "sequence_order": 0,
     "caption": null
   }
 ]

@@ -9,7 +9,6 @@
     "status": "visited",
     "region_code": "MDE",
     "post_type": "instagram",
-    "sequence_order": 0,
     "caption": null
   },
   {
@@ -22,7 +21,6 @@
     "status": "visited",
     "region_code": "MDE",
     "post_type": "instagram",
-    "sequence_order": 1,
     "caption": null
   },
   {
@@ -35,7 +33,6 @@
     "status": "visited",
     "region_code": "MDE",
     "post_type": "instagram",
-    "sequence_order": 2,
     "caption": null
   },
   {
@@ -48,7 +45,6 @@
     "status": "visited",
     "region_code": "MDE",
     "post_type": "instagram",
-    "sequence_order": 3,
     "caption": null
   },
   {
@@ -61,7 +57,6 @@
     "status": "visited",
     "region_code": "MDE",
     "post_type": "instagram",
-    "sequence_order": 4,
     "caption": null
   },
   {
@@ -74,7 +69,6 @@
     "status": "visited",
     "region_code": "JFK",
     "post_type": "instagram",
-    "sequence_order": 5,
     "caption": null
   },
   {
@@ -87,7 +81,6 @@
     "status": "visited",
     "region_code": "ARN",
     "post_type": "instagram",
-    "sequence_order": 6,
     "caption": null
   },
   {
@@ -100,7 +93,6 @@
     "status": "visited",
     "region_code": "JFK",
     "post_type": "instagram",
-    "sequence_order": 7,
     "caption": null
   },
   {
@@ -113,7 +105,6 @@
     "status": "visited",
     "region_code": "MEX",
     "post_type": "instagram",
-    "sequence_order": 8,
     "caption": null
   },
   {
@@ -126,7 +117,6 @@
     "status": "visited",
     "region_code": "MEX",
     "post_type": "instagram",
-    "sequence_order": 9,
     "caption": null
   },
   {
@@ -139,7 +129,6 @@
     "status": "visited",
     "region_code": "MEX",
     "post_type": "instagram",
-    "sequence_order": 10,
     "caption": null
   },
   {
@@ -152,7 +141,6 @@
     "status": "visited",
     "region_code": "MEX",
     "post_type": "instagram",
-    "sequence_order": 11,
     "caption": null
   },
   {
@@ -165,7 +153,6 @@
     "status": "visited",
     "region_code": "MEX",
     "post_type": "instagram",
-    "sequence_order": 12,
     "caption": null
   },
   {
@@ -178,7 +165,6 @@
     "status": "visited",
     "region_code": "MEX",
     "post_type": "instagram",
-    "sequence_order": 13,
     "caption": null
   },
   {
@@ -191,7 +177,6 @@
     "status": "visited",
     "region_code": "MEX",
     "post_type": "instagram",
-    "sequence_order": 14,
     "caption": null
   },
   {
@@ -204,7 +189,6 @@
     "status": "visited",
     "region_code": "MEX",
     "post_type": "instagram",
-    "sequence_order": 15,
     "caption": null
   },
   {
@@ -217,7 +201,6 @@
     "status": "visited",
     "region_code": "JFK",
     "post_type": "instagram",
-    "sequence_order": 16,
     "caption": null
   },
   {
@@ -230,7 +213,6 @@
     "status": "visited",
     "region_code": "OAX",
     "post_type": "instagram",
-    "sequence_order": 17,
     "caption": null
   },
   {
@@ -243,7 +225,6 @@
     "status": "visited",
     "region_code": "OAX",
     "post_type": "instagram",
-    "sequence_order": 18,
     "caption": null
   },
   {
@@ -256,7 +237,6 @@
     "status": "visited",
     "region_code": "OAX",
     "post_type": "instagram",
-    "sequence_order": 19,
     "caption": null
   },
   {
@@ -269,7 +249,6 @@
     "status": "visited",
     "region_code": "OAX",
     "post_type": "instagram",
-    "sequence_order": 20,
     "caption": null
   },
   {
@@ -282,7 +261,6 @@
     "status": "visited",
     "region_code": "OAX",
     "post_type": "instagram",
-    "sequence_order": 21,
     "caption": null
   },
   {
@@ -295,7 +273,6 @@
     "status": "visited",
     "region_code": "OAX",
     "post_type": "instagram",
-    "sequence_order": 22,
     "caption": null
   },
   {
@@ -308,7 +285,6 @@
     "status": "planned",
     "region_code": "DUB",
     "post_type": "planned",
-    "sequence_order": 0,
     "caption": null
   },
   {
@@ -321,7 +297,6 @@
     "status": "planned",
     "region_code": "LIS",
     "post_type": "planned",
-    "sequence_order": 1,
     "caption": null
   },
   {
@@ -334,7 +309,6 @@
     "status": "planned",
     "region_code": "FAO",
     "post_type": "planned",
-    "sequence_order": 2,
     "caption": null
   },
   {
@@ -347,7 +321,6 @@
     "status": "planned",
     "region_code": "SVQ",
     "post_type": "planned",
-    "sequence_order": 3,
     "caption": null
   },
   {
@@ -360,7 +333,6 @@
     "status": "planned",
     "region_code": "GRX",
     "post_type": "planned",
-    "sequence_order": 4,
     "caption": null
   },
   {
@@ -373,7 +345,6 @@
     "status": "planned",
     "region_code": "TNG",
     "post_type": "planned",
-    "sequence_order": 5,
     "caption": null
   },
   {
@@ -386,7 +357,6 @@
     "status": "planned",
     "region_code": "FEZ",
     "post_type": "planned",
-    "sequence_order": 6,
     "caption": null
   },
   {
@@ -399,7 +369,6 @@
     "status": "planned",
     "region_code": "RAK",
     "post_type": "planned",
-    "sequence_order": 7,
     "caption": null
   },
   {
@@ -412,7 +381,6 @@
     "status": "planned",
     "region_code": "AMS",
     "post_type": "planned",
-    "sequence_order": 8,
     "caption": null
   },
   {
@@ -425,7 +393,6 @@
     "status": "planned",
     "region_code": "BRU",
     "post_type": "planned",
-    "sequence_order": 9,
     "caption": null
   },
   {
@@ -438,7 +405,6 @@
     "status": "planned",
     "region_code": "LUX",
     "post_type": "planned",
-    "sequence_order": 10,
     "caption": null
   },
   {
@@ -451,7 +417,6 @@
     "status": "planned",
     "region_code": "FRA",
     "post_type": "planned",
-    "sequence_order": 11,
     "caption": null
   },
   {
@@ -464,7 +429,6 @@
     "status": "planned",
     "region_code": "MUC",
     "post_type": "planned",
-    "sequence_order": 12,
     "caption": null
   },
   {
@@ -477,7 +441,6 @@
     "status": "planned",
     "region_code": "SZG",
     "post_type": "planned",
-    "sequence_order": 13,
     "caption": null
   },
   {
@@ -490,7 +453,6 @@
     "status": "planned",
     "region_code": "VCE",
     "post_type": "planned",
-    "sequence_order": 14,
     "caption": null
   },
   {
@@ -503,7 +465,6 @@
     "status": "planned",
     "region_code": "BLQ",
     "post_type": "planned",
-    "sequence_order": 15,
     "caption": null
   },
   {
@@ -516,7 +477,6 @@
     "status": "planned",
     "region_code": "FLR",
     "post_type": "planned",
-    "sequence_order": 16,
     "caption": null
   },
   {
@@ -529,7 +489,6 @@
     "status": "planned",
     "region_code": "FCO",
     "post_type": "planned",
-    "sequence_order": 17,
     "caption": null
   },
   {
@@ -542,7 +501,6 @@
     "status": "planned",
     "region_code": "PVG",
     "post_type": "planned",
-    "sequence_order": 18,
     "caption": null
   },
   {
@@ -555,7 +513,6 @@
     "status": "planned",
     "region_code": "PEK",
     "post_type": "planned",
-    "sequence_order": 19,
     "caption": null
   },
   {
@@ -568,7 +525,6 @@
     "status": "planned",
     "region_code": "KWL",
     "post_type": "planned",
-    "sequence_order": 20,
     "caption": null
   },
   {
@@ -581,7 +537,6 @@
     "status": "planned",
     "region_code": "TPE",
     "post_type": "planned",
-    "sequence_order": 21,
     "caption": null
   },
   {
@@ -594,7 +549,6 @@
     "status": "planned",
     "region_code": "IAH",
     "post_type": "planned",
-    "sequence_order": 22,
     "caption": null
   },
   {
@@ -607,7 +561,6 @@
     "status": "planned",
     "region_code": "MSY",
     "post_type": "planned",
-    "sequence_order": 23,
     "caption": null
   },
   {
@@ -620,7 +573,6 @@
     "status": "planned",
     "region_code": "MEX",
     "post_type": "planned",
-    "sequence_order": 24,
     "caption": null
   },
   {
@@ -633,7 +585,6 @@
     "status": "planned",
     "region_code": "HAV",
     "post_type": "planned",
-    "sequence_order": 25,
     "caption": null
   },
   {
@@ -646,7 +597,6 @@
     "status": "planned",
     "region_code": "BOG",
     "post_type": "planned",
-    "sequence_order": 26,
     "caption": null
   },
   {
@@ -659,7 +609,6 @@
     "status": "planned",
     "region_code": "PEI",
     "post_type": "planned",
-    "sequence_order": 27,
     "caption": null
   },
   {
@@ -672,7 +621,6 @@
     "status": "planned",
     "region_code": "CTG",
     "post_type": "planned",
-    "sequence_order": 28,
     "caption": null
   },
   {
@@ -685,7 +633,6 @@
     "status": "planned",
     "region_code": "SMR",
     "post_type": "planned",
-    "sequence_order": 29,
     "caption": null
   },
   {
@@ -698,7 +645,6 @@
     "status": "planned",
     "region_code": "LET",
     "post_type": "planned",
-    "sequence_order": 30,
     "caption": null
   },
   {
@@ -711,7 +657,6 @@
     "status": "planned",
     "region_code": "MAO",
     "post_type": "planned",
-    "sequence_order": 31,
     "caption": null
   },
   {
@@ -724,7 +669,6 @@
     "status": "planned",
     "region_code": "GIG",
     "post_type": "planned",
-    "sequence_order": 32,
     "caption": null
   },
   {
@@ -737,7 +681,6 @@
     "status": "planned",
     "region_code": "GIG",
     "post_type": "planned",
-    "sequence_order": 33,
     "caption": null
   },
   {
@@ -750,7 +693,6 @@
     "status": "planned",
     "region_code": "GIG",
     "post_type": "planned",
-    "sequence_order": 34,
     "caption": null
   },
   {
@@ -763,7 +705,6 @@
     "status": "planned",
     "region_code": "GRU",
     "post_type": "planned",
-    "sequence_order": 35,
     "caption": null
   },
   {
@@ -776,7 +717,6 @@
     "status": "planned",
     "region_code": "SRE",
     "post_type": "planned",
-    "sequence_order": 36,
     "caption": null
   },
   {
@@ -789,7 +729,6 @@
     "status": "planned",
     "region_code": "SRE",
     "post_type": "planned",
-    "sequence_order": 37,
     "caption": null
   },
   {
@@ -802,7 +741,6 @@
     "status": "planned",
     "region_code": "LPB",
     "post_type": "planned",
-    "sequence_order": 38,
     "caption": null
   },
   {
@@ -815,7 +753,6 @@
     "status": "planned",
     "region_code": "IQQ",
     "post_type": "planned",
-    "sequence_order": 39,
     "caption": null
   },
   {
@@ -828,7 +765,6 @@
     "status": "planned",
     "region_code": "PMC",
     "post_type": "planned",
-    "sequence_order": 40,
     "caption": null
   },
   {
@@ -841,7 +777,6 @@
     "status": "planned",
     "region_code": "SCL",
     "post_type": "planned",
-    "sequence_order": 41,
     "caption": null
   },
   {
@@ -854,7 +789,6 @@
     "status": "planned",
     "region_code": "MDZ",
     "post_type": "planned",
-    "sequence_order": 42,
     "caption": null
   },
   {
@@ -867,7 +801,6 @@
     "status": "planned",
     "region_code": "EZE",
     "post_type": "planned",
-    "sequence_order": 43,
     "caption": null
   },
   {
@@ -880,7 +813,6 @@
     "status": "planned",
     "region_code": "AKL",
     "post_type": "planned",
-    "sequence_order": 44,
     "caption": null
   },
   {
@@ -893,7 +825,6 @@
     "status": "planned",
     "region_code": "AKL",
     "post_type": "planned",
-    "sequence_order": 45,
     "caption": null
   },
   {
@@ -906,7 +837,6 @@
     "status": "planned",
     "region_code": "TRG",
     "post_type": "planned",
-    "sequence_order": 46,
     "caption": null
   },
   {
@@ -919,7 +849,6 @@
     "status": "planned",
     "region_code": "WLG",
     "post_type": "planned",
-    "sequence_order": 47,
     "caption": null
   },
   {
@@ -932,7 +861,6 @@
     "status": "planned",
     "region_code": "CHC",
     "post_type": "planned",
-    "sequence_order": 48,
     "caption": null
   },
   {
@@ -945,7 +873,6 @@
     "status": "planned",
     "region_code": "NSN",
     "post_type": "planned",
-    "sequence_order": 49,
     "caption": null
   },
   {
@@ -958,7 +885,6 @@
     "status": "planned",
     "region_code": "ZQN",
     "post_type": "planned",
-    "sequence_order": 50,
     "caption": null
   },
   {
@@ -971,7 +897,6 @@
     "status": "planned",
     "region_code": "SYD",
     "post_type": "planned",
-    "sequence_order": 51,
     "caption": null
   },
   {
@@ -984,7 +909,6 @@
     "status": "planned",
     "region_code": "CNS",
     "post_type": "planned",
-    "sequence_order": 52,
     "caption": null
   },
   {
@@ -997,7 +921,6 @@
     "status": "planned",
     "region_code": "CAI",
     "post_type": "planned",
-    "sequence_order": 53,
     "caption": null
   },
   {
@@ -1010,7 +933,6 @@
     "status": "planned",
     "region_code": "ASW",
     "post_type": "planned",
-    "sequence_order": 54,
     "caption": null
   },
   {
@@ -1023,7 +945,6 @@
     "status": "planned",
     "region_code": "ASW",
     "post_type": "planned",
-    "sequence_order": 55,
     "caption": "Floating the Nile between Aswan and Luxor"
   },
   {
@@ -1036,7 +957,6 @@
     "status": "planned",
     "region_code": "LXR",
     "post_type": "planned",
-    "sequence_order": 56,
     "caption": null
   },
   {
@@ -1049,7 +969,6 @@
     "status": "planned",
     "region_code": "BEY",
     "post_type": "planned",
-    "sequence_order": 57,
     "caption": null
   },
   {
@@ -1062,7 +981,6 @@
     "status": "planned",
     "region_code": "AMM",
     "post_type": "planned",
-    "sequence_order": 58,
     "caption": null
   },
   {
@@ -1075,7 +993,6 @@
     "status": "planned",
     "region_code": "TLV",
     "post_type": "planned",
-    "sequence_order": 59,
     "caption": null
   },
   {
@@ -1088,7 +1005,6 @@
     "status": "planned",
     "region_code": "TLV",
     "post_type": "planned",
-    "sequence_order": 60,
     "caption": null
   },
   {
@@ -1101,7 +1017,6 @@
     "status": "planned",
     "region_code": "IST",
     "post_type": "planned",
-    "sequence_order": 61,
     "caption": null
   },
   {
@@ -1114,7 +1029,6 @@
     "status": "planned",
     "region_code": "ADB",
     "post_type": "planned",
-    "sequence_order": 62,
     "caption": "Exploring the Aegean coastline"
   },
   {
@@ -1127,7 +1041,6 @@
     "status": "planned",
     "region_code": "JTR",
     "post_type": "planned",
-    "sequence_order": 63,
     "caption": "Island hopping in the Aegean"
   },
   {
@@ -1140,7 +1053,6 @@
     "status": "planned",
     "region_code": "ATH",
     "post_type": "planned",
-    "sequence_order": 64,
     "caption": null
   },
   {
@@ -1153,7 +1065,6 @@
     "status": "planned",
     "region_code": "SOF",
     "post_type": "planned",
-    "sequence_order": 65,
     "caption": null
   },
   {
@@ -1166,7 +1077,6 @@
     "status": "planned",
     "region_code": "BEG",
     "post_type": "planned",
-    "sequence_order": 66,
     "caption": null
   },
   {
@@ -1179,7 +1089,6 @@
     "status": "planned",
     "region_code": "SJJ",
     "post_type": "planned",
-    "sequence_order": 67,
     "caption": null
   },
   {
@@ -1192,7 +1101,6 @@
     "status": "planned",
     "region_code": "DBV",
     "post_type": "planned",
-    "sequence_order": 68,
     "caption": null
   },
   {
@@ -1205,7 +1113,6 @@
     "status": "planned",
     "region_code": "DBV",
     "post_type": "planned",
-    "sequence_order": 69,
     "caption": null
   },
   {
@@ -1218,7 +1125,6 @@
     "status": "planned",
     "region_code": "SPU",
     "post_type": "planned",
-    "sequence_order": 70,
     "caption": "The Hvar Islands"
   },
   {
@@ -1231,7 +1137,6 @@
     "status": "planned",
     "region_code": "ZAG",
     "post_type": "planned",
-    "sequence_order": 71,
     "caption": null
   },
   {
@@ -1244,7 +1149,6 @@
     "status": "planned",
     "region_code": "BUD",
     "post_type": "planned",
-    "sequence_order": 72,
     "caption": null
   },
   {
@@ -1257,7 +1161,6 @@
     "status": "planned",
     "region_code": "VIE",
     "post_type": "planned",
-    "sequence_order": 73,
     "caption": null
   },
   {
@@ -1270,7 +1173,6 @@
     "status": "planned",
     "region_code": "PRG",
     "post_type": "planned",
-    "sequence_order": 74,
     "caption": null
   },
   {
@@ -1283,7 +1185,6 @@
     "status": "planned",
     "region_code": "DRS",
     "post_type": "planned",
-    "sequence_order": 75,
     "caption": null
   },
   {
@@ -1296,7 +1197,6 @@
     "status": "planned",
     "region_code": "BER",
     "post_type": "planned",
-    "sequence_order": 76,
     "caption": null
   },
   {
@@ -1309,7 +1209,6 @@
     "status": "planned",
     "region_code": "WAW",
     "post_type": "planned",
-    "sequence_order": 77,
     "caption": null
   },
   {
@@ -1322,7 +1221,6 @@
     "status": "planned",
     "region_code": "KRK",
     "post_type": "planned",
-    "sequence_order": 78,
     "caption": null
   },
   {
@@ -1335,7 +1233,6 @@
     "status": "planned",
     "region_code": "RIX",
     "post_type": "planned",
-    "sequence_order": 79,
     "caption": null
   },
   {
@@ -1348,7 +1245,6 @@
     "status": "planned",
     "region_code": "ARN",
     "post_type": "planned",
-    "sequence_order": 80,
     "caption": null
   },
   {
@@ -1361,7 +1257,6 @@
     "status": "planned",
     "region_code": "JFK",
     "post_type": "planned",
-    "sequence_order": 81,
     "caption": null
   },
   {
@@ -1374,7 +1269,6 @@
     "status": "visited",
     "region_code": "PRG",
     "post_type": "instagram",
-    "sequence_order": 82,
     "caption": null
   },
   {
@@ -1387,7 +1281,6 @@
     "status": "visited",
     "region_code": "PRG",
     "post_type": "instagram",
-    "sequence_order": 83,
     "caption": null
   },
   {
@@ -1400,7 +1293,6 @@
     "status": "visited",
     "region_code": "PRG",
     "post_type": "instagram",
-    "sequence_order": 84,
     "caption": null
   },
   {
@@ -1413,7 +1305,6 @@
     "status": "visited",
     "region_code": "BUD",
     "post_type": "instagram",
-    "sequence_order": 85,
     "caption": null
   },
   {
@@ -1426,7 +1317,6 @@
     "status": "visited",
     "region_code": "BUD",
     "post_type": "instagram",
-    "sequence_order": 86,
     "caption": null
   },
   {
@@ -1439,7 +1329,6 @@
     "status": "visited",
     "region_code": "VIE",
     "post_type": "instagram",
-    "sequence_order": 87,
     "caption": null
   },
   {
@@ -1452,7 +1341,6 @@
     "status": "visited",
     "region_code": "SJJ",
     "post_type": "instagram",
-    "sequence_order": 88,
     "caption": null
   },
   {
@@ -1465,7 +1353,6 @@
     "status": "visited",
     "region_code": "DBV",
     "post_type": "instagram",
-    "sequence_order": 89,
     "caption": null
   },
   {
@@ -1478,7 +1365,6 @@
     "status": "visited",
     "region_code": "DBV",
     "post_type": "instagram",
-    "sequence_order": 90,
     "caption": null
   },
   {
@@ -1491,7 +1377,6 @@
     "status": "visited",
     "region_code": "DBV",
     "post_type": "instagram",
-    "sequence_order": 91,
     "caption": null
   },
   {
@@ -1504,7 +1389,6 @@
     "status": "visited",
     "region_code": "ATH",
     "post_type": "instagram",
-    "sequence_order": 92,
     "caption": null
   },
   {
@@ -1517,7 +1401,6 @@
     "status": "visited",
     "region_code": "ATH",
     "post_type": "instagram",
-    "sequence_order": 93,
     "caption": null
   },
   {
@@ -1530,7 +1413,6 @@
     "status": "visited",
     "region_code": "IST",
     "post_type": "instagram",
-    "sequence_order": 94,
     "caption": null
   },
   {
@@ -1543,7 +1425,6 @@
     "status": "visited",
     "region_code": "IST",
     "post_type": "instagram",
-    "sequence_order": 95,
     "caption": null
   },
   {
@@ -1556,7 +1437,6 @@
     "status": "visited",
     "region_code": "IST",
     "post_type": "instagram",
-    "sequence_order": 96,
     "caption": null
   },
   {
@@ -1569,7 +1449,6 @@
     "status": "visited",
     "region_code": "IST",
     "post_type": "instagram",
-    "sequence_order": 97,
     "caption": null
   },
   {
@@ -1582,7 +1461,6 @@
     "status": "visited",
     "region_code": "DNZ",
     "post_type": "instagram",
-    "sequence_order": 98,
     "caption": null
   },
   {
@@ -1595,7 +1473,6 @@
     "status": "visited",
     "region_code": "DNZ",
     "post_type": "instagram",
-    "sequence_order": 99,
     "caption": null
   },
   {
@@ -1608,7 +1485,6 @@
     "status": "visited",
     "region_code": "ASR",
     "post_type": "instagram",
-    "sequence_order": 100,
     "caption": null
   },
   {
@@ -1621,7 +1497,6 @@
     "status": "visited",
     "region_code": "ASR",
     "post_type": "instagram",
-    "sequence_order": 101,
     "caption": null
   },
   {
@@ -1634,7 +1509,6 @@
     "status": "visited",
     "region_code": "ASR",
     "post_type": "instagram",
-    "sequence_order": 102,
     "caption": null
   },
   {
@@ -1647,7 +1521,6 @@
     "status": "visited",
     "region_code": "ASR",
     "post_type": "instagram",
-    "sequence_order": 103,
     "caption": null
   },
   {
@@ -1660,7 +1533,6 @@
     "status": "visited",
     "region_code": "ASR",
     "post_type": "instagram",
-    "sequence_order": 104,
     "caption": null
   },
   {
@@ -1673,7 +1545,6 @@
     "status": "visited",
     "region_code": "AYT",
     "post_type": "instagram",
-    "sequence_order": 105,
     "caption": null
   },
   {
@@ -1686,7 +1557,6 @@
     "status": "visited",
     "region_code": "TLV",
     "post_type": "instagram",
-    "sequence_order": 106,
     "caption": null
   },
   {
@@ -1699,7 +1569,6 @@
     "status": "visited",
     "region_code": "TLV",
     "post_type": "instagram",
-    "sequence_order": 107,
     "caption": null
   },
   {
@@ -1712,7 +1581,6 @@
     "status": "visited",
     "region_code": "TLV",
     "post_type": "instagram",
-    "sequence_order": 108,
     "caption": null
   },
   {
@@ -1725,7 +1593,6 @@
     "status": "visited",
     "region_code": "TLV",
     "post_type": "instagram",
-    "sequence_order": 109,
     "caption": null
   },
   {
@@ -1738,7 +1605,6 @@
     "status": "visited",
     "region_code": "AMM",
     "post_type": "instagram",
-    "sequence_order": 110,
     "caption": null
   },
   {
@@ -1751,7 +1617,6 @@
     "status": "visited",
     "region_code": "AMM",
     "post_type": "instagram",
-    "sequence_order": 111,
     "caption": null
   },
   {
@@ -1764,7 +1629,6 @@
     "status": "visited",
     "region_code": "AMM",
     "post_type": "instagram",
-    "sequence_order": 112,
     "caption": null
   },
   {
@@ -1777,7 +1641,6 @@
     "status": "visited",
     "region_code": "AMM",
     "post_type": "instagram",
-    "sequence_order": 113,
     "caption": null
   },
   {
@@ -1790,7 +1653,6 @@
     "status": "visited",
     "region_code": "AMM",
     "post_type": "instagram",
-    "sequence_order": 114,
     "caption": null
   },
   {
@@ -1803,7 +1665,6 @@
     "status": "visited",
     "region_code": "AMM",
     "post_type": "instagram",
-    "sequence_order": 115,
     "caption": null
   },
   {
@@ -1816,7 +1677,6 @@
     "status": "visited",
     "region_code": "AMM",
     "post_type": "instagram",
-    "sequence_order": 116,
     "caption": null
   },
   {
@@ -1829,7 +1689,6 @@
     "status": "visited",
     "region_code": "LXR",
     "post_type": "instagram",
-    "sequence_order": 117,
     "caption": null
   },
   {
@@ -1842,7 +1701,6 @@
     "status": "visited",
     "region_code": "LXR",
     "post_type": "instagram",
-    "sequence_order": 118,
     "caption": null
   },
   {
@@ -1855,7 +1713,6 @@
     "status": "visited",
     "region_code": "ASW",
     "post_type": "instagram",
-    "sequence_order": 119,
     "caption": null
   },
   {
@@ -1868,7 +1725,6 @@
     "status": "visited",
     "region_code": "ASW",
     "post_type": "instagram",
-    "sequence_order": 120,
     "caption": null
   },
   {
@@ -1881,7 +1737,6 @@
     "status": "visited",
     "region_code": "CAI",
     "post_type": "instagram",
-    "sequence_order": 121,
     "caption": null
   },
   {
@@ -1894,7 +1749,6 @@
     "status": "visited",
     "region_code": "CAI",
     "post_type": "instagram",
-    "sequence_order": 122,
     "caption": null
   },
   {
@@ -1907,7 +1761,6 @@
     "status": "visited",
     "region_code": "CAI",
     "post_type": "instagram",
-    "sequence_order": 123,
     "caption": null
   },
   {
@@ -1920,7 +1773,6 @@
     "status": "visited",
     "region_code": "CAI",
     "post_type": "instagram",
-    "sequence_order": 124,
     "caption": null
   },
   {
@@ -1933,7 +1785,6 @@
     "status": "visited",
     "region_code": "CAI",
     "post_type": "instagram",
-    "sequence_order": 125,
     "caption": null
   },
   {
@@ -1946,7 +1797,6 @@
     "status": "visited",
     "region_code": "CAI",
     "post_type": "instagram",
-    "sequence_order": 126,
     "caption": null
   },
   {
@@ -1959,7 +1809,6 @@
     "status": "visited",
     "region_code": "CAI",
     "post_type": "instagram",
-    "sequence_order": 127,
     "caption": null
   },
   {
@@ -1972,7 +1821,6 @@
     "status": "visited",
     "region_code": "ZQN",
     "post_type": "instagram",
-    "sequence_order": 128,
     "caption": null
   },
   {
@@ -1985,7 +1833,6 @@
     "status": "visited",
     "region_code": "CNS",
     "post_type": "instagram",
-    "sequence_order": 129,
     "caption": null
   },
   {
@@ -1998,7 +1845,6 @@
     "status": "visited",
     "region_code": "CNS",
     "post_type": "instagram",
-    "sequence_order": 130,
     "caption": null
   },
   {
@@ -2011,7 +1857,6 @@
     "status": "visited",
     "region_code": "CNS",
     "post_type": "instagram",
-    "sequence_order": 131,
     "caption": null
   },
   {
@@ -2024,7 +1869,6 @@
     "status": "visited",
     "region_code": "CNS",
     "post_type": "instagram",
-    "sequence_order": 132,
     "caption": null
   },
   {
@@ -2037,7 +1881,6 @@
     "status": "visited",
     "region_code": "ZQN",
     "post_type": "instagram",
-    "sequence_order": 133,
     "caption": null
   },
   {
@@ -2050,7 +1893,6 @@
     "status": "visited",
     "region_code": "SYD",
     "post_type": "instagram",
-    "sequence_order": 134,
     "caption": null
   },
   {
@@ -2063,7 +1905,6 @@
     "status": "visited",
     "region_code": "CNS",
     "post_type": "instagram",
-    "sequence_order": 135,
     "caption": null
   },
   {
@@ -2076,7 +1917,6 @@
     "status": "visited",
     "region_code": "SYD",
     "post_type": "instagram",
-    "sequence_order": 136,
     "caption": null
   },
   {
@@ -2089,7 +1929,6 @@
     "status": "visited",
     "region_code": "SYD",
     "post_type": "instagram",
-    "sequence_order": 137,
     "caption": null
   },
   {
@@ -2102,7 +1941,6 @@
     "status": "visited",
     "region_code": "SYD",
     "post_type": "instagram",
-    "sequence_order": 138,
     "caption": null
   },
   {
@@ -2115,7 +1953,6 @@
     "status": "visited",
     "region_code": "ZQN",
     "post_type": "instagram",
-    "sequence_order": 139,
     "caption": null
   },
   {
@@ -2128,7 +1965,6 @@
     "status": "visited",
     "region_code": "ZQN",
     "post_type": "instagram",
-    "sequence_order": 140,
     "caption": null
   },
   {
@@ -2141,7 +1977,6 @@
     "status": "visited",
     "region_code": "ZQN",
     "post_type": "instagram",
-    "sequence_order": 141,
     "caption": null
   },
   {
@@ -2154,7 +1989,6 @@
     "status": "visited",
     "region_code": "ZQN",
     "post_type": "instagram",
-    "sequence_order": 142,
     "caption": null
   },
   {
@@ -2167,7 +2001,6 @@
     "status": "visited",
     "region_code": "CHC",
     "post_type": "instagram",
-    "sequence_order": 143,
     "caption": null
   },
   {
@@ -2180,7 +2013,6 @@
     "status": "visited",
     "region_code": "CHC",
     "post_type": "instagram",
-    "sequence_order": 144,
     "caption": null
   },
   {
@@ -2193,7 +2025,6 @@
     "status": "visited",
     "region_code": "CHC",
     "post_type": "instagram",
-    "sequence_order": 145,
     "caption": null
   },
   {
@@ -2206,7 +2037,6 @@
     "status": "visited",
     "region_code": "ZQN",
     "post_type": "instagram",
-    "sequence_order": 146,
     "caption": null
   },
   {
@@ -2219,7 +2049,6 @@
     "status": "visited",
     "region_code": "BEG",
     "post_type": "instagram",
-    "sequence_order": 147,
     "caption": null
   },
   {
@@ -2232,7 +2061,6 @@
     "status": "visited",
     "region_code": "IST",
     "post_type": "instagram",
-    "sequence_order": 148,
     "caption": null
   },
   {
@@ -2245,7 +2073,6 @@
     "status": "visited",
     "region_code": "AYT",
     "post_type": "instagram",
-    "sequence_order": 149,
     "caption": null
   },
   {
@@ -2258,7 +2085,6 @@
     "status": "visited",
     "region_code": "TLV",
     "post_type": "instagram",
-    "sequence_order": 150,
     "caption": null
   },
   {
@@ -2271,7 +2097,6 @@
     "status": "visited",
     "region_code": "ZQN",
     "post_type": "instagram",
-    "sequence_order": 151,
     "caption": null
   },
   {
@@ -2284,7 +2109,6 @@
     "status": "visited",
     "region_code": "ZQN",
     "post_type": "instagram",
-    "sequence_order": 152,
     "caption": null
   },
   {
@@ -2297,7 +2121,6 @@
     "status": "visited",
     "region_code": "WLG",
     "post_type": "instagram",
-    "sequence_order": 153,
     "caption": null
   },
   {
@@ -2310,7 +2133,6 @@
     "status": "visited",
     "region_code": "WLG",
     "post_type": "instagram",
-    "sequence_order": 154,
     "caption": null
   },
   {
@@ -2323,7 +2145,6 @@
     "status": "visited",
     "region_code": "AKL",
     "post_type": "instagram",
-    "sequence_order": 155,
     "caption": null
   },
   {
@@ -2336,7 +2157,6 @@
     "status": "visited",
     "region_code": "AKL",
     "post_type": "instagram",
-    "sequence_order": 156,
     "caption": null
   },
   {
@@ -2349,7 +2169,6 @@
     "status": "visited",
     "region_code": "TRG",
     "post_type": "instagram",
-    "sequence_order": 157,
     "caption": null
   },
   {
@@ -2362,7 +2181,6 @@
     "status": "visited",
     "region_code": "AKL",
     "post_type": "instagram",
-    "sequence_order": 158,
     "caption": null
   },
   {
@@ -2375,7 +2193,6 @@
     "status": "visited",
     "region_code": "AKL",
     "post_type": "instagram",
-    "sequence_order": 159,
     "caption": null
   },
   {
@@ -2388,7 +2205,6 @@
     "status": "visited",
     "region_code": "AKL",
     "post_type": "instagram",
-    "sequence_order": 160,
     "caption": null
   },
   {
@@ -2401,7 +2217,6 @@
     "status": "visited",
     "region_code": "GIG",
     "post_type": "instagram",
-    "sequence_order": 161,
     "caption": null
   },
   {
@@ -2414,7 +2229,6 @@
     "status": "visited",
     "region_code": "EZE",
     "post_type": "instagram",
-    "sequence_order": 162,
     "caption": null
   },
   {
@@ -2427,7 +2241,6 @@
     "status": "visited",
     "region_code": "EZE",
     "post_type": "instagram",
-    "sequence_order": 163,
     "caption": null
   },
   {
@@ -2440,7 +2253,6 @@
     "status": "visited",
     "region_code": "EZE",
     "post_type": "instagram",
-    "sequence_order": 164,
     "caption": null
   },
   {
@@ -2453,7 +2265,6 @@
     "status": "visited",
     "region_code": "EZE",
     "post_type": "instagram",
-    "sequence_order": 165,
     "caption": null
   },
   {
@@ -2466,7 +2277,6 @@
     "status": "visited",
     "region_code": "EZE",
     "post_type": "instagram",
-    "sequence_order": 166,
     "caption": null
   },
   {
@@ -2479,7 +2289,6 @@
     "status": "visited",
     "region_code": "EZE",
     "post_type": "instagram",
-    "sequence_order": 167,
     "caption": null
   },
   {
@@ -2492,7 +2301,6 @@
     "status": "visited",
     "region_code": "EZE",
     "post_type": "instagram",
-    "sequence_order": 168,
     "caption": null
   },
   {
@@ -2505,7 +2313,6 @@
     "status": "visited",
     "region_code": "MDZ",
     "post_type": "instagram",
-    "sequence_order": 169,
     "caption": null
   },
   {
@@ -2518,7 +2325,6 @@
     "status": "visited",
     "region_code": "SCL",
     "post_type": "instagram",
-    "sequence_order": 170,
     "caption": null
   },
   {
@@ -2531,7 +2337,6 @@
     "status": "visited",
     "region_code": "MDZ",
     "post_type": "instagram",
-    "sequence_order": 171,
     "caption": null
   },
   {
@@ -2544,7 +2349,6 @@
     "status": "visited",
     "region_code": "SCL",
     "post_type": "instagram",
-    "sequence_order": 172,
     "caption": null
   },
   {
@@ -2557,7 +2361,6 @@
     "status": "visited",
     "region_code": "PMC",
     "post_type": "instagram",
-    "sequence_order": 173,
     "caption": null
   },
   {
@@ -2570,7 +2373,6 @@
     "status": "visited",
     "region_code": "SCL",
     "post_type": "instagram",
-    "sequence_order": 174,
     "caption": null
   },
   {
@@ -2583,7 +2385,6 @@
     "status": "visited",
     "region_code": "SCL",
     "post_type": "instagram",
-    "sequence_order": 175,
     "caption": null
   },
   {
@@ -2596,7 +2397,6 @@
     "status": "visited",
     "region_code": "SCL",
     "post_type": "instagram",
-    "sequence_order": 176,
     "caption": null
   },
   {
@@ -2609,7 +2409,6 @@
     "status": "visited",
     "region_code": "PMC",
     "post_type": "instagram",
-    "sequence_order": 177,
     "caption": null
   },
   {
@@ -2622,7 +2421,6 @@
     "status": "visited",
     "region_code": "LPB",
     "post_type": "instagram",
-    "sequence_order": 178,
     "caption": null
   },
   {
@@ -2635,7 +2433,6 @@
     "status": "visited",
     "region_code": "LPB",
     "post_type": "instagram",
-    "sequence_order": 179,
     "caption": null
   },
   {
@@ -2648,7 +2445,6 @@
     "status": "visited",
     "region_code": "LPB",
     "post_type": "instagram",
-    "sequence_order": 180,
     "caption": null
   },
   {
@@ -2661,7 +2457,6 @@
     "status": "visited",
     "region_code": "LPB",
     "post_type": "instagram",
-    "sequence_order": 181,
     "caption": null
   },
   {
@@ -2674,7 +2469,6 @@
     "status": "visited",
     "region_code": "LPB",
     "post_type": "instagram",
-    "sequence_order": 182,
     "caption": null
   },
   {
@@ -2687,7 +2481,6 @@
     "status": "visited",
     "region_code": "LPB",
     "post_type": "instagram",
-    "sequence_order": 183,
     "caption": null
   },
   {
@@ -2700,7 +2493,6 @@
     "status": "visited",
     "region_code": "GRU",
     "post_type": "instagram",
-    "sequence_order": 184,
     "caption": null
   },
   {
@@ -2713,7 +2505,6 @@
     "status": "visited",
     "region_code": "GRU",
     "post_type": "instagram",
-    "sequence_order": 185,
     "caption": null
   },
   {
@@ -2726,7 +2517,6 @@
     "status": "visited",
     "region_code": "SRE",
     "post_type": "instagram",
-    "sequence_order": 186,
     "caption": null
   },
   {
@@ -2739,7 +2529,6 @@
     "status": "visited",
     "region_code": "SRE",
     "post_type": "instagram",
-    "sequence_order": 187,
     "caption": null
   },
   {
@@ -2752,7 +2541,6 @@
     "status": "visited",
     "region_code": "SRE",
     "post_type": "instagram",
-    "sequence_order": 188,
     "caption": null
   },
   {
@@ -2765,7 +2553,6 @@
     "status": "visited",
     "region_code": "LPB",
     "post_type": "instagram",
-    "sequence_order": 189,
     "caption": null
   },
   {
@@ -2778,7 +2565,6 @@
     "status": "visited",
     "region_code": "LPB",
     "post_type": "instagram",
-    "sequence_order": 190,
     "caption": null
   },
   {
@@ -2791,7 +2577,6 @@
     "status": "visited",
     "region_code": "SRE",
     "post_type": "instagram",
-    "sequence_order": 191,
     "caption": null
   },
   {
@@ -2804,7 +2589,6 @@
     "status": "visited",
     "region_code": "SRE",
     "post_type": "instagram",
-    "sequence_order": 192,
     "caption": null
   },
   {
@@ -2817,7 +2601,6 @@
     "status": "visited",
     "region_code": "SRE",
     "post_type": "instagram",
-    "sequence_order": 193,
     "caption": null
   },
   {
@@ -2830,7 +2613,6 @@
     "status": "visited",
     "region_code": "SRE",
     "post_type": "instagram",
-    "sequence_order": 194,
     "caption": null
   },
   {
@@ -2843,7 +2625,6 @@
     "status": "visited",
     "region_code": "SRE",
     "post_type": "instagram",
-    "sequence_order": 195,
     "caption": null
   },
   {
@@ -2856,7 +2637,6 @@
     "status": "visited",
     "region_code": "MAO",
     "post_type": "instagram",
-    "sequence_order": 196,
     "caption": null
   },
   {
@@ -2869,7 +2649,6 @@
     "status": "visited",
     "region_code": "MAO",
     "post_type": "instagram",
-    "sequence_order": 197,
     "caption": null
   },
   {
@@ -2882,7 +2661,6 @@
     "status": "visited",
     "region_code": "MAO",
     "post_type": "instagram",
-    "sequence_order": 198,
     "caption": null
   },
   {
@@ -2895,7 +2673,6 @@
     "status": "visited",
     "region_code": "MAO",
     "post_type": "instagram",
-    "sequence_order": 199,
     "caption": null
   },
   {
@@ -2908,7 +2685,6 @@
     "status": "visited",
     "region_code": "LET",
     "post_type": "instagram",
-    "sequence_order": 200,
     "caption": null
   },
   {
@@ -2921,7 +2697,6 @@
     "status": "visited",
     "region_code": "MAO",
     "post_type": "instagram",
-    "sequence_order": 201,
     "caption": null
   },
   {
@@ -2934,7 +2709,6 @@
     "status": "visited",
     "region_code": "GIG",
     "post_type": "instagram",
-    "sequence_order": 202,
     "caption": null
   },
   {
@@ -2947,7 +2721,6 @@
     "status": "visited",
     "region_code": "GIG",
     "post_type": "instagram",
-    "sequence_order": 203,
     "caption": null
   },
   {
@@ -2960,7 +2733,6 @@
     "status": "visited",
     "region_code": "CTG",
     "post_type": "instagram",
-    "sequence_order": 204,
     "caption": null
   },
   {
@@ -2973,7 +2745,6 @@
     "status": "visited",
     "region_code": "CTG",
     "post_type": "instagram",
-    "sequence_order": 205,
     "caption": null
   },
   {
@@ -2986,7 +2757,6 @@
     "status": "visited",
     "region_code": "PEI",
     "post_type": "instagram",
-    "sequence_order": 206,
     "caption": null
   },
   {
@@ -2999,7 +2769,6 @@
     "status": "visited",
     "region_code": "PEI",
     "post_type": "instagram",
-    "sequence_order": 207,
     "caption": null
   },
   {
@@ -3012,7 +2781,6 @@
     "status": "visited",
     "region_code": "PEI",
     "post_type": "instagram",
-    "sequence_order": 208,
     "caption": null
   },
   {
@@ -3025,7 +2793,6 @@
     "status": "visited",
     "region_code": "BOG",
     "post_type": "instagram",
-    "sequence_order": 209,
     "caption": null
   },
   {
@@ -3038,7 +2805,6 @@
     "status": "visited",
     "region_code": "HAV",
     "post_type": "instagram",
-    "sequence_order": 210,
     "caption": null
   },
   {
@@ -3051,7 +2817,6 @@
     "status": "visited",
     "region_code": "HAV",
     "post_type": "instagram",
-    "sequence_order": 211,
     "caption": null
   },
   {
@@ -3064,7 +2829,6 @@
     "status": "visited",
     "region_code": "HAV",
     "post_type": "instagram",
-    "sequence_order": 212,
     "caption": null
   },
   {
@@ -3077,7 +2841,6 @@
     "status": "visited",
     "region_code": "HAV",
     "post_type": "instagram",
-    "sequence_order": 213,
     "caption": null
   },
   {
@@ -3090,7 +2853,6 @@
     "status": "visited",
     "region_code": "HAV",
     "post_type": "instagram",
-    "sequence_order": 214,
     "caption": null
   },
   {
@@ -3103,7 +2865,6 @@
     "status": "visited",
     "region_code": "HAV",
     "post_type": "instagram",
-    "sequence_order": 215,
     "caption": null
   },
   {
@@ -3116,7 +2877,6 @@
     "status": "visited",
     "region_code": "HAV",
     "post_type": "instagram",
-    "sequence_order": 216,
     "caption": null
   },
   {
@@ -3129,7 +2889,6 @@
     "status": "visited",
     "region_code": "PEK",
     "post_type": "instagram",
-    "sequence_order": 217,
     "caption": null
   },
   {
@@ -3142,7 +2901,6 @@
     "status": "visited",
     "region_code": "PEK",
     "post_type": "instagram",
-    "sequence_order": 218,
     "caption": null
   },
   {
@@ -3155,7 +2913,6 @@
     "status": "visited",
     "region_code": "TPE",
     "post_type": "instagram",
-    "sequence_order": 219,
     "caption": null
   },
   {
@@ -3168,7 +2925,6 @@
     "status": "visited",
     "region_code": "TPE",
     "post_type": "instagram",
-    "sequence_order": 220,
     "caption": null
   },
   {
@@ -3181,7 +2937,6 @@
     "status": "visited",
     "region_code": "MSY",
     "post_type": "instagram",
-    "sequence_order": 221,
     "caption": null
   },
   {
@@ -3194,7 +2949,6 @@
     "status": "visited",
     "region_code": "TPE",
     "post_type": "instagram",
-    "sequence_order": 222,
     "caption": null
   },
   {
@@ -3207,7 +2961,6 @@
     "status": "visited",
     "region_code": "TPE",
     "post_type": "instagram",
-    "sequence_order": 223,
     "caption": null
   },
   {
@@ -3220,7 +2973,6 @@
     "status": "visited",
     "region_code": "TPE",
     "post_type": "instagram",
-    "sequence_order": 224,
     "caption": null
   },
   {
@@ -3233,7 +2985,6 @@
     "status": "visited",
     "region_code": "TPE",
     "post_type": "instagram",
-    "sequence_order": 225,
     "caption": null
   },
   {
@@ -3246,7 +2997,6 @@
     "status": "visited",
     "region_code": "KWL",
     "post_type": "instagram",
-    "sequence_order": 226,
     "caption": null
   },
   {
@@ -3259,7 +3009,6 @@
     "status": "visited",
     "region_code": "KWL",
     "post_type": "instagram",
-    "sequence_order": 227,
     "caption": null
   },
   {
@@ -3272,7 +3021,6 @@
     "status": "visited",
     "region_code": "PVG",
     "post_type": "instagram",
-    "sequence_order": 228,
     "caption": null
   },
   {
@@ -3285,7 +3033,6 @@
     "status": "visited",
     "region_code": "PEK",
     "post_type": "instagram",
-    "sequence_order": 229,
     "caption": null
   },
   {
@@ -3298,7 +3045,6 @@
     "status": "visited",
     "region_code": "PEK",
     "post_type": "instagram",
-    "sequence_order": 230,
     "caption": null
   },
   {
@@ -3311,7 +3057,6 @@
     "status": "visited",
     "region_code": "FCO",
     "post_type": "instagram",
-    "sequence_order": 231,
     "caption": null
   },
   {
@@ -3324,7 +3069,6 @@
     "status": "visited",
     "region_code": "FCO",
     "post_type": "instagram",
-    "sequence_order": 232,
     "caption": null
   },
   {
@@ -3337,7 +3081,6 @@
     "status": "visited",
     "region_code": "FCO",
     "post_type": "instagram",
-    "sequence_order": 233,
     "caption": null
   },
   {
@@ -3350,7 +3093,6 @@
     "status": "visited",
     "region_code": "FCO",
     "post_type": "instagram",
-    "sequence_order": 234,
     "caption": null
   },
   {
@@ -3363,7 +3105,6 @@
     "status": "visited",
     "region_code": "FCO",
     "post_type": "instagram",
-    "sequence_order": 235,
     "caption": null
   },
   {
@@ -3376,7 +3117,6 @@
     "status": "visited",
     "region_code": "FCO",
     "post_type": "instagram",
-    "sequence_order": 236,
     "caption": null
   },
   {
@@ -3389,7 +3129,6 @@
     "status": "visited",
     "region_code": "FCO",
     "post_type": "instagram",
-    "sequence_order": 237,
     "caption": null
   },
   {
@@ -3402,7 +3141,6 @@
     "status": "visited",
     "region_code": "FLR",
     "post_type": "instagram",
-    "sequence_order": 238,
     "caption": null
   },
   {
@@ -3415,7 +3153,6 @@
     "status": "visited",
     "region_code": "FLR",
     "post_type": "instagram",
-    "sequence_order": 239,
     "caption": null
   },
   {
@@ -3428,7 +3165,6 @@
     "status": "visited",
     "region_code": "FLR",
     "post_type": "instagram",
-    "sequence_order": 240,
     "caption": null
   },
   {
@@ -3441,7 +3177,6 @@
     "status": "visited",
     "region_code": "FLR",
     "post_type": "instagram",
-    "sequence_order": 241,
     "caption": null
   },
   {
@@ -3454,7 +3189,6 @@
     "status": "visited",
     "region_code": "BLQ",
     "post_type": "instagram",
-    "sequence_order": 242,
     "caption": null
   },
   {
@@ -3467,7 +3201,6 @@
     "status": "visited",
     "region_code": "BLQ",
     "post_type": "instagram",
-    "sequence_order": 243,
     "caption": null
   },
   {
@@ -3480,7 +3213,6 @@
     "status": "visited",
     "region_code": "BLQ",
     "post_type": "instagram",
-    "sequence_order": 244,
     "caption": null
   },
   {
@@ -3493,7 +3225,6 @@
     "status": "visited",
     "region_code": "BLQ",
     "post_type": "instagram",
-    "sequence_order": 245,
     "caption": null
   },
   {
@@ -3506,7 +3237,6 @@
     "status": "visited",
     "region_code": "BLQ",
     "post_type": "instagram",
-    "sequence_order": 246,
     "caption": null
   },
   {
@@ -3519,7 +3249,6 @@
     "status": "visited",
     "region_code": "VCE",
     "post_type": "instagram",
-    "sequence_order": 247,
     "caption": null
   },
   {
@@ -3532,7 +3261,6 @@
     "status": "visited",
     "region_code": "VCE",
     "post_type": "instagram",
-    "sequence_order": 248,
     "caption": null
   },
   {
@@ -3545,7 +3273,6 @@
     "status": "visited",
     "region_code": "SZG",
     "post_type": "instagram",
-    "sequence_order": 249,
     "caption": null
   },
   {
@@ -3558,7 +3285,6 @@
     "status": "visited",
     "region_code": "SZG",
     "post_type": "instagram",
-    "sequence_order": 250,
     "caption": null
   },
   {
@@ -3571,7 +3297,6 @@
     "status": "visited",
     "region_code": "MUC",
     "post_type": "instagram",
-    "sequence_order": 251,
     "caption": null
   },
   {
@@ -3584,7 +3309,6 @@
     "status": "visited",
     "region_code": "MUC",
     "post_type": "instagram",
-    "sequence_order": 252,
     "caption": null
   },
   {
@@ -3597,7 +3321,6 @@
     "status": "visited",
     "region_code": "MUC",
     "post_type": "instagram",
-    "sequence_order": 253,
     "caption": null
   },
   {
@@ -3610,7 +3333,6 @@
     "status": "visited",
     "region_code": "BRU",
     "post_type": "instagram",
-    "sequence_order": 254,
     "caption": null
   },
   {
@@ -3623,7 +3345,6 @@
     "status": "visited",
     "region_code": "BRU",
     "post_type": "instagram",
-    "sequence_order": 255,
     "caption": null
   },
   {
@@ -3636,7 +3357,6 @@
     "status": "visited",
     "region_code": "LUX",
     "post_type": "instagram",
-    "sequence_order": 256,
     "caption": null
   },
   {
@@ -3649,7 +3369,6 @@
     "status": "visited",
     "region_code": "LUX",
     "post_type": "instagram",
-    "sequence_order": 257,
     "caption": null
   },
   {
@@ -3662,7 +3381,6 @@
     "status": "visited",
     "region_code": "FRA",
     "post_type": "instagram",
-    "sequence_order": 258,
     "caption": null
   },
   {
@@ -3675,7 +3393,6 @@
     "status": "visited",
     "region_code": "FRA",
     "post_type": "instagram",
-    "sequence_order": 259,
     "caption": null
   },
   {
@@ -3688,7 +3405,6 @@
     "status": "visited",
     "region_code": "AMS",
     "post_type": "instagram",
-    "sequence_order": 260,
     "caption": null
   },
   {
@@ -3701,7 +3417,6 @@
     "status": "visited",
     "region_code": "AMS",
     "post_type": "instagram",
-    "sequence_order": 261,
     "caption": null
   },
   {
@@ -3714,7 +3429,6 @@
     "status": "visited",
     "region_code": "RAK",
     "post_type": "instagram",
-    "sequence_order": 262,
     "caption": null
   },
   {
@@ -3727,7 +3441,6 @@
     "status": "visited",
     "region_code": "RAK",
     "post_type": "instagram",
-    "sequence_order": 263,
     "caption": null
   },
   {
@@ -3740,7 +3453,6 @@
     "status": "visited",
     "region_code": "RAK",
     "post_type": "instagram",
-    "sequence_order": 264,
     "caption": null
   },
   {
@@ -3753,7 +3465,6 @@
     "status": "visited",
     "region_code": "FEZ",
     "post_type": "instagram",
-    "sequence_order": 265,
     "caption": null
   },
   {
@@ -3766,7 +3477,6 @@
     "status": "visited",
     "region_code": "FEZ",
     "post_type": "instagram",
-    "sequence_order": 266,
     "caption": null
   },
   {
@@ -3779,7 +3489,6 @@
     "status": "visited",
     "region_code": "TNG",
     "post_type": "instagram",
-    "sequence_order": 267,
     "caption": null
   },
   {
@@ -3792,7 +3501,6 @@
     "status": "visited",
     "region_code": "FEZ",
     "post_type": "instagram",
-    "sequence_order": 268,
     "caption": null
   },
   {
@@ -3805,7 +3513,6 @@
     "status": "visited",
     "region_code": "TNG",
     "post_type": "instagram",
-    "sequence_order": 269,
     "caption": null
   },
   {
@@ -3818,7 +3525,6 @@
     "status": "visited",
     "region_code": "TNG",
     "post_type": "instagram",
-    "sequence_order": 270,
     "caption": null
   },
   {
@@ -3831,7 +3537,6 @@
     "status": "visited",
     "region_code": "AGP",
     "post_type": "instagram",
-    "sequence_order": 271,
     "caption": null
   },
   {
@@ -3844,7 +3549,6 @@
     "status": "visited",
     "region_code": "GRX",
     "post_type": "instagram",
-    "sequence_order": 272,
     "caption": null
   },
   {
@@ -3857,7 +3561,6 @@
     "status": "visited",
     "region_code": "GRX",
     "post_type": "instagram",
-    "sequence_order": 273,
     "caption": null
   },
   {
@@ -3870,7 +3573,6 @@
     "status": "visited",
     "region_code": "GRX",
     "post_type": "instagram",
-    "sequence_order": 274,
     "caption": null
   },
   {
@@ -3883,7 +3585,6 @@
     "status": "visited",
     "region_code": "GRX",
     "post_type": "instagram",
-    "sequence_order": 275,
     "caption": null
   },
   {
@@ -3896,7 +3597,6 @@
     "status": "visited",
     "region_code": "GRX",
     "post_type": "instagram",
-    "sequence_order": 276,
     "caption": null
   },
   {
@@ -3909,7 +3609,6 @@
     "status": "visited",
     "region_code": "SVQ",
     "post_type": "instagram",
-    "sequence_order": 277,
     "caption": null
   },
   {
@@ -3922,7 +3621,6 @@
     "status": "visited",
     "region_code": "SVQ",
     "post_type": "instagram",
-    "sequence_order": 278,
     "caption": null
   },
   {
@@ -3935,7 +3633,6 @@
     "status": "visited",
     "region_code": "SVQ",
     "post_type": "instagram",
-    "sequence_order": 279,
     "caption": null
   },
   {
@@ -3948,7 +3645,6 @@
     "status": "visited",
     "region_code": "SVQ",
     "post_type": "instagram",
-    "sequence_order": 280,
     "caption": null
   },
   {
@@ -3961,7 +3657,6 @@
     "status": "visited",
     "region_code": "SVQ",
     "post_type": "instagram",
-    "sequence_order": 281,
     "caption": null
   },
   {
@@ -3974,7 +3669,6 @@
     "status": "visited",
     "region_code": "FAO",
     "post_type": "instagram",
-    "sequence_order": 282,
     "caption": null
   },
   {
@@ -3987,7 +3681,6 @@
     "status": "visited",
     "region_code": "SVQ",
     "post_type": "instagram",
-    "sequence_order": 283,
     "caption": null
   },
   {
@@ -4000,7 +3693,6 @@
     "status": "visited",
     "region_code": "FAO",
     "post_type": "instagram",
-    "sequence_order": 284,
     "caption": null
   },
   {
@@ -4013,7 +3705,6 @@
     "status": "visited",
     "region_code": "LIS",
     "post_type": "instagram",
-    "sequence_order": 285,
     "caption": null
   },
   {
@@ -4026,7 +3717,6 @@
     "status": "visited",
     "region_code": "LIS",
     "post_type": "instagram",
-    "sequence_order": 286,
     "caption": null
   },
   {
@@ -4039,7 +3729,6 @@
     "status": "visited",
     "region_code": "LIS",
     "post_type": "instagram",
-    "sequence_order": 287,
     "caption": null
   },
   {
@@ -4052,7 +3741,6 @@
     "status": "visited",
     "region_code": "LIS",
     "post_type": "instagram",
-    "sequence_order": 288,
     "caption": null
   },
   {
@@ -4065,7 +3753,6 @@
     "status": "visited",
     "region_code": "LIS",
     "post_type": "instagram",
-    "sequence_order": 289,
     "caption": null
   },
   {
@@ -4078,7 +3765,6 @@
     "status": "visited",
     "region_code": "LIS",
     "post_type": "instagram",
-    "sequence_order": 290,
     "caption": null
   },
   {
@@ -4091,7 +3777,6 @@
     "status": "visited",
     "region_code": "LIS",
     "post_type": "instagram",
-    "sequence_order": 291,
     "caption": null
   },
   {
@@ -4104,7 +3789,6 @@
     "status": "visited",
     "region_code": "LIS",
     "post_type": "instagram",
-    "sequence_order": 292,
     "caption": null
   },
   {
@@ -4117,7 +3801,6 @@
     "status": "visited",
     "region_code": "LIS",
     "post_type": "instagram",
-    "sequence_order": 293,
     "caption": null
   },
   {
@@ -4130,7 +3813,6 @@
     "status": "visited",
     "region_code": "LIS",
     "post_type": "instagram",
-    "sequence_order": 294,
     "caption": null
   },
   {
@@ -4143,7 +3825,6 @@
     "status": "visited",
     "region_code": "DUB",
     "post_type": "instagram",
-    "sequence_order": 295,
     "caption": null
   },
   {
@@ -4156,7 +3837,6 @@
     "status": "visited",
     "region_code": "DUB",
     "post_type": "instagram",
-    "sequence_order": 296,
     "caption": null
   },
   {
@@ -4169,7 +3849,6 @@
     "status": "visited",
     "region_code": "DUB",
     "post_type": "instagram",
-    "sequence_order": 297,
     "caption": null
   },
   {
@@ -4182,7 +3861,6 @@
     "status": "visited",
     "region_code": "DUB",
     "post_type": "instagram",
-    "sequence_order": 298,
     "caption": null
   },
   {
@@ -4195,7 +3873,6 @@
     "status": "visited",
     "region_code": "DUB",
     "post_type": "instagram",
-    "sequence_order": 299,
     "caption": null
   },
   {
@@ -4208,7 +3885,6 @@
     "status": "visited",
     "region_code": "DUB",
     "post_type": "instagram",
-    "sequence_order": 300,
     "caption": null
   },
   {
@@ -4221,7 +3897,6 @@
     "status": "visited",
     "region_code": "DUB",
     "post_type": "instagram",
-    "sequence_order": 301,
     "caption": null
   },
   {
@@ -4234,7 +3909,6 @@
     "status": "visited",
     "region_code": "DUB",
     "post_type": "instagram",
-    "sequence_order": 302,
     "caption": null
   },
   {
@@ -4247,7 +3921,6 @@
     "status": "visited",
     "region_code": "DUB",
     "post_type": "instagram",
-    "sequence_order": 303,
     "caption": null
   },
   {
@@ -4260,7 +3933,6 @@
     "status": "visited",
     "region_code": "DUB",
     "post_type": "instagram",
-    "sequence_order": 304,
     "caption": null
   },
   {
@@ -4273,7 +3945,6 @@
     "status": "visited",
     "region_code": "DUB",
     "post_type": "instagram",
-    "sequence_order": 305,
     "caption": null
   },
   {
@@ -4286,7 +3957,6 @@
     "status": "visited",
     "region_code": "DUB",
     "post_type": "instagram",
-    "sequence_order": 306,
     "caption": null
   },
   {
@@ -4299,7 +3969,6 @@
     "status": "visited",
     "region_code": "YYZ",
     "post_type": "instagram",
-    "sequence_order": 307,
     "caption": null
   },
   {
@@ -4312,7 +3981,6 @@
     "status": "visited",
     "region_code": "NAS",
     "post_type": "instagram",
-    "sequence_order": 308,
     "caption": null
   },
   {
@@ -4325,7 +3993,6 @@
     "status": "visited",
     "region_code": "NAS",
     "post_type": "instagram",
-    "sequence_order": 309,
     "caption": null
   },
   {
@@ -4338,7 +4005,6 @@
     "status": "visited",
     "region_code": "NAS",
     "post_type": "instagram",
-    "sequence_order": 310,
     "caption": null
   },
   {
@@ -4351,7 +4017,6 @@
     "status": "visited",
     "region_code": "SEA",
     "post_type": "instagram",
-    "sequence_order": 311,
     "caption": null
   },
   {
@@ -4364,7 +4029,6 @@
     "status": "visited",
     "region_code": "SEA",
     "post_type": "instagram",
-    "sequence_order": 312,
     "caption": null
   },
   {
@@ -4377,7 +4041,6 @@
     "status": "visited",
     "region_code": "SEA",
     "post_type": "instagram",
-    "sequence_order": 313,
     "caption": null
   },
   {
@@ -4390,7 +4053,6 @@
     "status": "visited",
     "region_code": "SEA",
     "post_type": "instagram",
-    "sequence_order": 314,
     "caption": null
   },
   {
@@ -4403,7 +4065,6 @@
     "status": "visited",
     "region_code": "YVR",
     "post_type": "instagram",
-    "sequence_order": 315,
     "caption": null
   },
   {
@@ -4416,7 +4077,6 @@
     "status": "visited",
     "region_code": "SEA",
     "post_type": "instagram",
-    "sequence_order": 316,
     "caption": null
   },
   {
@@ -4429,7 +4089,6 @@
     "status": "visited",
     "region_code": "SEA",
     "post_type": "instagram",
-    "sequence_order": 317,
     "caption": null
   },
   {
@@ -4442,7 +4101,6 @@
     "status": "visited",
     "region_code": "SEA",
     "post_type": "instagram",
-    "sequence_order": 318,
     "caption": null
   },
   {
@@ -4455,7 +4113,6 @@
     "status": "visited",
     "region_code": "SEA",
     "post_type": "instagram",
-    "sequence_order": 319,
     "caption": null
   },
   {
@@ -4468,7 +4125,6 @@
     "status": "visited",
     "region_code": "YVR",
     "post_type": "instagram",
-    "sequence_order": 320,
     "caption": null
   },
   {
@@ -4481,7 +4137,6 @@
     "status": "visited",
     "region_code": "LAS",
     "post_type": "instagram",
-    "sequence_order": 321,
     "caption": null
   },
   {
@@ -4494,7 +4149,6 @@
     "status": "visited",
     "region_code": "LAS",
     "post_type": "instagram",
-    "sequence_order": 322,
     "caption": null
   },
   {
@@ -4507,7 +4161,6 @@
     "status": "visited",
     "region_code": "SFO",
     "post_type": "instagram",
-    "sequence_order": 323,
     "caption": null
   },
   {
@@ -4520,7 +4173,6 @@
     "status": "visited",
     "region_code": "JFK",
     "post_type": "instagram",
-    "sequence_order": 324,
     "caption": null
   },
   {
@@ -4533,7 +4185,6 @@
     "status": "visited",
     "region_code": "JFK",
     "post_type": "instagram",
-    "sequence_order": 325,
     "caption": null
   },
   {
@@ -4546,7 +4197,6 @@
     "status": "visited",
     "region_code": "JFK",
     "post_type": "instagram",
-    "sequence_order": 326,
     "caption": null
   },
   {
@@ -4559,7 +4209,6 @@
     "status": "visited",
     "region_code": "JFK",
     "post_type": "instagram",
-    "sequence_order": 327,
     "caption": null
   },
   {
@@ -4572,7 +4221,6 @@
     "status": "visited",
     "region_code": "JFK",
     "post_type": "instagram",
-    "sequence_order": 328,
     "caption": null
   },
   {
@@ -4585,7 +4233,6 @@
     "status": "visited",
     "region_code": "PVG",
     "post_type": "substack",
-    "sequence_order": 329,
     "caption": null
   },
   {
@@ -4598,7 +4245,6 @@
     "status": "visited",
     "region_code": "VCE",
     "post_type": "substack",
-    "sequence_order": 330,
     "caption": null
   },
   {
@@ -4611,7 +4257,6 @@
     "status": "visited",
     "region_code": "SZG",
     "post_type": "substack",
-    "sequence_order": 331,
     "caption": null
   },
   {
@@ -4624,7 +4269,6 @@
     "status": "visited",
     "region_code": "FRA",
     "post_type": "substack",
-    "sequence_order": 332,
     "caption": null
   },
   {
@@ -4637,7 +4281,6 @@
     "status": "visited",
     "region_code": "LUX",
     "post_type": "substack",
-    "sequence_order": 333,
     "caption": null
   },
   {
@@ -4650,7 +4293,6 @@
     "status": "visited",
     "region_code": "EZE",
     "post_type": "substack",
-    "sequence_order": 334,
     "caption": null
   },
   {
@@ -4663,7 +4305,6 @@
     "status": "visited",
     "region_code": "MDZ",
     "post_type": "substack",
-    "sequence_order": 335,
     "caption": null
   },
   {
@@ -4676,7 +4317,6 @@
     "status": "visited",
     "region_code": "SCL",
     "post_type": "substack",
-    "sequence_order": 336,
     "caption": null
   },
   {
@@ -4689,7 +4329,6 @@
     "status": "visited",
     "region_code": "IQQ",
     "post_type": "substack",
-    "sequence_order": 337,
     "caption": null
   },
   {
@@ -4702,7 +4341,6 @@
     "status": "visited",
     "region_code": "SRE",
     "post_type": "substack",
-    "sequence_order": 338,
     "caption": null
   },
   {
@@ -4715,7 +4353,6 @@
     "status": "visited",
     "region_code": "SEA",
     "post_type": "substack",
-    "sequence_order": 339,
     "caption": null
   },
   {
@@ -4728,7 +4365,6 @@
     "status": "visited",
     "region_code": "YYZ",
     "post_type": "substack",
-    "sequence_order": 340,
     "caption": null
   },
   {
@@ -4741,7 +4377,6 @@
     "status": "visited",
     "region_code": "YVR",
     "post_type": "substack",
-    "sequence_order": 341,
     "caption": null
   },
   {
@@ -4754,7 +4389,6 @@
     "status": "visited",
     "region_code": "SEA",
     "post_type": "substack",
-    "sequence_order": 342,
     "caption": null
   },
   {
@@ -4767,7 +4401,6 @@
     "status": "planned",
     "region_code": "AGP",
     "post_type": "planned",
-    "sequence_order": 0,
     "caption": null
   },
   {
@@ -4780,7 +4413,6 @@
     "status": "planned",
     "region_code": "NRT",
     "post_type": "planned",
-    "sequence_order": 1,
     "caption": null
   },
   {
@@ -4793,7 +4425,6 @@
     "status": "planned",
     "region_code": "KTM",
     "post_type": "planned",
-    "sequence_order": 2,
     "caption": null
   },
   {
@@ -4806,7 +4437,6 @@
     "status": "planned",
     "region_code": "PBH",
     "post_type": "planned",
-    "sequence_order": 3,
     "caption": null
   },
   {
@@ -4819,7 +4449,6 @@
     "status": "planned",
     "region_code": "SIN",
     "post_type": "planned",
-    "sequence_order": 4,
     "caption": null
   },
   {
@@ -4832,7 +4461,6 @@
     "status": "planned",
     "region_code": "DPS",
     "post_type": "planned",
-    "sequence_order": 5,
     "caption": null
   },
   {
@@ -4845,7 +4473,6 @@
     "status": "planned",
     "region_code": "MNL",
     "post_type": "planned",
-    "sequence_order": 6,
     "caption": null
   },
   {
@@ -4858,7 +4485,6 @@
     "status": "planned",
     "region_code": "GUM",
     "post_type": "planned",
-    "sequence_order": 7,
     "caption": null
   },
   {
@@ -4871,7 +4497,6 @@
     "status": "planned",
     "region_code": "PNI",
     "post_type": "planned",
-    "sequence_order": 8,
     "caption": null
   },
   {
@@ -4884,7 +4509,6 @@
     "status": "planned",
     "region_code": "HNL",
     "post_type": "planned",
-    "sequence_order": 9,
     "caption": null
   },
   {
@@ -4897,7 +4521,6 @@
     "status": "planned",
     "region_code": "IAH",
     "post_type": "planned",
-    "sequence_order": 10,
     "caption": null
   },
   {
@@ -4910,7 +4533,6 @@
     "status": "planned",
     "region_code": "GPS",
     "post_type": "planned",
-    "sequence_order": 11,
     "caption": null
   },
   {
@@ -4923,7 +4545,6 @@
     "status": "planned",
     "region_code": "FTE",
     "post_type": "planned",
-    "sequence_order": 12,
     "caption": null
   },
   {
@@ -4936,7 +4557,6 @@
     "status": "planned",
     "region_code": "DXB",
     "post_type": "planned",
-    "sequence_order": 13,
     "caption": null
   },
   {
@@ -4949,7 +4569,6 @@
     "status": "planned",
     "region_code": "DOH",
     "post_type": "planned",
-    "sequence_order": 14,
     "caption": null
   },
   {
@@ -4962,7 +4581,6 @@
     "status": "planned",
     "region_code": "BAH",
     "post_type": "planned",
-    "sequence_order": 15,
     "caption": null
   },
   {
@@ -4975,7 +4593,6 @@
     "status": "planned",
     "region_code": "RUH",
     "post_type": "planned",
-    "sequence_order": 16,
     "caption": null
   },
   {
@@ -4988,7 +4605,6 @@
     "status": "planned",
     "region_code": "CPT",
     "post_type": "planned",
-    "sequence_order": 17,
     "caption": null
   },
   {
@@ -5001,7 +4617,6 @@
     "status": "planned",
     "region_code": "GBE",
     "post_type": "planned",
-    "sequence_order": 18,
     "caption": null
   },
   {
@@ -5014,7 +4629,6 @@
     "status": "planned",
     "region_code": "KGL",
     "post_type": "planned",
-    "sequence_order": 19,
     "caption": null
   },
   {
@@ -5027,7 +4641,6 @@
     "status": "planned",
     "region_code": "WDH",
     "post_type": "planned",
-    "sequence_order": 20,
     "caption": null
   },
   {
@@ -5040,7 +4653,6 @@
     "status": "planned",
     "region_code": "IST",
     "post_type": "planned",
-    "sequence_order": 21,
     "caption": null
   },
   {
@@ -5053,7 +4665,6 @@
     "status": "planned",
     "region_code": "SOF",
     "post_type": "planned",
-    "sequence_order": 22,
     "caption": null
   },
   {
@@ -5066,7 +4677,6 @@
     "status": "planned",
     "region_code": "VAR",
     "post_type": "planned",
-    "sequence_order": 23,
     "caption": null
   },
   {
@@ -5079,7 +4689,6 @@
     "status": "planned",
     "region_code": "OTP",
     "post_type": "planned",
-    "sequence_order": 24,
     "caption": null
   },
   {
@@ -5092,7 +4701,6 @@
     "status": "planned",
     "region_code": "EVN",
     "post_type": "planned",
-    "sequence_order": 25,
     "caption": null
   },
   {
@@ -5105,7 +4713,6 @@
     "status": "planned",
     "region_code": "TAS",
     "post_type": "planned",
-    "sequence_order": 26,
     "caption": null
   },
   {
@@ -5118,7 +4725,6 @@
     "status": "planned",
     "region_code": "ALA",
     "post_type": "planned",
-    "sequence_order": 27,
     "caption": null
   },
   {
@@ -5131,7 +4737,6 @@
     "status": "planned",
     "region_code": "FRU",
     "post_type": "planned",
-    "sequence_order": 28,
     "caption": null
   },
   {
@@ -5144,7 +4749,6 @@
     "status": "planned",
     "region_code": "URC",
     "post_type": "planned",
-    "sequence_order": 29,
     "caption": null
   }
 ]

@@ -44,7 +44,6 @@ interface StopRecord {
   status: string;
   region_code: string | null;
   post_type: string;
-  sequence_order: number;
   caption: string | null;
 }
 
@@ -86,7 +85,7 @@ function processTrip(trip: Trip): void {
     end_date: endDate,
   });
 
-  trip.stops.forEach((stop: Stop, index: number) => {
+  trip.stops.forEach((stop: Stop) => {
     const post = stop.post;
 
     let caption: string | null = null;
@@ -104,7 +103,6 @@ function processTrip(trip: Trip): void {
       status: stop.status,
       region_code: stop.regionCode ?? null,
       post_type: post.type,
-      sequence_order: index,
       caption,
     });
 
