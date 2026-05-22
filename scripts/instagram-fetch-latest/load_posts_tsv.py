@@ -22,6 +22,7 @@ import csv
 import json
 import os
 import posixpath
+import re
 import sys
 from datetime import datetime, timezone
 
@@ -33,8 +34,8 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..
 
 load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
 
-ACCESS_TOKEN = os.environ["INSTA_ACCESS_TOKEN"]
-ACCESS_TOKEN_2 = os.environ.get("INSTA_ACCESS_TOKEN_2", "")
+ACCESS_TOKEN = os.environ["INSTAGRAM_GRAPH_API_TOKEN"]
+ACCESS_TOKEN_2 = os.environ.get("INSTAGRAM_GRAPH_API_TOKEN_2", "")
 TOKENS = [t for t in [ACCESS_TOKEN, ACCESS_TOKEN_2] if t]
 ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 BASE_URL = "https://graph.instagram.com/v25.0"
@@ -101,7 +102,7 @@ def download_media(media_url: str, local_id: int, media_type: str, media_dir: st
         for chunk in resp.iter_content(chunk_size=8192):
             f.write(chunk)
 
-    return local_path
+    return os.path.normpath(local_path)
 
 
 def get_location_via_claude(
@@ -142,7 +143,7 @@ def get_location_via_claude(
         "If you cannot determine the location, set all four values to empty strings. "
         "If you cannot determine the lat/lng, provide the location and region but leave lat and lng as empty strings. "
         "If you cannot determine the nearest international airport, provide the location and lat/lng but leave region as an empty string. "
-        "Do not include any text outside the JSON object."
+        "Do not include any text outside the JSON object. Do not wrap the JSON in markdown code fences."
     )
 
     content: list[dict] = []
@@ -163,12 +164,20 @@ def get_location_via_claude(
     content.append({"type": "text", "text": prompt})
 
     response = client.messages.create(
-        model="claude-opus-4-5",
+        model="claude-sonnet-4-6",
         max_tokens=256,
         messages=[{"role": "user", "content": content}],
     )
 
     raw = response.content[0].text.strip()
+    # Strip markdown code fences if Claude wrapped the JSON despite the prompt.
+    if raw.startswith("```"):
+        first_nl = raw.find("\n")
+        if first_nl != -1:
+            raw = raw[first_nl + 1 :]
+        if raw.endswith("```"):
+            raw = raw[:-3]
+        raw = raw.strip()
     try:
         data = json.loads(raw)
         return (
@@ -194,7 +203,8 @@ def fetch_new_post_ids(access_token: str, since_ts: int, until_ts: int) -> list[
     page_num = 0
     while next_url:
         page_num += 1
-        print(f"  [page {page_num}] {next_url[:80]}...")
+        safe_url = re.sub(r"access_token=[^&]*", "access_token=[REDACTED]", next_url)
+        print(f"  [page {page_num}] {safe_url[:120]}...")
         try:
             page = fetch_media_page(next_url)
         except requests.HTTPError as exc:
@@ -365,4 +375,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    if (sys.stdout.encoding or "").lower() != "utf-8":
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
     main()
