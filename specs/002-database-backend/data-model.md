@@ -1,6 +1,6 @@
-# Data Model: Data Ingestion & Backend
+# Data Model: Database & Backend
 
-**Phase**: 1 | **Plan**: [plan.md](plan.md) | **Date**: 2026-05-12
+**Phase**: 1 | **Plan**: [plan.md](plan.md) | **Date**: 2026-05-12 (updated 2026-05-22)
 
 ## Entity Overview
 
@@ -12,6 +12,8 @@ trips
         ├── instagram_posts (FK: stop_id)  [post_type = 'instagram']
         └── substack_posts  (FK: stop_id)  [post_type = 'substack', nullable]
 ```
+
+> This schema is the canonical definition. `003-ingestion-pipeline` writes new rows into `stops`, `instagram_posts`, and `substack_posts` but does not modify the schema.
 
 ---
 
@@ -26,10 +28,12 @@ Maps to `Trip` in `src/data/types.ts`.
 | `description` | `TEXT` | NOT NULL | |
 | `start_date` | `DATE` | NOT NULL | Derived from the earliest stop date at seed time; operator-managed thereafter |
 | `end_date` | `DATE` | NOT NULL | Derived from the latest stop date at seed time |
-| `created_at` | `TIMESTAMPTZ` | NOT NULL, DEFAULT now() | Used for trip-assignment tie-breaking (FR-040) |
+| `created_at` | `TIMESTAMPTZ` | NOT NULL, DEFAULT now() | Used by `003-ingestion-pipeline` for trip-assignment tie-breaking |
 | `updated_at` | `TIMESTAMPTZ` | NOT NULL, DEFAULT now() | Updated on every `PUT /trips/:id` |
 
-**Indexes**: `(start_date, end_date)` for trip-assignment date range queries (FR-040).
+**Indexes**: `(start_date, end_date)` for trip-assignment date range queries from the ingestion pipeline.
+
+The seed pipeline MUST create a row with `id = "miscellaneous-adventures"`; the ingestion pipeline relies on it as the default fallback when no other trip date range matches a new post.
 
 ---
 
@@ -40,13 +44,13 @@ Maps to `Stop` in `src/data/types.ts`.
 | Column | Type | Constraints | Notes |
 |--------|------|-------------|-------|
 | `id` | `VARCHAR(100)` | PRIMARY KEY | Stable string; existing IDs (`"23"`, `"ecs2027-01"`) preserved at seed; UUID for new ingested stops |
-| `trip_id` | `VARCHAR(100)` | NOT NULL, FK → trips.id | Must reference a valid trip; ingestion falls back to `"miscellaneous-adventures"` |
+| `trip_id` | `VARCHAR(100)` | NOT NULL, FK → trips.id | Must reference a valid trip; ingestion uses `"miscellaneous-adventures"` as default |
 | `date` | `DATE` | NOT NULL | Date of the visit or planned date |
 | `location` | `VARCHAR(500)` | NOT NULL | Human-readable location string |
 | `lat` | `DECIMAL(10, 7)` | NULLABLE | Null when location could not be geocoded |
 | `lng` | `DECIMAL(10, 7)` | NULLABLE | Null when location could not be geocoded |
 | `status` | `VARCHAR(20)` | NOT NULL, CHECK IN ('visited','planned') | |
-| `region_code` | `VARCHAR(10)` | NULLABLE | IATA code of nearest in-country international airport; null if lookup fails |
+| `region_code` | `VARCHAR(10)` | NULLABLE | IATA code of nearest in-country international airport; populated at seed time from source TS data; for new rows, written by ingestion (see `003-ingestion-pipeline`) |
 | `post_type` | `VARCHAR(20)` | NOT NULL, CHECK IN ('instagram','substack','planned') | |
 | `caption` | `TEXT` | NULLABLE | Used for `post_type = 'planned'` only |
 | `created_at` | `TIMESTAMPTZ` | NOT NULL, DEFAULT now() | |
@@ -67,14 +71,14 @@ Maps to `InstagramPost` in `src/data/types.ts`, extended with platform and inges
 |--------|------|-------------|-------|
 | `id` | `UUID` | PRIMARY KEY, DEFAULT gen_random_uuid() | |
 | `stop_id` | `VARCHAR(100)` | NOT NULL, FK → stops.id, UNIQUE | One post per stop |
-| `instagram_id` | `VARCHAR(100)` | NOT NULL, UNIQUE | Platform identifier; used for idempotency check (FR-022) |
+| `instagram_id` | `VARCHAR(100)` | NOT NULL, UNIQUE | Platform identifier; used for idempotency by `003-ingestion-pipeline` |
 | `shortcode` | `VARCHAR(100)` | NOT NULL | Used to construct `instagram.com/p/<shortcode>/` URL |
-| `media_url` | `VARCHAR(500)` | NOT NULL | Relative POSIX path (e.g. `/media/<stop_id>.jpg`); empty string if download failed |
+| `media_url` | `VARCHAR(500)` | NOT NULL | Relative POSIX path (e.g. `/media/<stop_id>.jpg`); empty string if ingestion download failed |
 | `caption` | `TEXT` | NOT NULL, DEFAULT '' | Post caption text |
 | `timestamp` | `TIMESTAMPTZ` | NOT NULL | Original Instagram post timestamp |
 | `created_at` | `TIMESTAMPTZ` | NOT NULL, DEFAULT now() | |
 
-**Indexes**: `(instagram_id)` UNIQUE (deduplication); `(timestamp)` for since-timestamp ingestion queries (FR-018); `(stop_id)` for join.
+**Indexes**: `(instagram_id)` UNIQUE (deduplication); `(timestamp)` for since-timestamp ingestion queries; `(stop_id)` for join.
 
 ---
 
@@ -85,8 +89,8 @@ Maps to `SubstackPost` in `src/data/types.ts`, extended with platform metadata.
 | Column | Type | Constraints | Notes |
 |--------|------|-------------|-------|
 | `id` | `UUID` | PRIMARY KEY, DEFAULT gen_random_uuid() | |
-| `stop_id` | `VARCHAR(100)` | NULLABLE, FK → stops.id | Null until manually assigned; excluded from API responses until assigned (per spec Assumptions) |
-| `substack_id` | `VARCHAR(500)` | NOT NULL, UNIQUE | Stable identifier — `<guid>` or `<link>` from RSS; used for idempotency (FR-025) |
+| `stop_id` | `VARCHAR(100)` | NULLABLE, FK → stops.id | Null until manually assigned; excluded from API responses until assigned |
+| `substack_id` | `VARCHAR(500)` | NOT NULL, UNIQUE | Stable identifier — `<guid>` or `<link>` from RSS; used for idempotency by `003-ingestion-pipeline` |
 | `title` | `VARCHAR(500)` | NOT NULL | |
 | `subtitle` | `TEXT` | NULLABLE | From RSS `<description>` |
 | `body` | `TEXT` | NOT NULL | From RSS `<content:encoded>` |
@@ -105,7 +109,7 @@ Maps to `SubstackPost` in `src/data/types.ts`, extended with platform metadata.
 planned ──► visited
 ```
 
-A stop moves from `planned` to `visited` when an Instagram post is ingested and matched to it by trip date range. Status never regresses (visited stops cannot become planned again). The frontend derives `abandoned` as an effective status at render time — it is never stored in the database (consistent with the existing `StopStatus` type in `types.ts`).
+A stop moves from `planned` to `visited` when an Instagram post is ingested and matched to it by trip date range (logic in `003-ingestion-pipeline`). Status never regresses (visited stops cannot become planned again). The frontend derives `abandoned` as an effective status at render time — it is never stored in the database (consistent with the existing `StopStatus` type in `types.ts`).
 
 ### Substack Post Assignment
 
@@ -120,21 +124,10 @@ Substack posts are ingested without a `stop_id`. The operator assigns them to a 
 
 ---
 
-## Trip Assignment Logic (FR-040)
-
-When the ingestion job creates a new stop for an Instagram post with timestamp `T`:
-
-1. Find all trips where `start_date <= T <= end_date`
-2. If exactly one match → assign to it
-3. If multiple matches → assign to the trip with the most recent `created_at`
-4. If no match → assign to trip with `id = "miscellaneous-adventures"`; if that trip is absent, log ERROR and halt
-
----
-
 ## Seed Pipeline
 
 ```
-TypeScript source files (src/data/*.ts)
+TypeScript source files (frontend/src/data/*.ts)
         │
         ▼ tsx scripts/export-seed-data.ts
 scripts/seed-data/
@@ -151,3 +144,5 @@ scripts/seed-dump.sql   ← mounted into DB container on first start
 ```
 
 The seed script is idempotent: it uses `INSERT ... ON CONFLICT DO NOTHING` on all primary keys and unique indexes. Running it twice produces no duplicate records (US1 scenario 3).
+
+> Trip-assignment logic for newly ingested posts (FR-040) lives in `003-ingestion-pipeline/data-model.md`.
