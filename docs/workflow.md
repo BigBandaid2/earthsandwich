@@ -14,15 +14,16 @@ Roughly once per week, the Team Lead is responsible for grasping the current sta
 
 1. **Reconcile Code to Tasks** — drift scan against preview drift reconciliation → HEAD (see [§Reconciliation](#reconciliation-claudespec-drift-scan)).
 2. **New Phase/Story for Code Drift** - bundle detected changes to a new Phase in appended to relevant `tasks.md` for shipped work.
-3. **Check Progress Against Previous Sprint Plan** - append sprint review notes.
+3. **Sync Spec State to JIRA** — push any new phases as Stories via `/speckit.jira.specstoissues <spec>`, then flip completion status on existing Stories via `/speckit.jira.sync-status <spec>`. Run for every spec with new phases or `[x]` task flips since the last sync so the planning meeting reads off current JIRA state.
+4. **Check Progress Against Previous Sprint Plan** - append sprint review notes.
 
 ### After Weekly Team Meeting
 
-4. **Create New Sprint Plan** - Create new sprint plan via Jira tickets or directly
-5. **Push to JIRA** — new phases become new Stories in OCS, placed in the current sprint for velocity attribution.
-6. **Plan the week in JIRA's UI** — drag stories into the sprint, assign owners, set story points, write the Sprint goal.
-7. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
-8. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
+5. **Create New Sprint Plan** - Create new sprint plan via Jira tickets or directly
+6. **Push to JIRA** — any phases newly decided in the meeting become new Stories in OCS, placed in the current sprint for velocity attribution. (Drift-discovered phases were already synced in step 3.)
+7. **Plan the week in JIRA's UI** — drag stories into the sprint, assign owners, set story points, write the Sprint goal.
+8. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
+9. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
 
 The weekly cadence is the contract. The per-feature ceremony (below) is the optional discipline for serious architectural work.
 

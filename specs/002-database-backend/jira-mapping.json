@@ -1,0 +1,82 @@
+{
+  "created_at": "2026-05-25T00:00:00Z",
+  "updated_at": "2026-05-25T00:00:00Z",
+  "spec": "002-database-backend",
+  "project": "OCS",
+  "jira_base_url": "https://datacommlab.atlassian.net",
+  "mode": "story-only",
+  "epic": {
+    "key": "OCS-73",
+    "summary": "Database & Backend",
+    "url": "https://datacommlab.atlassian.net/browse/OCS-73"
+  },
+  "stories": [
+    {
+      "key": "OCS-75",
+      "summary": "Phase 1: Setup (Project Initialization)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-75",
+      "status": "completed",
+      "tasks": []
+    },
+    {
+      "key": "OCS-76",
+      "summary": "Phase 2: Foundational (Blocking Prerequisites)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-76",
+      "status": "completed",
+      "tasks": []
+    },
+    {
+      "key": "OCS-77",
+      "summary": "Phase 3: US1 - Seed the Database (P1, MVP)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-77",
+      "status": "completed",
+      "tasks": []
+    },
+    {
+      "key": "OCS-78",
+      "summary": "Phase 4: US2 - Read API Endpoints (P1)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-78",
+      "status": "pending",
+      "tasks": []
+    },
+    {
+      "key": "OCS-79",
+      "summary": "Phase 6: US4 - Trip Management & Region End Date (P2)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-79",
+      "status": "pending",
+      "tasks": []
+    },
+    {
+      "key": "OCS-80",
+      "summary": "Phase 8: US6 - Containerization (P3)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-80",
+      "status": "pending",
+      "tasks": []
+    },
+    {
+      "key": "OCS-81",
+      "summary": "Phase 9: Polish & Cross-Cutting Concerns",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-81",
+      "status": "pending",
+      "tasks": []
+    },
+    {
+      "key": "OCS-82",
+      "summary": "Phase 17: Drift Reconciliation (2026-05-25 weekly scan)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-82",
+      "status": "completed",
+      "tasks": []
+    }
+  ],
+  "summary": {
+    "total_stories": 8,
+    "completed_stories": 4,
+    "pending_stories": 4
+  },
+  "notes": [
+    "All Stories created 2026-05-25 after the 2026-05-22 split of 002-data-ingestion into 002-database-backend and 003-ingestion-pipeline.",
+    "Phases stored at the Story level only — no Subtasks created per the team convention (stories-only sync unless there's a clear reason to break out individual tasks).",
+    "Phase 5 (MOVED to 003 as Phase 1) and Phase 7 (MOVED to 003 as Phase 2) stubs in tasks.md were intentionally NOT created as Stories in JIRA — they live in tasks.md only as historical-record breadcrumbs.",
+    "Stories created in 'To Do' status. Phases 1, 2, 3, and 17 are spec-marked completed and need transitioning to 'Done' via /speckit.jira.sync-status."
+  ]
+}
