@@ -14,7 +14,7 @@ Roughly once per week, the Team Lead is responsible for grasping the current sta
 
 1. **Reconcile Code to Tasks** — drift scan against preview drift reconciliation → HEAD (see [§Reconciliation](#reconciliation-claudespec-drift-scan)).
 2. **New Phase/Story for Code Drift** - bundle detected changes to a new Phase in appended to relevant `tasks.md` for shipped work.
-3. **Sync Spec State to JIRA** — push any new phases as Stories via `/speckit.jira.specstoissues <spec>`, then flip completion status on existing Stories via `/speckit.jira.sync-status <spec>`. Run for every spec with new phases or `[x]` task flips since the last sync so the planning meeting reads off current JIRA state.
+3. **Sync Spec State to JIRA** — push new phases as Stories and flip completion statuses so the planning meeting reads off current JIRA state (see [§JIRA sync](#jira-sync)).
 4. **Check Progress Against Previous Sprint Plan** - append sprint review notes.
 
 ### After Weekly Team Meeting
@@ -93,6 +93,25 @@ Claude enumerates changed files per commit, buckets them by spec, greps `tasks.m
 | Weekly Monday | Full drift scan. Append misses as new phases. |
 
 Per-commit is too noisy. Per-push and weekly catch-up is the right cadence.
+
+---
+
+## JIRA sync
+
+Two commands keep JIRA aligned with the spec state:
+
+- `/speckit.jira.specstoissues <spec>` — creates an Epic for the spec and a Story for each `## Phase N: ...` in its `tasks.md`. Existing Stories are left alone; only new phases are pushed. Subtasks are *not* created by default — sync at the Story level unless there's a clear reason to break out individual tasks (e.g. active forward-sprint work that needs triage in JIRA).
+- `/speckit.jira.sync-status <spec>` — reads `[ ]` / `[~]` / `[x]` task flips in `tasks.md` and transitions the corresponding JIRA issues to `To Do` / `In Progress` / `Done`.
+
+### Sprint membership rule
+
+Any Story flipped to **Done** must belong to a sprint — default to the currently-open sprint unless the work demonstrably happened in a different one (in which case set that sprint explicitly). This keeps velocity attribution accurate at sprint-review time.
+
+In-progress stories are *not* automatically added to the current sprint. Add one case-by-case when partial work has shipped this sprint and the team wants velocity credit for it.
+
+### What never goes into the sync
+
+Per Cardinal Rule 6, `specs/<spec>/jira-mapping.json` must not record sprint, owner, status, story points, or priority. Those PM fields live in JIRA's UI; the mapping file carries only identity (key, summary, URL, parent/child structure).
 
 ---
 
