@@ -1,0 +1,22 @@
+Date	DOW	Sprint	Story	Person	Commits	Time Span	Hours Estimated	Hours Attested
+2026-05-05	Tue	Sprint 1	OCS-72	Elena Shen	0a689de (T097 update 2015 trip image routes — small targeted change)	17:00	0.25
+2026-05-06	Wed	Sprint 1	Overhead	Ethan Shen	6fd2327 (clean up workflow.md after W19 sprint plan landed)	16:02	1.0
+2026-05-07	Thu	Sprint 1	OCS-72	Elena Shen	9f800f2 (add region column to posts.tsv + load_posts_tsv script); 57aeb53 (T098 first-pass IG ingestion — public/posts.json + usePosts.ts + App.tsx wiring)	22:07-23:21	1.5
+2026-05-08	Fri	Sprint 1	OCS-72	Elena Shen	85348c4 (add second test account scaffolding); 17b532f (T099 add Kos region)	00:16-01:22	1.0
+2026-05-08	Fri	Sprint 1	OCS-73	Elena Shen	a093cd0 (define new spec 002-data-ingestion — /speckit.specify per-feature ceremony)	20:33	1.5
+2026-05-12	Tue	(inter-sprint)	OCS-73	Elena Shen	6faeb11 (/speckit.plan for 002 — per-feature ceremony)	20:34	1.5
+2026-05-15	Fri	Sprint 2	OCS-72	Ethan Shen	650a222 portion (Phase 16 drift-recon authoring; commit was bundled with sprint planning + workflow.md updates — those split into Overhead row)	17:52	0.5
+2026-05-15	Fri	Sprint 2	Overhead	Ethan Shen	650a222 portion (sprint planning + workflow.md tweaks); f5b8233 (W20 sprint plan creation)	17:52-17:53	1.0
+2026-05-17	Sun	Sprint 2	OCS-73	Elena Shen	7538aee (spec amendment — LLM-only location, region end-date endpoint); 7695685 (tasks.md initial author)	17:10-17:23	0.5
+2026-05-17	Sun	Sprint 2	OCS-75	Elena Shen	8ec0b68 (T001 backend dir scaffold); ce22f8e (T002 migrate frontend/ — large rename diff)	17:32-17:41	1.0
+2026-05-18	Mon	Sprint 2	OCS-75	Elena Shen	952ffad (T003-T005 reqs + tsx + backend/.env.example — late-night session)	02:47	1.0
+2026-05-18	Mon	Sprint 2	OCS-77	Elena Shen	729b94a (T019 export-seed-data.ts — early-morning standalone session)	03:25	0.75
+2026-05-18	Mon	Sprint 2	OCS-76	Elena Shen	236956c (T006 config); cc22fe6 (T007 database); 5219ac0 (T008 main.py with lifespan hook)	20:35-20:57	0.75
+2026-05-19	Tue	Sprint 2	OCS-76	Elena Shen	8 commits in 24 min — AI-assisted burst: 4394695 T009 trip, b4b4fb8 T010 stop, 89380b3 T011 instagram_post, 5be4594 T012 substack_post, 63eb2e4 T013-T014 alembic init, 373700f T015 initial migration, 592cc54 T016 trip schema, 4b27396 T017-T018 stop+post schemas	18:53-19:17	0.5
+2026-05-19	Tue	Sprint 2	OCS-77	Elena Shen	401c2aa (T020 seed.py); a65c23b (T021 remove sequence_order — models + schemas + export + seed); 3775ea1 (T022 pg_dump invocation)	19:39-20:14	0.75
+2026-05-19	Tue	Sprint 2	OCS-82	Elena Shen	ce55532 (T052 temp docker-compose.db.yml + backend/session.json dev setup)	21:14	0.5
+2026-05-22	Fri	Sprint 2	OCS-77	Elena Shen	085b95c (fix seed.py + alembic upgrade head — post-T020/T022 cleanup)	16:21	0.5
+2026-05-22	Fri	Sprint 2	OCS-86	Ethan Shen	504c617 (T100 standalone-execution prep — UTF-8, token redact, fence-strip, env rename)	16:12	1.5
+2026-05-22	Fri	Sprint 2	Overhead	Ethan Shen	f767e33 (spec restructure — split 002-data-ingestion into 002-database-backend + 003-ingestion-pipeline)	16:13	1.5
+2026-05-25	Mon	Sprint 2	OCS-86	Ethan Shen	5 commits prototyping OCS-83 subtasks: a5f5d9f (T101 instagrapi pivot + dual-path location); 2629535 (T102 integration test + tests/ scaffold); 8feb24e (T103 21 unit tests for location helpers); df40169 (T104 extract process_media + 22 unit tests); 2265cf6 (T105 retire FR-043 + Phase 17 author)	10:58-12:16	3.0
+2026-05-25	Mon	Sprint 2	Overhead	Ethan Shen	53c3e8f (JIRA sync push for 002+003 specs + workflow.md step 3); e36e648 (workflow.md JIRA-sync detail section + sprint membership rule)	13:02-13:24	1.5

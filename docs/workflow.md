@@ -15,15 +15,17 @@ Roughly once per week, the Team Lead is responsible for grasping the current sta
 1. **Reconcile Code to Tasks** — drift scan against preview drift reconciliation → HEAD (see [§Reconciliation](#reconciliation-claudespec-drift-scan)).
 2. **New Phase/Story for Code Drift** - bundle detected changes to a new Phase in appended to relevant `tasks.md` for shipped work.
 3. **Sync Spec State to JIRA** — push new phases as Stories and flip completion statuses so the planning meeting reads off current JIRA state (see [§JIRA sync](#jira-sync)).
-4. **Check Progress Against Previous Sprint Plan** - append sprint review notes.
+4. **Log estimated hours** — append daily rows to `docs/planning/time-log.tsv` and add a person/story hours summary to the current sprint plan (see [§Time logging](#time-logging)).
+5. **Check Progress Against Previous Sprint Plan** - append sprint review notes.
 
 ### After Weekly Team Meeting
 
-5. **Create New Sprint Plan** - Create new sprint plan via Jira tickets or directly
-6. **Push to JIRA** — any phases newly decided in the meeting become new Stories in OCS, placed in the current sprint for velocity attribution. (Drift-discovered phases were already synced in step 3.)
-7. **Plan the week in JIRA's UI** — drag stories into the sprint, assign owners, set story points, write the Sprint goal.
-8. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
-9. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
+6. **Attest hours** — each team member confirms their estimated hours, adds meeting time, fills the `Hours Attested` column (see [§Time logging](#time-logging)).
+7. **Create New Sprint Plan** - Create new sprint plan via Jira tickets or directly
+8. **Push to JIRA** — any phases newly decided in the meeting become new Stories in OCS, placed in the current sprint for velocity attribution. (Drift-discovered phases were already synced in step 3.)
+9. **Plan the week in JIRA's UI** — drag stories into the sprint, assign owners, set story points, write the Sprint goal.
+10. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
+11. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
 
 The weekly cadence is the contract. The per-feature ceremony (below) is the optional discipline for serious architectural work.
 
@@ -112,6 +114,40 @@ In-progress stories are *not* automatically added to the current sprint. Add one
 ### What never goes into the sync
 
 Per Cardinal Rule 6, `specs/<spec>/jira-mapping.json` must not record sprint, owner, status, story points, or priority. Those PM fields live in JIRA's UI; the mapping file carries only identity (key, summary, URL, parent/child structure).
+
+---
+
+## Time logging
+
+`docs/planning/time-log.tsv` is an append-only daily ledger of estimated and attested hours. One row per day per person per Story (or per `Overhead` category). It exists to make velocity attribution honest at sprint review and to build a calibration loop: the gap between *estimated* and *attested* hours tells you whether your future estimates need adjustment.
+
+### Columns
+
+| Column | Notes |
+|---|---|
+| Date | YYYY-MM-DD |
+| DOW | Day of week |
+| Sprint | `OCS Sprint N` (the sprint the work calendar-attributes to) |
+| Story | JIRA key (`OCS-NN`). Use `Overhead` for non-Story work (sprint planning, workflow doc updates, JIRA sync, spec restructures). |
+| Person | Full name matching git author / JIRA assignee |
+| Commits | Commit hash + brief description. Include qualitative notes that explain the estimate (e.g. "AI-assisted burst, 8 commits in 24 min"). |
+| Time Span | Calendar span of commits that day (`HH:MM-HH:MM`). Reference only — not the same as active work time. |
+| Hours Estimated | Single decimal. Filled before the weekly team meeting from commit history + judgment. |
+| Hours Attested | Filled by the team member after the meeting. Includes meeting time on top of work time. Empty until attested. |
+
+### Before the weekly team meeting
+
+After the drift scan and JIRA sync, the team lead enumerates commits since the last sync, groups them by Story + person + day, and writes one row each with `Hours Estimated`. Add a person/story summary block at the bottom of `docs/planning/YYYY-WW.md` so the meeting has a quick read of where effort went.
+
+### After the weekly team meeting (attestation)
+
+Each team member reviews their rows and fills `Hours Attested`:
+
+- **Add meeting time on top of work time.** The weekly meeting itself counts — add it to one of your existing rows for that day, or create a dedicated `Overhead — meeting` row.
+- **Adjust the number** if your actual time differed significantly from the estimate. The gap is feedback for tuning future estimates; don't silently re-baseline.
+- Leave a note in the Commits column if context is important (e.g. "deeper than estimated — blocked 2h on instagrapi challenge").
+
+Attested numbers are the source of truth for sprint velocity. Estimated numbers stay in place for the calibration history.
 
 ---
 
