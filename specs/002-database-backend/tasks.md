@@ -137,6 +137,14 @@
 
 ---
 
+## Phase 17: Drift Reconciliation (2026-05-25 weekly scan)
+
+**Status**: Dev-infrastructure work that shipped without a prior task entry.
+
+- [x] T052 Add temporary `docker-compose.db.yml` (Postgres-only stack) used during seed-script development. Superseded by the full `docker-compose.yml` in T046. Commit: `ce55532`. **Security note**: `backend/session.json` was committed in the same change — verify whether it contains real auth state before pushing to a public remote.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

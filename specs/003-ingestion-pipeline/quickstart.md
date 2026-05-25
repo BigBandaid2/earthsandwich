@@ -14,9 +14,6 @@ INSTA_PASSWORD=<instagram password>
 INSTAGRAPI_SESSION_FILE=./instagrapi_session.json
 SUBSTACK_RSS_URL=<substack rss url>
 
-# Optional — Instagram Graph API fallback
-INSTAGRAM_GRAPH_API_TOKEN=
-
 # Optional — schedule overrides (defaults shown)
 INSTAGRAM_POLL_INTERVAL_MINUTES=60
 SUBSTACK_POLL_INTERVAL_MINUTES=60
@@ -42,7 +39,7 @@ docker compose exec backend python -m app.cli.manage login
 
 This prompts interactively for Instagram credentials and writes the session file to the path configured by `INSTAGRAPI_SESSION_FILE`. Normal scheduled ingestion reuses this session without re-authenticating.
 
-If the session expires (Instagram challenge, 2FA, etc.), a notification email is sent to `automation@datacommlab.com` and the Graph API fallback is attempted (if configured). Re-run the login command to refresh the session.
+If the session expires (Instagram challenge, 2FA, etc.), a notification email is sent to `automation@datacommlab.com` and the job exits cleanly. Re-run the login command above to refresh the session.
 
 ---
 
