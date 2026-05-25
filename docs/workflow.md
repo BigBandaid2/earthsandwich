@@ -18,14 +18,18 @@ Roughly once per week, the Team Lead is responsible for grasping the current sta
 4. **Log estimated hours** — append daily rows to `docs/planning/time-log.tsv` and add a person/story hours summary to the current sprint plan (see [§Time logging](#time-logging)).
 5. **Check Progress Against Previous Sprint Plan** - append sprint review notes.
 
-### After Weekly Team Meeting
+### During Weekly Team Meeting
 
 6. **Attest hours** — each team member confirms their estimated hours, adds meeting time, fills the `Hours Attested` column (see [§Time logging](#time-logging)).
-7. **Create New Sprint Plan** - Create new sprint plan via Jira tickets or directly
-8. **Push to JIRA** — any phases newly decided in the meeting become new Stories in OCS, placed in the current sprint for velocity attribution. (Drift-discovered phases were already synced in step 3.)
-9. **Plan the week in JIRA's UI** — drag stories into the sprint, assign owners, set story points, write the Sprint goal.
-10. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
-11. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
+7. **Plan the week in JIRA's UI** — drag stories into the sprint, assign owners, set story points, write the Sprint goal.
+
+### After Weekly Team Meeting
+
+8. **Create New Sprint Plan** - Create new sprint plan via Jira tickets or directly
+9. **Push to JIRA** — any phases newly decided in the meeting become new Stories in OCS, placed in the current sprint for velocity attribution. (Drift-discovered phases were already synced in step 3.)
+10. **Link user-created tickets to spec-kit equivalents** — `Duplicate` for 1-to-1 parallels, `Relates` otherwise (see [§JIRA sync](#jira-sync)).
+11. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
+12. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
 
 The weekly cadence is the contract. The per-feature ceremony (below) is the optional discipline for serious architectural work.
 
@@ -110,6 +114,17 @@ Two commands keep JIRA aligned with the spec state:
 Any Story flipped to **Done** must belong to a sprint — default to the currently-open sprint unless the work demonstrably happened in a different one (in which case set that sprint explicitly). This keeps velocity attribution accurate at sprint-review time.
 
 In-progress stories are *not* automatically added to the current sprint. Add one case-by-case when partial work has shipped this sprint and the team wants velocity credit for it.
+
+### User-created tickets — reconciliation
+
+JIRA accumulates two kinds of issues: those produced by `/speckit.jira.specstoissues` (labeled `spec-kit`) and those created ad-hoc in the JIRA UI (typically during weekly meetings or stakeholder discussions). When the two describe the same work, the spec-kit Story is the canonical record and the user ticket gets linked to it rather than left orphaned.
+
+Convention:
+- **`Duplicate`** link when the user ticket and spec-kit Story describe the same work 1-to-1. Direction: the user ticket *duplicates* the spec-kit Story (`outwardIssue` = user ticket, `inwardIssue` = spec-kit Story).
+- **`Relates`** link when the user ticket is a spike, prerequisite, or tangentially related (e.g. a webfetch-blocking spike whose outcome was the instagrapi pivot).
+- **Don't touch the Subtasks attached to spec-kit Stories** — those are managed by the speckit-jira agents. Linking happens at the user-ticket level only.
+
+True close-cascade requires a Parent-Subtask relationship, which would mean converting the user ticket's issue type. That's out of scope for the weekly cadence; manually close the duplicate when the spec-kit Story closes (or leave it for next-week reconciliation).
 
 ### What never goes into the sync
 
