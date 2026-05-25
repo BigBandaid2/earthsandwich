@@ -376,6 +376,120 @@ def fetch_new_media_instagrapi(cl: "object", since_ts: int, max_total: int = 100
     return list(reversed(collected))
 
 
+def process_media(
+    m: "object",
+    local_id: int,
+    media_dir: str,
+    recent_locations: list[str],
+) -> dict:
+    """Process one instagrapi `Media` object into a TSV row dict.
+
+    Pipeline (in order):
+      1. Field extraction: pk, shortcode, caption, timestamp.
+      2. Media URL + type resolution (handles IMAGE / VIDEO / Album with
+         `media_type` codes 1 / 2 / 8 respectively).
+      3. Media download via `download_media`; failures log and continue.
+      4. Dual-path location resolution:
+           FR-019 tagged path: `m.location.name` is populated → use name/
+             lat/lng verbatim, call `get_region_only_via_claude` for IATA.
+           FR-020 inferred path: no tag → call `get_location_via_claude`
+             with caption + image + recent_locations context.
+      5. Path normalization for the TSV (relative to PROJECT_ROOT, posix
+         separators).
+
+    Returns a row dict matching the TSV column order. Does NOT mutate
+    `recent_locations`, increment ids, or write to disk — those iteration
+    concerns belong to the caller (`main`).
+    """
+    instagram_id = str(m.pk)
+    shortcode = m.code or ""
+    caption = m.caption_text or ""
+
+    # Normalize the timestamp to match the existing TSV style (2026-05-08T14:39:41+0000).
+    ts_dt = m.taken_at
+    if ts_dt.tzinfo is None:
+        ts_dt = ts_dt.replace(tzinfo=timezone.utc)
+    timestamp = ts_dt.strftime("%Y-%m-%dT%H:%M:%S%z")
+
+    # Resolve media URL and type. instagrapi media_type: 1=Photo, 2=Video, 8=Album.
+    media_type_code = getattr(m, "media_type", 1)
+    if media_type_code == 2:
+        media_type = "VIDEO"
+        remote_media_url = str(m.video_url) if getattr(m, "video_url", None) else ""
+    elif media_type_code == 8 and getattr(m, "resources", None):
+        first = m.resources[0]
+        if getattr(first, "media_type", 1) == 2:
+            media_type = "VIDEO"
+            remote_media_url = str(first.video_url) if getattr(first, "video_url", None) else ""
+        else:
+            media_type = "IMAGE"
+            remote_media_url = str(first.thumbnail_url) if getattr(first, "thumbnail_url", None) else ""
+    else:
+        media_type = "IMAGE"
+        remote_media_url = str(m.thumbnail_url) if getattr(m, "thumbnail_url", None) else ""
+
+    # Download media
+    local_media_path = ""
+    if remote_media_url:
+        try:
+            local_media_path = download_media(
+                remote_media_url, local_id, media_type, media_dir
+            )
+            print(f"  ↓ saved {local_media_path}")
+        except (requests.RequestException, OSError) as exc:
+            print(f"  ! pk={instagram_id}  media download failed ({exc})")
+
+    # Dual-path location:
+    #   FR-019 tagged: Media has a Location → name/lat/lng authoritative; Claude only for IATA.
+    #   FR-020 inferred: no tag → Claude full inference from caption + image + recent context.
+    location, lat, lng, region = "", "", "", ""
+    tagged: Optional[tuple[str, str, str]] = None
+    loc = getattr(m, "location", None)
+    if loc and getattr(loc, "name", None):
+        raw_lat = getattr(loc, "lat", None)
+        raw_lng = getattr(loc, "lng", None)
+        if raw_lat in (None, 0, 0.0) and raw_lng in (None, 0, 0.0):
+            tagged = (loc.name, "", "")
+        else:
+            lat_s = "" if raw_lat is None else str(raw_lat)
+            lng_s = "" if raw_lng is None else str(raw_lng)
+            tagged = (loc.name, lat_s, lng_s)
+
+    if tagged:
+        location, lat, lng = tagged
+        region = get_region_only_via_claude(location, lat, lng)
+        print(f"  location (tagged): {location}  lat={lat}  lng={lng}  region: {region or '(undetermined)'}")
+    else:
+        try:
+            location, lat, lng, region = get_location_via_claude(
+                caption=caption,
+                local_media_path=local_media_path,
+                media_type=media_type,
+                recent_locations=recent_locations,
+            )
+            print(f"  location (inferred — no tag found): {location or '(undetermined)'}  lat={lat}  lng={lng}  region: {region or '(undetermined)'}")
+        except Exception as exc:
+            print(f"  ! pk={instagram_id}  Claude location lookup failed ({exc})")
+
+    # Strip project root prefix and normalize to posix separators for the TSV row.
+    if local_media_path.startswith(PROJECT_ROOT):
+        local_media_path = os.path.relpath(local_media_path, PROJECT_ROOT)
+    local_media_path = local_media_path.replace(os.sep, posixpath.sep)
+
+    return {
+        "id": local_id,
+        "instagram_id": instagram_id,
+        "shortcode": shortcode,
+        "media_url": local_media_path,
+        "caption": caption,
+        "timestamp": timestamp,
+        "location": location,
+        "lat": lat,
+        "lng": lng,
+        "region": region,
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Fetch new Instagram posts and append to TSV.")
     parser.add_argument(
@@ -452,103 +566,19 @@ def main() -> None:
         total_written = 0
         for m in new_media:
             local_id = next_id
-            instagram_id = str(m.pk)
-            shortcode = m.code or ""
-            caption = m.caption_text or ""
+            row = process_media(m, local_id, args.media_dir, recent_locations)
 
-            # Normalize the timestamp to match the existing TSV style (2026-05-08T14:39:41+0000).
-            ts_dt = m.taken_at
-            if ts_dt.tzinfo is None:
-                ts_dt = ts_dt.replace(tzinfo=timezone.utc)
-            timestamp = ts_dt.strftime("%Y-%m-%dT%H:%M:%S%z")
-
-            # Resolve media URL and type. instagrapi media_type: 1=Photo, 2=Video, 8=Album.
-            media_type_code = getattr(m, "media_type", 1)
-            if media_type_code == 2:
-                media_type = "VIDEO"
-                remote_media_url = str(m.video_url) if getattr(m, "video_url", None) else ""
-            elif media_type_code == 8 and getattr(m, "resources", None):
-                first = m.resources[0]
-                if getattr(first, "media_type", 1) == 2:
-                    media_type = "VIDEO"
-                    remote_media_url = str(first.video_url) if getattr(first, "video_url", None) else ""
-                else:
-                    media_type = "IMAGE"
-                    remote_media_url = str(first.thumbnail_url) if getattr(first, "thumbnail_url", None) else ""
-            else:
-                media_type = "IMAGE"
-                remote_media_url = str(m.thumbnail_url) if getattr(m, "thumbnail_url", None) else ""
-
-            # Download media
-            local_media_path = ""
-            if remote_media_url:
-                try:
-                    local_media_path = download_media(
-                        remote_media_url, local_id, media_type, args.media_dir
-                    )
-                    print(f"  ↓ saved {local_media_path}")
-                except (requests.RequestException, OSError) as exc:
-                    print(f"  ! pk={instagram_id}  media download failed ({exc})")
-
-            # Dual-path location:
-            #   FR-019 tagged: Media has a Location → name/lat/lng authoritative; Claude only for IATA.
-            #   FR-020 inferred: no tag → Claude full inference from caption + image + recent context.
-            location, lat, lng, region = "", "", "", ""
-            tagged: Optional[tuple[str, str, str]] = None
-            loc = getattr(m, "location", None)
-            if loc and getattr(loc, "name", None):
-                raw_lat = getattr(loc, "lat", None)
-                raw_lng = getattr(loc, "lng", None)
-                if raw_lat in (None, 0, 0.0) and raw_lng in (None, 0, 0.0):
-                    tagged = (loc.name, "", "")
-                else:
-                    lat_s = "" if raw_lat is None else str(raw_lat)
-                    lng_s = "" if raw_lng is None else str(raw_lng)
-                    tagged = (loc.name, lat_s, lng_s)
-
-            if tagged:
-                location, lat, lng = tagged
-                region = get_region_only_via_claude(location, lat, lng)
-                print(f"  location (tagged): {location}  lat={lat}  lng={lng}  region: {region or '(undetermined)'}")
-            else:
-                try:
-                    location, lat, lng, region = get_location_via_claude(
-                        caption=caption,
-                        local_media_path=local_media_path,
-                        media_type=media_type,
-                        recent_locations=recent_locations,
-                    )
-                    print(f"  location (inferred — no tag found): {location or '(undetermined)'}  lat={lat}  lng={lng}  region: {region or '(undetermined)'}")
-                except Exception as exc:
-                    print(f"  ! pk={instagram_id}  Claude location lookup failed ({exc})")
-
-            # Strip project root prefix and normalize to posix separators for the TSV row.
-            if local_media_path.startswith(PROJECT_ROOT):
-                local_media_path = os.path.relpath(local_media_path, PROJECT_ROOT)
-            local_media_path = local_media_path.replace(os.sep, posixpath.sep)
-
-            writer.writerow({
-                "id": local_id,
-                "instagram_id": instagram_id,
-                "shortcode": shortcode,
-                "media_url": local_media_path,
-                "caption": caption,
-                "timestamp": timestamp,
-                "location": location,
-                "lat": lat,
-                "lng": lng,
-                "region": region,
-            })
+            writer.writerow(row)
             out_file.flush()
 
             # Feed this post's location into context for subsequent Claude calls
-            if location:
-                recent_locations.insert(0, location)
+            if row["location"]:
+                recent_locations.insert(0, row["location"])
                 recent_locations = recent_locations[:RECENT_LOCATION_COUNT]
 
             next_id += 1
             total_written += 1
-            print(f"  + [{local_id}] pk={instagram_id}  shortcode={shortcode}")
+            print(f"  + [{local_id}] pk={row['instagram_id']}  shortcode={row['shortcode']}")
 
     print(f"\nDone. {total_written} new posts written to {args.output}.")
 

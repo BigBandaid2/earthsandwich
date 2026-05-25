@@ -2,11 +2,18 @@
 
 ## What's here
 
+- `test_process_media.py` — **unit tests** for `process_media`, the
+  per-post handler extracted from `main()`. 22 tests covering the dual-
+  path branching (tagged vs. inferred), edge cases for `(0,0)` and
+  name-only Location tags, IMAGE/VIDEO/Album URL selection, timestamp
+  normalization, path normalization, and field extraction. Mocks
+  `download_media`, `get_region_only_via_claude`, and
+  `get_location_via_claude` so the whole file runs in <1s. Unmarked.
 - `test_location_helpers.py` — **unit tests** for `get_region_only_via_claude`
   and `get_location_via_claude`. Mocks the Anthropic client so they run in
   ~2s with no network, no credentials. 21 tests covering response
   sanitization, JSON-fence stripping, image-inclusion rules, recent-locations
-  injection, and the bias-guard wording. Unmarked → runs by default.
+  injection, and the bias-guard wording. Unmarked.
 - `test_instagram_pull.py` — **integration smoke test**. Truncates
   `posts.local.tsv` to row 322, runs `load_posts_tsv.py`, and verifies that
   row 323 (the Mexico City test post on `@welawen`) comes back with its
@@ -98,14 +105,11 @@ Patterns established here, to follow as the suite grows:
 
 Natural next steps for expanding coverage:
 
-1. **Dual-path branching test** — mock `instagrapi.Client.user_medias_paginated_v1`
-   to return synthetic `Media` objects (one with a `Location`, one without)
-   and assert that `main()` writes the right rows for each. Requires a small
-   refactor of `main()` to extract a per-post `process_media(...)` function
-   for easier testing in isolation.
-2. **Media URL extraction test** — the IMAGE / VIDEO / Album (`media_type=8`)
-   branching that selects `thumbnail_url` vs `video_url` vs the first
-   resource. Currently inlined in `main()`; pulling it into a helper would
-   make it unit-testable.
-3. **`fetch_new_media_instagrapi` cursor walk** — verify the
-   "stop when ts <= since_ts" logic with a fake paginated client.
+1. ✅ **Dual-path branching test** — done. `process_media` was extracted
+   from `main()` and `test_process_media.py` covers the tagged-vs-inferred
+   dispatch, plus the media URL/type, timestamp, and path-normalization
+   logic.
+2. **`fetch_new_media_instagrapi` cursor walk** — verify the
+   "stop when ts <= since_ts" logic with a fake paginated client. Would
+   need a small wrapper or `monkeypatch` on `cl.user_medias_paginated_v1`
+   that returns synthetic Media lists with controlled timestamps.
