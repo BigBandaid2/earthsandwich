@@ -2,16 +2,24 @@
 
 ## What's here
 
-- `test_instagram_pull.py` — end-to-end integration smoke test. Truncates
+- `test_location_helpers.py` — **unit tests** for `get_region_only_via_claude`
+  and `get_location_via_claude`. Mocks the Anthropic client so they run in
+  ~2s with no network, no credentials. 21 tests covering response
+  sanitization, JSON-fence stripping, image-inclusion rules, recent-locations
+  injection, and the bias-guard wording. Unmarked → runs by default.
+- `test_instagram_pull.py` — **integration smoke test**. Truncates
   `posts.local.tsv` to row 322, runs `load_posts_tsv.py`, and verifies that
   row 323 (the Mexico City test post on `@welawen`) comes back with its
-  explicit geo-tag intact. Marked `@pytest.mark.integration`.
+  explicit geo-tag intact. ~8s. Marked `@pytest.mark.integration`.
 
 ## How to run
 
 ```bash
-# From the project root (Windows):
+# All tests (unit + integration) from the project root:
 scripts\instagram-fetch-latest\venv\Scripts\pytest scripts/instagram-fetch-latest/tests
+
+# Unit tests only — the fast path; skip the live-API integration test:
+scripts\instagram-fetch-latest\venv\Scripts\pytest scripts/instagram-fetch-latest/tests -m "not integration"
 
 # Cross-platform from an activated venv:
 pytest scripts/instagram-fetch-latest/tests
@@ -76,18 +84,28 @@ Two things to get right for this to work in GitHub Actions (or equivalent):
 
 ## Building on this
 
-This is the **first** test in the project. Patterns to follow as the suite
-grows:
+Patterns established here, to follow as the suite grows:
 
 - Live-service tests get `@pytest.mark.integration`; offline/mocked tests
-  get no marker (or `@pytest.mark.unit` if we want to be explicit).
-- Default CI runs only unmarked tests (`pytest -m "not integration"`).
-- Nightly cron runs everything (`pytest`).
-- Keep integration tests small in count — they're slow and rate-limit-prone.
-  Cover the data-flow logic in unit tests with mocked `instagrapi.Client`
-  and `anthropic.Anthropic` instead.
+  get no marker.
+- Default per-PR CI: `pytest -m "not integration"` — fast, no credentials.
+- Nightly cron + `master` merges: `pytest` — runs everything.
+- Keep integration tests small in count and short in runtime — they're slow
+  and rate-limit-prone. Cover code logic in unit tests with mocks instead.
+- Mocking pattern: see `mock_anthropic_client` fixture in
+  `test_location_helpers.py` for how to patch `anthropic.Anthropic` from
+  inside the `load_posts_tsv` module via `monkeypatch.setattr`.
 
-A natural next step: a unit-style test that mocks the instagrapi `Media`
-object and verifies the dual-path branching in `load_posts_tsv.py` without
-hitting any network — covers more of the code surface for less cost, runs
-on every PR.
+Natural next steps for expanding coverage:
+
+1. **Dual-path branching test** — mock `instagrapi.Client.user_medias_paginated_v1`
+   to return synthetic `Media` objects (one with a `Location`, one without)
+   and assert that `main()` writes the right rows for each. Requires a small
+   refactor of `main()` to extract a per-post `process_media(...)` function
+   for easier testing in isolation.
+2. **Media URL extraction test** — the IMAGE / VIDEO / Album (`media_type=8`)
+   branching that selects `thumbnail_url` vs `video_url` vs the first
+   resource. Currently inlined in `main()`; pulling it into a helper would
+   make it unit-testable.
+3. **`fetch_new_media_instagrapi` cursor walk** — verify the
+   "stop when ts <= since_ts" logic with a fake paginated client.
