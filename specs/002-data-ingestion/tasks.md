@@ -75,7 +75,7 @@
 
 - [x] T023 [P] [US2] Create backend/app/api/trips.py with GET /trips handler (reverse-chronological by start_date, optional status filter: active/completed/upcoming derived from dates vs. today) and GET /trips/:id handler (returns full trip with nested stops and each stop's post data using a join query; returns 404 if trip not found)
 - [x] T024 [P] [US2] Create backend/app/api/stops.py with GET /stops handler supporting all query filters from contracts/api.md: trip_id, status, region_code, post_type, after (date ≥), before (date ≤)
-- [ ] T025 [P] [US2] Create backend/app/api/posts.py with GET /instagram-posts handler (filters: stop_id, after timestamp, before timestamp) and GET /substack-posts handler (same filters; only return rows where stop_id IS NOT NULL)
+- [x] T025 [P] [US2] Create backend/app/api/posts.py with GET /instagram-posts handler (filters: stop_id, after timestamp, before timestamp) and GET /substack-posts handler (same filters; only return rows where stop_id IS NOT NULL)
 - [ ] T026 [US2] Register all read routers (trips, stops, posts) in backend/app/main.py with appropriate prefixes
 - [ ] T027 [US2] Implement structured error responses in all route handlers: `{"error": "...", "detail": "..."}` for 404 (trip/stop not found), 422 (invalid query params), 500 (unexpected); ensure no stack traces or internal identifiers leak (FR-033)
 - [ ] T052 [US2] Create backend/tests/conftest.py with pytest-asyncio configuration (asyncio_mode = "auto") and an async `client` fixture using `httpx.AsyncClient` with the FastAPI app; override `get_db` to yield an `AsyncMock` that returns controlled query results; add factory helpers that build realistic mock Trip, Stop, InstagramPost, and SubstackPost objects for reuse across unit test modules
