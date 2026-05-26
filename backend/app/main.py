@@ -11,6 +11,9 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
+from app.api.posts import router as posts_router
+from app.api.stops import router as stops_router
+from app.api.trips import router as trips_router
 from app.config import settings
 from app.ingestion.scheduler import scheduler
 
@@ -83,6 +86,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ── Routers ───────────────────────────────────────────────────────────────────
+
+app.include_router(trips_router)
+app.include_router(stops_router)
+app.include_router(posts_router)
 
 
 # ── Error handlers ────────────────────────────────────────────────────────────
