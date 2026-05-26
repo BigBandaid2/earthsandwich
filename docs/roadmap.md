@@ -24,6 +24,31 @@ The more serious **Data Unification** work was started and paused due to spirali
 
 ---
 
+## Specs
+
+Sorted by Purpose, then logical sequence within each Purpose. Italicized rows are planned (not yet formalized).
+
+| Spec | Epic | Purpose | Scope (summary) | Trigger | Reference |
+|---|---|---|---|---|---|
+| `001-world-travelogue` | [OCS-11](https://datacommlab.atlassian.net/browse/OCS-11) | 1 | Front-end UX for read-only browsing of trip history and plans; wiring to the 002 backend now in progress. | 2026-04 — initial build of a basic front-end-only demo app. | [↓](#001-world-travelogue) |
+| `002-database-backend` | [OCS-73](https://datacommlab.atlassian.net/browse/OCS-73) | 1 | Travelogue DB, REST read API, full-app containerization. (Write paths — MCP + user-editing interface + trip import — live in the MCP + user input spec below.) | 2026-05 — hardcoded scope outgrown; recurring Instagram ingestion made static JSON impractical. | [↓](#002-database-backend) |
+| `004-test-and-cicd` | — | 2 | Project-wide test suite + GitHub Actions (per-PR unit lane, nightly integration lane) + deployment / domain pipeline (TLS, secrets, log aggregation; references [OCS-69](https://datacommlab.atlassian.net/browse/OCS-69)). Kernel in `scripts/instagram-fetch-latest/tests/`. | Next sprint or two. | [↓](#004-test-and-cicd) |
+| _MCP + user input interface_ | — | 2 | All Travelogue write paths: LLM CRUD via an MCP server (references [OCS-71](https://datacommlab.atlassian.net/browse/OCS-71)), a user-facing editing UI for trips/stops, and finalized-itinerary import from chat (the workflow that supersedes the dropped Festivals spec). | When LLM-based trip authoring or hands-on trip editing becomes a real need. | [↓](#mcp--user-input-interface) |
+| `003-ingestion-pipeline` | [OCS-74](https://datacommlab.atlassian.net/browse/OCS-74) | 3 (App 1) | Standalone, source-specific raw-data pipelines feeding the raw data pile. See reference for detail. | 2026-05 — split from 002 to isolate ingestion / pile concerns from the production app's DB. | [↑ App 1](#app-1---raw-data-pile-input-for-data-unification) |
+
+A planned spec graduates by running `/speckit.specify <slug>` once its trigger fires; at that point its Epic is filled in and the Trigger column updates to a backward-looking date + justification.
+
+### Boundary rules
+
+- **001 owns the UI and the in-repo data shapes** (`Stop`, `Trip`, `Region` types, regions list). It does *not* own persistence or fetching.
+- **002 owns persistence, the read API, and containerization**. It does *not* own ingestion, the UI, or any write paths.
+- **003 owns automated content ingestion only** — writes rows into the raw-data DB (independent of the Travelogue app's production DB). It does *not* expose HTTP endpoints or change the UI.
+- **MCP + user input interface (planned)** owns the write paths: LLM CRUD via MCP, user-facing trip/stop editor, finalized-itinerary import. Backed by 002's persistence; orthogonal to 003's ingestion.
+
+When work is ambiguous between specs (e.g. a new stop type), default to whichever spec owns the *primary* surface area; document the cross-spec dependency in the spec that depends on it. Phase numbering preserves history across splits (see the 002 → 002+003 split on 2026-05-22).
+
+---
+
 ## Purpose 3 — Data Unification outline
 
 > Transcription of `docs/images/data-unification-outline.jpeg` (handwritten notebook page). From data Unification perspective there are 4 distinct apps.
@@ -79,38 +104,6 @@ The more serious **Data Unification** work was started and paused due to spirali
 
 This is the downstream app / operating user that we are meant to serve. This owner of this app outlines what they need and Data Unification (DU) is meant to help them extract it out of the dog pile, clean it up, and present it as a push data export or queryable end-point.
 
-In addition to a creating a clean, query-able data source. DU will also provide:
-
-- **Cost Visibility and Allocation**, both for the consumer and provider of the data. Create an internal marketplace for data, and build the foundations for DU to evolve into a 3rd party marketplace and purveyor of data.
-- **Data Quality Quantified** - Certain data sets will be marked as base truth for a particular slice/node of data. All other nodes will inherit a degree of credibility based on their variance and distance from these base truth nodes. Provide source trace for any delivered data point.
-- **Searchable Data Dictionary** - AI assisted dataset curation, what do I want to do and what datasets might help me do it? Ideally both within the pile and beyond. Crawl data catalogues, inventories, contracts, internet. Guidance for new data acquisition and on-boarding.
-
----
-
-## Specs
-
-Sorted by Purpose, then logical sequence within each Purpose. Italicized rows are planned (not yet formalized).
-
-| Spec | Epic | Purpose | Scope (summary) | Trigger | Reference |
-|---|---|---|---|---|---|
-| `001-world-travelogue` | [OCS-11](https://datacommlab.atlassian.net/browse/OCS-11) | 1 | Front-end UX for read-only browsing of trip history and plans; wiring to the 002 backend now in progress. | 2026-04 — initial build of a basic front-end-only demo app. | [↓](#001-world-travelogue) |
-| `002-database-backend` | [OCS-73](https://datacommlab.atlassian.net/browse/OCS-73) | 1 | Relational DB, REST API, MCP, basic user-editing interface for trips/stops, full-app containerization. | 2026-05 — hardcoded scope outgrown; recurring Instagram ingestion made static JSON impractical. | [↓](#002-database-backend) |
-| _Festivals trip mode_ | — | 1 | Trip variant where stops cluster around named events rather than chronology. | When a festivals-shaped use case starts feeling real. | [↓](#festivals-trip-mode) |
-| _Deployment + domain_ | — | 1 | Domain pointing, TLS, secrets, log aggregation, deploy pipeline. References [OCS-69](https://datacommlab.atlassian.net/browse/OCS-69). | When the first prod-bound code lands. | [↓](#deployment--domain) |
-| `004-test-and-cicd` | — | 2 | Project-wide test suite + GitHub Actions (per-PR unit lane, nightly integration lane). Kernel in `scripts/instagram-fetch-latest/tests/`. | Next sprint or two. | [↓](#004-test-and-cicd) |
-| _MCP for trip / stop CRUD_ | — | 2 | LLM read + write of trips/stops via an MCP server backed by 002's API. References [OCS-71](https://datacommlab.atlassian.net/browse/OCS-71). Possibly subsumed by 002's MCP scope; revisit when LLM-authoring becomes a real need. | When LLM-based trip authoring becomes a real need. | [↓](#mcp-for-trip--stop-crud) |
-| `003-ingestion-pipeline` | [OCS-74](https://datacommlab.atlassian.net/browse/OCS-74) | 3 (App 1) | Standalone, source-specific raw-data pipelines feeding the raw data pile. See reference for detail. | 2026-05 — split from 002 to isolate ingestion / pile concerns from the production app's DB. | [↑ App 1](#app-1---raw-data-pile-input-for-data-unification) |
-
-A planned spec graduates by running `/speckit.specify <slug>` once its trigger fires; at that point its Epic is filled in and the Trigger column updates to a backward-looking date + justification.
-
-### Boundary rules
-
-- **001 owns the UI and the in-repo data shapes** (`Stop`, `Trip`, `Region` types, regions list). It does *not* own persistence or fetching.
-- **002 owns persistence and the read/write API**. It does *not* own ingestion or UI.
-- **003 owns automated content ingestion only** — writes rows into the raw-data DB (independent of the Travelogue app's production DB). It does *not* expose HTTP endpoints or change the UI.
-
-When work is ambiguous between specs (e.g. a new stop type), default to whichever spec owns the *primary* surface area; document the cross-spec dependency in the spec that depends on it. Phase numbering preserves history across splits (see the 002 → 002+003 split on 2026-05-22).
-
 ---
 
 ## Spec references
@@ -121,23 +114,19 @@ _Placeholder — to be expanded._ Purpose 1 (Travelogue). Originally a read-only
 
 ### 002-database-backend
 
-_Placeholder — to be expanded._ Purpose 1 (Travelogue). Backend + persistence + editing surface that 001 reads from. Includes containerization for full-app packaging.
+_Placeholder — to be expanded._ Purpose 1 (Travelogue). Backend persistence + read API + full-app containerization. 001 reads from it; 003 writes raw-pile rows into its own DB (not 002's). All Travelogue write paths — user editing, LLM CRUD, finalized-itinerary import from chat — live in the MCP + user input interface spec, not here.
 
 ### 004-test-and-cicd
 
-_Placeholder — to be written when the spec is formalized._ Purpose 2 (AI-driven dev experiment). Project-wide test suite organization + CI/CD workflows.
+_Placeholder — to be written when the spec is formalized._ Purpose 2 (AI-driven dev experiment). Project-wide test suite organization + CI/CD workflows. Also absorbs the production deployment pipeline (domain pointing, TLS, secrets, log aggregation — what was previously the "Deployment + domain" planned spec) since the same infrastructure / GitHub Actions surface owns both.
 
-### MCP for trip / stop CRUD
+### MCP + user input interface
 
-_Placeholder — to be written when the spec is formalized._ Purpose 2 (AI-driven dev experiment). LLM-targeted CRUD interface backed by 002's API.
+_Placeholder — to be written when the spec is formalized._ Purpose 2 (AI-driven dev experiment). One spec covering all Travelogue write paths so 002 stays read-only:
 
-### Festivals trip mode
-
-_Placeholder — to be written when the spec is formalized._ Purpose 1 (Travelogue). Trip variant clustered around named events.
-
-### Deployment + domain
-
-_Placeholder — to be written when the spec is formalized._ Purpose 1 (Travelogue). Production deploy pipeline + domain pointing.
+- **LLM CRUD via MCP** — an MCP server backed by 002's read API (write side added here), letting Claude / other LLMs read and modify trips, stops, posts. References [OCS-71](https://datacommlab.atlassian.net/browse/OCS-71).
+- **User-facing editor UI** — hands-on trip/stop editing surface in the front-end for non-LLM workflows.
+- **Finalized-itinerary import** — trip research and planning happens outside Travelogue (chat, notes, other tools); the resulting multi-stop itinerary is imported into the Travelogue DB via this interface. Subsumes what was previously sketched as the "Festivals trip mode" spec.
 
 ---
 
