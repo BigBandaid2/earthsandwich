@@ -73,11 +73,15 @@
 
 **Independent Test**: Start backend with `uvicorn app.main:app --reload`; run all curl commands from quickstart.md section 8; verify response shapes match contracts/api.md exactly. Test invalid trip id → 404. Test invalid filter value → 422.
 
-- [ ] T023 [P] [US2] Create backend/app/api/trips.py with GET /trips handler (reverse-chronological by start_date, optional status filter: active/completed/upcoming derived from dates vs. today) and GET /trips/:id handler (returns full trip with nested stops and each stop's post data using a join query; returns 404 if trip not found)
+- [x] T023 [P] [US2] Create backend/app/api/trips.py with GET /trips handler (reverse-chronological by start_date, optional status filter: active/completed/upcoming derived from dates vs. today) and GET /trips/:id handler (returns full trip with nested stops and each stop's post data using a join query; returns 404 if trip not found)
 - [ ] T024 [P] [US2] Create backend/app/api/stops.py with GET /stops handler supporting all query filters from contracts/api.md: trip_id, status, region_code, post_type, after (date ≥), before (date ≤)
 - [ ] T025 [P] [US2] Create backend/app/api/posts.py with GET /instagram-posts handler (filters: stop_id, after timestamp, before timestamp) and GET /substack-posts handler (same filters; only return rows where stop_id IS NOT NULL)
 - [ ] T026 [US2] Register all read routers (trips, stops, posts) in backend/app/main.py with appropriate prefixes
 - [ ] T027 [US2] Implement structured error responses in all route handlers: `{"error": "...", "detail": "..."}` for 404 (trip/stop not found), 422 (invalid query params), 500 (unexpected); ensure no stack traces or internal identifiers leak (FR-033)
+- [ ] T052 [US2] Create backend/tests/conftest.py with pytest-asyncio configuration (asyncio_mode = "auto") and an async `client` fixture using `httpx.AsyncClient` with the FastAPI app; override `get_db` to yield an `AsyncMock` that returns controlled query results; add factory helpers that build realistic mock Trip, Stop, InstagramPost, and SubstackPost objects for reuse across unit test modules
+- [ ] T053 [P] [US2] Write backend/tests/unit/api/test_trips.py: test GET /trips returns 200 with trips sorted reverse-chronologically by start_date; test `status=active`, `status=completed`, and `status=upcoming` each return only matching trips; test GET /trips/:id returns 200 with nested stops where `post` is `InstagramPostResponse` for instagram stops, `SubstackPostResponse` for substack stops, and null for planned stops; test GET /trips/:id returns 404 with `{"error": "Not Found", ...}` for an unknown id
+- [ ] T054 [P] [US2] Write backend/tests/unit/api/test_stops.py: test GET /stops with no filters returns 200 with all stops; test each query param (trip_id, status, region_code, post_type, after, before) filters results correctly in isolation; test combined filters narrow results correctly; verify response items do not include a `post` field
+- [ ] T055 [P] [US2] Write backend/tests/unit/api/test_posts.py: test GET /instagram-posts returns 200; test stop_id, after, and before query params each filter correctly; test GET /substack-posts returns only rows where stop_id IS NOT NULL; test stop_id, after, and before query params filter substack posts correctly
 
 **Checkpoint**: US1 + US2 complete — frontend can query trips, stops, and posts from the database; validate with quickstart.md section 8.
 
@@ -188,7 +192,8 @@
 
 - T003, T004, T005 in Phase 1: all parallel (different files); T002 is sequential (filesystem move)
 - T007, T010, T011, T012, T016, T017, T018 in Phase 2: all parallel (different files)
-- T023, T024, T025 in US2: all parallel (different files)
+- T023, T024, T025 in US2: all parallel (different files); T052 (conftest) must precede T053, T054, T055
+- T053, T054, T055 in US2: all parallel after T052 (different test files)
 - T037, T038, T039 in US4: all parallel (T040 waits on T037)
 - T044, T045 in US6: parallel (different Dockerfiles)
 - T048, T049, T050 in Polish: all parallel
@@ -210,6 +215,15 @@ Task T012: Create backend/app/models/substack_post.py
 Task T023: Create backend/app/api/trips.py (GET /trips, GET /trips/:id)
 Task T024: Create backend/app/api/stops.py (GET /stops)
 Task T025: Create backend/app/api/posts.py (GET /instagram-posts, GET /substack-posts)
+```
+
+### US2 Unit Tests (T052 first, then T053–T055 parallel):
+```
+Task T052: Create backend/tests/conftest.py  ← first (test infrastructure)
+Then in parallel:
+Task T053: Write backend/tests/unit/api/test_trips.py
+Task T054: Write backend/tests/unit/api/test_stops.py
+Task T055: Write backend/tests/unit/api/test_posts.py
 ```
 
 ### US4 Write Endpoints (T037 must complete first, then T038+T039 parallel):
