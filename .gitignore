@@ -47,5 +47,4 @@ htmlcov/
 .specify/extensions/jira/jira-config.local.yml
 
 # Strategic / private docs — not for the public repo.
-docs/roadmap.md
-docs/images/
+docs/du-vision.md
