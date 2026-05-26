@@ -32,9 +32,9 @@ Sorted by Purpose, then logical sequence within each Purpose. Italicized rows ar
 |---|---|---|---|---|---|
 | `001-world-travelogue` | [OCS-11](https://datacommlab.atlassian.net/browse/OCS-11) | 1 | Front-end UX for read-only browsing of trip history and plans; wiring to the 002 backend now in progress. | 2026-04 — initial build of a basic front-end-only demo app. | [↓](#001-world-travelogue) |
 | `002-database-backend` | [OCS-73](https://datacommlab.atlassian.net/browse/OCS-73) | 1 | Travelogue DB, REST read API, full-app containerization. (Write paths — MCP + user-editing interface + trip import — live in the MCP + user input spec below.) | 2026-05 — hardcoded scope outgrown; recurring Instagram ingestion made static JSON impractical. | [↓](#002-database-backend) |
+| _MCP + user input interface_ | — | 1 | All Travelogue write paths: LLM CRUD via an MCP server (references [OCS-71](https://datacommlab.atlassian.net/browse/OCS-71)), a user-facing editing UI for trips/stops, and finalized-itinerary import from chat (the workflow that supersedes the dropped Festivals spec). | When LLM-based trip authoring or hands-on trip editing becomes a real need. | [↓](#mcp--user-input-interface) |
 | `004-test-and-cicd` | — | 2 | Project-wide test suite + GitHub Actions (per-PR unit lane, nightly integration lane) + deployment / domain pipeline (TLS, secrets, log aggregation; references [OCS-69](https://datacommlab.atlassian.net/browse/OCS-69)). Kernel in `scripts/instagram-fetch-latest/tests/`. | Next sprint or two. | [↓](#004-test-and-cicd) |
-| _MCP + user input interface_ | — | 2 | All Travelogue write paths: LLM CRUD via an MCP server (references [OCS-71](https://datacommlab.atlassian.net/browse/OCS-71)), a user-facing editing UI for trips/stops, and finalized-itinerary import from chat (the workflow that supersedes the dropped Festivals spec). | When LLM-based trip authoring or hands-on trip editing becomes a real need. | [↓](#mcp--user-input-interface) |
-| `003-ingestion-pipeline` | [OCS-74](https://datacommlab.atlassian.net/browse/OCS-74) | 3 (App 1) | Standalone, source-specific raw-data pipelines feeding the raw data pile. See reference for detail. | 2026-05 — split from 002 to isolate ingestion / pile concerns from the production app's DB. | [↑ App 1](#app-1---raw-data-pile-input-for-data-unification) |
+| `003-ingestion-pipeline` | [OCS-74](https://datacommlab.atlassian.net/browse/OCS-74) | 3 (App 1) | Standalone, source-specific raw-data pipelines feeding the raw data pile. See reference for detail. | 2026-05 — split from 002 to isolate ingestion / pile concerns from the production app's DB. | [↓ App 1](#app-1---raw-data-pile-input-for-data-unification) |
 
 A planned spec graduates by running `/speckit.specify <slug>` once its trigger fires; at that point its Epic is filled in and the Trigger column updates to a backward-looking date + justification.
 
@@ -116,17 +116,17 @@ _Placeholder — to be expanded._ Purpose 1 (Travelogue). Originally a read-only
 
 _Placeholder — to be expanded._ Purpose 1 (Travelogue). Backend persistence + read API + full-app containerization. 001 reads from it; 003 writes raw-pile rows into its own DB (not 002's). All Travelogue write paths — user editing, LLM CRUD, finalized-itinerary import from chat — live in the MCP + user input interface spec, not here.
 
-### 004-test-and-cicd
-
-_Placeholder — to be written when the spec is formalized._ Purpose 2 (AI-driven dev experiment). Project-wide test suite organization + CI/CD workflows. Also absorbs the production deployment pipeline (domain pointing, TLS, secrets, log aggregation — what was previously the "Deployment + domain" planned spec) since the same infrastructure / GitHub Actions surface owns both.
-
 ### MCP + user input interface
 
-_Placeholder — to be written when the spec is formalized._ Purpose 2 (AI-driven dev experiment). One spec covering all Travelogue write paths so 002 stays read-only:
+_Placeholder — to be written when the spec is formalized._ Purpose 1 (Travelogue). One spec covering all Travelogue write paths so 002 stays read-only:
 
 - **LLM CRUD via MCP** — an MCP server backed by 002's read API (write side added here), letting Claude / other LLMs read and modify trips, stops, posts. References [OCS-71](https://datacommlab.atlassian.net/browse/OCS-71).
 - **User-facing editor UI** — hands-on trip/stop editing surface in the front-end for non-LLM workflows.
 - **Finalized-itinerary import** — trip research and planning happens outside Travelogue (chat, notes, other tools); the resulting multi-stop itinerary is imported into the Travelogue DB via this interface. Subsumes what was previously sketched as the "Festivals trip mode" spec.
+
+### 004-test-and-cicd
+
+_Placeholder — to be written when the spec is formalized._ Purpose 2 (AI-driven dev experiment). Project-wide test suite organization + CI/CD workflows. Also absorbs the production deployment pipeline (domain pointing, TLS, secrets, log aggregation — what was previously the "Deployment + domain" planned spec) since the same infrastructure / GitHub Actions surface owns both.
 
 ---
 
