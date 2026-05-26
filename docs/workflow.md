@@ -25,9 +25,9 @@ Roughly once per week, the Team Lead is responsible for grasping the current sta
 
 ### After Weekly Team Meeting
 
-8. **Create New Sprint Plan** - Create new sprint plan via Jira tickets or directly
-9. **Push to JIRA** — any phases newly decided in the meeting become new Stories in OCS, placed in the current sprint for velocity attribution. (Drift-discovered phases were already synced in step 3.)
-10. **Link user-created tickets to spec-kit equivalents** — `Duplicate` for 1-to-1 parallels, `Relates` otherwise (see [§JIRA sync](#jira-sync)).
+8. **Link related tickets** — `Duplicate` for 1-to-1 parallels with a spec-kit Story, `Blocks` for prerequisite dependencies between tickets, `Relates` for everything else (see [§JIRA sync](#jira-sync)).
+9. **Create New Sprint Plan** - Create new sprint plan via Jira tickets or directly
+10. **Push to JIRA** — any phases newly decided in the meeting become new Stories in OCS, placed in the current sprint for velocity attribution. (Drift-discovered phases were already synced in step 3.)
 11. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
 12. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
 
@@ -121,8 +121,11 @@ JIRA accumulates two kinds of issues: those produced by `/speckit.jira.specstois
 
 Convention:
 - **`Duplicate`** link when the user ticket and spec-kit Story describe the same work 1-to-1. Direction: the user ticket *duplicates* the spec-kit Story (`outwardIssue` = user ticket, `inwardIssue` = spec-kit Story).
-- **`Relates`** link when the user ticket is a spike, prerequisite, or tangentially related (e.g. a webfetch-blocking spike whose outcome was the instagrapi pivot).
-- **Don't touch the Subtasks attached to spec-kit Stories** — those are managed by the speckit-jira agents. Linking happens at the user-ticket level only.
+- **`Blocks`** link when one ticket must finish before another can start (cross-ticket dependency, in either direction — spec-kit ↔ user, spec-kit ↔ spec-kit, or user ↔ user). Direction: `inwardIssue` = the blocker, `outwardIssue` = the blocked ticket (so "A is blocked by B" → `inwardIssue: B, outwardIssue: A`). Surface these at planning so blocked work doesn't get committed before its prereq.
+- **`Relates`** link when the connection is tangential — a spike whose outcome shaped another story, a follow-on idea, historical context (e.g. a webfetch-blocking spike whose outcome was the instagrapi pivot).
+- **Don't touch the Subtasks attached to spec-kit Stories** — those are managed by the speckit-jira agents. Linking happens at the user-ticket / Story level only.
+
+This OCS workflow has only `To Do` / `In Progress` / `Done` — no `Blocked` status. The `Blocks` link is the canonical record of a dependency; the blocked ticket stays in `To Do` (or `In Progress` if partial work has shipped) until the blocker clears.
 
 True close-cascade requires a Parent-Subtask relationship, which would mean converting the user ticket's issue type. That's out of scope for the weekly cadence; manually close the duplicate when the spec-kit Story closes (or leave it for next-week reconciliation).
 
