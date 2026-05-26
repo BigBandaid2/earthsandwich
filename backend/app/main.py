@@ -5,6 +5,7 @@ import structlog
 import structlog.stdlib
 import structlog.dev
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -99,7 +100,16 @@ app.include_router(posts_router)
 
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc: Exception) -> JSONResponse:
-    return JSONResponse(status_code=404, content={"error": "Not Found", "detail": str(exc)})
+    detail = getattr(exc, "detail", "Not found.")
+    return JSONResponse(status_code=404, content={"error": "Not Found", "detail": detail})
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    return JSONResponse(
+        status_code=422,
+        content={"error": "Unprocessable Entity", "detail": "Invalid request parameters."},
+    )
 
 
 @app.exception_handler(500)
