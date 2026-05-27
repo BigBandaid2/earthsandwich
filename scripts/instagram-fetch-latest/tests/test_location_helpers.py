@@ -7,7 +7,7 @@ every PR push and in pre-commit hooks.
 What they cover:
   - `get_region_only_via_claude` sanitizing Claude's reply into a 3-letter
     IATA code (or empty string) — the FR-019 tagged-path tail.
-  - `get_location_via_claude` parsing JSON responses, including markdown-
+  - `infer_post_location` parsing JSON responses, including markdown-
     fenced variants Claude occasionally returns despite the prompt — the
     FR-020 inferred path.
   - Image inclusion semantics: included for IMAGE posts with a real file,
@@ -24,10 +24,10 @@ from unittest.mock import MagicMock
 import pytest
 
 import load_posts_tsv
-from load_posts_tsv import get_location_via_claude, get_region_only_via_claude
+from load_posts_tsv import infer_post_location, canonicalize_tagged_location
 
 
-def _claude_response(text: str) -> MagicMock:
+def _mock_response(text: str) -> MagicMock:
     """Build a fake Anthropic API response with the given text content."""
     block = MagicMock()
     block.text = text
@@ -48,75 +48,113 @@ def mock_anthropic_client(monkeypatch):
 
 
 # ---------------------------------------------------------------------------
-# get_region_only_via_claude — FR-019 tail
+# canonicalize_tagged_location — FR-019 tail (canonical name + IATA in one call)
 # ---------------------------------------------------------------------------
 
-class TestGetRegionOnlyViaClaude:
-    def test_returns_clean_iata_code(self, mock_anthropic_client):
-        mock_anthropic_client.messages.create.return_value = _claude_response("MEX")
-        assert get_region_only_via_claude("Mexico City", "19.43", "-99.13") == "MEX"
+class TestCanonicalizeTaggedLocation:
+    VALID_JSON = '{"canonical_name":"Alki Beach Park, Seattle, USA","region":"SEA"}'
+    PARSED = ("Alki Beach Park, Seattle, USA", "SEA", "")
 
-    def test_uppercases_lowercase_response(self, mock_anthropic_client):
-        mock_anthropic_client.messages.create.return_value = _claude_response("jfk")
-        assert get_region_only_via_claude("New York", "40.75", "-73.99") == "JFK"
+    def test_parses_clean_json(self, mock_anthropic_client):
+        mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
+        assert canonicalize_tagged_location("Alki Beach Park", "47.58", "-122.41") == self.PARSED
 
-    def test_strips_whitespace(self, mock_anthropic_client):
-        mock_anthropic_client.messages.create.return_value = _claude_response("  CDG  ")
-        assert get_region_only_via_claude("Paris", "48.85", "2.35") == "CDG"
-
-    def test_strips_punctuation(self, mock_anthropic_client):
-        mock_anthropic_client.messages.create.return_value = _claude_response("LAX.")
-        assert get_region_only_via_claude("Los Angeles", "34.05", "-118.24") == "LAX"
-
-    def test_returns_empty_on_verbose_response(self, mock_anthropic_client):
-        """When Claude refuses the format and writes a sentence, fail closed."""
-        mock_anthropic_client.messages.create.return_value = _claude_response(
-            "I'm not sure which airport applies"
+    def test_lowercased_region_is_uppercased_and_validated(self, mock_anthropic_client):
+        mock_anthropic_client.messages.create.return_value = _mock_response(
+            '{"canonical_name":"Paris, France","region":"cdg"}'
         )
-        assert get_region_only_via_claude("Nowhere", "0", "0") == ""
+        result = canonicalize_tagged_location("Paris", "48.85", "2.35")
+        assert result == ("Paris, France", "CDG", "")
 
-    def test_returns_empty_on_too_short_response(self, mock_anthropic_client):
-        mock_anthropic_client.messages.create.return_value = _claude_response("X")
-        assert get_region_only_via_claude("X", "0", "0") == ""
+    def test_punctuated_region_is_stripped(self, mock_anthropic_client):
+        mock_anthropic_client.messages.create.return_value = _mock_response(
+            '{"canonical_name":"Los Angeles, USA","region":"LAX."}'
+        )
+        result = canonicalize_tagged_location("LA", "34.05", "-118.24")
+        assert result == ("Los Angeles, USA", "LAX", "")
 
-    def test_returns_empty_on_empty_response(self, mock_anthropic_client):
-        mock_anthropic_client.messages.create.return_value = _claude_response("")
-        assert get_region_only_via_claude("Unknown", "", "") == ""
+    def test_typo_in_tag_gets_corrected_when_canonicalize_does(self, mock_anthropic_client):
+        """Passes the typo through to the model; the test mocks the canonical
+        form. Real correction quality is exercised by the integration test."""
+        mock_anthropic_client.messages.create.return_value = _mock_response(
+            '{"canonical_name":"Oaxaca City, Oaxaca, Mexico","region":"OAX"}'
+        )
+        result = canonicalize_tagged_location("Oxaca", "17.06", "-96.72")
+        assert result == ("Oaxaca City, Oaxaca, Mexico", "OAX", "")
+
+    def test_empty_canonical_name_returns_empty(self, mock_anthropic_client):
+        """All-empty JSON (Claude couldn't determine anything) → empty fields.
+        Callers fall back to the verbatim tag in that case."""
+        mock_anthropic_client.messages.create.return_value = _mock_response(
+            '{"canonical_name":"","region":""}'
+        )
+        assert canonicalize_tagged_location("???", "", "") == ("", "", "")
+
+    def test_invalid_region_format_is_blanked(self, mock_anthropic_client):
+        """A region that isn't a clean 3-letter code is rejected — better empty
+        than wrong. Canonical name still passes through."""
+        mock_anthropic_client.messages.create.return_value = _mock_response(
+            '{"canonical_name":"Somewhere, Country","region":"NOT-VALID"}'
+        )
+        assert canonicalize_tagged_location("X", "0", "0") == ("Somewhere, Country", "", "")
 
     def test_returns_empty_when_api_raises(self, mock_anthropic_client):
         mock_anthropic_client.messages.create.side_effect = RuntimeError("rate limit")
-        assert get_region_only_via_claude("Anywhere", "0", "0") == ""
+        assert canonicalize_tagged_location("Anywhere", "0", "0") == ("", "", "")
+
+    def test_returns_empty_on_unparseable_response(self, mock_anthropic_client):
+        """When Claude writes prose with no JSON at all, both fields blank and
+        the prose is surfaced as reasoning."""
+        mock_anthropic_client.messages.create.return_value = _mock_response(
+            "I'm not sure where this is"
+        )
+        canonical, region, reasoning = canonicalize_tagged_location("???", "0", "0")
+        assert canonical == ""
+        assert region == ""
+        assert "I'm not sure" in reasoning
 
     def test_does_not_send_image(self, mock_anthropic_client):
-        """The text-only IATA call must not include an image — coordinates
-        and name are authoritative under FR-019, so vision isn't needed."""
-        mock_anthropic_client.messages.create.return_value = _claude_response("MEX")
-        get_region_only_via_claude("Mexico City", "19.43", "-99.13")
+        """The canonicalize call is text-only — coordinates and the verbatim
+        tag are authoritative, no vision required."""
+        mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
+        canonicalize_tagged_location("Alki Beach Park", "47.58", "-122.41")
         messages = mock_anthropic_client.messages.create.call_args.kwargs["messages"]
-        # `content` is a plain string here, not a list with image blocks.
         assert isinstance(messages[0]["content"], str)
 
-    def test_prompt_includes_location_and_coords(self, mock_anthropic_client):
+    def test_prompt_includes_verbatim_tag_and_coords(self, mock_anthropic_client):
         """Sanity check that the prompt carries the inputs Claude needs."""
-        mock_anthropic_client.messages.create.return_value = _claude_response("MEX")
-        get_region_only_via_claude("Mexico City", "19.43", "-99.13")
+        mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
+        canonicalize_tagged_location("Oxaca", "17.06", "-96.72")
         prompt = mock_anthropic_client.messages.create.call_args.kwargs["messages"][0]["content"]
-        assert "Mexico City" in prompt
-        assert "19.43" in prompt
-        assert "-99.13" in prompt
+        assert "Oxaca" in prompt
+        assert "17.06" in prompt
+        assert "-96.72" in prompt
+
+    def test_extracts_json_from_prose_preamble(self, mock_anthropic_client):
+        """Regression: Claude sometimes writes reasoning prose before the
+        JSON. The parser must skip the prose and parse the trailing object,
+        and preserve the prose as `reasoning`."""
+        mock_anthropic_client.messages.create.return_value = _mock_response(
+            "Looking at the lat/lng, this is clearly in Mexico City.\n\n"
+            '{"canonical_name":"Mexico City, Mexico","region":"MEX"}'
+        )
+        canonical, region, reasoning = canonicalize_tagged_location("Mexico City", "19.43", "-99.13")
+        assert canonical == "Mexico City, Mexico"
+        assert region == "MEX"
+        assert "Looking at the lat/lng" in reasoning
 
 
 # ---------------------------------------------------------------------------
-# get_location_via_claude — FR-020 inferred path
+# infer_post_location — FR-020 inferred path
 # ---------------------------------------------------------------------------
 
-class TestGetLocationViaClaude:
+class TestInferPostLocation:
     VALID_JSON = '{"location":"Paris","lat":"48.8566","lng":"2.3522","region":"CDG"}'
-    PARSED = ("Paris", "48.8566", "2.3522", "CDG")
+    PARSED = ("Paris", "48.8566", "2.3522", "CDG", "")  # 5th slot = reasoning, empty when no prose
 
     def test_parses_clean_json(self, mock_anthropic_client):
-        mock_anthropic_client.messages.create.return_value = _claude_response(self.VALID_JSON)
-        result = get_location_via_claude(
+        mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
+        result = infer_post_location(
             caption="Eiffel views", local_media_path="", media_type="IMAGE", recent_locations=[]
         )
         assert result == self.PARSED
@@ -125,49 +163,76 @@ class TestGetLocationViaClaude:
         """Regression: Claude sometimes wraps the JSON in ```json fences
         despite the prompt asking not to. The parser must tolerate this."""
         wrapped = f"```json\n{self.VALID_JSON}\n```"
-        mock_anthropic_client.messages.create.return_value = _claude_response(wrapped)
-        result = get_location_via_claude(
+        mock_anthropic_client.messages.create.return_value = _mock_response(wrapped)
+        result = infer_post_location(
             caption="x", local_media_path="", media_type="IMAGE", recent_locations=[]
         )
         assert result == self.PARSED
 
     def test_strips_plain_code_fences(self, mock_anthropic_client):
         wrapped = f"```\n{self.VALID_JSON}\n```"
-        mock_anthropic_client.messages.create.return_value = _claude_response(wrapped)
-        result = get_location_via_claude(
+        mock_anthropic_client.messages.create.return_value = _mock_response(wrapped)
+        result = infer_post_location(
             caption="x", local_media_path="", media_type="IMAGE", recent_locations=[]
         )
         assert result == self.PARSED
 
+    def test_extracts_json_from_prose_preamble(self, mock_anthropic_client):
+        """Regression for the prose-preamble bug found during the @ourearthsandwich
+        from-scratch scrape (23 rows affected). Claude sometimes writes
+        reasoning before the JSON object — the parser must skip the prose,
+        parse the JSON, and preserve the prose as `reasoning`."""
+        response = (
+            "Looking at the evidence:\n\n"
+            "1. The boarding pass is from Virgin America, Flight VX 23\n"
+            "2. The destination appears to be Los Angeles (LAX)\n\n"
+            "The person is at JFK Airport, departing from New York.\n\n"
+            '{"location":"JFK Airport, Queens, NY, USA","lat":"40.6413","lng":"-73.7781","region":"JFK"}'
+        )
+        mock_anthropic_client.messages.create.return_value = _mock_response(response)
+        location, lat, lng, region, reasoning = infer_post_location(
+            caption="adios", local_media_path="", media_type="IMAGE", recent_locations=[]
+        )
+        assert location == "JFK Airport, Queens, NY, USA"
+        assert lat == "40.6413"
+        assert lng == "-73.7781"
+        assert region == "JFK"
+        assert "Looking at the evidence" in reasoning
+        assert "Virgin America" in reasoning
+
     def test_falls_back_to_raw_text_on_invalid_json(self, mock_anthropic_client):
-        """When Claude writes prose instead of JSON, the raw text becomes the
-        location name and coords/region stay empty. Documented behavior."""
-        mock_anthropic_client.messages.create.return_value = _claude_response(
+        """When Claude writes prose with no JSON at all, the raw text becomes
+        the location name, coords/region stay empty, and reasoning surfaces
+        the prose."""
+        mock_anthropic_client.messages.create.return_value = _mock_response(
             "I think this is somewhere in France"
         )
-        result = get_location_via_claude(
+        location, lat, lng, region, reasoning = infer_post_location(
             caption="x", local_media_path="", media_type="IMAGE", recent_locations=[]
         )
-        assert result == ("I think this is somewhere in France", "", "", "")
+        assert location == "I think this is somewhere in France"
+        assert lat == lng == region == ""
+        assert "France" in reasoning
 
     def test_handles_empty_string_fields(self, mock_anthropic_client):
-        """All-empty JSON (Claude couldn't determine anything) → all-empty tuple."""
-        mock_anthropic_client.messages.create.return_value = _claude_response(
+        """All-empty JSON (Claude couldn't determine anything) → all-empty tuple
+        with no reasoning preamble."""
+        mock_anthropic_client.messages.create.return_value = _mock_response(
             '{"location":"","lat":"","lng":"","region":""}'
         )
-        result = get_location_via_claude(
+        result = infer_post_location(
             caption="x", local_media_path="", media_type="IMAGE", recent_locations=[]
         )
-        assert result == ("", "", "", "")
+        assert result == ("", "", "", "", "")
 
     def test_includes_image_for_photo_when_file_exists(self, mock_anthropic_client, tmp_path):
         """IMAGE posts with a downloaded media file send the image bytes to
         Claude (vision input)."""
         img = tmp_path / "post.jpg"
         img.write_bytes(b"\xff\xd8\xff" + b"\x00" * 50)  # minimal JPEG header
-        mock_anthropic_client.messages.create.return_value = _claude_response(self.VALID_JSON)
+        mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
 
-        get_location_via_claude(
+        infer_post_location(
             caption="x", local_media_path=str(img), media_type="IMAGE", recent_locations=[]
         )
 
@@ -182,9 +247,9 @@ class TestGetLocationViaClaude:
         Claude's vision API rejects video bytes and we'd waste tokens."""
         vid = tmp_path / "post.mp4"
         vid.write_bytes(b"\x00\x00\x00\x18ftypmp42" + b"\x00" * 100)
-        mock_anthropic_client.messages.create.return_value = _claude_response(self.VALID_JSON)
+        mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
 
-        get_location_via_claude(
+        infer_post_location(
             caption="x", local_media_path=str(vid), media_type="VIDEO", recent_locations=[]
         )
 
@@ -195,9 +260,9 @@ class TestGetLocationViaClaude:
     def test_skips_image_when_file_missing(self, mock_anthropic_client):
         """If the IMAGE download failed earlier (no local file), the call
         still goes out with caption + context only — no image block."""
-        mock_anthropic_client.messages.create.return_value = _claude_response(self.VALID_JSON)
+        mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
 
-        get_location_via_claude(
+        infer_post_location(
             caption="x", local_media_path="/nonexistent/path.jpg",
             media_type="IMAGE", recent_locations=[]
         )
@@ -209,9 +274,9 @@ class TestGetLocationViaClaude:
     def test_includes_recent_locations_in_prompt(self, mock_anthropic_client):
         """The inferred path passes up to RECENT_LOCATION_COUNT recent
         locations as context. They must appear in the prompt text."""
-        mock_anthropic_client.messages.create.return_value = _claude_response(self.VALID_JSON)
+        mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
 
-        get_location_via_claude(
+        infer_post_location(
             caption="x", local_media_path="", media_type="IMAGE",
             recent_locations=["Oaxaca City", "Mexico City", "Puebla"],
         )
@@ -227,9 +292,9 @@ class TestGetLocationViaClaude:
     def test_excludes_empty_recent_locations_from_prompt(self, mock_anthropic_client):
         """Empty entries in the recent list are filtered before formatting
         so they don't produce empty "- " bullets in the prompt."""
-        mock_anthropic_client.messages.create.return_value = _claude_response(self.VALID_JSON)
+        mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
 
-        get_location_via_claude(
+        infer_post_location(
             caption="x", local_media_path="", media_type="IMAGE",
             recent_locations=["", "Tokyo", "", "Kyoto", ""],
         )
@@ -247,9 +312,9 @@ class TestGetLocationViaClaude:
         """Regression: the bias-guard wording prevents Claude from defaulting
         to a recent-context location. Removing it caused the Mexico City =>
         Oaxaca bug. Keep this assertion strict."""
-        mock_anthropic_client.messages.create.return_value = _claude_response(self.VALID_JSON)
+        mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
 
-        get_location_via_claude(
+        infer_post_location(
             caption="x", local_media_path="", media_type="IMAGE",
             recent_locations=["Oaxaca"],
         )
