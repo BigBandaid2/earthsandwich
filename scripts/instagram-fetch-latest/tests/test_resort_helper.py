@@ -12,12 +12,18 @@ Covers:
 
 import csv
 import os
+import time
 from pathlib import Path
 
 import pytest
 
 import load_posts_tsv
-from load_posts_tsv import _resort_tsv_and_rename_media, TSV_COLUMNS
+from load_posts_tsv import (
+    _extract_city_heuristic,
+    _prune_scrape_logs,
+    _resort_tsv_and_rename_media,
+    TSV_COLUMNS,
+)
 
 
 def _write_tsv(path: Path, rows: list[dict]) -> None:
@@ -229,3 +235,117 @@ class TestSortAndReid:
         #            id 2 = newest (was id 1 — file was missing, no rename happened)
         assert [r["id"] for r in result] == ["1", "2"]
         assert (media_dir / f"{target}_1.jpg").read_bytes() == b"only this exists"
+
+
+class TestPruneScrapeLogs:
+    def _make_log(self, log_dir: Path, name: str, age_offset: int) -> Path:
+        """Create a log file with mtime = now + age_offset (negative for older)."""
+        path = log_dir / name
+        path.write_text("...")
+        ts = time.time() + age_offset
+        os.utime(path, (ts, ts))
+        return path
+
+    def test_no_logs_no_op(self, tmp_path):
+        """Empty directory: function returns without error."""
+        _prune_scrape_logs("anyone", str(tmp_path))  # must not raise
+
+    def test_fewer_than_keep_no_op(self, tmp_path):
+        """3 logs with keep=5: nothing deleted (under the threshold)."""
+        for i in range(3):
+            self._make_log(tmp_path, f"scrape-foo-2026010{i}.log", age_offset=-i)
+        _prune_scrape_logs("foo", str(tmp_path), keep=5)
+        assert sorted(p.name for p in tmp_path.iterdir()) == [
+            "scrape-foo-20260100.log",
+            "scrape-foo-20260101.log",
+            "scrape-foo-20260102.log",
+        ]
+
+    def test_more_than_keep_deletes_oldest(self, tmp_path):
+        """6 logs with keep=5: deletes 2 oldest, keeps 4 newest (current run's
+        log will bring total to 5 again)."""
+        # Oldest at offset=-5 days, newest at offset=0
+        for i in range(6):
+            self._make_log(tmp_path, f"scrape-foo-day{i}.log", age_offset=-(5 - i) * 86400)
+        _prune_scrape_logs("foo", str(tmp_path), keep=5)
+        remaining = sorted(p.name for p in tmp_path.iterdir())
+        # Kept: day2..day5 (4 newest). Pruned: day0, day1.
+        assert remaining == ["scrape-foo-day2.log", "scrape-foo-day3.log",
+                              "scrape-foo-day4.log", "scrape-foo-day5.log"]
+
+    def test_only_touches_matching_target(self, tmp_path):
+        """A scrape for target 'foo' must not delete 'bar's logs even if
+        bar has many old ones."""
+        for i in range(6):
+            self._make_log(tmp_path, f"scrape-foo-{i}.log", age_offset=-i * 100)
+            self._make_log(tmp_path, f"scrape-bar-{i}.log", age_offset=-i * 100)
+        _prune_scrape_logs("foo", str(tmp_path), keep=5)
+        remaining = sorted(p.name for p in tmp_path.iterdir())
+        # bar's 6 logs all intact + foo's 4 newest
+        bar_logs = [n for n in remaining if "bar" in n]
+        foo_logs = [n for n in remaining if "foo" in n]
+        assert len(bar_logs) == 6
+        assert len(foo_logs) == 4
+
+    def test_target_prefix_boundary(self, tmp_path):
+        """'foo' must not match 'foobar' — the trailing `-` after the target
+        name in `scrape-<target>-*` enforces the boundary."""
+        self._make_log(tmp_path, "scrape-foo-1.log", age_offset=-1)
+        # Six 'foobar' logs — must NOT be pruned when target=foo
+        for i in range(6):
+            self._make_log(tmp_path, f"scrape-foobar-{i}.log", age_offset=-(i + 10))
+        _prune_scrape_logs("foo", str(tmp_path), keep=5)
+        foobar_logs = [p.name for p in tmp_path.iterdir() if p.name.startswith("scrape-foobar-")]
+        assert len(foobar_logs) == 6  # untouched
+
+    def test_keeps_newest_4_by_mtime(self, tmp_path):
+        """With keep=5 and 10 logs of varying ages, the 4 newest by mtime
+        survive (the current run's log brings total to 5)."""
+        names = [f"scrape-foo-{i}.log" for i in range(10)]
+        # age_offset goes -9 (oldest) to 0 (newest)
+        for i, name in enumerate(names):
+            self._make_log(tmp_path, name, age_offset=-(9 - i) * 60)
+        _prune_scrape_logs("foo", str(tmp_path), keep=5)
+        remaining = sorted(p.name for p in tmp_path.iterdir())
+        assert remaining == ["scrape-foo-6.log", "scrape-foo-7.log",
+                              "scrape-foo-8.log", "scrape-foo-9.log"]
+
+
+class TestExtractCityHeuristic:
+    """The city-extraction heuristic used by the no-inference fallback path
+    to copy the prior post's CITY (not its venue) into a blank-location row.
+    """
+
+    def test_three_segment_canonical_venue_city_country(self):
+        assert _extract_city_heuristic("Sistine Chapel, Vatican City, Italy") == "Vatican City"
+
+    def test_three_segment_neighborhood_city_country(self):
+        assert _extract_city_heuristic("Chiado, Lisbon, Portugal") == "Lisbon"
+
+    def test_four_segments_drops_first_keeps_third(self):
+        """Four-segment 'Venue, Neighborhood, City, Country' → 'City'."""
+        assert _extract_city_heuristic("Hudson River, New York Harbor, New York, USA") == "New York"
+
+    def test_two_segments_city_country_returns_city(self):
+        assert _extract_city_heuristic("Lisbon, Portugal") == "Lisbon"
+
+    def test_single_segment_returns_as_is(self):
+        """Bare strings (no commas) come back unchanged — sometimes geo-tags
+        are just 'Costco' or a place name. Better than blanking."""
+        assert _extract_city_heuristic("Costco") == "Costco"
+
+    def test_empty_string_returns_empty(self):
+        assert _extract_city_heuristic("") == ""
+
+    def test_whitespace_only_returns_empty(self):
+        assert _extract_city_heuristic("   ") == ""
+
+    def test_strips_whitespace_around_segments(self):
+        assert _extract_city_heuristic("Pike Place Market,  Seattle , United States") == "Seattle"
+
+    def test_us_city_state_country_resolves_to_state_documented_limitation(self):
+        """Known limitation: 'Seattle, Washington, USA' resolves to 'Washington'
+        because the heuristic can't distinguish 'City, State, Country' from
+        'Venue, City, Country'. Documented in the helper's docstring; the
+        fallback is still a general-area marker, just at state level."""
+        assert _extract_city_heuristic("Seattle, Washington, USA") == "Washington"

@@ -200,19 +200,48 @@ class TestInferPostLocation:
         assert "Looking at the evidence" in reasoning
         assert "Virgin America" in reasoning
 
-    def test_falls_back_to_raw_text_on_invalid_json(self, mock_anthropic_client):
-        """When Claude writes prose with no JSON at all, the raw text becomes
-        the location name, coords/region stay empty, and reasoning surfaces
-        the prose."""
+    def test_pure_prose_response_returns_empty_location(self, mock_anthropic_client):
+        """When the model writes prose with no JSON at all, location returns
+        EMPTY (so the call-site city-level fallback engages) and the prose
+        is preserved in `reasoning` for audit. This is the post-fix behavior;
+        previously the raw prose was used as the location string."""
         mock_anthropic_client.messages.create.return_value = _mock_response(
-            "I think this is somewhere in France"
+            "I think this is somewhere in France based on the architecture"
         )
         location, lat, lng, region, reasoning = infer_post_location(
             caption="x", local_media_path="", media_type="IMAGE", recent_locations=[]
         )
-        assert location == "I think this is somewhere in France"
+        assert location == ""
         assert lat == lng == region == ""
-        assert "France" in reasoning
+        assert "France" in reasoning  # raw text preserved as audit trail
+
+    def test_rejects_location_exceeding_max_length(self, mock_anthropic_client):
+        """The model occasionally puts prose into the JSON's `location` field
+        despite the prompt — a 'location' string over 200 chars is rejected
+        as malformed; location returns empty and the rejected text plus a
+        rejection note end up in `reasoning`."""
+        long_loc = "I can see a sign that says XYZ " * 10  # well over 200 chars
+        payload = (
+            '{"location":"' + long_loc + '","lat":"","lng":"","region":""}'
+        )
+        mock_anthropic_client.messages.create.return_value = _mock_response(payload)
+        location, lat, lng, region, reasoning = infer_post_location(
+            caption="x", local_media_path="", media_type="IMAGE", recent_locations=[]
+        )
+        assert location == ""
+        assert lat == lng == region == ""
+        assert "parser rejected location" in reasoning
+
+    def test_rejects_location_containing_newline(self, mock_anthropic_client):
+        """A 'location' field containing a newline is treated as malformed
+        regardless of length — real place names are single-line."""
+        payload = '{"location":"Empire State\\nBuilding","lat":"40.7","lng":"-74","region":"JFK"}'
+        mock_anthropic_client.messages.create.return_value = _mock_response(payload)
+        location, lat, lng, region, reasoning = infer_post_location(
+            caption="x", local_media_path="", media_type="IMAGE", recent_locations=[]
+        )
+        assert location == ""
+        assert "parser rejected location" in reasoning
 
     def test_handles_empty_string_fields(self, mock_anthropic_client):
         """All-empty JSON (Claude couldn't determine anything) → all-empty tuple

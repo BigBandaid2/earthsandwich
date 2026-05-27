@@ -184,46 +184,69 @@ class TestDualPathBranching:
         assert row["region"] == "JFK"
         assert "Virgin America" in row["reasoning"]
 
-    def test_inferred_path_falls_back_to_prior_post_when_inference_empty(self, patched):
-        """When inference returns no location AND recent_locations is non-empty,
-        the most recent prior post's location is carried forward and the
-        fallback is recorded in the reasoning column. lat/lng/region stay
-        empty so downstream consumers can spot fallback rows by missing coords."""
+    def test_inferred_path_falls_back_to_prior_post_city_when_inference_empty(self, patched):
+        """When inference returns no location AND a previous_row is provided,
+        the row's location becomes the prior post's CITY (not its exact venue),
+        and lat/lng/region are inherited from that prior post."""
         patched.infer_post_location.return_value = ("", "", "", "", "")  # empty inference
         m = make_media(location=None)
 
+        prior = {
+            "location": "Sistine Chapel, Vatican City, Italy",
+            "lat": "41.9029",
+            "lng": "12.4534",
+            "region": "FCO",
+        }
         row = process_media(
             m, target="acct", local_id=999, media_dir="/tmp",
-            recent_locations=["Seattle, Washington", "Seattle, Washington", "New York"],
+            recent_locations=["Sistine Chapel, Vatican City, Italy"],
+            previous_row=prior,
         )
 
-        assert row["location"] == "Seattle, Washington"  # copied from recent_locations[0]
-        assert row["lat"] == ""
-        assert row["lng"] == ""
-        assert row["region"] == ""
+        assert row["location"] == "Vatican City"  # heuristic city extraction
+        assert row["lat"] == "41.9029"            # inherited from prior
+        assert row["lng"] == "12.4534"
+        assert row["region"] == "FCO"
         assert "fallback" in row["reasoning"]
-        assert "Seattle, Washington" in row["reasoning"]
+        assert "Vatican City" in row["reasoning"]
 
-    def test_inferred_path_fallback_skips_empty_prior_locations(self, patched):
-        """The fallback uses the most recent NON-EMPTY prior location, not
-        blindly recent_locations[0] (which can be an empty string)."""
+    def test_inferred_path_fallback_uses_city_segment_for_two_segment_form(self, patched):
+        """'City, Country' form → first segment is the city."""
         patched.infer_post_location.return_value = ("", "", "", "", "")
         m = make_media(location=None)
+        prior = {"location": "Lisbon, Portugal", "lat": "38.7", "lng": "-9.1", "region": "LIS"}
 
         row = process_media(
             m, target="acct", local_id=999, media_dir="/tmp",
-            recent_locations=["", "", "Lisbon, Portugal", "Sintra"],
+            recent_locations=["Lisbon, Portugal"],
+            previous_row=prior,
         )
 
-        assert row["location"] == "Lisbon, Portugal"
-        assert "fallback" in row["reasoning"]
+        assert row["location"] == "Lisbon"  # parts[0] for 'City, Country'
+        assert row["region"] == "LIS"
 
-    def test_inferred_path_no_fallback_when_recent_locations_empty(self, patched):
-        """No prior context → no fallback. The row stays genuinely empty."""
+    def test_inferred_path_no_fallback_when_no_previous_row(self, patched):
+        """No previous_row → no fallback. The row stays genuinely empty."""
         patched.infer_post_location.return_value = ("", "", "", "", "")
         m = make_media(location=None)
 
         row = process_media(m, target="acct", local_id=999, media_dir="/tmp", recent_locations=[])
+
+        assert row["location"] == ""
+        assert row["reasoning"] == ""
+
+    def test_inferred_path_no_fallback_when_previous_row_has_no_location(self, patched):
+        """If previous_row exists but its location is empty (an edge case
+        where the prior post was itself unresolved), no fallback fires."""
+        patched.infer_post_location.return_value = ("", "", "", "", "")
+        m = make_media(location=None)
+        prior = {"location": "", "lat": "", "lng": "", "region": ""}
+
+        row = process_media(
+            m, target="acct", local_id=999, media_dir="/tmp",
+            recent_locations=[],
+            previous_row=prior,
+        )
 
         assert row["location"] == ""
         assert row["reasoning"] == ""
@@ -249,13 +272,16 @@ class TestDualPathBranching:
             "", "", "", "", "I considered Tokyo but couldn't confirm the building.",
         )
         m = make_media(location=None)
+        prior = {"location": "Kyoto, Japan", "lat": "35.0", "lng": "135.7", "region": "ITM"}
 
         row = process_media(
             m, target="acct", local_id=999, media_dir="/tmp",
             recent_locations=["Kyoto, Japan"],
+            previous_row=prior,
         )
 
-        assert row["location"] == "Kyoto, Japan"
+        assert row["location"] == "Kyoto"  # city heuristic from 'Kyoto, Japan'
+        assert row["region"] == "ITM"      # inherited
         assert "I considered Tokyo" in row["reasoning"]
         assert "fallback" in row["reasoning"]
 
