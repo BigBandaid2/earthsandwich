@@ -101,7 +101,7 @@ A visitor viewing a trip can see stops that were planned but never visited (thei
 
 ---
 
-> **Data ingestion moved**: All ingestion-related user stories, requirements, and edge cases have been moved to [specs/002-data-ingestion/spec.md](../002-data-ingestion/spec.md).
+> **Data ingestion moved**: All ingestion-related user stories, requirements, and edge cases now live in [specs/003-ingestion-pipeline/spec.md](../003-ingestion-pipeline/spec.md). (Originally moved to `002-data-ingestion`; that spec was split on 2026-05-22 into `002-database-backend` for schema/API/container and `003-ingestion-pipeline` for ingestion.)
 
 ### Edge Cases
 
@@ -157,7 +157,7 @@ A visitor viewing a trip can see stops that were planned but never visited (thei
 - **FR-031**: The trip feed sidebar MUST add a third collapsible section, "Abandoned", to the existing "Visited" and "Planned" sections. The three sections are rendered in a fixed top-to-bottom order: Visited → Planned → Abandoned. Fully-abandoned regions are listed in the Abandoned section and are excluded from the Visited and Planned sections. Sections that contain no regions for the current trip remain hidden (consistent with FR-002).
 - **FR-032**: Abandoned stops MUST follow the same interaction and suppression rules as Planned stops: clicking an abandoned stop marker on the map or an abandoned stop tile in the sidebar MUST NOT open the stop detail pop-up; and abandoned stop tiles MUST be suppressed from the region sidebar whenever any Instagram or Substack stop exists in the same region (per FR-018). When shown, abandoned stop tiles display location, date, and optional caption.
 - **FR-033**: The system MUST exclude Substack stop dates from a region's start-date and end-date computation (FR-014) when the region contains any non-Substack stop. Rationale: Substack articles are typically authored after the visit, so their dates represent publication, not presence. The Substack stop itself MUST still appear within the region (on the map and in the region sidebar); only its date is excluded from the date-range bounds. If a region contains only Substack stops, the system falls back to those stops' dates so the region still displays a date range.
-> **Ingestion requirements FR-034 to FR-041 moved to [specs/002-data-ingestion/spec.md](../002-data-ingestion/spec.md).**
+> **Ingestion requirements FR-034 to FR-041 moved to [specs/003-ingestion-pipeline/spec.md](../003-ingestion-pipeline/spec.md).** (Originally moved to `002-data-ingestion`, then split out to `003-ingestion-pipeline` on 2026-05-22.)
 
 ### Key Entities *(include if feature involves data)*
 
@@ -259,4 +259,4 @@ Opens as a modal overlay that dims the background and occupies approximately 80%
 - Mobile responsiveness is expected, but desktop and tablet are the primary target.
 - The map component is provided by a third-party mapping service; zoom behavior, map detail levels, and marker rendering are constrained by that service's capabilities.
 - The active region concept (FR-011) is only meaningful for trips with a mix of visited and planned regions.
-- Data ingestion, database, backend API, and containerization assumptions are documented in [specs/002-data-ingestion/spec.md](../002-data-ingestion/spec.md).
+- Database, backend API, and containerization assumptions are documented in [specs/002-database-backend/spec.md](../002-database-backend/spec.md). Automated data ingestion assumptions live in [specs/003-ingestion-pipeline/spec.md](../003-ingestion-pipeline/spec.md).

@@ -1,0 +1,493 @@
+old rows: 324   new rows: 323
+both: 322   only-old: 2   only-new: 1
+
+Total location diffs among shared shortcodes: 191 / 322
+
+Diff buckets:
+  old_appends_country: 64
+  new_has_prose_blob: 17
+  new_undetermined: 5
+  old_undetermined: 28
+  spelling_or_minor: 29
+  truly_different: 48
+
+================================================================================
+BUCKET: old_appends_country  (64)
+================================================================================
+  shortcode=5OtGZYlnLm  old_id=306  new_id=17
+    OLD: Alki Beach Park, Seattle
+    NEW: Alki Beach Park
+  shortcode=5OtXvIFnME  old_id=305  new_id=18
+    OLD: Alki Beach Park, Seattle
+    NEW: Alki Beach Park
+  shortcode=5mctThFnIX  old_id=302  new_id=21
+    OLD: Compass Point Beach Resort, Bahamas
+    NEW: Compass Point Beach Resort
+  shortcode=5nM0rkFnGg  old_id=301  new_id=22
+    OLD: Compass Point Beach Resort, Bahamas
+    NEW: Compass Point Beach Resort
+  shortcode=58Dx3vlnHK  old_id=287  new_id=36
+    OLD: Ruínas do Convento do Carmo, Lisbon
+    NEW: Ruínas do Convento do Carmo
+  shortcode=5-qW_7lnEh  old_id=286  new_id=37
+    OLD: Rua da Bica de Duarte Belo, Lisbon
+    NEW: Rua Da Bica De Duarte Belo
+  shortcode=5-tEZAFnJI  old_id=284  new_id=39
+    OLD: Alfama, Lisbon, Portugal
+    NEW: Alfama, Lisboa, Portugal
+  shortcode=6AvJSglnEB  old_id=283  new_id=40
+    OLD: Monserrate Palace, Sintra
+    NEW: Monserrate Palace
+  shortcode=6AwZefFnGJ  old_id=282  new_id=41
+    OLD: Pena Palace, Sintra
+    NEW: Pena Palace
+  shortcode=6DlaPzFnDj  old_id=278  new_id=45
+    OLD: Chiado, Lisbon
+    NEW: Chiado
+  shortcode=6QrTtRFnAM  old_id=274  new_id=49
+    OLD: Giralda, Seville Cathedral
+    NEW: Giralda
+  shortcode=6QrzP8lnA-  old_id=273  new_id=50
+    OLD: Tiana, Catalonia, Spain
+    NEW: Tiana, Cataluna, Spain
+  shortcode=6QtCK7FnDN  old_id=272  new_id=51
+    OLD: Maria Luisa Park, Seville
+    NEW: Maria Luisa Park
+  shortcode=6fRKqGlnNs  old_id=266  new_id=57
+    OLD: Alhambra, Granada, Spain
+    NEW: Alhambra, Granada, España
+  shortcode=6pmrY9FnFa  old_id=259  new_id=64
+    OLD: Riad Idrissy & The Ruined Garden, Fez
+    NEW: Riad Idrissy & The Ruined Garden
+  shortcode=62g1tGFnJG  old_id=255  new_id=68
+    OLD: Place Jemâa el-Fna, Marrakech
+    NEW: Place Jemâa el-Fna
+  shortcode=68WgY3FnK_  old_id=254  new_id=69
+    OLD: Tulip Market, Amsterdam
+    NEW: Tulip Market
+  shortcode=7p03X2lnIW  old_id=239  new_id=84
+    OLD: Torre degli Asinelli, Bologna
+    NEW: Torre degli Asinelli
+  shortcode=70hwVvlnHL  old_id=237  new_id=86
+    OLD: San Petronio Basilica, Bologna
+    NEW: San Petronio Basilica
+  shortcode=73Zpu-lnLq  old_id=234  new_id=89
+    OLD: Leonardo da Vinci Museum, Florence
+    NEW: Leonardo Da Vinci Museum
+  shortcode=8RHwTOlnJ1  old_id=226  new_id=97
+    OLD: Sistine Chapel, Vatican City
+    NEW: Sistine Chapel
+  shortcode=8RIA48lnKW  old_id=225  new_id=98
+    OLD: Colosseum, Rome
+    NEW: Colosseum
+  shortcode=8RJyChFnOD  old_id=224  new_id=99
+    OLD: San Bartolomeo all'Isola, Rome
+    NEW: San Bartolomeo all'Isola
+  shortcode=9Cj6H8FnFJ  old_id=222  new_id=101
+    OLD: Temple of Heaven, Beijing
+    NEW: Temple Of Heaven, Beijing, China
+  shortcode=9FIn05lnNh  old_id=220  new_id=103
+    OLD: Yangshuo, China
+    NEW: Yangshuo
+  shortcode=9H6fIqlnIR  old_id=219  new_id=104
+    OLD: Yangshuo, China
+    NEW: Yangshuo
+  shortcode=9Pid74FnI6  old_id=216  new_id=107
+    OLD: 228 Peace Memorial Park, Taipei
+    NEW: 228 Peace Memorial Park
+  shortcode=9o20UHFnI8  old_id=210  new_id=113
+    OLD: Wangfujing Night Market, Beijing
+    NEW: Wangfujing Night Market
+  shortcode=9-G9ECFnBD  old_id=204  new_id=119
+    OLD: Gimnasio de Boxeo Rafael Trejo, Havana
+    NEW: Gimnasio De Boxeo Rafael Trejo
+  shortcode=-RLZjwFnNE  old_id=201  new_id=122
+    OLD: Hacienda Venecia Coffee Farm, Colombia
+    NEW: Hacienda Venecia Coffee Farm
+  ... (34 more)
+
+================================================================================
+BUCKET: new_has_prose_blob  (17)
+================================================================================
+  shortcode=5x58KzlnLa  old_id=293  new_id=30
+    OLD: The Cobblestone, Dublin
+    NEW: The Cobblestone
+  shortcode=50acq0lnDR  old_id=292  new_id=31
+    OLD: Long Room Library, Trinity College, Dublin
+    NEW: The Long Room Library, Trinity College
+  shortcode=78uIebFnGN  old_id=231  new_id=92
+    OLD: Leaning Tower of Pisa
+    NEW: The Leaning Tower of Pisa
+  shortcode=9o1sA3FnHK  old_id=211  new_id=112
+    OLD: Great Wall of China, Jinshanling
+    NEW: The Great Wall of China, Jinshanling section
+  shortcode=BALfnv7FnBG  old_id=183  new_id=140
+    OLD: Death Road, La Paz, Bolivia
+    NEW: The Death Road La Paz - Bolivia
+  shortcode=BAMw0balnBU  old_id=182  new_id=141
+    OLD: Death Road, La Paz, Bolivia
+    NEW: The Death Road La Paz - Bolivia
+  shortcode=BBy08ZNlnC1  old_id=154  new_id=169
+    OLD: Palacio de las Aguas Corrientes, Buenos Aires
+    NEW: The Water Company Palace
+  shortcode=BCIK3K9FnG5  old_id=153  new_id=170
+    OLD: Buenos Aires, Argentina
+    NEW: I need to analyze the image and caption carefully.
+
+The caption says "An old friend shows up to see us off. Thanks big J...
+  shortcode=BChkQ6tlnDx  old_id=146  new_id=177
+    OLD: Weta Cave, Miramar, Wellington
+    NEW: The large troll statue is recognizable as one of the trolls from the Weta Cave / Weta Workshop in Miramar, Wellington, N...
+  shortcode=BDAUJNoFnIs  old_id=139  new_id=184
+    OLD: Little Paradise Lodge & Gardens, Glenorchy, New Zealand
+    NEW: I can see a circular moon gate made of stacked stones in a lush garden setting. The caption mentions "wonderland garden"...
+  shortcode=BDAVzMklnKI  old_id=138  new_id=185
+    OLD: Little Paradise Lodge & Gardens, Glenorchy, New Zealand
+    NEW: I need to analyze this image carefully.
+
+The image shows a map painted/carved on a flat rock/stone on the ground. The ma...
+  shortcode=BEGsqnzFnIv  old_id=115  new_id=208
+    OLD: The Nile River, Egypt
+    NEW: The Nile River
+  shortcode=BFJu2Y8lnBK  old_id=100  new_id=223
+    OLD: Perge Ancient City, Antalya, Turkey
+    NEW: The image shows massive ancient stone ruins with arched niches in a large wall, with a person standing at the base for s...
+  shortcode=BGRhG3AlnEe  old_id=80  new_id=243
+    OLD: Military Museum, Kalemegdan, Belgrade
+    NEW: I can see military vehicles/tanks on display outdoors, children playing on them, and what appears to be a small informat...
+  shortcode=BHsKjrFB-Wd  old_id=69  new_id=254
+    OLD: Amazon Books, University Village, Seattle
+    NEW: I need to identify the specific Amazon Books store location visible in this image.
+
+Observable evidence:
+1. "amazon book...
+  shortcode=Bf6bSrCARBY  old_id=48  new_id=275
+    OLD: Texas Legation, St James's, London
+    NEW: The bronze plaque reads "TEXAS LEGATION" and mentions it was the legation for ministers from the Republic of Texas to th...
+  shortcode=C3g2YOHMR-r  old_id=3  new_id=320
+    OLD: Hierve el Agua, Oaxaca, Mexico
+    NEW: The sign reads "POR SU SEGURIDAD NO ACERCARSE AL ABISMO" / "FOR YOUR SAFETY DO NOT APPROACH THE ABISS" — this is a well-...
+
+================================================================================
+BUCKET: new_undetermined  (5)
+================================================================================
+  shortcode=BJGdT9-BYeE  old_id=65  new_id=258
+    OLD: Seattle, Washington
+    NEW: 
+  shortcode=BMFsW9thGGT  old_id=60  new_id=263
+    OLD: Seattle, Washington
+    NEW: 
+  shortcode=BMZgSVmhTmR  old_id=59  new_id=264
+    OLD: Seattle, Washington
+    NEW: 
+  shortcode=Bd8J9ZrgftF  old_id=49  new_id=274
+    OLD: New York, New York
+    NEW: 
+  shortcode=BjxaZmbBaPU  old_id=41  new_id=282
+    OLD: New York, New York
+    NEW: 
+
+================================================================================
+BUCKET: old_undetermined  (28)
+================================================================================
+  shortcode=4MgtN7FnOe  old_id=322  new_id=1
+    OLD: 
+    NEW: Hudson River, New York Harbor, USA
+  shortcode=4XH8OvFnGe  old_id=320  new_id=3
+    OLD: 
+    NEW: Upper West Side, New York, USA
+  shortcode=4ZTJ3DFnDY  old_id=318  new_id=5
+    OLD: 
+    NEW: Looking at the evidence:
+
+1. The boarding pass is from **Virgin America**, Flight VX 23
+2. The boarding pass shows **New...
+  shortcode=4aCGbhlnDv  old_id=317  new_id=6
+    OLD: 
+    NEW: Looking at the observable evidence:
+
+1. The caption mentions "SFO" explicitly - San Francisco International Airport
+2. T...
+  shortcode=4cKiSglnJf  old_id=316  new_id=7
+    OLD: 
+    NEW: Las Vegas, Nevada, USA
+  shortcode=4gN0y0lnII  old_id=315  new_id=8
+    OLD: 
+    NEW: Las Vegas, Nevada, USA
+  shortcode=4sf-_dlnMv  old_id=313  new_id=10
+    OLD: 
+    NEW: The fine print at the bottom reads "At participating McDonald's restaurants in Canada" and the prices shown ($8.99/$6.19...
+  shortcode=45EA90FnDO  old_id=311  new_id=12
+    OLD: 
+    NEW: Looking at the observable evidence:
+
+1. The store is clearly **Costco** - identifiable from the warehouse-style layout, ...
+  shortcode=5IzQD2FnNR  old_id=308  new_id=15
+    OLD: 
+    NEW: Looking at the observable evidence:
+
+1. The aircraft appears to be a Dash 8 (DHC-8) turboprop, numbered "319"
+2. The air...
+  shortcode=5OssbxFnLD  old_id=307  new_id=16
+    OLD: 
+    NEW: Looking at the observable evidence:
+
+1. The caption references "Reservoir Dogs" - a stylistic/humorous caption about a g...
+  shortcode=5fuI_0FnCe  old_id=303  new_id=20
+    OLD: 
+    NEW: I'll analyze the observable evidence in the image:
+
+1. **Tropical turquoise water** - shallow, clear Caribbean-style wat...
+  shortcode=5t7qpalnJj  old_id=296  new_id=27
+    OLD: 
+    NEW: The sign shows "79 Dishes for €7.99" — the euro currency strongly suggests Ireland/Europe. Combined with the nearby post...
+  shortcode=51XnncFnD1  old_id=290  new_id=33
+    OLD: 
+    NEW: Guinness Storehouse, Dublin, Ireland
+  shortcode=547dePlnC7  old_id=289  new_id=34
+    OLD: 
+    NEW: The caption says "Irish Cinnabun" and the recent posts are all in Ireland. The image shows a topiary/hedge maze. The hed...
+  shortcode=548ERElnEY  old_id=288  new_id=35
+    OLD: 
+    NEW: I need to analyze the image carefully.
+
+The image shows:
+- A round stone tower with battlements/crenellations at the top...
+  shortcode=5-rW2KlnF7  old_id=285  new_id=38
+    OLD: 
+    NEW: Rua Augusta Da Prata
+  shortcode=6Ndp8DFnOI  old_id=276  new_id=47
+    OLD: 
+    NEW: Portugal -> Spain
+  shortcode=6NgZgjFnCm  old_id=275  new_id=48
+    OLD: 
+    NEW: Portugal -> Spain
+  shortcode=6txb7VlnPN  old_id=258  new_id=65
+    OLD: 
+    NEW: I can see a sign in the image that reads "MAISON ARTISANE" (or similar), and the architectural style shows a covered sou...
+  shortcode=7ScG0MlnJ1  old_id=251  new_id=72
+    OLD: 
+    NEW: Schlossbeleuchtung Heidelberg
+  shortcode=9CiXJGlnCw  old_id=223  new_id=100
+    OLD: 
+    NEW: Yangshuochen, Guangxi, China
+  shortcode=9PhvblFnHo  old_id=217  new_id=106
+    OLD: 
+    NEW: Taiwan Peace Park
+  shortcode=-RMFY8FnOQ  old_id=199  new_id=124
+    OLD: 
+    NEW: Manizales Vereda El Rosario
+  shortcode=BAH7keKlnGc  old_id=184  new_id=139
+    OLD: 
+    NEW: Salar de Uyuni, Bolivia
+  shortcode=BAZ1ZUPlnC7  old_id=171  new_id=152
+    OLD: 
+    NEW: El Alto, La Paz, Bolivia
+  shortcode=BBBgI_YFnJv  old_id=166  new_id=157
+    OLD: 
+    NEW: The chalkboard mentions "MosaicCafé" (written as "MosaiCafé"). The nearby posts mention Santiago, Chile (Museo Chileno d...
+  shortcode=BBOsiIMlnHr  old_id=163  new_id=160
+    OLD: 
+    NEW: I can see oak wine barrels labeled "Élégance" (numbers 39 and 40 visible) and what appears to be "Taransaud" on the bott...
+  shortcode=BBOtF1QFnIm  old_id=162  new_id=161
+    OLD: 
+    NEW: I'll analyze the observable evidence:
+
+1. **Mountain range**: Dramatic, jagged mountains visible in the background - app...
+
+================================================================================
+BUCKET: spelling_or_minor  (29)
+================================================================================
+  shortcode=6BC2zyFnLg  old_id=280  new_id=43
+    OLD: Cruz Alta, Pena Park, Sintra
+    NEW: Cruz Alta - Parque e Palácio Da Pena
+  shortcode=6WD06KlnM5  old_id=270  new_id=53
+    OLD: Plaza de Toros de la Real Maestranza, Seville
+    NEW: Plaza de toros de la Real Maestranza de Caballería de Sevilla
+  shortcode=6x8KBBFnKW  old_id=257  new_id=66
+    OLD: Merzouga, Sahara Desert, Morocco
+    NEW: Merzouga - Sahara Desert
+  shortcode=60yLk7FnOn  old_id=256  new_id=67
+    OLD: Merzouga, Sahara Desert, Morocco
+    NEW: Merzouga - Sahara Desert
+  shortcode=7Sc8sclnLF  old_id=250  new_id=73
+    OLD: Luxembourg City, Luxembourg
+    NEW: Luxembourg, Luxembourg
+  shortcode=7cO6OIFnNy  old_id=246  new_id=77
+    OLD: Englischer Garten, Munich
+    NEW: Englischer Garten - Bei de Surfer
+  shortcode=7cQxgLlnPy  old_id=244  new_id=79
+    OLD: Alpsee, Hohenschwangau, Germany
+    NEW: Alpsee Hohenschwangau
+  shortcode=7i5Kr6lnIp  old_id=243  new_id=80
+    OLD: Mirabellgarten, Salzburg
+    NEW: Mirabellgarten Salzburg
+  shortcode=7plyT5FnPS  old_id=240  new_id=83
+    OLD: Venezia Mestre Railway Station
+    NEW: Venezia Mestre railway station
+  shortcode=70r2T-lnDG  old_id=236  new_id=87
+    OLD: Piazza Maggiore, Bologna
+    NEW: Piazza Maggiore (Piazza Grande), Bologna
+  shortcode=9Ckqx1FnGb  old_id=221  new_id=102
+    OLD: Jianguo Hotel, Shanghai
+    NEW: Jianguo Hotel Shanghai
+  shortcode=9Q1Lf9lnOV  old_id=215  new_id=108
+    OLD: Sanho Night Market, Taipei
+    NEW: 三和夜市，Sanho Night Market, Tapei, Taiwan
+  shortcode=9oz7qEFnEl  old_id=214  new_id=109
+    OLD: New Orleans, Louisiana, USA
+    NEW: New Orleans East Area, New Orleans, Louisiana
+  shortcode=9o1A7EFnGD  old_id=212  new_id=111
+    OLD: Taipei 101 Mall, Taipei
+    NEW: TAIPEI 101 MALL 台北 101 購物中心
+  shortcode=_75XEMFnKx  old_id=186  new_id=137
+    OLD: Sucre, Bolivia
+    NEW: Sucre,Bolivia
+  shortcode=BAM1A7CFnJ4  old_id=180  new_id=143
+    OLD: Train Cemetery, Uyuni, Bolivia
+    NEW: Cementerio De Trenes/ Train Cemetery
+  shortcode=BAM5rTYFnCy  old_id=177  new_id=146
+    OLD: Vila Madalena, São Paulo
+    NEW: Vila Madalena - Sao Paulo
+  shortcode=BC9BeL3FnM-  old_id=144  new_id=179
+    OLD: Arrowtown, South Island, New Zealand
+    NEW: Arrowtown. South Island New Zealand
+  shortcode=BDIIek_FnEA  old_id=135  new_id=188
+    OLD: Arrowtown, South Island, New Zealand
+    NEW: Arrowtown. South Island New Zealand
+  shortcode=BDOus1_FnGc  old_id=134  new_id=189
+    OLD: Bondi Beach, Sydney
+    NEW: Bondi Beach Sydney
+  shortcode=BDgy1jjlnMz  old_id=132  new_id=191
+    OLD: Bondi Beach, Sydney
+    NEW: Bondi Beach - Sydney
+  shortcode=BEl_V0cFnHz  old_id=109  new_id=214
+    OLD: Dead Sea, Jordan
+    NEW: Dead Sea - Jordan
+  shortcode=BFgmAFmFnG-  old_id=98  new_id=225
+    OLD: Derinkuyu Underground City
+    NEW: Derinkuyu underground city
+  shortcode=BF92a0iFnBw  old_id=85  new_id=238
+    OLD: Victoria Park, Athens
+    NEW: Victoria Park Athens
+  shortcode=BGQCWNplnGb  old_id=81  new_id=242
+    OLD: Latin Bridge, Sarajevo
+    NEW: Latin Bridge Sarajevo
+  shortcode=BGo9Dl7lnCR  old_id=76  new_id=247
+    OLD: Sedlec Ossuary (Church of Bones)
+    NEW: Church of Bones, Sedlec Ossuary
+  shortcode=BHc2mvchQS9  old_id=71  new_id=252
+    OLD: Lake Union Park, Seattle
+    NEW: Lake Union, Seattle, Washington, USA
+  shortcode=BKBxxm8hgv3  old_id=63  new_id=260
+    OLD: Washington Dulles International Airport, Dulles, VA
+    NEW: IAD - Washington Dulles International Airport - Dulles, VA
+  shortcode=Bno-dHdBEOf  old_id=31  new_id=292
+    OLD: J.Stalin's Underground Printing House Museum
+    NEW: J.stalin's Underground Printing House Museum
+
+================================================================================
+BUCKET: truly_different  (48)
+================================================================================
+  shortcode=6BBVdKlnIh  old_id=281  new_id=42
+    OLD: Palácio da Pena, Sintra
+    NEW: Palacio da Pena Sintra Portugal
+  shortcode=6fSguQlnAl  old_id=265  new_id=58
+    OLD: Palacios Nazaríes, Alhambra, Granada
+    NEW: Palacios Nazaries
+  shortcode=6iorSelnON  old_id=263  new_id=60
+    OLD: Medina of Tetouan, Morocco
+    NEW: Khasa Medina Tetouan
+  shortcode=6io-7FFnOi  old_id=262  new_id=61
+    OLD: Medina of Tetouan, Morocco
+    NEW: Khasa Medina Tetouan
+  shortcode=6nubLTlnAf  old_id=260  new_id=63
+    OLD: Medina of Tetouan, Morocco
+    NEW: Khasa Medina Tetouan
+  shortcode=7ShPyYFnD2  old_id=247  new_id=76
+    OLD: Grand Place, Brussels
+    NEW: Grand Market, Brussels, Belgium
+  shortcode=7cP1hcFnOx  old_id=245  new_id=78
+    OLD: Neuschwanstein Castle, Füssen, Germany
+    NEW: Neuchweinstein Castle, Fussen, Germany
+  shortcode=7i6CtNFnKv  old_id=242  new_id=81
+    OLD: Red Bull Hangar-7, Salzburg
+    NEW: Red Bull Hangar 7 Salzburg
+  shortcode=7lZA2MFnPn  old_id=241  new_id=82
+    OLD: Venice, Italy
+    NEW: Venezia, Italia
+  shortcode=73aLrBFnM6  old_id=233  new_id=90
+    OLD: Mercato Centrale, Florence
+    NEW: Central Market , Florence
+  shortcode=78s_fBlnEU  old_id=232  new_id=91
+    OLD: Riomaggiore, Cinque Terre, Italy
+    NEW: Cinque Terre Riomagiore, Italy
+  shortcode=8RGkcWlnHW  old_id=227  new_id=96
+    OLD: St Peter's Basilica, Vatican City
+    NEW: St Peters Basilica, Vatican City
+  shortcode=-FxdjNFnEK  old_id=202  new_id=121
+    OLD: Salt Cathedral of Zipaquirá, Colombia
+    NEW: Salt Catherdral At Zipaquira
+  shortcode=-Xaa6sFnJO  old_id=198  new_id=125
+    OLD: Cartagena, Colombia
+    NEW: Cartegena Colombia
+  shortcode=-XbXXalnLE  old_id=197  new_id=126
+    OLD: Cartagena, Colombia
+    NEW: Cartegena Colombia
+  shortcode=_DRpzAlnJr  old_id=194  new_id=129
+    OLD: Bosque da Ciência - INPA, Manaus
+    NEW: Bosque Da Ciencia-Impa
+  shortcode=BAH7i4gFnGZ  old_id=185  new_id=138
+    OLD: Reserva Eduardo Avaroa, Bolivia
+    NEW: Riserva Eduardo Avaroa | Bolivia
+  shortcode=BAMxmiDlnC2  old_id=181  new_id=142
+    OLD: Salvador Dalí Desert, Bolivia
+    NEW: Desert Salvador Dali , Bolivia
+  shortcode=BAXKqr9FnKQ  old_id=175  new_id=148
+    OLD: Lake Titicaca, Copacabana, Bolivia
+    NEW: Titicaca Lake, Copacabana, Bolivia
+  shortcode=BBBhww9lnNE  old_id=165  new_id=158
+    OLD: Volcán Osorno, Puerto Varas, Chile
+    NEW: Volcano Osorno, Puerto Varas Chile
+  shortcode=BBOrulpFnGI  old_id=164  new_id=159
+    OLD: Cerro Santa Lucía, Santiago, Chile
+    NEW: Mirador Cerro Santa Lucia
+  shortcode=BBvtN0qlnK7  old_id=155  new_id=168
+    OLD: Cementerio de la Recoleta, Buenos Aires
+    NEW: Cemetario Recoleta, Buenos Aires
+  shortcode=BChkf3kFnEA  old_id=145  new_id=178
+    OLD: Weta Cave, Miramar, Wellington
+    NEW: Weka Street, Miramar, Wellington, New Zealand
+  shortcode=BD7MxxtlnG9  old_id=117  new_id=206
+    OLD: Cairo International Airport
+    NEW: مطار القاهرة الدولي - Cairo International Airport
+  shortcode=BFgoDnNlnLu  old_id=97  new_id=226
+    OLD: Paşabağ, Ürgüp
+    NEW: Pasa Bağı - Ürgüp
+  shortcode=BFtQVuDFnH_  old_id=93  new_id=230
+    OLD: Pamukkale, Turkey
+    NEW: Pammukale
+  shortcode=BFtSJJYFnMT  old_id=92  new_id=231
+    OLD: Pamukkale, Turkey
+    NEW: Pammukale
+  shortcode=BFzfRBlFnNq  old_id=90  new_id=233
+    OLD: Istanbul, Turkey
+    NEW: Golden Horn
+  shortcode=BGHLPwKlnF4  old_id=83  new_id=240
+    OLD: Dubrovnik, Croatia
+    NEW: Treasures of an island
+  shortcode=BGw4mBYFnHj  old_id=73  new_id=250
+    OLD: Seattle Tacoma International Airport
+    NEW: Seattle Tacoma International Aiport
+  ... (18 more)
+
+================================================================================
+Shortcodes ONLY in old TSV: 2
+================================================================================
+  old_id=323  DYEAwY7F2Bb  loc=Rio De Janeiro, Brazil
+  old_id=324  DYEJwwvl9iJ  loc=Santorini, Greece
+
+================================================================================
+Shortcodes ONLY in new TSV: 1
+================================================================================
+  new_id=323  DYFNMcHxKDv  loc=Mexico City

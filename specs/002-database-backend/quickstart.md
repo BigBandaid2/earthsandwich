@@ -1,6 +1,8 @@
-# Quickstart: Data Ingestion & Backend
+# Quickstart: Database & Backend
 
-**Branch**: `002-data-ingestion` | **Plan**: [plan.md](plan.md)
+**Branch**: `002-database-backend` | **Plan**: [plan.md](plan.md)
+
+> Ingestion-specific setup (`instagrapi` login, manual Instagram/Substack triggers) lives in [`003-ingestion-pipeline/quickstart.md`](../003-ingestion-pipeline/quickstart.md).
 
 ## Prerequisites
 
@@ -16,20 +18,16 @@
 cp .env.example .env
 ```
 
-Fill in all required values in `.env` (see [contracts/api.md](contracts/api.md) for the full variable reference). At minimum for local dev:
+Fill in the values required by this spec in `.env`. At minimum for local dev:
 
 ```env
 DATABASE_URL=postgresql+asyncpg://earthsandwich:earthsandwich@localhost:5432/earthsandwich
 API_SECRET_KEY=<generate a random string>
-INSTA_USERNAME=<instagram username>
-INSTA_PASSWORD=<instagram password>
-INSTAGRAPI_SESSION_FILE=./instagrapi_session.json
-ANTHROPIC_API_KEY=<your key>
-AIRPORT_API_KEY=<airlabs key>
-SUBSTACK_RSS_URL=<substack rss url>
 FRONTEND_ORIGIN=http://localhost:5173
 ENVIRONMENT=development
 ```
+
+Ingestion variables (Instagram credentials, Substack RSS URL, SMTP, etc.) are required only when working on `003-ingestion-pipeline`; see that spec's quickstart for the full list.
 
 ---
 
@@ -72,35 +70,7 @@ After generating a new `seed-dump.sql`, commit it so new Docker environments pic
 
 ---
 
-## 4. Instagram Login (one-time setup)
-
-Before the ingestion scheduler can run, the instagrapi session must be initialized:
-
-```bash
-docker compose exec backend python -m app.cli.manage login
-```
-
-This prompts interactively for Instagram credentials and writes the session file to the path configured by `INSTAGRAPI_SESSION_FILE`. Normal scheduled ingestion reuses this session without re-authenticating.
-
-If the session expires (Instagram challenge, 2FA, etc.), a notification email is sent to `automation@datacommlab.com` and the Graph API fallback is attempted. Re-run the login command to refresh the session.
-
----
-
-## 5. Trigger Ingestion Manually
-
-Instagram ingestion (bypasses the schedule, runs immediately):
-```bash
-docker compose exec backend python -m app.ingestion.instagram
-```
-
-Substack ingestion:
-```bash
-docker compose exec backend python -m app.ingestion.substack
-```
-
----
-
-## 6. Run Database Migrations
+## 4. Run Database Migrations
 
 After any schema change, generate and apply an Alembic migration:
 
@@ -114,7 +84,7 @@ docker compose exec backend alembic upgrade head
 
 ---
 
-## 7. Run Tests
+## 5. Run Tests
 
 ```bash
 # Unit tests (no database required)
@@ -132,7 +102,7 @@ docker compose exec backend pytest
 
 ---
 
-## 8. Verify the API
+## 6. Verify the API
 
 ```bash
 # List all trips

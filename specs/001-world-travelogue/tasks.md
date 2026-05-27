@@ -242,10 +242,10 @@
 
 ## Phase 16: Drift Reconciliation (2026-05-15 weekly scan)
 
-**Status**: Backfill of work that shipped between commits `1b5f11a` (Phase 15 close) and `6faeb11` (HEAD) without a prior task entry. Some entries here arguably belong to spec 002-data-ingestion but landed on the 001 branch before that spec existed.
+**Status**: Backfill of work that shipped between commits `1b5f11a` (Phase 15 close) and `6faeb11` (HEAD) without a prior task entry. Some entries here arguably belong to the data-ingestion direction (originally spec 002-data-ingestion, split 2026-05-22 into 002-database-backend and 003-ingestion-pipeline) but landed on the 001 branch before that spec existed.
 
 - [x] T097 Update Earth Sandwich 2015 trip image routes in `src/data/earth-sandwich-2015.ts`. Commit: `0a689de`.
-- [x] T098 First-pass Instagram data ingestion: emit `public/posts.json` via `scripts/export_posts_json.py`, add `src/hooks/usePosts.ts`, wire into `src/App.tsx`. Commit: `57aeb53`. **Note**: predates the 002-data-ingestion spec; superseded direction lives in `specs/002-data-ingestion/plan.md`.
+- [x] T098 First-pass Instagram data ingestion: emit `public/posts.json` via `scripts/export_posts_json.py`, add `src/hooks/usePosts.ts`, wire into `src/App.tsx`. Commit: `57aeb53`. **Note**: predates the 002-data-ingestion spec; superseded direction lives in `specs/003-ingestion-pipeline/plan.md` (after the 2026-05-22 split of 002).
 - [x] T099 Add Kos (Greek Islands) airport anchor entry to `src/data/regions.ts`. Commit: `17b532f`.
 
 ---

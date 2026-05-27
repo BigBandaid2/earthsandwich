@@ -25,8 +25,9 @@ venv/
 # Alembic
 backend/alembic/versions/*.pyc
 
-# instagrapi session
+# instagrapi session (active + backup variants)
 instagrapi_session.json
+instagrapi_session.json.bak
 
 # Media downloads
 public/media/
@@ -45,3 +46,6 @@ htmlcov/
 # config (jira-config.yml) and discovered-fields.json ARE committed so the
 # whole team conforms to the same JIRA mappings.
 .specify/extensions/jira/jira-config.local.yml
+
+# Strategic / private docs — not for the public repo.
+docs/du-vision.md

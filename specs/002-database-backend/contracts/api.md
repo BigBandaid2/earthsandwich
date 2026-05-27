@@ -1,6 +1,6 @@
-# API Contract: Data Ingestion & Backend
+# API Contract: Database & Backend
 
-**Phase**: 1 | **Plan**: [../plan.md](../plan.md) | **Date**: 2026-05-12
+**Phase**: 1 | **Plan**: [../plan.md](../plan.md) | **Date**: 2026-05-12 (updated 2026-05-22)
 
 ## Base URL
 
@@ -268,25 +268,14 @@ Returns Substack posts that have been assigned to a stop (`stop_id IS NOT NULL`)
 
 ## Environment Variables Reference
 
-All required variables must be present in `.env` (see `.env.example`):
+Variables required by this spec (database, API, container concerns):
 
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `DATABASE_URL` | Yes | `postgresql+asyncpg://user:pass@host:5432/db` |
 | `API_SECRET_KEY` | Yes | Bearer token for write endpoints |
-| `INSTA_USERNAME` | Yes | Instagram account username for instagrapi |
-| `INSTA_PASSWORD` | Yes | Instagram account password for instagrapi |
-| `INSTAGRAPI_SESSION_FILE` | Yes | Path to persisted instagrapi session file |
-| `ANTHROPIC_API_KEY` | Yes | Claude API key for location inference fallback |
-| `AIRPORT_API_KEY` | Yes | Airlabs API key for IATA lookup |
-| `SUBSTACK_RSS_URL` | Yes | Full URL of the Substack RSS feed |
 | `FRONTEND_ORIGIN` | Yes | CORS allowed origin (e.g. `http://localhost:5173`) |
-| `INSTAGRAM_GRAPH_API_TOKEN` | No | Graph API fallback token (instagrapi primary) |
-| `INSTAGRAM_POLL_INTERVAL_MINUTES` | No | Default: `60` |
-| `SUBSTACK_POLL_INTERVAL_MINUTES` | No | Default: `60` |
-| `SMTP_HOST` | No | SMTP server for session-error email alerts |
-| `SMTP_PORT` | No | Default: `587` |
-| `SMTP_USER` | No | SMTP credentials |
-| `SMTP_PASSWORD` | No | SMTP credentials |
 | `LOG_LEVEL` | No | Default: `INFO` |
 | `ENVIRONMENT` | No | `development` (console logs) or `production` (JSON logs); default: `production` |
+
+> Ingestion-specific env vars (`INSTA_USERNAME`, `INSTA_PASSWORD`, `INSTAGRAPI_SESSION_FILE`, `ANTHROPIC_API_KEY`, `SUBSTACK_RSS_URL`, `INSTAGRAM_GRAPH_API_TOKEN`, `INSTAGRAM_POLL_INTERVAL_MINUTES`, `SUBSTACK_POLL_INTERVAL_MINUTES`, `SMTP_*`) live in [`003-ingestion-pipeline/quickstart.md`](../../003-ingestion-pipeline/quickstart.md).
