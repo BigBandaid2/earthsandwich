@@ -71,6 +71,12 @@ INSTAGRAPI_SESSION_FILE = os.environ.get(
 # overridable by the --targets CLI flag. One TSV is written per target.
 DEFAULT_TARGETS = os.environ.get("INSTAGRAM_TARGET_ACCOUNTS", "ourearthsandwich")
 
+# Inferred-location sanity bounds. Models occasionally return prose-as-location
+# despite the prompt — a "location" longer than this or containing newlines is
+# treated as malformed, the row falls through to the city-level fallback, and
+# the rejected text is preserved in `reasoning` for audit.
+MAX_INFERRED_LOCATION_LEN = 200
+
 TSV_COLUMNS = ["id", "instagram_id", "shortcode", "media_url", "caption", "timestamp", "location", "lat", "lng", "region", "reasoning"]
 DEFAULT_OUTPUT_TEMPLATE = os.path.join(PROJECT_ROOT, "posts.{target}.local.tsv")
 DEFAULT_MEDIA_DIR = os.path.join(PROJECT_ROOT, "public/media")
@@ -232,10 +238,14 @@ def infer_post_location(
         '"lat" (decimal latitude as a string, e.g. \'40.7580\'), '
         '"lng" (decimal longitude as a string, e.g. \'-73.9855\'), '
         'and "region" (IATA code of the nearest in-country international airport, e.g. \'JFK\'). '
+        'The "location" value MUST be a short place-name string (under 200 characters, no line breaks) — '
+        "not a sentence, paragraph, or your reasoning prose. "
         "If you cannot determine the location with reasonable confidence, set all four values to empty strings. "
         "If you cannot determine the lat/lng, provide the location and region but leave lat and lng as empty strings. "
         "If you cannot determine the nearest international airport, provide the location and lat/lng but leave region as an empty string. "
-        "Do not include any text outside the JSON object. Do not wrap the JSON in markdown code fences."
+        "CRITICAL: Your entire response must be exactly one JSON object and nothing else. "
+        "Do not write reasoning, observations, or analysis before or after the JSON. "
+        "Do not wrap the JSON in markdown code fences. The downstream parser cannot recover from a pure-prose response."
     )
 
     content: list[dict] = []
@@ -264,16 +274,30 @@ def infer_post_location(
     raw = response.content[0].text
     data, reasoning = _extract_json_and_reasoning(raw)
     if data is not None:
+        location = str(data.get("location", "")).strip()
+        # Sanity-check the location string. Even when the model returns valid
+        # JSON, it sometimes stuffs prose-as-location into the "location"
+        # field. A real place name is short and single-line; anything else
+        # is treated as malformed so the call site applies the city-level
+        # fallback. The rejected text moves to `reasoning` for audit.
+        if "\n" in location or len(location) > MAX_INFERRED_LOCATION_LEN:
+            rejection = (
+                f"[parser rejected location as malformed "
+                f"(len={len(location)}, has_newline={'\\n' in location}); "
+                f"first 300 chars: {location[:300]!r}]"
+            )
+            combined = f"{reasoning}\n\n{rejection}" if reasoning else rejection
+            return ("", "", "", "", combined)
         return (
-            str(data.get("location", "")),
+            location,
             str(data.get("lat", "")),
             str(data.get("lng", "")),
             str(data.get("region", "")),
             reasoning,
         )
-    # No parseable JSON — treat the whole response as a location-name hint
-    # and surface it as reasoning too, so the row records what the model said.
-    return (raw.strip(), "", "", "", reasoning)
+    # No parseable JSON at all — return empty location so the call site applies
+    # its city-level fallback. Preserve the raw text in `reasoning` for audit.
+    return ("", "", "", "", raw.strip())
 
 
 def _challenge_code_handler(username: str, choice) -> str:
@@ -445,6 +469,30 @@ def canonicalize_tagged_location(name: str, lat: str, lng: str) -> tuple[str, st
     return (canonical, region, reasoning)
 
 
+def _extract_city_heuristic(location: str) -> str:
+    """Pull a city-level name out of a canonical 'Venue, City, Country'-style
+    location string. Used by the fallback path so a row with no observable
+    evidence inherits the neighbor's *city*, not its exact venue (the prior
+    post was probably nearby in the same city, almost never at the same venue).
+
+    Heuristic — intentionally simple, no LLM call:
+      - 3+ segments → second-to-last (the city slot in 'Venue, City, Country').
+      - 2 segments → first ('City, Country' → 'City').
+      - 1 segment / empty → return as-is.
+
+    Known limitation: US 'City, State, Country' tags resolve to the state
+    ('Seattle, Washington, USA' → 'Washington') rather than the city. The
+    fallback is still a general-area marker — wider than the venue, which
+    is the user-visible improvement — just at state level for those cases.
+    """
+    parts = [p.strip() for p in location.split(",") if p.strip()]
+    if len(parts) >= 3:
+        return parts[-2]
+    if len(parts) == 2:
+        return parts[0]
+    return location.strip()
+
+
 def _jittered_sleep(low: float, high: float, label: str = "") -> None:
     """Sleep for a random duration in [low, high] seconds. Logs the chosen
     duration so operator output makes the wait visible. No-op when high<=0."""
@@ -593,6 +641,7 @@ def process_media(
     local_id: int,
     media_dir: str,
     recent_locations: list[str],
+    previous_row: Optional[dict] = None,
 ) -> dict:
     """Process one instagrapi `Media` object into a TSV row dict.
 
@@ -700,19 +749,27 @@ def process_media(
             # the chronological-neighbor fallback, and the `reasoning` column
             # records that the value was a fallback rather than an inference.
             fallback_used = False
-            if not location:
-                fallback = next((loc_str for loc_str in recent_locations if loc_str), "")
-                if fallback:
-                    location = fallback
-                    fallback_used = True
-                    note = (
-                        f"fallback: no observable evidence in image/caption; "
-                        f"location copied from prior post ({fallback}). "
-                        f"lat/lng/region left empty so downstream consumers can "
-                        f"identify fallback rows."
-                    )
-                    reasoning = f"{reasoning}\n\n{note}" if reasoning else note
-            label = "inferred — fallback to prior post" if fallback_used else "inferred — no tag found"
+            if not location and previous_row and previous_row.get("location"):
+                # Fall back to the prior post's CITY (not its exact venue) so
+                # we don't mislabel this row with the neighbor's specific
+                # landmark. lat/lng/region are inherited from the prior post —
+                # they're at the prior venue's resolution, but for a fallback
+                # marker that's close enough (same city = same IATA region,
+                # coords off by a few km at most).
+                fallback_full = previous_row["location"]
+                fallback_city = _extract_city_heuristic(fallback_full)
+                location = fallback_city
+                lat = previous_row.get("lat", "")
+                lng = previous_row.get("lng", "")
+                region = previous_row.get("region", "")
+                fallback_used = True
+                note = (
+                    f"fallback: no observable evidence in image/caption; "
+                    f"used the prior post's city ({fallback_city}, derived from "
+                    f"'{fallback_full}'); lat/lng/region inherited from that post."
+                )
+                reasoning = f"{reasoning}\n\n{note}" if reasoning else note
+            label = "inferred — fallback to prior post's city" if fallback_used else "inferred — no tag found"
             print(f"  location ({label}): {location or '(undetermined)'}  lat={lat}  lng={lng}  region: {region or '(undetermined)'}")
 
     # Strip project root prefix and normalize to posix separators for the TSV row.
@@ -845,6 +902,37 @@ def _resort_tsv_and_rename_media(path: str, target: str, media_dir: str) -> None
             print(f"  swept {len(swept)} orphan media file(s): {sample}{more}")
 
 
+def _prune_scrape_logs(target: str, log_dir: str, keep: int = 5) -> None:
+    """Keep only the most recent `keep - 1` `scrape-<target>-*.log` files in
+    `log_dir`. The in-flight log being written by the shell's `tee` (if any)
+    will bring the total to `keep` after this run completes.
+
+    Best-effort: file-system errors during deletion are reported but do not
+    abort the scrape. Matches strictly `scrape-<target>-*.log` so an account
+    `test` won't sweep an account `testing`'s logs (the trailing `-`
+    separator after the target name enforces the boundary).
+    """
+    import glob as _glob
+    pattern = os.path.join(log_dir, f"scrape-{target}-*.log")
+    logs = _glob.glob(pattern)
+    if not logs or len(logs) < keep:
+        return
+    logs.sort(key=lambda p: os.path.getmtime(p))  # oldest first
+    keep_count = max(0, keep - 1)
+    to_delete = logs[:-keep_count] if keep_count else logs
+    pruned: list[str] = []
+    for path in to_delete:
+        try:
+            os.remove(path)
+            pruned.append(os.path.basename(path))
+        except OSError as exc:
+            print(f"  ! could not prune log {os.path.basename(path)}: {exc}")
+    if pruned:
+        sample = ", ".join(pruned[:3])
+        more = f" (+{len(pruned) - 3} more)" if len(pruned) > 3 else ""
+        print(f"  pruned {len(pruned)} stale scrape log(s): {sample}{more}")
+
+
 def resolve_target_user_id(cl: "object", username: str) -> Optional[tuple[int, int]]:
     """Resolve a target Instagram username to its (user_id, media_count).
 
@@ -919,6 +1007,12 @@ def run_for_target(
     output_path = output_template.format(target=target)
     print(f"\n=== Target: @{target} → {output_path} ===")
 
+    # Sweep old `scrape-<target>-*.log` files in the script's directory,
+    # keeping only the newest 4 prior runs. The current run's log (being
+    # written by the shell's tee, if any) will bring the on-disk total
+    # back up to 5 once this scrape completes.
+    _prune_scrape_logs(target, os.path.dirname(os.path.abspath(__file__)))
+
     resolved = resolve_target_user_id(cl, target)
     if resolved is None:
         return
@@ -955,9 +1049,13 @@ def run_for_target(
     elif media_count:
         print(f"  account has {media_count} total post(s); TSV already has {len(existing_rows)}. Looking for net-new posts only.")
 
-    # Seed inference context with the target's own recent posts.
+    # Seed inference context with the target's own recent posts. `recent_locations`
+    # is a list[str] used by the LLM prompt; `previous_row` carries full row
+    # metadata (lat/lng/region) so the no-inference fallback can inherit those
+    # from the immediately-prior post.
     sorted_rows = sorted(timestamped, key=lambda r: r["timestamp"], reverse=True)
     recent_locations = [r.get("location", "") for r in sorted_rows[:RECENT_LOCATION_COUNT]]
+    previous_row: Optional[dict] = sorted_rows[0] if sorted_rows else None
 
     print(f"Streaming new media via instagrapi (since {last_timestamp_str}):")
     write_header = not os.path.exists(output_path)
@@ -986,7 +1084,7 @@ def run_for_target(
                 long_rest=rate_config["long_rest"],
             ):
                 local_id = next_id
-                row = process_media(m, target, local_id, media_dir, recent_locations)
+                row = process_media(m, target, local_id, media_dir, recent_locations, previous_row)
 
                 writer.writerow(row)
                 out_file.flush()
@@ -994,6 +1092,7 @@ def run_for_target(
                 if row["location"]:
                     recent_locations.insert(0, row["location"])
                     recent_locations = recent_locations[:RECENT_LOCATION_COUNT]
+                    previous_row = row  # carry forward for the next row's fallback
 
                 next_id += 1
                 total_written += 1
@@ -1084,7 +1183,11 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    if (sys.stdout.encoding or "").lower() != "utf-8":
-        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    # Force line-buffered stdout/stderr so live tailing of `tee`'d logs
+    # actually shows progress as it happens — without this, Python switches
+    # to block-buffered mode whenever stdout is piped and the log only
+    # updates in 4-8KB chunks (or at process exit). The encoding reconfigure
+    # also fixes Windows cp1252 → utf-8 for emoji-free arrow / accent chars.
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
     main()
