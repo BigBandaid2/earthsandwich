@@ -142,10 +142,10 @@
 
 **Independent Test**: On a machine with Docker and no local Python/Node setup, run `docker compose up`; navigate to frontend URL; confirm travelogue loads data from backend. Stop and restart → data still present.
 
-- [ ] T044 [P] [US6] Create backend/Dockerfile: Python 3.12 slim base; COPY requirements.txt and RUN pip install; COPY app/; EXPOSE 8000; CMD uvicorn app.main:app --host 0.0.0.0 --port 8000
+- [x] T044 [P] [US6] Create backend/Dockerfile: Python 3.12 slim base; COPY requirements.txt and RUN pip install; COPY app/; EXPOSE 8000; CMD uvicorn app.main:app --host 0.0.0.0 --port 8000
 - [ ] T045 [P] [US6] Create Dockerfile.frontend: multi-stage — stage 1 Node 18 alpine, COPY package*.json, RUN npm ci, COPY frontend/src/ (updated path after T002 migration), RUN npm run build; stage 2 nginx:alpine, COPY --from=stage1 /app/dist /usr/share/nginx/html
 - [ ] T046 [US6] Create docker-compose.yml: db service (postgres:16, named volume for data persistence, mounts scripts/seed-dump.sql into /docker-entrypoint-initdb.d/seed-dump.sql, health check via pg_isready); backend service (build backend/, depends_on db with health condition, env_file .env, health check via GET /health); frontend service (build Dockerfile.frontend, depends_on backend); all services on shared network (FR-036, FR-038, FR-039)
-- [ ] T047 [US6] Verify backend can connect to db service using Docker Compose service name in DATABASE_URL (postgresql+asyncpg://user:pass@db:5432/earthsandwich); confirm Alembic migrations run on backend container start before accepting traffic
+- [X] T047 [US6] Verify backend can connect to db service using Docker Compose service name in DATABASE_URL (postgresql+asyncpg://user:pass@db:5432/earthsandwich); confirm Alembic migrations run on backend container start before accepting traffic
 
 **Checkpoint**: US6 complete — validate with quickstart.md section 2 end-to-end (docker compose up → browser loads travelogue).
 

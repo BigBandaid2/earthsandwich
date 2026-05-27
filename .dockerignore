@@ -1,12 +1,14 @@
 .git/
 .github/
 node_modules/
+frontend/
 dist/
 build/
 *.log
 .env
 .env.local
 .env.*.local
+backend/.env
 __pycache__/
 *.pyc
 .venv/
@@ -14,6 +16,7 @@ venv/
 .coverage
 htmlcov/
 .pytest_cache/
+backend/tests/
 specs/
 docs/
 .specify/
