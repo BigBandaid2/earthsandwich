@@ -38,10 +38,11 @@ async def mock_db() -> AsyncMock:
 
 
 @pytest_asyncio.fixture
-async def client(mock_db: AsyncMock) -> AsyncGenerator[tuple[AsyncClient, AsyncMock], None]:
+async def client(mock_db: AsyncMock) -> AsyncGenerator[AsyncClient, None]:
     """httpx AsyncClient with get_db overridden to yield mock_db.
 
-    Yields (client, mock_db) so tests can configure mock_db before requests.
+    Use alongside the mock_db fixture to configure DB responses before each request.
+    pytest reuses the same mock_db instance for both fixtures in one test.
     """
 
     async def _override_get_db():
@@ -49,7 +50,7 @@ async def client(mock_db: AsyncMock) -> AsyncGenerator[tuple[AsyncClient, AsyncM
 
     app.dependency_overrides[get_db] = _override_get_db
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        yield ac, mock_db
+        yield ac
     app.dependency_overrides.pop(get_db, None)
 
 
