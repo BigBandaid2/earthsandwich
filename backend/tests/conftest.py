@@ -106,6 +106,9 @@ def make_stop(
     stop.instagram_post = instagram_post
     stop.substack_post = substack_post
     stop.created_at = datetime(2024, 6, 15, 0, 0, 0)
+    # Pydantic reads stop.post when validating StopResponse from_attributes;
+    # MagicMock would auto-return a MagicMock here, so pin it to None explicitly.
+    stop.post = None
     return stop
 
 
