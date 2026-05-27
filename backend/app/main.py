@@ -24,7 +24,6 @@ from app.ingestion.scheduler import scheduler
 def _configure_logging() -> None:
     shared_processors: list = [
         structlog.stdlib.add_log_level,
-        structlog.stdlib.add_logger_name,
         structlog.processors.TimeStamper(fmt="iso"),
     ]
 
