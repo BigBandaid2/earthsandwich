@@ -1,141 +1,39 @@
 id	instagram_id	shortcode	media_url	caption	timestamp	location	lat	lng	region	reasoning
-1	1012327861066298270	4MgtN7FnOe	public/media/ourearthsandwich_1.jpg	Avast me mateys, thar yonder port be a ripe for the taking!	2015-06-21T15:01:46+0000	Hudson River, New York Harbor, New York, USA	40.6892	-74.0445	JFK	
-2	1015202770431930740	4WuYp6lnF0	public/media/ourearthsandwich_2.jpg	We've been staring at this map on our wall for 4 years	2015-06-25T14:13:42+0000	Hudson River, New York Harbor, New York, USA				fallback: no observable evidence in image/caption; location copied from prior post (Hudson River, New York Harbor, New York, USA). lat/lng/region left empty so downstream consumers can identify fallback rows.
-3	1015315166311903646	4XH8OvFnGe	public/media/ourearthsandwich_3.jpg	There's now a voodoo doll of me getting jabbed somewhere in the upper west side #craigslist #grrmondays	2015-06-25T17:57:01+0000	Upper West Side, New York, USA	40.8044	-73.9480	JFK	
-4	1015648181776970079	4YTqPjlnFf	public/media/ourearthsandwich_4.jpg	All you really need	2015-06-26T04:58:39+0000	Upper West Side, New York, USA				fallback: no observable evidence in image/caption; location copied from prior post (Upper West Side, New York, USA). lat/lng/region left empty so downstream consumers can identify fallback rows.
-5	1015927431415361752	4ZTJ3DFnDY	public/media/ourearthsandwich_5.jpg	Guess I won't be needing this anymore #adiosamigos	2015-06-26T14:13:29+0000	John F. Kennedy International Airport, Queens, New York, USA	40.6413	-73.7781	JFK	"Looking at the boarding pass, I can see:
-- Virgin America flight VX 23
-- Departure: New York/JFK
-- Destination: appears to be Los Angeles (LAX) based on ""LAS"" visible
-- Date: 26 JUN 15
-- Boarding: 9:05AM
-
-The MTA MetroCard confirms the person is in New York. The caption ""Guess I won't be needing this anymore #adiosamigos"" suggests they're leaving New York (no longer needing the MetroCard).
-
-The boarding pass shows ""New York/JFK"" as departure, so the photo is likely taken at JFK Airport."
-6	1016133903889887471	4aCGbhlnDv	public/media/ourearthsandwich_6.jpg	Virgin airlines is all about fun. That's why we played chicken at SFO for the right to land and live #radical	2015-06-26T21:03:42+0000	San Francisco International Airport approach, San Francisco Bay, California, USA	37.6213	-122.3790	SFO	"Looking at the evidence:
-
-1. Caption mentions ""SFO"" explicitly - San Francisco International Airport
-2. The image shows a marina/harbor visible below, consistent with the San Francisco Bay Area
-3. Another American Airlines aircraft is visible nearby (the caption humorously says ""Virgin airlines"" but the plane clearly shows American Airlines livery)
-4. The winglet shows an American flag design
-5. The aerial view shows a coastal marina, urban sprawl, and hills in the background - consistent with the East Bay/Oakland area near SFO
-6. The marina visible below appears to be in the Oakland/Alameda or similar Bay Area marina
-
-The location appears to be approaching SFO, with the marina below looking like it could be in the Oakland/Alameda area or possibly near the Brisbane/South SF area approaching SFO."
+1	1012327861066298270	4MgtN7FnOe	public/media/ourearthsandwich_1.jpg	Avast me mateys, thar yonder port be a ripe for the taking!	2015-06-21T15:01:46+0000	New York Harbor, with Manhattan skyline including One World Trade Center visible, New York, USA	40.6892	-74.0445	JFK	
+2	1015202770431930740	4WuYp6lnF0	public/media/ourearthsandwich_2.jpg	We've been staring at this map on our wall for 4 years	2015-06-25T14:13:42+0000	New York	40.6892	-74.0445	JFK	fallback: no observable evidence in image/caption; used the prior post's city (New York, derived from 'New York Harbor, with Manhattan skyline including One World Trade Center visible, New York, USA'); lat/lng/region inherited from that post.
+3	1015315166311903646	4XH8OvFnGe	public/media/ourearthsandwich_3.jpg	There's now a voodoo doll of me getting jabbed somewhere in the upper west side #craigslist #grrmondays	2015-06-25T17:57:01+0000	Upper West Side, Manhattan, New York, USA	40.7870	-73.9754	JFK	
+4	1015648181776970079	4YTqPjlnFf	public/media/ourearthsandwich_4.jpg	All you really need	2015-06-26T04:58:39+0000	New York	40.7870	-73.9754	JFK	fallback: no observable evidence in image/caption; used the prior post's city (New York, derived from 'Upper West Side, Manhattan, New York, USA'); lat/lng/region inherited from that post.
+5	1015927431415361752	4ZTJ3DFnDY	public/media/ourearthsandwich_5.jpg	Guess I won't be needing this anymore #adiosamigos	2015-06-26T14:13:29+0000	John F. Kennedy International Airport, New York, USA	40.6413	-73.7781	JFK	
+6	1016133903889887471	4aCGbhlnDv	public/media/ourearthsandwich_6.jpg	Virgin airlines is all about fun. That's why we played chicken at SFO for the right to land and live #radical	2015-06-26T21:03:42+0000	San Francisco Bay Area, approaching SFO, California, USA	37.6213	-122.3790	SFO	
 7	1016733952680292959	4cKiSglnJf	public/media/ourearthsandwich_7.jpg	Wtf kind of bruise is this? Either I got kicked by a pony or I clotheslined an octopus last night #animalcontrol #vegas	2015-06-27T16:55:53+0000	Las Vegas, Nevada, USA	36.1699	-115.1398	LAS	
-8	1017874318372532744	4gN0y0lnII	public/media/ourearthsandwich_8.jpg	Maybe the wine cellars at the Bellagio, or maybe a strip mall Thai joint with a killer duck panang for $10, #vegas has no rules	2015-06-29T06:41:36+0000	Bellagio Hotel & Casino, Las Vegas, Nevada, USA	36.1126	-115.1767	LAS	"The caption mentions ""the wine cellars at the Bellagio"" and ""#vegas"" — the Bellagio is a specific, well-known hotel in Las Vegas. The image shows an extensive wine cellar/wine shop with wooden racks, consistent with an upscale Vegas establishment. The caption's reference to the Bellagio wine cellar as a possibility, combined with the #vegas hashtag, provides reasonable confidence this is at or near the Bellagio in Las Vegas."
-9	1020503595446333457	4pjpz6lnAR	public/media/ourearthsandwich_9.mp4	That's what commitment looks like	2015-07-02T21:45:30+0000	Bellagio Hotel & Casino, Las Vegas, Nevada, USA				fallback: no observable evidence in image/caption; location copied from prior post (Bellagio Hotel & Casino, Las Vegas, Nevada, USA). lat/lng/region left empty so downstream consumers can identify fallback rows.
-10	1021331883697795887	4sf-_dlnMv	public/media/ourearthsandwich_10.jpg	Impressive, Canada. The student has become the teacher #americafuckyeah #imlovinit	2015-07-04T01:11:09+0000	Canada (McDonald's restaurant)			YYZ	
-11	1024133501149409549	42c_5ClnEN	public/media/ourearthsandwich_11.jpg	This is also how I hug Wela #lennypetting	2015-07-07T21:57:28+0000	Canada (McDonald's restaurant)				fallback: no observable evidence in image/caption; location copied from prior post (Canada (McDonald's restaurant)). lat/lng/region left empty so downstream consumers can identify fallback rows.
+8	1017874318372532744	4gN0y0lnII	public/media/ourearthsandwich_8.jpg	Maybe the wine cellars at the Bellagio, or maybe a strip mall Thai joint with a killer duck panang for $10, #vegas has no rules	2015-06-29T06:41:36+0000	Las Vegas, Nevada, USA	36.1699	-115.1398	LAS	
+9	1020503595446333457	4pjpz6lnAR	public/media/ourearthsandwich_9.mp4	That's what commitment looks like	2015-07-02T21:45:30+0000	Nevada	36.1699	-115.1398	LAS	fallback: no observable evidence in image/caption; used the prior post's city (Nevada, derived from 'Las Vegas, Nevada, USA'); lat/lng/region inherited from that post.
+10	1021331883697795887	4sf-_dlnMv	public/media/ourearthsandwich_10.jpg	Impressive, Canada. The student has become the teacher #americafuckyeah #imlovinit	2015-07-04T01:11:09+0000	Canada (McDonald's restaurant)				
+11	1024133501149409549	42c_5ClnEN	public/media/ourearthsandwich_11.jpg	This is also how I hug Wela #lennypetting	2015-07-07T21:57:28+0000	Canada (McDonald's restaurant)				fallback: no observable evidence in image/caption; used the prior post's city (Canada (McDonald's restaurant), derived from 'Canada (McDonald's restaurant)'); lat/lng/region inherited from that post.
 12	1024868048761680078	45EA90FnDO	public/media/ourearthsandwich_12.jpg	Ah Costco, where else could I get two liters of ranch dressing, a diamond ring, and agoraphobia all in one stop? #capitalism	2015-07-08T22:16:53+0000	Costco				
-13	1026465172850897357	4-vKLiFnHN	public/media/ourearthsandwich_13.jpg	I'm so glad there are still restaurants that give you crayons #idontwannagrowup	2015-07-11T03:10:05+0000	Costco				fallback: no observable evidence in image/caption; location copied from prior post (Costco). lat/lng/region left empty so downstream consumers can identify fallback rows.
-14	1027050882733601302	5A0VYXlnIW	public/media/ourearthsandwich_14.jpg	You win this round, child's plaything	2015-07-11T22:33:47+0000	Costco				fallback: no observable evidence in image/caption; location copied from prior post (Costco). lat/lng/region left empty so downstream consumers can identify fallback rows.
-15	1029297918866518865	5IzQD2FnNR	public/media/ourearthsandwich_15.jpg	I always feel like a rock star when I walk out on the tarmac, even though this is also how refugees board planes	2015-07-15T00:58:15+0000	Vancouver International Airport, Richmond, British Columbia, Canada	49.1967	-123.1815	YVR	"I can see a small turboprop aircraft (appears to be a Dash 8/De Havilland Canada DHC-8) with the number ""319"" visible on the nose. There appears to be a red maple leaf logo partially visible, suggesting this is an Air Canada Jazz or similar Canadian regional carrier. The tarmac boarding scene and background skyline with mountains visible in the distance is consistent with Vancouver International Airport (YVR), which is known for tarmac boarding of regional turboprop flights. The distant mountains and flat terrain are characteristic of the Vancouver area."
-16	1030957932232471235	5OssbxFnLD	public/media/ourearthsandwich_16.jpg	Reservoir Dogs on holiday	2015-07-17T07:56:24+0000	"I can observe in the image:
-- A waterfront promenade/boardwalk
-- A large body of water (bay or sound)
-- Mountains visible across the water
-- A sunset scene
-- The caption ""Reservoir Dogs on holiday"" (Tarantino film reference, not a location cue)
-- Nearby posts suggest Vancouver area
-
-The geographic features are distinctive: a wide bay/sound with mountains across the water, a pebbled beach alongside a paved promenade, and the specific mountain silhouette. This matches **Alki Beach in West Seattle** or **Waterfront Park in Seattle** overlooking Puget Sound and the Olympic Mountains — OR it could be Vancouver's English Bay/Sunset Beach with mountains across the water.
-
-The nearby posts include Vancouver International Airport, suggesting Vancouver. English Bay/Sunset Beach in Vancouver shows exactly this view: mountains across the water, pebbled beach, paved promenade, and spectacular sunsets. The mountain profile and beach characteristics are consistent with English Bay, Vancouver.
-
-{""location"": ""English Bay Beach, Vancouver, British Columbia, Canada"", ""lat"": ""49.2827"", ""lng"": ""-123.1"				"I can observe in the image:
-- A waterfront promenade/boardwalk
-- A large body of water (bay or sound)
-- Mountains visible across the water
-- A sunset scene
-- The caption ""Reservoir Dogs on holiday"" (Tarantino film reference, not a location cue)
-- Nearby posts suggest Vancouver area
-
-The geographic features are distinctive: a wide bay/sound with mountains across the water, a pebbled beach alongside a paved promenade, and the specific mountain silhouette. This matches **Alki Beach in West Seattle** or **Waterfront Park in Seattle** overlooking Puget Sound and the Olympic Mountains — OR it could be Vancouver's English Bay/Sunset Beach with mountains across the water.
-
-The nearby posts include Vancouver International Airport, suggesting Vancouver. English Bay/Sunset Beach in Vancouver shows exactly this view: mountains across the water, pebbled beach, paved promenade, and spectacular sunsets. The mountain profile and beach characteristics are consistent with English Bay, Vancouver.
-
-{""location"": ""English Bay Beach, Vancouver, British Columbia, Canada"", ""lat"": ""49.2827"", ""lng"": ""-123.1"
+13	1026465172850897357	4-vKLiFnHN	public/media/ourearthsandwich_13.jpg	I'm so glad there are still restaurants that give you crayons #idontwannagrowup	2015-07-11T03:10:05+0000	Costco				fallback: no observable evidence in image/caption; used the prior post's city (Costco, derived from 'Costco'); lat/lng/region inherited from that post.
+14	1027050882733601302	5A0VYXlnIW	public/media/ourearthsandwich_14.jpg	You win this round, child's plaything	2015-07-11T22:33:47+0000	Costco				fallback: no observable evidence in image/caption; used the prior post's city (Costco, derived from 'Costco'); lat/lng/region inherited from that post.
+15	1029297918866518865	5IzQD2FnNR	public/media/ourearthsandwich_15.jpg	I always feel like a rock star when I walk out on the tarmac, even though this is also how refugees board planes	2015-07-15T00:58:15+0000	Vancouver International Airport, Vancouver, BC, Canada	49.1967	-123.1815	YVR	
+16	1030957932232471235	5OssbxFnLD	public/media/ourearthsandwich_16.jpg	Reservoir Dogs on holiday	2015-07-17T07:56:24+0000	Alki Beach, Seattle, Washington, USA	47.5814	-122.4093	SEA	
 17	1030959716380340966	5OtGZYlnLm	public/media/ourearthsandwich_17.jpg	The green wizard's neighborhood is really getting gentrified	2015-07-17T07:59:57+0000	Alki Beach Park, Seattle, United States	47.580989	-122.406729	SEA	
 18	1030960907956941572	5OtXvIFnME	public/media/ourearthsandwich_18.jpg	Next stop, Atlantis	2015-07-17T08:02:19+0000	Alki Beach Park, Seattle, United States	47.580989	-122.406729	SEA	
 19	1030963552767603506	5Ot-OTFnMy	public/media/ourearthsandwich_19.jpg	2015 finalists in the western conference tree pose championships	2015-07-17T08:07:34+0000	Seattle Aquarium, Seattle, United States	47.607560000764	-122.34262076207	SEA	
-20	1035749367733448862	5fuI_0FnCe	public/media/ourearthsandwich_20.jpg	Open bar and sharks, a winning combination	2015-07-23T22:36:07+0000	"I need to analyze the image for location clues.
-
-Observable evidence:
-- Crystal clear, turquoise/teal shallow water typical of the Caribbean or Bahamas
-- White sandy beach
-- Wooden pier/dock structure in background
-- Tropical setting with clear blue sky
-- A nurse shark being handled on a leash
-- Caption mentions ""open bar and sharks""
-- The specific shade of turquoise water and white sand is characteristic of the Bahamas
-
-The shark feeding/interaction with tourists on a beach with this specific turquoise water color, wooden dock structure, and the style of the tourist attraction strongly resembles **Compass Cay** or more likely **Staniel Cay** or **Bimini** in the Bahamas — but the most famous shark feeding beach attraction in the Bahamas matching this exact setup (wooden shack bar, shallow turquoise water, nurse sharks on leashes for tourist interaction) is **Compass Cay, Exumas, Bahamas** or **Bimini Big Game Club**.
-
-The setup most closely matches **Compass Cay Marina** in the Exumas, Bahamas, which is"				"I need to analyze the image for location clues.
-
-Observable evidence:
-- Crystal clear, turquoise/teal shallow water typical of the Caribbean or Bahamas
-- White sandy beach
-- Wooden pier/dock structure in background
-- Tropical setting with clear blue sky
-- A nurse shark being handled on a leash
-- Caption mentions ""open bar and sharks""
-- The specific shade of turquoise water and white sand is characteristic of the Bahamas
-
-The shark feeding/interaction with tourists on a beach with this specific turquoise water color, wooden dock structure, and the style of the tourist attraction strongly resembles **Compass Cay** or more likely **Staniel Cay** or **Bimini** in the Bahamas — but the most famous shark feeding beach attraction in the Bahamas matching this exact setup (wooden shack bar, shallow turquoise water, nurse sharks on leashes for tourist interaction) is **Compass Cay, Exumas, Bahamas** or **Bimini Big Game Club**.
-
-The setup most closely matches **Compass Cay Marina** in the Exumas, Bahamas, which is"
+20	1035749367733448862	5fuI_0FnCe	public/media/ourearthsandwich_20.jpg	Open bar and sharks, a winning combination	2015-07-23T22:36:07+0000	Compass Cay Marina, Exumas, Bahamas	24.0167	-76.5333	GGT	
 21	1037643022790455831	5mctThFnIX	public/media/ourearthsandwich_21.jpg	Congrats to the beautiful new Mr. and Mrs. Wissman	2015-07-26T13:18:29+0000	Compass Point Beach Resort, Nassau, Bahamas	25.064334775624	-77.480053753964	NAS	
 22	1037854635879461280	5nM0rkFnGg	public/media/ourearthsandwich_22.jpg	Let there be no doubt which table was the most rocking last night	2015-07-26T20:18:55+0000	Compass Point Beach Resort, Nassau, Bahamas	25.064334775624	-77.480053753964	NAS	
 23	1038275034912026681	5osaSrFnA5	public/media/ourearthsandwich_23.jpg	After an aborted attempt to break into the particle physics game, Toronto cleverly refit their Hadron Collider into an efficient transit solution	2015-07-27T10:14:10+0000	Toronto, Ontario, Canada	43.648	-79.3872	YYZ	
 24	1039690639011639713	5tuSCulnGh	public/media/ourearthsandwich_24.jpg	Some street art and political commentary in a Dublin back alley, right outside a bar of course	2015-07-29T09:06:44+0000	Dublin, Dublin, Ireland	53.3476	-6.2591	DUB	
 25	1039693755547283935	5tu_ZOlnHf	public/media/ourearthsandwich_25.jpg	A cobblestone passage through a medieval city wall, complete with a bar and a drunk stumbling home on a Wednesday morning, everything I ever hoped Ireland would be	2015-07-29T09:12:55+0000	Dublin, Dublin, Ireland	53.3476	-6.2591	DUB	
 26	1039696842471141920	5tvsUJlnIg	public/media/ourearthsandwich_26.jpg	There was a lot controversy when St. Patrick's Cathedral selected Dr Suess as their landscaper, nonetheless the archdiocese has stood steadfast by their choice	2015-07-29T09:19:03+0000	Saint Patrick's Cathedral, Dublin, Ireland	53.3392	-6.27152	DUB	
-27	1039749504424112739	5t7qpalnJj	public/media/ourearthsandwich_27.jpg	I'm gonna guess 2 Michelin stars	2015-07-29T11:03:41+0000	Buffet B79, Parnell Street, Dublin, Ireland	53.3516	-6.2649	DUB	"The sign shows ""79 Dishes for €7.99"" — the euro currency confirms Ireland or continental Europe. The nearby posts suggest Dublin, Ireland. The restaurant is ""Buffet B79"" offering Indian, Chinese, Japanese, Italian, and Thai cuisine. Searching for ""Buffet 79"" in Dublin, this appears to be located on Parnell Street, Dublin, which is known for its multicultural restaurants."
+27	1039749504424112739	5t7qpalnJj	public/media/ourearthsandwich_27.jpg	I'm gonna guess 2 Michelin stars	2015-07-29T11:03:41+0000	Buffet B79, Dublin, Ireland	53.3498	-6.2603	DUB	
 28	1040734666154734473	5xbqoxlnOJ	public/media/ourearthsandwich_28.jpg	I like Ireland's binary approach to banking: Money is Yes	2015-07-30T19:41:01+0000	Dublin, Dublin, Ireland	53.3476	-6.2591	DUB	
 29	1040738355942683645	5xcgVKFnP9	public/media/ourearthsandwich_29.jpg	Kiss me under the light of a thousand stars...	2015-07-30T19:48:21+0000	Galway, Galway, Ireland	53.2719	-9.04889	GWY	
 30	1040867812321948378	5x58KzlnLa	public/media/ourearthsandwich_30.jpg	While they threw in an authentic Irish jig every few sets, these folks were predominantly an One Direction cover band	2015-07-31T00:05:34+0000	The Cobblestone, Dublin, Ireland	53.3498	-6.27786	DUB	
 31	1041573733163495633	50acq0lnDR	public/media/ourearthsandwich_31.jpg	Even in 8th century manuscripts, there are still poems about cats #pangurban #bookofkells	2015-07-31T23:28:06+0000	The Long Room Library, Trinity College, Dublin, Ireland	53.343893210453	-6.2569356523512	DUB	
 32	1041587896581517866	50dqxiFnIq	public/media/ourearthsandwich_32.jpg	Irish people suck at walking	2015-07-31T23:56:14+0000	Dublin, Dublin, Ireland	53.3476	-6.2591	DUB	
 33	1041842766282649845	51XnncFnD1	public/media/ourearthsandwich_33.jpg	It's a matter of principle really	2015-08-01T08:22:37+0000	Guinness Storehouse, Dublin, Ireland	53.3418	-6.2868	DUB	
-34	1042844823819022523	547dePlnC7	public/media/ourearthsandwich_34.jpg	Irish Cinnabun	2015-08-02T17:33:32+0000	"The caption says ""Irish Cinnabun"" and the nearby posts are all in Ireland. The image shows a hedge maze/labyrinth. In Ireland, a well-known hedge maze exists at Russborough House or at various gardens. However, a particularly famous spiral/snail-shaped hedge maze is at the **Glendeer Pet Farm** or more notably at **Castlewellan** — but looking more carefully, the spiral topiary hedge design is characteristic of the maze at **Powerscourt Gardens** in Wicklow, Ireland, or the maze at **Blarney Castle**.
-
-Actually, the hedge maze with that distinctive spiral/snail shape is most recognizable as the one at **Glendeer** or — more likely given the Dublin-area context — the **hedge maze at Russborough** or **Powerscourt Estate, Enniskerry, Co. Wicklow, Ireland**.
-
-The spiral hedge topiary is quite distinctive of **Powerscourt Gardens**, which also fits the nearby Dublin posts context and is a very popular tourist stop from Dublin.
-
-{""location"": ""Powerscourt Estate Gardens, Enniskerry, Co. Wick"				"The caption says ""Irish Cinnabun"" and the nearby posts are all in Ireland. The image shows a hedge maze/labyrinth. In Ireland, a well-known hedge maze exists at Russborough House or at various gardens. However, a particularly famous spiral/snail-shaped hedge maze is at the **Glendeer Pet Farm** or more notably at **Castlewellan** — but looking more carefully, the spiral topiary hedge design is characteristic of the maze at **Powerscourt Gardens** in Wicklow, Ireland, or the maze at **Blarney Castle**.
-
-Actually, the hedge maze with that distinctive spiral/snail shape is most recognizable as the one at **Glendeer** or — more likely given the Dublin-area context — the **hedge maze at Russborough** or **Powerscourt Estate, Enniskerry, Co. Wicklow, Ireland**.
-
-The spiral hedge topiary is quite distinctive of **Powerscourt Gardens**, which also fits the nearby Dublin posts context and is a very popular tourist stop from Dublin.
-
-{""location"": ""Powerscourt Estate Gardens, Enniskerry, Co. Wick"
-35	1042847489735422232	548ERElnEY	public/media/ourearthsandwich_35.jpg	My fairest damsel, let down your hair!	2015-08-02T17:38:50+0000	"I can observe in the image:
-- A round stone tower with crenellations (battlements) at the top
-- Ivy/vegetation growing on the tower
-- Tall cypress trees (Italian cypress) surrounding it
-- Lush garden setting
-- The caption references ""let down your hair"" (Rapunzel reference)
-
-The tower appears to be a **folly** — a decorative tower built as a garden feature. The combination of the round crenellated stone tower, Italian cypress trees, and formal garden setting is very characteristic of **Powerscourt Estate** in Enniskerry, Co. Wicklow, Ireland, which is near Dublin and fits the nearby post context. Powerscourt Gardens are famous for their follies, Italian cypress trees, and elaborate garden features.
-
-The nearby posts strongly suggest Dublin/Ireland, and Powerscourt is one of the most visited garden estates from Dublin, known for exactly this type of tower folly surrounded by cypress trees and lush vegetation.
-
-{""location"": ""Powerscourt Estate, Enniskerry, Co. Wicklow, Ireland"", ""lat"": ""53.1844"", ""lng"": ""-6."				"I can observe in the image:
-- A round stone tower with crenellations (battlements) at the top
-- Ivy/vegetation growing on the tower
-- Tall cypress trees (Italian cypress) surrounding it
-- Lush garden setting
-- The caption references ""let down your hair"" (Rapunzel reference)
-
-The tower appears to be a **folly** — a decorative tower built as a garden feature. The combination of the round crenellated stone tower, Italian cypress trees, and formal garden setting is very characteristic of **Powerscourt Estate** in Enniskerry, Co. Wicklow, Ireland, which is near Dublin and fits the nearby post context. Powerscourt Gardens are famous for their follies, Italian cypress trees, and elaborate garden features.
-
-The nearby posts strongly suggest Dublin/Ireland, and Powerscourt is one of the most visited garden estates from Dublin, known for exactly this type of tower folly surrounded by cypress trees and lush vegetation.
-
-{""location"": ""Powerscourt Estate, Enniskerry, Co. Wicklow, Ireland"", ""lat"": ""53.1844"", ""lng"": ""-6."
+34	1042844823819022523	547dePlnC7	public/media/ourearthsandwich_34.jpg	Irish Cinnabun	2015-08-02T17:33:32+0000	Iveagh Gardens, Dublin, Ireland	53.3366	-6.2622	DUB	
+35	1042847489735422232	548ERElnEY	public/media/ourearthsandwich_35.jpg	My fairest damsel, let down your hair!	2015-08-02T17:38:50+0000	Powerscourt Gardens, Enniskerry, County Wicklow, Ireland	53.1864	-6.1897	DUB	
 36	1043725834891194826	58Dx3vlnHK	public/media/ourearthsandwich_36.jpg	Mind the gap	2015-08-03T22:43:56+0000	Ruins of the Carmo Convent, Lisbon, Portugal	38.712037943371	-9.1405686227443	LIS	
 37	1044458462023938337	5-qW_7lnEh	public/media/ourearthsandwich_37.jpg	Heading home for siesta after a morning of exploring. I assume they do that here too.	2015-08-04T22:59:32+0000	Bica Funicular Street, Lisbon, Portugal	38.70949160899	-9.1463834178778	LIS	
 38	1044462849584689531	5-rW2KlnF7	public/media/ourearthsandwich_38.jpg	I'd be offended, but they just seem to be getting along so well #multiculturalism	2015-08-04T23:08:15+0000	Rua Augusta da Prata, Lisbon, Portugal	38.712148326485	-9.1381401848133	LIS	
@@ -147,48 +45,36 @@ The nearby posts strongly suggest Dublin/Ireland, and Powerscourt is one of the 
 44	1045131486880494383	6BDYzLFnMv	public/media/ourearthsandwich_44.jpg	The manliest picnic table ever made	2015-08-05T21:16:43+0000	Sintra, Sintra, Portugal	38.8	-9.38333	LIS	
 45	1045844069870629091	6DlaPzFnDj	public/media/ourearthsandwich_45.jpg	The most adorable volunteer fire station ever	2015-08-06T20:52:30+0000	Chiado, Lisbon, Portugal	38.71072643011	-9.1411898663065	LIS	
 46	1047698514954842370	6KLD-XlnEC	public/media/ourearthsandwich_46.jpg	Excuse me while I go fetch my Millennium Falcon	2015-08-09T10:16:57+0000	Lagos, Faro, Portugal	37.1006	-8.6799	FAO	
-47	1048624713570874248	6Ndp8DFnOI	public/media/ourearthsandwich_47.jpg	This blows my mind everytime. Put me in a polka dot dress, I'll shill for them any day #tmobile #productplacement	2015-08-10T16:57:08+0000	Seville, Andalusia, Spain	37.3704868	-5.9451679	SVQ	
+47	1048624713570874248	6Ndp8DFnOI	public/media/ourearthsandwich_47.jpg	This blows my mind everytime. Put me in a polka dot dress, I'll shill for them any day #tmobile #productplacement	2015-08-10T16:57:08+0000	Seville, Seville, Spain	37.3704868	-5.9451679	SVQ	
 48	1048636778670878886	6NgZgjFnCm	public/media/ourearthsandwich_48.jpg	Always sit on the left side of an eastbound bus, because science. (reversed for southern hemisphere)	2015-08-10T17:21:07+0000	Seville, Andalusia, Spain	37.3704868	-5.9451679	SVQ	
 49	1049529183452426252	6QrTtRFnAM	public/media/ourearthsandwich_49.jpg	The largest Gothic cathedral in the world so I'm told	2015-08-11T22:54:10+0000	Giralda, Seville, Spain	37.386175612406	-5.9924434872509	SVQ	
 50	1049531350993236030	6QrzP8lnA-	public/media/ourearthsandwich_50.jpg	Yes, that is an ice cream cone of meat	2015-08-11T22:58:28+0000	Tiana, Barcelona, Spain	41.4807	2.2681	BCN	
 51	1049536774438023373	6QtCK7FnDN	public/media/ourearthsandwich_51.jpg	The Spanish have style, these canopied daybeds are just part of a municipal park	2015-08-11T23:09:14+0000	Maria Luisa Park, Seville, Spain	37.374821	-5.988573	SVQ	
 52	1051040482065806021	6WC7_yFnLF	public/media/ourearthsandwich_52.jpg	I think you never really get away until you're on a boat	2015-08-14T00:56:50+0000	Plaza de España, Seville, Spain	37.37694	-5.98694	SVQ	
-53	1051044393044570937	6WD06KlnM5	public/media/ourearthsandwich_53.jpg	I'm fighting a bull, obviously. #nailedit	2015-08-14T01:04:37+0000	Plaza de Toros de la Real Maestranza de Caballería de Sevilla, Seville, Spain	37.386	-5.9983	SVQ	
+53	1051044393044570937	6WD06KlnM5	public/media/ourearthsandwich_53.jpg	I'm fighting a bull, obviously. #nailedit	2015-08-14T01:04:37+0000	Plaza de Toros de la Real Maestranza de Caballería, Seville, Spain	37.386	-5.9983	SVQ	
 54	1052078306034611022	6Zu6UrFnNO	public/media/ourearthsandwich_54.jpg	One of these was less than a dollar	2015-08-15T11:18:49+0000	Granada, Andalusia, Spain	37.1833	-3.6	GRX	
 55	1052437932244627627	6bArkrlnCr	public/media/ourearthsandwich_55.jpg	"""Closed for vacation, back in September. Happy summer!"" - your move France..."	2015-08-15T23:13:19+0000	Granada, Andalusia, Spain	37.1833	-3.6	GRX	
 56	1052813382070465336	6cWDFlFnM4	public/media/ourearthsandwich_56.jpg	They take cockoo for cocoa puffs to the next level here	2015-08-16T11:39:17+0000	Granada, Andalusia, Spain	37.1833	-3.6	GRX	
 57	1053636337021121388	6fRKqGlnNs	public/media/ourearthsandwich_57.jpg	Spain's Duck-alope, ancestor to our Jackalope	2015-08-17T14:54:20+0000	Alhambra, Granada, Spain	37.176666259766	-3.58944439888	GRX	
 58	1053642251358859301	6fSguQlnAl	public/media/ourearthsandwich_58.jpg	Granada as seen by the Moorish sultans of old	2015-08-17T15:06:05+0000	Nasrid Palaces, Granada, Spain	37.177085237138	-3.5902363814392	GRX	
 59	1054247797405414078	6hcMk9lnK-	public/media/ourearthsandwich_59.jpg	See you later Europe, I'll catch you on the flip side.	2015-08-18T11:09:12+0000	Rock of Gibraltar, Gibraltar, Gibraltar	36.144320923739	-5.3423595428467	GIB	
-60	1054584159396590477	6iorSelnON	public/media/ourearthsandwich_60.jpg	Lose your remote? It's here in Morocco	2015-08-18T22:17:30+0000	Khassa Medina, Tetouan, Morocco	35.570377795249	-5.374175071324	TTU	
-61	1054585508662244258	6io-7FFnOi	public/media/ourearthsandwich_61.jpg	Good afternoon, Africa	2015-08-18T22:20:10+0000	Khassa Medina, Tetouan, Morocco	35.570377795249	-5.374175071324	TTU	
+60	1054584159396590477	6iorSelnON	public/media/ourearthsandwich_60.jpg	Lose your remote? It's here in Morocco	2015-08-18T22:17:30+0000	Khasa Medina, Tetouan, Morocco	35.570377795249	-5.374175071324	TTU	
+61	1054585508662244258	6io-7FFnOi	public/media/ourearthsandwich_61.jpg	Good afternoon, Africa	2015-08-18T22:20:10+0000	Khasa Medina, Tetouan, Morocco	35.570377795249	-5.374175071324	TTU	
 62	1055226950434844786	6k61ISFnBy	public/media/ourearthsandwich_62.jpg	@demianfaulkner I have this amazing place for you to try	2015-08-19T19:34:36+0000	Fez, Fez, Morocco	34.0355	-5.0096	FEZ	
-63	1056016815346839583	6nubLTlnAf	public/media/ourearthsandwich_63.jpg	Moroccan chutes and ladders is serious business	2015-08-20T21:43:56+0000	Khasa Medina, Tetouan, Morocco	35.570377795249	-5.374175071324	TTU	
-64	1056545695094698330	6pmrY9FnFa	public/media/ourearthsandwich_64.jpg	Iron chef Morocco	2015-08-21T15:14:43+0000	Riad Idrissy & The Ruined Garden, Fes, Morocco	34.062256545021	-4.9776585799829	FEZ	
-65	1057718910919799757	6txb7VlnPN	public/media/ourearthsandwich_65.jpg	Chaos and sublime in the winding bazaars	2015-08-23T06:05:41+0000	"I can see a sign in the image that reads ""MAISON ARTISANALE"" (or similar), and the architecture shows a covered souk/medina passage with traditional Moroccan wooden ceiling (mashrabiya-style), wrought iron lanterns, and shops selling djellabas and crafts. The caption mentions ""winding bazaars.""
-
-Looking more carefully at the sign in the background, it appears to read something like ""MAISON ARTISANALE"" which is common in Moroccan medinas. The architectural style with the ornate wooden latticed ceiling covering the souk alley is characteristic of the medinas in Fes or Tetouan, Morocco.
-
-The nearby posts are heavily weighted toward Fes and Tetouan. The covered wooden ceiling structure with mashrabiya panels looks very characteristic of the renovated souks in **Tetouan's medina** (a UNESCO World Heritage site), which has distinctive covered market passages. The sign visible also seems consistent with Tetouan.
-
-{""location"": ""Medina of Tetouan, Tetouan, Morocco"", ""lat"": ""35.5706"", ""lng"": ""-5"				"I can see a sign in the image that reads ""MAISON ARTISANALE"" (or similar), and the architecture shows a covered souk/medina passage with traditional Moroccan wooden ceiling (mashrabiya-style), wrought iron lanterns, and shops selling djellabas and crafts. The caption mentions ""winding bazaars.""
-
-Looking more carefully at the sign in the background, it appears to read something like ""MAISON ARTISANALE"" which is common in Moroccan medinas. The architectural style with the ornate wooden latticed ceiling covering the souk alley is characteristic of the medinas in Fes or Tetouan, Morocco.
-
-The nearby posts are heavily weighted toward Fes and Tetouan. The covered wooden ceiling structure with mashrabiya panels looks very characteristic of the renovated souks in **Tetouan's medina** (a UNESCO World Heritage site), which has distinctive covered market passages. The sign visible also seems consistent with Tetouan.
-
-{""location"": ""Medina of Tetouan, Tetouan, Morocco"", ""lat"": ""35.5706"", ""lng"": ""-5"
+63	1056016815346839583	6nubLTlnAf	public/media/ourearthsandwich_63.jpg	Moroccan chutes and ladders is serious business	2015-08-20T21:43:56+0000	Khassa Medina, Tetouan, Morocco	35.570377795249	-5.374175071324	TTU	
+64	1056545695094698330	6pmrY9FnFa	public/media/ourearthsandwich_64.jpg	Iron chef Morocco	2015-08-21T15:14:43+0000	Riad Idrissy & The Ruined Garden, Fez, Morocco	34.062256545021	-4.9776585799829	FEZ	
+65	1057718910919799757	6txb7VlnPN	public/media/ourearthsandwich_65.jpg	Chaos and sublime in the winding bazaars	2015-08-23T06:05:41+0000	Souk Medina, Fez, Morocco	34.0642	-4.9739	FEZ	
 66	1058891958486200982	6x8KBBFnKW	public/media/ourearthsandwich_66.jpg	Partaking in the ancient and long revered Berber tradition of sandboarding	2015-08-24T20:56:19+0000	Merzouga, Errachidia, Morocco	31.098070930334	-4.0161895751953	ERH	
 67	1059692510224741287	60yLk7FnOn	public/media/ourearthsandwich_67.jpg	The ruthless Khaleesi, leading her hoard to its next plunder	2015-08-25T23:26:52+0000	Merzouga, Errachidia, Morocco	31.098070930334	-4.0161895751953	ERH	
-68	1060179190333469254	62g1tGFnJG	public/media/ourearthsandwich_68.jpg	Motherfucka lunged me	2015-08-26T15:33:49+0000	Jemaa el-Fnaa Square, Marrakech, Morocco	31.625412997105	-7.9888866482742	RAK	
+68	1060179190333469254	62g1tGFnJG	public/media/ourearthsandwich_68.jpg	Motherfucka lunged me	2015-08-26T15:33:49+0000	Jemaa el-Fna Square, Marrakech, Morocco	31.625412997105	-7.9888866482742	RAK	
 69	1061822594893116095	68WgY3FnK_	public/media/ourearthsandwich_69.jpg	Oh Holland, have you learned nothing?	2015-08-28T21:58:58+0000	Tulip Market, Amsterdam, Netherlands	52.367021898889	4.8905435088889	AMS	
-70	1061824090489647848	68W2JvlnLo	public/media/ourearthsandwich_70.jpg	Oh please do tell	2015-08-28T22:01:57+0000	Amsterdam, Amsterdam, Netherlands	52.3769	4.8982	AMS	
+70	1061824090489647848	68W2JvlnLo	public/media/ourearthsandwich_70.jpg	Oh please do tell	2015-08-28T22:01:57+0000	Amsterdam, North Holland, Netherlands	52.3769	4.8982	AMS	
 71	1068034686709035516	7Sa-ONFnH8	public/media/ourearthsandwich_71.jpg	Foreign languages are a total scam	2015-09-06T11:41:17+0000	Heidelberg, Baden-Württemberg, Germany	49.4122	8.71	FRA	
 72	1068039675305161333	7ScG0MlnJ1	public/media/ourearthsandwich_72.jpg	Tower ripped asunder	2015-09-06T11:51:12+0000	Heidelberg Castle Illumination, Heidelberg, Germany	49.413810053277	8.7043587402154	FRA	
 73	1068043377835406021	7Sc8sclnLF	public/media/ourearthsandwich_73.jpg	Good old fashioned fun at a 600 year old carnival	2015-09-06T11:58:33+0000	Luxembourg City, Luxembourg, Luxembourg	49.6117	6.13	LUX	
-74	1068044558808806116	7SdN4UFnLk	public/media/ourearthsandwich_74.jpg	Hold on! You have so much to live for!	2015-09-06T12:00:54+0000	Municipal Park, Luxembourg City, Luxembourg	49.614570188664	6.1271393413507	LUX	
+74	1068044558808806116	7SdN4UFnLk	public/media/ourearthsandwich_74.jpg	Hold on! You have so much to live for!	2015-09-06T12:00:54+0000	Luxembourg City Park, Luxembourg City, Luxembourg	49.614570188664	6.1271393413507	LUX	
 75	1068046726710326034	7SdtbVFnMS	public/media/ourearthsandwich_75.jpg	I spent 20 minutes trying to get mugged so I could see them spring into action	2015-09-06T12:05:13+0000	Brussels, Brussels, Belgium	50.85	4.35	BRU	
-76	1068062282058461430	7ShPyYFnD2	public/media/ourearthsandwich_76.jpg	Now that's what I call biscuits and gravy!	2015-09-06T12:36:07+0000	Grand Market Hall, Brussels, Belgium	50.86508724375	4.3585107275	BRU	
+76	1068062282058461430	7ShPyYFnD2	public/media/ourearthsandwich_76.jpg	Now that's what I call biscuits and gravy!	2015-09-06T12:36:07+0000	Grand Place, Brussels, Belgium	50.86508724375	4.3585107275	BRU	
 77	1070796384956216178	7cO6OIFnNy	public/media/ourearthsandwich_77.jpg	This just got added to my list of things to do in life. Now I just have to learn to surf (and speak German and move to Munich)	2015-09-10T07:08:18+0000	English Garden - By the Surfers, Munich, Germany	48.143470543164	11.587763013572	MUC	
 78	1070800460141982641	7cP1hcFnOx	public/media/ourearthsandwich_78.jpg	Not usually into filters, but Cinderella's castle deserves a little magic	2015-09-10T07:16:23+0000	Neuschwanstein Castle, Füssen, Germany	47.557602	10.749768	MUC	
 79	1070804581960020978	7cQxgLlnPy	public/media/ourearthsandwich_79.jpg	Clearly, I love rowboats	2015-09-10T07:24:35+0000	Alpsee Lake, Hohenschwangau, Germany	48.145843239	11.5622427034	MUC	
@@ -196,17 +82,17 @@ The nearby posts are heavily weighted toward Fes and Tetouan. The covered wooden
 81	1072674933942153903	7i6CtNFnKv	public/media/ourearthsandwich_81.jpg	This is where Redbull keeps all their toys. In the top right corner is a badass glass conference room suspended above the hanger	2015-09-12T21:20:38+0000	Red Bull Hangar-7, Salzburg, Austria	47.793573696703	13.007599998369	SZG	
 82	1073374095545365479	7lZA2MFnPn	public/media/ourearthsandwich_82.jpg	What does the fox say?	2015-09-13T20:29:45+0000	Venice, Venice, Italy	45.437723268072	12.331639631021	VCE	
 83	1074556171158189010	7plyT5FnPS	public/media/ourearthsandwich_83.jpg	It's nice that some things transcend all cultural boundaries	2015-09-15T11:38:19+0000	Venezia Mestre Railway Station, Venice, Italy	45.48245	12.23204	VCE	
-84	1074622489706263062	7p03X2lnIW	public/media/ourearthsandwich_84.jpg	I've learned that Pisa is only the best known of hundreds of leaning towers in Italy. Evidently, they are just bad at this particular task	2015-09-15T13:50:05+0000	Tower of the Asinelli, Bologna, Italy	44.49427	11.34697	BLQ	
+84	1074622489706263062	7p03X2lnIW	public/media/ourearthsandwich_84.jpg	I've learned that Pisa is only the best known of hundreds of leaning towers in Italy. Evidently, they are just bad at this particular task	2015-09-15T13:50:05+0000	Torre degli Asinelli, Bologna, Italy	44.49427	11.34697	BLQ	
 85	1077501025743959001	70DXlclnPZ	public/media/ourearthsandwich_85.jpg	This is, without question, the greatest nativity scene ever	2015-09-19T13:09:13+0000	Bologna, Bologna, Italy	44.5075	11.3514	BLQ	
 86	1077634668265107915	70hwVvlnHL	public/media/ourearthsandwich_86.jpg	The Pope is not impressed by your little Basilica	2015-09-19T17:34:44+0000	Basilica of San Petronio, Bologna, Italy	44.493535481881	11.343056387127	BLQ	
 87	1077679059151253702	70r2T-lnDG	public/media/ourearthsandwich_87.jpg	She handles her business like a lady, dat ass tho!	2015-09-19T19:02:56+0000	Piazza Maggiore, Bologna, Italy	44.493885548432	11.343085931977	BLQ	
 88	1077684099991630177	70s_qoFnFh	public/media/ourearthsandwich_88.jpg	This smile is from before climbing the 500 steps to the top.	2015-09-19T19:12:57+0000	Towers of Bologna, Bologna, Italy	44.4943	11.3465	BLQ	
-89	1078443454882018026	73Zpu-lnLq	public/media/ourearthsandwich_89.jpg	It looks like Leonardo was the original #leanstartup	2015-09-20T20:21:39+0000	Museo Nazionale della Scienza e della Tecnologia Leonardo da Vinci, Milan, Italy	43.774886663197	11.259172598267	MXP	
+89	1078443454882018026	73Zpu-lnLq	public/media/ourearthsandwich_89.jpg	It looks like Leonardo was the original #leanstartup	2015-09-20T20:21:39+0000	National Museum of Science and Technology Leonardo da Vinci, Florence, Italy	43.774886663197	11.259172598267	FLR	
 90	1078445787091202874	73aLrBFnM6	public/media/ourearthsandwich_90.jpg	Dave's really been trying to find himself	2015-09-20T20:26:17+0000	Central Market, Florence, Italy	43.776311	11.25317	FLR	
-91	1079935887348232468	78s_fBlnEU	public/media/ourearthsandwich_91.jpg	An escapee from the little shop of horrors	2015-09-22T21:46:51+0000	Riomaggiore, Cinque Terre, Italy	43.77632774	11.2565134425	FLR	
+91	1079935887348232468	78s_fBlnEU	public/media/ourearthsandwich_91.jpg	An escapee from the little shop of horrors	2015-09-22T21:46:51+0000	Riomaggiore, Cinque Terre, Italy	43.77632774	11.2565134425	GEN	
 92	1079940903224111501	78uIebFnGN	public/media/ourearthsandwich_92.jpg	Sometimes there's no reason to resist indulging in a classic	2015-09-22T21:56:49+0000	The Leaning Tower of Pisa, Pisa, Italy	43.76615234	11.27228290875	PSA	
 93	1082858898963460181	8HFm5ulnBV	public/media/ourearthsandwich_93.jpg	Inspired by Michelangelo's David...	2015-09-26T22:34:21+0000	Rome, Lazio, Italy	41.9	12.5	FCO	
-94	1082864155642720486	8HGzZZFnDm	public/media/ourearthsandwich_94.jpg	Architectural drawings from ancient times. Somehow it never occurred to me that they didn't just grab a chisel and go at it	2015-09-26T22:44:48+0000	Rome, Lazio, Italy				fallback: no observable evidence in image/caption; location copied from prior post (Rome, Lazio, Italy). lat/lng/region left empty so downstream consumers can identify fallback rows.
+94	1082864155642720486	8HGzZZFnDm	public/media/ourearthsandwich_94.jpg	Architectural drawings from ancient times. Somehow it never occurred to me that they didn't just grab a chisel and go at it	2015-09-26T22:44:48+0000	Lazio	41.9	12.5	FCO	fallback: no observable evidence in image/caption; used the prior post's city (Lazio, derived from 'Rome, Lazio, Italy'); lat/lng/region inherited from that post.
 95	1085670421641457905	8RE38RFnDx	public/media/ourearthsandwich_95.jpg	Yes to all of those things.	2015-09-30T19:40:21+0000	Rome, Lazio, Italy	41.9	12.5	FCO	
 96	1085677877796958678	8RGkcWlnHW	public/media/ourearthsandwich_96.jpg	I forgot maps had this function. St. Peter looks over Rome, and so do Sergie and Larry.	2015-09-30T19:55:10+0000	St. Peter's Basilica, Vatican City, Vatican City	41.900596998301	12.466691135805	FCO	
 97	1085683090679296629	8RHwTOlnJ1	public/media/ourearthsandwich_97.jpg	I believe this panel depicts how God escapes awkward situations	2015-09-30T20:05:31+0000	Sistine Chapel, Rome, Italy	41.902913866404	12.454394996166	FCO	
@@ -220,15 +106,15 @@ The nearby posts are heavily weighted toward Fes and Tetouan. The covered wooden
 105	1103244125636292970	9Pgq_hFnFq	public/media/ourearthsandwich_105.jpg	Blatant copyright infringement and careless appropriation of religious symbology all to sell some fried chicken. I like it.	2015-10-25T01:36:10+0000	Taipei, Taipei, Taiwan	25.0458	121.5339	TPE	
 106	1103248828692591080	9PhvblFnHo	public/media/ourearthsandwich_106.jpg	Joined a political rally yesterday because I love chanting mobs. Also they had free ice cream	2015-10-25T01:45:30+0000	Taiwan Peace Park, Taipei, Taiwan	25.04121333	121.51479346	TPE	
 107	1103252024467026490	9Pid74FnI6	public/media/ourearthsandwich_107.jpg	You don't fool me cubism, I know what I'm looking at	2015-10-25T01:51:51+0000	228 Peace Memorial Park, Taipei, Taiwan	25.0417	121.515	TPE	
-108	1103615795404370837	9Q1Lf9lnOV	public/media/ourearthsandwich_108.jpg	For 3 bucks, you get a bunch of fragile tissue paper nets, and every fish you catch is yours. I didn't need new pets so I ate mine.	2015-10-25T13:54:36+0000	Sanhe Night Market, Taipei, Taiwan	25.065736204736	121.5002245545	TPE	
+108	1103615795404370837	9Q1Lf9lnOV	public/media/ourearthsandwich_108.jpg	For 3 bucks, you get a bunch of fragile tissue paper nets, and every fish you catch is yours. I didn't need new pets so I ate mine.	2015-10-25T13:54:36+0000	Sanhe Night Market, New Taipei City, Taiwan	25.065736204736	121.5002245545	TPE	
 109	1110365708133757221	9oz7qEFnEl	public/media/ourearthsandwich_109.jpg	Fabulous lady of mystery contemplates her next adventure	2015-11-03T21:25:28+0000	New Orleans East, New Orleans, United States	30.077412946767	-89.828338623047	MSY	
-110	1110367193278083395	9o0RRNlnFD	public/media/ourearthsandwich_110.jpg	Late night shrimpin'	2015-11-03T21:28:25+0000	Taipei, Taiwan	25.0458	121.5339	TPE	
+110	1110367193278083395	9o0RRNlnFD	public/media/ourearthsandwich_110.jpg	Late night shrimpin'	2015-11-03T21:28:25+0000	Taipei, Taipei, Taiwan	25.0458	121.5339	TPE	
 111	1110370468031263107	9o1A7EFnGD	public/media/ourearthsandwich_111.mp4	Rock out buddy, how do I get your confidence?	2015-11-03T21:34:56+0000	Taipei 101 Mall, Taipei, Taiwan	25.034380598423	121.56444325583	TPE	
 112	1110373429193109962	9o1sA3FnHK	public/media/ourearthsandwich_112.jpg	Yay adventure, Yay friendship, Yay good feeling!	2015-11-03T21:40:49+0000	Jinshanling Great Wall, Beijing, China	39.8916812	116.3838965	PEK	
 113	1110378397664965180	9o20UHFnI8	public/media/ourearthsandwich_113.jpg	Edible Arrangements have been trying to branch out lately	2015-11-03T21:50:41+0000	Wangfujing Night Market, Beijing, China	39.9135289447	116.40459003	PEK	
 114	1116341515889046097	9-CrGulnJR	public/media/ourearthsandwich_114.jpg	Our first 10 minutes in Havana and we couldn't have found a more Cubano character if we were casting a movie	2015-11-12T03:18:20+0000	Havana, Havana, Cuba	23.1319	-82.3642	HAV	
 115	1116343404013712017	9-DGlLlnKR	public/media/ourearthsandwich_115.jpg	No matter what corner of the world you go, there will always be a Chinatown	2015-11-12T03:22:05+0000	Havana, Havana, Cuba	23.1319	-82.3642	HAV	
-116	1116346207159349982	9-DvX0FnLe	public/media/ourearthsandwich_116.jpg	Leg room in these old Chevys was insane. Now I finally get why losing your virginity in a car is an American thing	2015-11-12T03:27:39+0000	Viñales, Pinar del Río, Cuba	22.6164	-83.7078	HAV	
+116	1116346207159349982	9-DvX0FnLe	public/media/ourearthsandwich_116.jpg	Leg room in these old Chevys was insane. Now I finally get why losing your virginity in a car is an American thing	2015-11-12T03:27:39+0000	Viñales, Viñales, Cuba	22.6164	-83.7078	HAV	
 117	1116348101147652885	9-EK7ulnMV	public/media/ourearthsandwich_117.jpg	'Fidel' by Banksy	2015-11-12T03:31:25+0000	Havana, Havana, Cuba	23.1319	-82.3642	HAV	
 118	1116350221150221133	9-EpyIlnNN	public/media/ourearthsandwich_118.jpg	In Cuba, even Jesus is smoking a cigar and holding a martini	2015-11-12T03:35:38+0000	Havana, Havana, Cuba	23.1319	-82.3642	HAV	
 119	1116360342131601475	9-G9ECFnBD	public/media/ourearthsandwich_119.jpg	Stumbled on a qualifier match for the provincial championships. Apparently Cubans love boxing and ballet because of the Soviets. Ivan would be proud	2015-11-12T03:55:44+0000	Rafael Trejo Boxing Gym, Havana, Cuba	23.139641800855	-82.352361595608	HAV	
@@ -245,168 +131,76 @@ The nearby posts are heavily weighted toward Fes and Tetouan. The covered wooden
 130	1135834512372429566	_DS3iZlnL-	public/media/ourearthsandwich_130.jpg	Peruvian side of the Amazon river is rather less developed, as attested by the the logs lashed together as a dock gang plank	2015-12-09T00:47:26+0000	Leticia, Amazonas, Colombia	-4.2089	-69.93811	LET	
 131	1135842028556809137	_DUk6ZFnOx	public/media/ourearthsandwich_131.jpg	Thanks team! For not letting us die in the jungle	2015-12-09T01:02:22+0000	Amazon Rainforest, Iquitos, Peru	-3.7769349433526	-73.291329230012	IQT	
 132	1135843434353292240	_DU5XpFnPQ	public/media/ourearthsandwich_132.jpg	Oh piranhas, how quickly the tables turn	2015-12-09T01:05:10+0000	Amazon Rainforest, Iquitos, Peru	-3.7769349433526	-73.291329230012	IQT	
-133	1135848503043846215	_DWDIOlnBH	public/media/ourearthsandwich_133.jpg	Practicing for our inevitable encounter with giant tarantulas, river sharks, and Farc guerrillas	2015-12-09T01:15:14+0000	Amazon Rainforest, Iquitos, Peru	-3.7769349433526	-73.291329230012	IQT	
+133	1135848503043846215	_DWDIOlnBH	public/media/ourearthsandwich_133.jpg	Practicing for our inevitable encounter with giant tarantulas, river sharks, and Farc guerrillas	2015-12-09T01:15:14+0000	Amazon Rainforest, Loreto, Peru	-3.7769349433526	-73.291329230012	IQT	
 134	1135861211281650038	_DY8DslnF2	public/media/ourearthsandwich_134.jpg	Hey little buddy, whatcha doin' down there?	2015-12-09T01:40:29+0000	Amazon Rainforest, Iquitos, Peru	-3.7769349433526	-73.291329230012	IQT	
 135	1146024425403347031	_nfyScFnBX	public/media/ourearthsandwich_135.jpg	Wayward Amish clan contemplate taking the airport escalator because, fuck it, they're about to board a sky-buggy of damnation anyways	2015-12-23T02:12:59+0000	Viru Viru International Airport, Santa Cruz de la Sierra, Bolivia	-17.644722222222	-63.135277777778	VVI	
 136	1151765067299451534	_75Dn1FnKO	public/media/ourearthsandwich_136.jpg	My window buddy enroute to the Salt Flats	2015-12-31T00:18:37+0000	Salar de Uyuni, Uyuni, Bolivia	-20.133775	-67.489133333333	UYU	
-137	1151766403420156593	_75XEMFnKx	public/media/ourearthsandwich_137.jpg	Onward to victory brave patriot	2015-12-31T00:21:16+0000	Lishui, Zhejiang, China	28.99895613	118.857033	WNZ	The coordinates 28.99895613, 118.857033 point to a location in Zhejiang Province, China (near Lishui/Jinhua area), not Sucre, Bolivia. The coordinates are authoritative.
+137	1151766403420156593	_75XEMFnKx	public/media/ourearthsandwich_137.jpg	Onward to victory brave patriot	2015-12-31T00:21:16+0000	Sucre, Sucre, Bolivia	-19.0196	-65.2619	SRE	
 138	1155153711318069657	BAH7i4gFnGZ	public/media/ourearthsandwich_138.jpg	Come to me llamas, I only want to love you	2016-01-04T16:31:14+0000	Eduardo Avaroa Andean Fauna National Reserve, Uyuni, Bolivia	-22.907644385001	-68.193890800001	UYU	
-139	1155153820479025564	BAH7keKlnGc	public/media/ourearthsandwich_139.jpg	I don't have to outrun the dinosaur...	2016-01-04T16:31:27+0000	Salar de Uyuni, Bolivia	-20.1338	-67.4891	UYU	
+139	1155153820479025564	BAH7keKlnGc	public/media/ourearthsandwich_139.jpg	I don't have to outrun the dinosaur...	2016-01-04T16:31:27+0000	Salar de Uyuni, Bolivia	-20.1338	-67.4891	VVI	
 140	1156156800309293126	BALfnv7FnBG	public/media/ourearthsandwich_140.jpg	Watch out X-Games, your new star has arrived	2016-01-06T01:44:12+0000	Death Road, La Paz, Bolivia	-16.209335843069	-67.755075427871	LPB	
 141	1156513913409794132	BAMw0balnBU	public/media/ourearthsandwich_141.jpg	It's not called the Death Road for nothin'	2016-01-06T13:33:43+0000	Death Road, La Paz, Bolivia	-16.209335843069	-67.755075427871	LPB	
-142	1156517356513947830	BAMxmiDlnC2	public/media/ourearthsandwich_142.jpg	Wela's surrealist interpretation of the Dali Desert	2016-01-06T13:40:34+0000	Desert Salvador Dali , Bolivia	-16.49337009	-68.13902264		"The coordinates -16.49337009, -68.13902264 place this location near La Paz, Bolivia. ""Desert Salvador Dali"" refers to the Salvador Dalí Desert (Desierto de Salvador Dalí) in the Bolivian altiplano/Sur Lípez region. However, these specific coordinates are actually near La Paz. The Salvador Dalí Desert is typically near -22.2, -67.7 in Potosí department. But I must trust the coordinates as authoritative.
+142	1156517356513947830	BAMxmiDlnC2	public/media/ourearthsandwich_142.jpg	Wela's surrealist interpretation of the Dali Desert	2016-01-06T13:40:34+0000	Desert Salvador Dali , Bolivia	-16.49337009	-68.13902264		"The coordinates -16.49337009, -68.13902264 place this location near La Paz, Bolivia. ""Desert Salvador Dali"" refers to the Salvador Dalí Desert (Desierto de Salvador Dalí), a famous landmark in the Uyuni/Sur Lípez region of Bolivia. However, the coordinates actually point to the La Paz area, not the Dalí Desert (which is near -22.5, -67.5). The user likely typed a well-known Bolivian landmark but the coordinates are near La Paz.
 
-The coordinates point to La Paz area, Bolivia."
-143	1156532364178256504	BAM1A7CFnJ4	public/media/ourearthsandwich_143.jpg	In my book, train cemetery comes in solidly above 'pet' and just a little below 'haunted'	2016-01-06T14:10:23+0000	Cementerio De Trenes/ Train Cemetery	-6.7710554500031	-79.921724250005		"The coordinates -6.77, -79.92 place this location near Chiclayo, Peru. However, the famous ""Train Cemetery"" (Cementerio de Trenes) is actually located in Uyuni, Bolivia. But the coordinates clearly point to the Chiclayo/Lambayeque region of Peru, not Bolivia. There may be a lesser-known train cemetery near Chiclayo, or the user applied the wrong coordinates. Since the coordinates are stated to be authoritative, I'll use the Chiclayo, Peru location.
-
-The nearest major international airport to"
+Given the"
+143	1156532364178256504	BAM1A7CFnJ4	public/media/ourearthsandwich_143.jpg	In my book, train cemetery comes in solidly above 'pet' and just a little below 'haunted'	2016-01-06T14:10:23+0000	Train Cemetery, Chiclayo, Peru	-6.7710554500031	-79.921724250005	CIX	
 144	1156538144231158558	BAM2VCIFnMe	public/media/ourearthsandwich_144.jpg	Our kickass Bolivian Spanish teacher, Shirley	2016-01-06T14:21:52+0000	Open Spanish ELE School, Sucre, Bolivia	-19.050461785	-65.256352505	SRE	
 145	1156546704923063287	BAM4Rm5FnP3	public/media/ourearthsandwich_145.jpg	Brazilian water-heating shower head. Sounds like an amazing innovation until you realize it's a wet 220 volt appliance plugged in right above your naked body	2016-01-06T14:38:52+0000	São Paulo, São Paulo, Brazil	-23.55	-46.6333	GRU	
 146	1156552868721225906	BAM5rTYFnCy	public/media/ourearthsandwich_146.jpg	3000 miles to end up right back in Brooklyn #nycisthenewrome	2016-01-06T14:51:07+0000	Vila Madalena, São Paulo, Brazil	-23.5259028	-46.6817143	GRU	
 147	1159430789907509565	BAXICkWFnE9	public/media/ourearthsandwich_147.jpg	There is no corner on earth where people don't love Korean soaps	2016-01-10T14:09:02+0000	La Paz, La Paz, Bolivia	-16.4965	-68.134	LPB	
 148	1159442342950105744	BAXKqr9FnKQ	public/media/ourearthsandwich_148.jpg	Bolivia has some bumpy-ass roads. This was by far the most comfortable part of our journey to Lake Titicaca	2016-01-10T14:31:59+0000	Lake Titicaca, Copacabana, Bolivia	-16.165473641677	-69.088928858423	LPB	
-149	1159449735226356586	BAXMWQjFnNq	public/media/ourearthsandwich_149.jpg	The Rock is going to look so bad ass power drifting these in Fast and Furious 8	2016-01-10T14:46:40+0000	Copacabana, Copacabana, Bolivia	-16.1653	-69.08617	LPB	
+149	1159449735226356586	BAXMWQjFnNq	public/media/ourearthsandwich_149.jpg	The Rock is going to look so bad ass power drifting these in Fast and Furious 8	2016-01-10T14:46:40+0000	Copacabana, La Paz, Bolivia	-16.1653	-69.08617	LPB	
 150	1159805887067877383	BAYdU8zFnAH	public/media/ourearthsandwich_150.jpg	Can there be too much of a good thing? Answer is no.	2016-01-11T02:34:17+0000	La Paz, La Paz, Bolivia	-16.4965	-68.134	LPB	
 151	1159809032577773676	BAYeCuSFnBs	public/media/ourearthsandwich_151.jpg	The Temptation of Christ	2016-01-11T02:40:32+0000	El Alto, El Alto, Bolivia	-16.502176550199	-68.133413783196	LPB	
-152	1160193215212974267	BAZ1ZUPlnC7	public/media/ourearthsandwich_152.mp4	Bolivian Cholita Wrestling. We watched 4 hours of this. I am hoarse from shouting	2016-01-11T15:23:50+0000	El Alto, La Paz, Bolivia	-16.5000	-68.1833	LPB	
+152	1160193215212974267	BAZ1ZUPlnC7	public/media/ourearthsandwich_152.mp4	Bolivian Cholita Wrestling. We watched 4 hours of this. I am hoarse from shouting	2016-01-11T15:23:50+0000	Cholita Wrestling, El Alto, Bolivia	-16.5000	-68.1500	LPB	
 153	1161516319222689972	BAeiPA4FnC0	public/media/ourearthsandwich_153.jpg	Adios Bolivia, you magnificently weird duck	2016-01-13T11:12:36+0000	Sopocachi, La Paz, Bolivia	-17.15	-69.0333	LPB	
 154	1166783819476791726	BAxP7OxlnGu	public/media/ourearthsandwich_154.jpg	I'm Hans, unt I'm Frans. And vee are goona Pump! You Aup! 	2016-01-20T17:38:11+0000	Ensenada, Puerto Montt, Chile	-41.2	-72.55	PMC	
 155	1171350773042672037	BBBeVJulnGl	public/media/ourearthsandwich_155.jpg	The imperial accounting system of the Incans recorded in knots	2016-01-27T00:51:55+0000	Chilean Museum of Pre-Columbian Art, Santiago, Chile	-33.43864	-70.65222	SCL	
 156	1171355018785616394	BBBfS74lnIK	public/media/ourearthsandwich_156.jpg	Now it's a party! 	2016-01-27T01:00:21+0000	Chilean Museum of Pre-Columbian Art, Santiago, Chile	-33.43864	-70.65222	SCL	
-157	1171358733387068015	BBBgI_YFnJv	public/media/ourearthsandwich_157.jpg	Sometimes nothing makes me happier than seeing little affirmations of America's all-pervasive cultural dominance #americafuckyeah 	2016-01-27T01:07:44+0000	MosaiCafé, Santiago, Chile	-33.4372	-70.6317	SCL	"The chalkboard mentions ""MosaiCafé"" — this appears to be a specific café name. The text is in Spanish, and given the nearby posts context includes Santiago, Chile, and the street/sidewalk style is consistent with Latin America, the café ""MosaiCafé"" can be searched. There is a ""Mosaico Café"" or ""MosaiCafe"" in Santiago, Chile.
-
-The sign features Pinky and the Brain characters (an American cartoon), which fits the caption about ""America's all-pervasive cultural dominance.""
-
-The place name ""MosaiCafé"" is the key identifier. Searching for MosaiCafé in Santiago, Chile — there is a café called Mosaico located in the Barrio Italia / Providencia area of Santiago."
-158	1171365864735667012	BBBhww9lnNE	public/media/ourearthsandwich_158.jpg	It's a bird! It's a plane! 	2016-01-27T01:21:54+0000	Osorno Volcano, Puerto Montt, Chile	-41.12788911096	-72.52975229688	PMC	
-159	1175068870303969672	BBOrulpFnGI	public/media/ourearthsandwich_159.jpg	Discovered by the Germans in 1904, they named it Santiago, which of course in German means ‘a whale’s vagina'.	2016-02-01T03:59:06+0000	Cerro Santa Lucia Viewpoint, Santiago, Chile	-33.440372204187	-70.643297888274	SCL	
-160	1175072412100096491	BBOsiIMlnHr	public/media/ourearthsandwich_160.jpg	I wonder what this button does...	2016-02-01T04:06:09+0000	Cerro Santa Lucia Viewpoint, Santiago, Chile				"I can see oak wine barrels labeled ""Élégance 40"" and ""Élégance 39"" — ""Élégance"" is a French cooperage barrel type/brand (likely Taransaud, visible on the bottom barrel). The barrels suggest a winery barrel room/cave. The nearby posts include Chile and New Zealand wine regions.
-
-However, the barrels themselves don't pinpoint a specific winery or location definitively. The ""Élégance"" branding on barrels is used by Taransaud cooperage (French), but these barrels are used worldwide.
-
-Given insufficient specific location evidence in the image or caption to identify a particular winery or region with confidence, I cannot determine the location.
-
-fallback: no observable evidence in image/caption; location copied from prior post (Cerro Santa Lucia Viewpoint, Santiago, Chile). lat/lng/region left empty so downstream consumers can identify fallback rows."
-161	1175074865658884646	BBOtF1QFnIm	public/media/ourearthsandwich_161.jpg	The Supreme Leader inspects another bountiful harvest	2016-02-01T04:11:01+0000	"I'll analyze the observable evidence:
-
-1. **Mountain range**: Dramatic, relatively low-latitude mountains visible in the background with a distinctive jagged profile
-2. **Terrain**: Flat agricultural valley/plain in the foreground with what appears to be vineyard trellising
-3. **Vegetation**: Herb garden with labeled plants (basil varieties including purple basil visible, with small white plant markers)
-4. **Climate**: Appears to be summer, lush growing conditions
-5. **Context clues**: Recent posts are from Chile, particularly the Lake District/Puerto Montt area
-6. **The mountains + flat agricultural plain + vineyard infrastructure**: This combination is very consistent with the Wairau Valley in Marlborough, New Zealand, OR the Andean foothills near Mendoza, Argentina — both wine regions
-
-Looking more carefully:
-- The mountain profile and flat valley floor strongly suggest the **Wairau Valley, Marlborough, New Zealand** (with the Richmond/Kaikōura ranges) OR **Mendoza, Argentina**
-- The herb garden with labeled plants in what appears to be a restaurant/winery kitchen garden
-- The wooden"				"I'll analyze the observable evidence:
-
-1. **Mountain range**: Dramatic, relatively low-latitude mountains visible in the background with a distinctive jagged profile
-2. **Terrain**: Flat agricultural valley/plain in the foreground with what appears to be vineyard trellising
-3. **Vegetation**: Herb garden with labeled plants (basil varieties including purple basil visible, with small white plant markers)
-4. **Climate**: Appears to be summer, lush growing conditions
-5. **Context clues**: Recent posts are from Chile, particularly the Lake District/Puerto Montt area
-6. **The mountains + flat agricultural plain + vineyard infrastructure**: This combination is very consistent with the Wairau Valley in Marlborough, New Zealand, OR the Andean foothills near Mendoza, Argentina — both wine regions
-
-Looking more carefully:
-- The mountain profile and flat valley floor strongly suggest the **Wairau Valley, Marlborough, New Zealand** (with the Richmond/Kaikōura ranges) OR **Mendoza, Argentina**
-- The herb garden with labeled plants in what appears to be a restaurant/winery kitchen garden
-- The wooden"
+157	1171358733387068015	BBBgI_YFnJv	public/media/ourearthsandwich_157.jpg	Sometimes nothing makes me happier than seeing little affirmations of America's all-pervasive cultural dominance #americafuckyeah 	2016-01-27T01:07:44+0000	MosaicCafé, Santiago, Chile	-33.4489	-70.6693	SCL	
+158	1171365864735667012	BBBhww9lnNE	public/media/ourearthsandwich_158.jpg	It's a bird! It's a plane! 	2016-01-27T01:21:54+0000	Osorno Volcano, Puerto Varas, Chile	-41.12788911096	-72.52975229688	PMC	
+159	1175068870303969672	BBOrulpFnGI	public/media/ourearthsandwich_159.jpg	Discovered by the Germans in 1904, they named it Santiago, which of course in German means ‘a whale’s vagina'.	2016-02-01T03:59:06+0000	Santa Lucia Hill Viewpoint, Santiago, Chile	-33.440372204187	-70.643297888274	SCL	
+160	1175072412100096491	BBOsiIMlnHr	public/media/ourearthsandwich_160.jpg	I wonder what this button does...	2016-02-01T04:06:09+0000	Santiago	-33.440372204187	-70.643297888274	SCL	fallback: no observable evidence in image/caption; used the prior post's city (Santiago, derived from 'Santa Lucia Hill Viewpoint, Santiago, Chile'); lat/lng/region inherited from that post.
+161	1175074865658884646	BBOtF1QFnIm	public/media/ourearthsandwich_161.jpg	The Supreme Leader inspects another bountiful harvest	2016-02-01T04:11:01+0000	Wairau Valley, Marlborough, New Zealand	-41.5167	173.9500	BHE	
 162	1175078952848749191	BBOuBTvlnKH	public/media/ourearthsandwich_162.jpg	Travel tip no. 42: When crossing mountains by land, the changing air pressure may or may not implode your bus like a sinking submarine	2016-02-01T04:19:08+0000	Andes Mountains, Mendoza, Argentina	-32.892071349248	-68.837925589603	MDZ	
 163	1177058179726865049	BBVwC2alnKZ	public/media/ourearthsandwich_163.jpg	Now that's what I call an idyllic country cottage	2016-02-03T21:51:31+0000	Buenos Aires, Buenos Aires, Argentina	-34.6086	-58.4215	EZE	
 164	1177063476470117145	BBVxP7ZFnMZ	public/media/ourearthsandwich_164.jpg	I always wondered what it would look like if Jesus gave Alec Baldwin's brass balls speech dressed as a pirate	2016-02-03T22:02:02+0000	Buenos Aires, Buenos Aires, Argentina	-34.6086	-58.4215	EZE	
 165	1180877097528619242	BBjUXaxlnDq	public/media/ourearthsandwich_165.jpg	Warming up for a good old fashioned game of father-daughter polo	2016-02-09T04:19:01+0000	Buenos Aires, Buenos Aires, Argentina	-34.6086	-58.4215	EZE	
-166	1181153101161591389	BBkTHzMFnJd	public/media/ourearthsandwich_166.jpg	Protesting human right violations and Attaining enlightenment, #stuffwhitepeoplelike is the same everywhere	2016-02-09T13:27:23+0000	Barracas de Belgrano Chinatown, Buenos Aires, Argentina	-34.557417764497	-58.450474984779	EZE	
+166	1181153101161591389	BBkTHzMFnJd	public/media/ourearthsandwich_166.jpg	Protesting human right violations and Attaining enlightenment, #stuffwhitepeoplelike is the same everywhere	2016-02-09T13:27:23+0000	Barrancas de Belgrano Chinatown, Buenos Aires, Argentina	-34.557417764497	-58.450474984779	EZE	
 167	1181154904267715224	BBkTiCdlnKY	public/media/ourearthsandwich_167.jpg	Close enough	2016-02-09T13:30:58+0000	Puerto Iguazú, Misiones, Argentina	-25.59854	-54.57061	IGR	
 168	1184364089017004731	BBvtN0qlnK7	public/media/ourearthsandwich_168.jpg	I wonder if she was actually this haunting in life or if they amped it up for the cemetery so she wouldn't get picked on by the other ghouls	2016-02-13T23:47:03+0000	Recoleta Cemetery, Buenos Aires, Argentina	-34.587636842559	-58.392411199979	EZE	
 169	1185242500610551989	BBy08ZNlnC1	public/media/ourearthsandwich_169.jpg	In Argentina, they call this a municipal water pumping station	2016-02-15T04:52:18+0000	Palacio de Aguas Corrientes, Buenos Aires, Argentina	-34.600555555556	-58.395	EZE	
-170	1191249873238127033	BCIK3K9FnG5	public/media/ourearthsandwich_170.mp4	An old friend shows up to see us off. Thanks big J!	2016-02-23T11:47:52+0000	Palacio de Aguas Corrientes, Buenos Aires, Argentina				fallback: no observable evidence in image/caption; location copied from prior post (Palacio de Aguas Corrientes, Buenos Aires, Argentina). lat/lng/region left empty so downstream consumers can identify fallback rows.
+170	1191249873238127033	BCIK3K9FnG5	public/media/ourearthsandwich_170.mp4	An old friend shows up to see us off. Thanks big J!	2016-02-23T11:47:52+0000	Buenos Aires	-34.600555555556	-58.395	EZE	fallback: no observable evidence in image/caption; used the prior post's city (Buenos Aires, derived from 'Palacio de Aguas Corrientes, Buenos Aires, Argentina'); lat/lng/region inherited from that post.
 171	1193346647968871293	BCPnnQmFnN9	public/media/ourearthsandwich_171.jpg	Kiwis are very trusting about leaving their things around	2016-02-26T09:13:47+0000	Kitekite Falls, Auckland, New Zealand	-36.955969218619	174.4681706986	AKL	
 172	1193349135426024357	BCPoLdOFnOl	public/media/ourearthsandwich_172.jpg	I'm confident only good things can come of this	2016-02-26T09:18:44+0000	Ace Rental Cars, Auckland, New Zealand	-36.849752770714	174.77723284786	AKL	
 173	1193351475797324748	BCPotg3FnPM	public/media/ourearthsandwich_173.jpg	Embracing cultural nuance	2016-02-26T09:23:23+0000	Auckland War Memorial Museum, Auckland, New Zealand	-36.85892	174.77548	AKL	
-174	1198176462651682901	BCgxyUClnBV	public/media/ourearthsandwich_174.jpg	A bit of geology porn at the top of Mt Doom	2016-03-04T01:09:46+0000	Tongariro Alpine Crossing	-41.293197157831	174.78391374478		"The coordinates (-41.293197, 174.783913) actually point to Wellington, New Zealand. However, the geo-tag says ""Tongariro Alpine Crossing"" which is a famous track in the central North Island. The coordinates seem mismatched (they point to Wellington), but the geo-tag name is authoritative as a named place. Let me reconcile: the instructions say lat/lon are authoritative for the location. The coordinates point to Wellington, NZ.
+174	1198176462651682901	BCgxyUClnBV	public/media/ourearthsandwich_174.jpg	A bit of geology porn at the top of Mt Doom	2016-03-04T01:09:46+0000	Tongariro Alpine Crossing	-41.293197157831	174.78391374478		"The coordinates -41.293197, 174.783914 point to Wellington, New Zealand area, but the geo-tag ""Tongariro Alpine Crossing"" is a famous hiking trail in the central North Island of New Zealand, near Taupo/Ruapehu district. The coordinates seem mismatched (they point to Wellington), but the verbatim tag is authoritative for the location name, while coordinates are authoritative for the location. However, the instructions say lat/long are authoritative.
 
-But wait - Tongariro Alpine Crossing is a well-known location. The coordinates given actually match Wellington city center"
+Actually, re-reading: ""The latitude/longitude (when present) are authoritative"
 175	1198183067120201949	BCgzSa7lnDd	public/media/ourearthsandwich_175.jpg	I'm going to wager that exactly zero black people have ever stayed at this bed & breakfast	2016-03-04T01:22:53+0000	Little Earth Lodge, Whangarei, New Zealand	-35.71035867	174.35512524	WRE	
 176	1198187120327815461	BCg0NZxlnEl	public/media/ourearthsandwich_176.jpg	Suddenly being a black sheep doesn't sound so bad...	2016-03-04T01:30:57+0000	Sheepworld Farm Park, Warkworth, New Zealand	-36.371219611994	174.62987154722	AKL	
-177	1198398468085149937	BChkQ6tlnDx	public/media/ourearthsandwich_177.jpg	High five bro!	2016-03-04T08:30:51+0000	Weta Workshop, Miramar, Wellington, New Zealand	-41.3267	174.8128	WLG	"I can see a large troll statue that appears to be from a Lord of the Rings/Hobbit themed attraction. The statue looks like one of the trolls from ""The Hobbit."" Given the nearby posts are all in New Zealand, and New Zealand is famous for Hobbit/LOTR tourism, this could be at Weta Workshop or a similar attraction in Wellington, New Zealand.
-
-However, looking more carefully at the statue style and setting, this appears to be at **Weta Cave/Weta Workshop** in Miramar, Wellington, New Zealand, which has large creature statues outside including trolls."
-178	1198399495496691968	BChkf3kFnEA	public/media/ourearthsandwich_178.jpg	Close but no cigar	2016-03-04T08:32:54+0000	Weka Street, Miramar, Wellington, New Zealand	-41.3197	174.8156	WLG	"I can see a ""WEKA ST"" street sign and a business called ""Weka"" (possibly ""Weka Cave"" or similar) with an ""OPEN"" sign. The caption ""Close but no cigar"" suggests they were looking for something nearby but didn't quite find it — likely Weta Workshop (given the recent nearby posts context and the similarity between ""Weka"" and ""Weta"").
-
-Weka Street is in Miramar, Wellington, New Zealand — very close to Weta Workshop. This matches perfectly with the caption ""Close but no cigar"" (Weka vs. Weta)."
+177	1198398468085149937	BChkQ6tlnDx	public/media/ourearthsandwich_177.jpg	High five bro!	2016-03-04T08:30:51+0000	Weta Cave / Weta Workshop, Wellington, New Zealand	-41.3154	174.7486	WLG	
+178	1198399495496691968	BChkf3kFnEA	public/media/ourearthsandwich_178.jpg	Close but no cigar	2016-03-04T08:32:54+0000	Weka Street, Raglan, New Zealand	-37.8024	174.8731	HLZ	
 179	1206126747571352382	BC9BeL3FnM-	public/media/ourearthsandwich_179.jpg	Tricked by metric eggs	2016-03-15T00:25:34+0000	Arrowtown, Queenstown, New Zealand	-44.938468001133	168.83213449397	ZQN	
 180	1206132333595751398	BC9CveQFnPm	public/media/ourearthsandwich_180.jpg	Serenely peaceful even though it looks like the vox of a badass dub step	2016-03-15T00:36:40+0000	Lake Matheson, Fox Glacier, New Zealand	-45.022114895	168.74027642	ZQN	
-181	1206145789258527008	BC9FzR0FnEg	public/media/ourearthsandwich_181.jpg	Adventure awaits	2016-03-15T01:03:24+0000	Kaikoura Coast Track, Kaikoura, New Zealand	-42.63781347316	173.44689499603	KBZ	
+181	1206145789258527008	BC9FzR0FnEg	public/media/ourearthsandwich_181.jpg	Adventure awaits	2016-03-15T01:03:24+0000	Kaikōura Coast Track, Kaikōura, New Zealand	-42.63781347316	173.44689499603	KBZ	
 182	1206147171717902653	BC9GHZVFnE9	public/media/ourearthsandwich_182.jpg	No predators on this island so the sheep here are beyond indifferent	2016-03-15T01:06:09+0000	Kaikoura Coast Track, Kaikoura, New Zealand	-42.63781347316	173.44689499603	KBZ	
 183	1206156247780717056	BC9ILeElnIA	public/media/ourearthsandwich_183.jpg	Jabba the Hut and his bodyguards	2016-03-15T01:24:11+0000	Half-Moon Bay, Stewart Island, New Zealand	-46.9	168.133	IVC	
-184	1207053294172009004	BDAUJNoFnIs	public/media/ourearthsandwich_184.jpg	Through the looking glass at the wonderland garden	2016-03-16T07:06:27+0000	"I can see a circular stone moon gate in a lush garden setting. The caption mentions ""wonderland garden"" and the context shows recent posts from New Zealand. 
-
-Looking at the stone moon gate structure and ""wonderland garden"" caption, this appears to be the **Amisfield Winery Garden** or more likely the **Wonderland Garden** — but the most recognizable moon gate in a ""wonderland"" garden context in New Zealand is at **Broadgreen Historic House** or **Ayrlies Garden**... 
-
-Actually, the most famous ""moon gate"" in a garden called ""wonderland"" in New Zealand is at **Larnach Castle Gardens** in Dunedin, which has a moon gate, OR this could be the **Gillies Creek Reserve**... 
-
-The stone moon gate with ""wonderland"" branding and the New Zealand context strongly suggests this is at **Larnach Castle, Dunedin, New Zealand**, which has a famous moon gate in their ""garden of wonderland.""
-
-{""location"": ""Larnach Castle Garden, Dunedin, New Zealand"", ""lat"": ""-45.8589"", ""lng"": ""170."				"I can see a circular stone moon gate in a lush garden setting. The caption mentions ""wonderland garden"" and the context shows recent posts from New Zealand. 
-
-Looking at the stone moon gate structure and ""wonderland garden"" caption, this appears to be the **Amisfield Winery Garden** or more likely the **Wonderland Garden** — but the most recognizable moon gate in a ""wonderland"" garden context in New Zealand is at **Broadgreen Historic House** or **Ayrlies Garden**... 
-
-Actually, the most famous ""moon gate"" in a garden called ""wonderland"" in New Zealand is at **Larnach Castle Gardens** in Dunedin, which has a moon gate, OR this could be the **Gillies Creek Reserve**... 
-
-The stone moon gate with ""wonderland"" branding and the New Zealand context strongly suggests this is at **Larnach Castle, Dunedin, New Zealand**, which has a famous moon gate in their ""garden of wonderland.""
-
-{""location"": ""Larnach Castle Garden, Dunedin, New Zealand"", ""lat"": ""-45.8589"", ""lng"": ""170."
-185	1207060577304081032	BDAVzMklnKI	public/media/ourearthsandwich_185.jpg	Ground zero for #ourearthsandwich	2016-03-16T07:20:55+0000	"I need to analyze this image carefully.
-
-The image shows a map painted/carved on a flat stone/rock on the ground. The map shows:
-- North Atlantic Ocean
-- Portugal, Spain, France, England
-- Morocco, Algeria
-- Mediterranean Sea
-- Italy (partially visible)
-- A ""45th North"" parallel line
-- ""Little Paradise"" marked with a pink dot in the North Atlantic (roughly where the Azores would be, but labeled ""Little Paradise"")
-- New Zealand is outlined in pink and placed over Spain's location on the map
-
-The caption says ""Ground zero for #ourearthsandwich""
-
-An ""Earth Sandwich"" is when two people stand on exactly opposite sides of the Earth simultaneously. The concept was popularized by Ze Frank. If you're in Spain/Portugal area, the antipodal point would be in New Zealand (which is roughly antipodal to Spain/Portugal).
-
-The map shows New Zealand's outline overlaid on Spain, indicating this location is antipodal to New Zealand. The ""45th North"" line is marked, suggesting latitude ~45°N.
-
-""Little Paradise"" appears to be the name of this specific location. Searching my knowledge"				"I need to analyze this image carefully.
-
-The image shows a map painted/carved on a flat stone/rock on the ground. The map shows:
-- North Atlantic Ocean
-- Portugal, Spain, France, England
-- Morocco, Algeria
-- Mediterranean Sea
-- Italy (partially visible)
-- A ""45th North"" parallel line
-- ""Little Paradise"" marked with a pink dot in the North Atlantic (roughly where the Azores would be, but labeled ""Little Paradise"")
-- New Zealand is outlined in pink and placed over Spain's location on the map
-
-The caption says ""Ground zero for #ourearthsandwich""
-
-An ""Earth Sandwich"" is when two people stand on exactly opposite sides of the Earth simultaneously. The concept was popularized by Ze Frank. If you're in Spain/Portugal area, the antipodal point would be in New Zealand (which is roughly antipodal to Spain/Portugal).
-
-The map shows New Zealand's outline overlaid on Spain, indicating this location is antipodal to New Zealand. The ""45th North"" line is marked, suggesting latitude ~45°N.
-
-""Little Paradise"" appears to be the name of this specific location. Searching my knowledge"
+184	1207053294172009004	BDAUJNoFnIs	public/media/ourearthsandwich_184.jpg	Through the looking glass at the wonderland garden	2016-03-16T07:06:27+0000	Wonderland Garden, New Zealand				
+185	1207060577304081032	BDAVzMklnKI	public/media/ourearthsandwich_185.jpg	Ground zero for #ourearthsandwich	2016-03-16T07:20:55+0000	Little Paradise Lodge, Queenstown-Lakes District, New Zealand	-44.9333	168.2167	ZQN	
 186	1207837239813763119	BDDGZH5lnAv	public/media/ourearthsandwich_186.jpg	Airplane mode	2016-03-17T09:04:00+0000	Milford Sound, Fiordland National Park, New Zealand	-45.033503798478	168.66233488478	ZQN	
 187	1208888761515405895	BDG1exzFnJH	public/media/ourearthsandwich_187.jpg	Second biggest pigeon species in the world, tiniest head	2016-03-18T19:53:12+0000	Kiwi Park, Queenstown, New Zealand	-45.027922947159	168.65686297417	ZQN	
 188	1209253785618510080	BDIIek_FnEA	public/media/ourearthsandwich_188.jpg	I've never seen such a perfect caricature of an apple. All its missing is a cartoon worm wearing reading glasses sticking out the side	2016-03-19T07:58:26+0000	Arrowtown, Queenstown, New Zealand	-44.938468001133	168.83213449397	ZQN	
 189	1211110741572481436	BDOus1_FnGc	public/media/ourearthsandwich_189.jpg	That about sums up my tenuous connection to the real world	2016-03-21T21:27:52+0000	Bondi Beach, Sydney, Australia	-33.891649	151.276245	SYD	
-190	1214464888371835568	BDapWGnlnKw	public/media/ourearthsandwich_190.jpg	Practicing for the real deal	2016-03-26T12:31:58+0000	Scenic World, Katoomba, Australia	-33.728877306431	150.30125324239	SYD	
-191	1216195482025882419	BDgy1jjlnMz	public/media/ourearthsandwich_191.jpg	Helmet = safe	2016-03-28T21:50:21+0000	Bondi Beach, Sydney, Australia	-16.917927599889	145.77347252401	SYD	
+190	1214464888371835568	BDapWGnlnKw	public/media/ourearthsandwich_190.jpg	Practicing for the real deal	2016-03-26T12:31:58+0000	Scenic World, Blue Mountains, Australia	-33.728877306431	150.30125324239	SYD	
+191	1216195482025882419	BDgy1jjlnMz	public/media/ourearthsandwich_191.jpg	Helmet = safe	2016-03-28T21:50:21+0000	Bondi Beach, Cairns, Australia	-16.917927599889	145.77347252401	CNS	
 192	1216622065593250031	BDiT1KdlnDv	public/media/ourearthsandwich_192.jpg	Uncertain if this wallaby is having an much fun as us... Welcome to Australia bro!	2016-03-29T11:57:53+0000	Wildlife Habitat, Port Douglas, Australia	-16.485933032982	145.46627287917	CNS	
 193	1216628102589215153	BDiVNA2lnGx	public/media/ourearthsandwich_193.jpg	Sunrise at Sydney's beaches. Aussies play hard, 6:30am on a weekday and folks are out surfing	2016-03-29T12:09:53+0000	Bondi Beach, Sydney, Australia	-33.890609250723	151.27751124008	SYD	
 194	1216638401560081127	BDiXi4hFnLn	public/media/ourearthsandwich_194.jpg	The taste of victory is sweet	2016-03-29T12:30:21+0000	Queenstown, Queenstown, New Zealand	-45.0316	168.6631	ZQN	
 195	1219529075141800286	BDsozuFFnFe	public/media/ourearthsandwich_195.jpg	Protected from jelly fish and enemy ninjas	2016-04-02T12:13:36+0000	Great Barrier Reef, Cairns, Australia	-16.921026832105	145.77829278942	CNS	
-196	1219546874375467896	BDss2u6FnN4	public/media/ourearthsandwich_196.jpg	Up up and away! Nice flying dad!	2016-04-02T12:48:58+0000	Auckland, Auckland, New Zealand	-36.845204309736	174.74316669516	AKL	The coordinates (-36.845, 174.743) point to Auckland, New Zealand, not Port Douglas, Queensland, Australia. The coordinates are authoritative.
+196	1219546874375467896	BDss2u6FnN4	public/media/ourearthsandwich_196.jpg	Up up and away! Nice flying dad!	2016-04-02T12:48:58+0000	Auckland, Auckland, New Zealand	-36.845204309736	174.74316669516	AKL	The coordinates (-36.845, 174.743) point to Auckland, New Zealand — not Port Douglas, Queensland, Australia.
 197	1219980401327895136	BDuPbYWFnJg	public/media/ourearthsandwich_197.jpg	Mighty Atlas	2016-04-03T03:10:18+0000	Chillagoe-Mungana Caves National Park, Chillagoe, Australia	-16.92563175	145.77952928	CNS	
-198	1219982197999956621	BDuP1hoFnKN	public/media/ourearthsandwich_198.jpg	Beware of dismemberment by squid	2016-04-03T03:13:52+0000	Daintree Rainforest & Cape Tribulation, Mossman, Australia	-16.249755216301	145.31833370733	CNS	
+198	1219982197999956621	BDuP1hoFnKN	public/media/ourearthsandwich_198.jpg	Beware of dismemberment by squid	2016-04-03T03:13:52+0000	Daintree Rainforest & Cape Tribulation, Cairns, Australia	-16.249755216301	145.31833370733	CNS	
 199	1220318829340946939	BDvcYJ_lnH7	public/media/ourearthsandwich_199.jpg	Waterfall so majestic it has a rainbow boner	2016-04-03T14:22:42+0000	Milford Sound, Fiordland National Park, New Zealand	-45.033503798478	168.66233488478	ZQN	
 200	1221172379172369344	BDyec8OFnPA	public/media/ourearthsandwich_200.jpg	A young family teaches me how to cross streets in Cairo	2016-04-04T18:38:33+0000	Cairo, Cairo, Egypt	30.0571	31.2387	CAI	
 201	1221175803955802146	BDyfOxzFnAi	public/media/ourearthsandwich_201.jpg	Welcome to Egypt	2016-04-04T18:45:21+0000	Great Pyramids of Giza, Giza, Egypt	29.975271739712	31.140369529942	CAI	
@@ -422,104 +216,57 @@ The map shows New Zealand's outline overlaid on Spain, indicating this location 
 211	1234250378083987860	BEg8C31lnGU	public/media/ourearthsandwich_211.jpg	I like Jordan's version of the Middle East. Same same, but different, but still same!	2016-04-22T19:42:12+0000	Amman, Amman, Jordan	31.95	35.9333	AMM	
 212	1234286794079891884	BEhEUy4FnGs	public/media/ourearthsandwich_212.jpg	Grazing in a lost city	2016-04-22T20:54:33+0000	Petra, Ma'an, Jordan	30.3167	35.4833	AMM	
 213	1234780211482358186	BEi0g9pFnGq	public/media/ourearthsandwich_213.jpg	American cheese whiz, Mexican themed, manufactured in Greece, sold in Jordan	2016-04-23T13:14:53+0000	Galleria Mall, Amman, Jordan	31.959452590793	35.862027818828	AMM	
-214	1235672249128088051	BEl_V0cFnHz	public/media/ourearthsandwich_214.jpg	Fun with buoyancy at 34% salinity. Don't let it touch your eyes or mouth or you will start to die immediately.	2016-04-24T18:47:12+0000	Dead Sea, Madaba, Jordan	31.943318979033	35.864271485893	AMM	
+214	1235672249128088051	BEl_V0cFnHz	public/media/ourearthsandwich_214.jpg	Fun with buoyancy at 34% salinity. Don't let it touch your eyes or mouth or you will start to die immediately.	2016-04-24T18:47:12+0000	Dead Sea, Madaba Governorate, Jordan	31.943318979033	35.864271485893	AMM	
 215	1235696011873513869	BEmEvnOFnGN	public/media/ourearthsandwich_215.jpg	Eat hearty my friend, tonight we dine in hell!	2016-04-24T19:34:25+0000	Wadi Rum, Aqaba, Jordan	29.530115456437	35.003375159458	AQJ	
 216	1235702212405391978	BEmGJ16lnJq	public/media/ourearthsandwich_216.jpg	OSHA is for pussies	2016-04-24T19:46:44+0000	Wadi Rum, Aqaba, Jordan	29.530115456437	35.003375159458	AQJ	
 217	1236385846066049340	BEohmBYFnE8	public/media/ourearthsandwich_217.mp4	Grumpy grumps	2016-04-25T18:25:00+0000	Wadi Rum, Aqaba, Jordan	29.530115456437	35.003375159458	AQJ	
 218	1238991292002103311	BExyAP_lnAP	public/media/ourearthsandwich_218.jpg	Just like in the movie!	2016-04-29T08:41:33+0000	Mount Zion, Jerusalem, Israel	31.771666666667	35.228611111111	TLV	
 219	1240695334050885652	BE31dU0lnAU	public/media/ourearthsandwich_219.jpg	This undercover IDF officer and I are about equally skilled at being inconspicuos. #nailedit	2016-05-01T17:07:11+0000	Jerusalem Central Bus Station, Jerusalem, Israel	31.789	35.203	TLV	
-220	1242847407903240784	BE_eyHyFnJQ	public/media/ourearthsandwich_220.jpg	A rebellious Israeli teenager chose to express his angst and deface the boardwalk by drawing this kitty, shittily.	2016-05-04T16:22:58+0000	Tel Aviv, Tel Aviv, Israel	32.0667	34.7667	TLV	
+220	1242847407903240784	BE_eyHyFnJQ	public/media/ourearthsandwich_220.jpg	A rebellious Israeli teenager chose to express his angst and deface the boardwalk by drawing this kitty, shittily.	2016-05-04T16:22:58+0000	Tel Aviv, Tel Aviv District, Israel	32.0667	34.7667	TLV	
 221	1242854621837685605	BE_gbGSFnNl	public/media/ourearthsandwich_221.jpg	In commemoration for Ted Cruz's valiant last stand, L'chaim.	2016-05-04T16:37:18+0000	Jerusalem, Jerusalem, Israel	31.7833	35.2167	TLV	
-222	1242864125350408356	BE_ilZHlnCk	public/media/ourearthsandwich_222.jpg	Third holiest site in Islam, vigilantly policed by volunteers who dinged us for holding hands	2016-05-04T16:56:11+0000	Dome of the Rock, Temple Mount, Jerusalem, Israel	31.7781	35.2354	TLV	
-223	1245732819722203210	BFJu2Y8lnBK	public/media/ourearthsandwich_223.jpg	Standing in for some absentee statues	2016-05-08T15:55:46+0000	"I need to analyze the image carefully.
-
-Observable evidence:
-1. Large ancient stone ruins with arched niches in a massive wall
-2. The architecture shows Roman-style arched recesses/niches
-3. The caption mentions ""standing in for some absentee statues"" - suggesting these niches once held statues
-4. The construction style with large limestone blocks and multiple arched niches is characteristic of Roman-era architecture
-5. The recent posts context shows Israel/Jerusalem area
-
-The architecture - massive wall with arched niches at lower level and smaller niches above, built from large limestone blocks - is very characteristic of Roman-era ruins in the Levant region.
-
-The style strongly resembles the ruins at **Perge** (Turkey) or sites in the Levant. However, given the nearby posts in Israel, and looking more carefully at the architectural style with these specific arched niches in a nymphaeum/basilica-style structure...
-
-This looks very much like the **Nymphaeum at Caesarea Maritima** (Israel) or possibly **Beit She'an** (Scythopolis). The large arched niches in"				"I need to analyze the image carefully.
-
-Observable evidence:
-1. Large ancient stone ruins with arched niches in a massive wall
-2. The architecture shows Roman-style arched recesses/niches
-3. The caption mentions ""standing in for some absentee statues"" - suggesting these niches once held statues
-4. The construction style with large limestone blocks and multiple arched niches is characteristic of Roman-era architecture
-5. The recent posts context shows Israel/Jerusalem area
-
-The architecture - massive wall with arched niches at lower level and smaller niches above, built from large limestone blocks - is very characteristic of Roman-era ruins in the Levant region.
-
-The style strongly resembles the ruins at **Perge** (Turkey) or sites in the Levant. However, given the nearby posts in Israel, and looking more carefully at the architectural style with these specific arched niches in a nymphaeum/basilica-style structure...
-
-This looks very much like the **Nymphaeum at Caesarea Maritima** (Israel) or possibly **Beit She'an** (Scythopolis). The large arched niches in"
+222	1242864125350408356	BE_ilZHlnCk	public/media/ourearthsandwich_222.jpg	Third holiest site in Islam, vigilantly policed by volunteers who dinged us for holding hands	2016-05-04T16:56:11+0000	Dome of the Rock, Temple Mount, Jerusalem	31.7781	35.2353	TLV	
+223	1245732819722203210	BFJu2Y8lnBK	public/media/ourearthsandwich_223.jpg	Standing in for some absentee statues	2016-05-08T15:55:46+0000	Perge Ancient City, Antalya, Turkey	36.9611	30.8522	AYT	
 224	1248647227360310217	BFUFgmklnPJ	public/media/ourearthsandwich_224.mp4	Saying hello to the locals	2016-05-12T16:26:10+0000	Kekova Island, Kaş, Turkey	36.197862229178	29.644437549871	DLM	
 225	1252167828184134078	BFgmAFmFnG-	public/media/ourearthsandwich_225.jpg	This ventilation shaft descends 85 meters into a Tolkien-esque underground city that could once shelter 30,000 people. Not a very photogenic place but mind-blowing	2016-05-17T13:00:58+0000	Derinkuyu Underground City, Derinkuyu, Turkey	38.373554260887	34.73512172699	ASR	
-226	1252176866531767022	BFgoDnNlnLu	public/media/ourearthsandwich_226.jpg	Jordan had some crazy rocks, but Turkey is giving it a run	2016-05-17T13:18:56+0000	Pasabagi Valley, Ürgüp, Turkey	38.677618827479	34.855964426641	ASR	
+226	1252176866531767022	BFgoDnNlnLu	public/media/ourearthsandwich_226.jpg	Jordan had some crazy rocks, but Turkey is giving it a run	2016-05-17T13:18:56+0000	Paşabağı (Monks Valley), Ürgüp, Turkey	38.677618827479	34.855964426641	ASR	
 227	1252192886273241395	BFgrsuwlnEz	public/media/ourearthsandwich_227.jpg	Put a helmet on her and Wela has no fear, taunting the 7th story of a canyon-side dwelling like a Eyrie sky cell	2016-05-17T13:50:46+0000	Zelve Valley, Nevşehir, Turkey	38.6427547	34.8288648	NAV	
-228	1253385768451600600	BFk67c3FnDY	public/media/ourearthsandwich_228.jpg	Troglodyte castle	2016-05-19T05:20:48+0000	Uchisar, Cappadocia, Turkey	38.629994653481	34.807097276196	ASR	
-229	1253393043681603956	BFk8lUclnF0	public/media/ourearthsandwich_229.jpg	I wonder if it's a rough neighborhood	2016-05-19T05:35:15+0000	Uchisar, Cappadocia, Turkey	38.629994653481	34.807097276196	NAV	
+228	1253385768451600600	BFk67c3FnDY	public/media/ourearthsandwich_228.jpg	Troglodyte castle	2016-05-19T05:20:48+0000	Uchisar, Nevsehir, Turkey	38.629994653481	34.807097276196	NAV	
+229	1253393043681603956	BFk8lUclnF0	public/media/ourearthsandwich_229.jpg	I wonder if it's a rough neighborhood	2016-05-19T05:35:15+0000	Uchisar, Cappadocia, Turkey	38.629994653481	34.807097276196	ASR	
 230	1255731732403352063	BFtQVuDFnH_	public/media/ourearthsandwich_230.jpg	Any journey in Turkey exceeding 90 minutes requires at least one stop for a cup of apple tea and a thorough cleaning of the vehicle. We are not barbarians.	2016-05-22T11:01:49+0000	Pamukkale Restaurant, Paris, France	48.87133971	2.32672952	CDG	
 231	1255739664486527763	BFtSJJYFnMT	public/media/ourearthsandwich_231.jpg	Some things we know about Turkey: 1. They love their country 2. Phenomenal horticulturalists	2016-05-22T11:17:34+0000	Pamukkale Restaurant, Paris, France	48.87133971	2.32672952	CDG	
 232	1257458363429974910	BFzY7ggFnN-	public/media/ourearthsandwich_232.mp4	Baklava is just a gateway to the hard stuff	2016-05-24T20:12:19+0000	Istiklal Avenue, Istanbul, Turkey	41.013501325	28.97810174875	IST	
 233	1257486230335419242	BFzfRBlFnNq	public/media/ourearthsandwich_233.jpg	Faraway place, faraway look	2016-05-24T21:07:41+0000	Golden Horn, Istanbul, Turkey	41.054192025768	28.946591708131	IST	
 234	1258130957908996574	BF1x3C7FnHe	public/media/ourearthsandwich_234.jpg	Bold, very bold.	2016-05-25T18:28:39+0000	Hagia Sophia, Istanbul, Turkey	41.008527777778	28.979916666667	IST	
-235	1258456445948948522	BF273hSFnAq	public/media/ourearthsandwich_235.jpg	Turkey spells borrowed words like a precocious three-year-old. This has been a continuous source of joy for us and a reminder of how arbitrary English's phonetic rules are.	2016-05-26T05:15:20+0000	Sabiha Gökçen International Airport, Istanbul, Turkey	40.908466160335	29.315775853816	SAW	
+235	1258456445948948522	BF273hSFnAq	public/media/ourearthsandwich_235.jpg	Turkey spells borrowed words like a precocious three-year-old. This has been a continuous source of joy for us and a reminder of how arbitrary English's phonetic rules are.	2016-05-26T05:15:20+0000	Istanbul Sabiha Gökçen International Airport, Istanbul, Turkey	40.908466160335	29.315775853816	SAW	
 236	1258466515046789385	BF2-KC3FnEJ	public/media/ourearthsandwich_236.jpg	If we ever achieve world peace through global cultural homogenization, it will be the Selfie that blazes the path	2016-05-26T05:35:20+0000	Blue Mosque, Istanbul, Turkey	40.9058113	29.1681499	IST	
 237	1258673713941213892	BF3tRL3lnLE	public/media/ourearthsandwich_237.jpg	Welcome to Greece	2016-05-26T12:27:00+0000	Athens International Airport Eleftherios Venizelos, Athens, Greece	37.936107639927	23.947175416399	ATH	
 238	1260402808358072432	BF92a0iFnBw	public/media/ourearthsandwich_238.jpg	Really hoping I get to throw a Molotov or flip a car before we leave Greece. That's a centaur btw.	2016-05-28T21:42:25+0000	Victoria Park, Athens, Greece	37.995583575	23.72990467	ATH	
 239	1262846797111784309	BGGiHiblnN1	public/media/ourearthsandwich_239.jpg	I had thought there was nothing more lovely in life than having a beer by the sea, then a pirate ship showed up	2016-06-01T06:38:11+0000	Dubrovnik Old Town City Walls, Dubrovnik, Croatia	42.641041638857	18.110631702947	DBV	
-240	1263027681521725816	BGHLPwKlnF4	public/media/ourearthsandwich_240.mp4	Ah, romance...	2016-06-01T12:37:34+0000	Treasures of an Island, Dubrovnik, Croatia	42.626065062731	18.123064041138	DBV	
+240	1263027681521725816	BGHLPwKlnF4	public/media/ourearthsandwich_240.mp4	Ah, romance...	2016-06-01T12:37:34+0000	Konavle, Dubrovnik, Croatia	42.626065062731	18.123064041138	DBV	
 241	1263938559964246734	BGKaWx0lnLO	public/media/ourearthsandwich_241.jpg	Nothing lasts forever, except for stone arches. It is now on my life to-do's to build at least one on this earth	2016-06-02T18:47:19+0000	Trsteno Arboretum, Dubrovnik, Croatia	42.71666667	17.98333333	DBV	
 242	1265521817868988827	BGQCWNplnGb	public/media/ourearthsandwich_242.jpg	This bridge is where WWI began. Prince Franz Ferdinand of Austria was assassinated here by a teenager, setting in motion the events that ended the age of empires and created almost all the modern political nations and boundaries as we know them.	2016-06-04T23:12:58+0000	Latin Bridge, Sarajevo, Bosnia and Herzegovina	43.85820809	18.43047735	SJJ	
-243	1265938577185206558	BGRhG3AlnEe	public/media/ourearthsandwich_243.jpg	Excellent recycling	2016-06-05T13:01:00+0000	Latin Bridge, Sarajevo, Bosnia and Herzegovina				"I can see military vehicles/tanks on display outdoors, with a small information placard visible that appears to read ""M?? Skelly"" or similar. The caption ""Excellent recycling"" suggests these are repurposed/displayed military vehicles. There appear to be children climbing on what looks like artillery pieces and a tank.
-
-The small sign visible near the bottom center appears to reference military equipment. This looks like an outdoor military museum display. Given the context of nearby posts mentioning Sarajevo, Bosnia and Herzegovina, and the visible military equipment (which is consistent with Balkan military history museums), plus the style of the tank (appears to be a WWII-era or Cold War-era tank common in Yugoslav/Eastern European collections), this could be at a military museum in the Balkans region.
-
-However, without clear identifying signage, landmarks, or definitive geographic features, I cannot determine the specific location with sufficient confidence.
-
-fallback: no observable evidence in image/caption; location copied from prior post (Latin Bridge, Sarajevo, Bosnia and Herzegovina). lat/lng/region left empty so downstream consumers can identify fallback rows."
+243	1265938577185206558	BGRhG3AlnEe	public/media/ourearthsandwich_243.jpg	Excellent recycling	2016-06-05T13:01:00+0000	Sarajevo	43.85820809	18.43047735	SJJ	fallback: no observable evidence in image/caption; used the prior post's city (Sarajevo, derived from 'Latin Bridge, Sarajevo, Bosnia and Herzegovina'); lat/lng/region inherited from that post.
 244	1268677897553867162	BGbP9N6FnGa	public/media/ourearthsandwich_244.jpg	I thought I caught an opera singer on a surreptitious cigarette break, turns out it was just a flamboyant ticket scalper	2016-06-09T07:43:32+0000	Vienna State Opera, Vienna, Austria	48.202777925135	16.369139774595	VIE	
 245	1270566707543831176	BGh9bBSlnKI	public/media/ourearthsandwich_245.jpg	Winter is coming	2016-06-11T22:16:16+0000	Fisherman's Bastion, Budapest, Hungary	47.501676596407	19.034999012947	BUD	
 246	1270569301393699564	BGh-AxAFnLs	public/media/ourearthsandwich_246.jpg	I wonder how many people have dropped their phone taking this exact picture	2016-06-11T22:21:25+0000	St. Stephen's Basilica, Budapest, Hungary	47.500825983741	19.053897857666	BUD	
-247	1272535422455935121	BGo9Dl7lnCR	public/media/ourearthsandwich_247.jpg	The decoratively arranged remains of 40,000 souls make a haunting hell-scape, but the company of field-tripping school children helps fortify the courage	2016-06-14T15:27:45+0000	Sedlec Ossuary, Kutná Hora, Czech Republic	49.961687	15.287829	PRG	
+247	1272535422455935121	BGo9Dl7lnCR	public/media/ourearthsandwich_247.jpg	The decoratively arranged remains of 40,000 souls make a haunting hell-scape, but the company of field-tripping school children helps fortify the courage	2016-06-14T15:27:45+0000	Sedlec Ossuary (Church of Bones), Kutná Hora, Czech Republic	49.961687	15.287829	PRG	
 248	1273400777122410882	BGsB0KRFnGC	public/media/ourearthsandwich_248.jpg	The Czechs are the original Bohemians, and their hipster descendants flourish in the bosom of the earth mother	2016-06-15T20:07:03+0000	Vršovice, Prague, Czech Republic	50.06444	14.4525	PRG	
 249	1273433876262711900	BGsJV0PlnJc	public/media/ourearthsandwich_249.jpg	All we really needed #ourearthsandwich	2016-06-15T21:12:49+0000	Prague, Prague, Czech Republic	50.0876	14.4215	PRG	
 250	1274767597968454115	BGw4mBYFnHj	public/media/ourearthsandwich_250.jpg	Welcome home?	2016-06-17T17:22:41+0000	Seattle-Tacoma International Airport, Seattle, United States	47.64880696316	-122.32270295743	SEA	
 251	1276152990018203925	BG1zmIRFnEV	public/media/ourearthsandwich_251.jpg	Hey little buddy, I missed you too	2016-06-19T15:15:13+0000	Bellevue, Washington, United States	47.6172	-122.199	SEA	
-252	1287143750317180093	BHc2mvchQS9	public/media/ourearthsandwich_252.jpg	Wooden boat festival at Lake Union. Amidst the yatchs and antique boats on display, this homemade plywood box with sails stole the show for us	2016-07-04T19:11:53+0000	Lake Union, Seattle, Washington, USA	47.6493	-122.3360	SEA	
+252	1287143750317180093	BHc2mvchQS9	public/media/ourearthsandwich_252.jpg	Wooden boat festival at Lake Union. Amidst the yatchs and antique boats on display, this homemade plywood box with sails stole the show for us	2016-07-04T19:11:53+0000	Lake Union, Seattle, Washington, USA	47.6414	-122.3360	SEA	
 253	1287151990849410440	BHc4eqChBWI	public/media/ourearthsandwich_253.jpg	Graced during Pride Week with a magic rainbow of hetero platonic friendship	2016-07-04T19:28:16+0000	Seattle, Washington, United States	47.6046	-122.3308	SEA	
-254	1291453625050588573	BHsKjrFB-Wd	public/media/ourearthsandwich_254.jpg	The future is here. It seems familiar somehow...	2016-07-10T17:54:50+0000	Amazon Books, University Village, Seattle, Washington, USA	47.6627	-122.2934	SEA	"I need to identify which Amazon Books location this is.
-
-Observable evidence:
-- ""amazon books"" signage on a brick building
-- Modern retail storefront with large glass windows
-- Landscaping with magnolia tree, flowering plants
-- Street lamp visible
-- The caption ""The future is here. It seems familiar somehow..."" suggests this was an early/novel Amazon Books physical store
-
-Amazon Books opened several physical locations. Given the nearby posts context showing Seattle, Washington, and the fact that the first Amazon Books store opened in Seattle (University Village), this matches the University Village location in Seattle.
-
-The Amazon Books at University Village, Seattle:
-- Address: 4601 26th Ave NE, Seattle, WA 98105
-- This was Amazon's first physical bookstore (opened 2015)
-
-The building architecture, brick facade, and landscaping are consistent with the University Village shopping center in Seattle."
+254	1291453625050588573	BHsKjrFB-Wd	public/media/ourearthsandwich_254.jpg	The future is here. It seems familiar somehow...	2016-07-10T17:54:50+0000	Amazon Books, University Village, Seattle, Washington, USA	47.6626	-122.2996	SEA	
 255	1291758179755274022	BHtPzhwBK8m	public/media/ourearthsandwich_255.jpg	Artistic drainage in the Red Hook of Seattle	2016-07-11T03:59:56+0000	Ballard, Seattle, United States	47.68649272884	-122.3960803743	SEA	
 256	1294403617994684990	BH2pTuGjbo-	public/media/ourearthsandwich_256.jpg	Outpost of Diagon Alley next dpor	2016-07-14T19:35:57+0000	Seattle, Washington, United States	47.6046	-122.3308	SEA	
 257	1296393955533286819	BH9t28Yhm2j	public/media/ourearthsandwich_257.jpg	Stay classy	2016-07-17T13:30:24+0000	South Lake Union, Seattle, United States	47.62472	-122.335117	SEA	
-258	1316868856610129796	BJGdT9-BYeE	public/media/ourearthsandwich_258.jpg	Cheetos, at least they're gluten free...	2016-08-14T19:30:22+0000	South Lake Union, Seattle, United States				fallback: no observable evidence in image/caption; location copied from prior post (South Lake Union, Seattle, United States). lat/lng/region left empty so downstream consumers can identify fallback rows.
+258	1316868856610129796	BJGdT9-BYeE	public/media/ourearthsandwich_258.jpg	Cheetos, at least they're gluten free...	2016-08-14T19:30:22+0000	Seattle	47.62472	-122.335117	SEA	fallback: no observable evidence in image/caption; used the prior post's city (Seattle, derived from 'South Lake Union, Seattle, United States'); lat/lng/region inherited from that post.
 259	1324581037267123886	BJh2296hn6u	public/media/ourearthsandwich_259.jpg	Don't you ever forget	2016-08-25T10:53:06+0000	Newark Liberty International Airport, Newark, United States	40.690140502725	-74.170331954956	EWR	
 260	1333565878029388791	BKBxxm8hgv3	public/media/ourearthsandwich_260.jpg	Almost bought this but couldn't get reasonable assurance that it wouldn't have been an inadvertent campaign donation	2016-09-06T20:24:22+0000	Washington Dulles International Airport, Washington D.C., United States	38.948807240272	-77.448300161468	IAD	
 261	1333570461036405210	BKBy0TNB2Ha	public/media/ourearthsandwich_261.mp4	We ate this half a gallon of molten cheese and then slept for 14 hours straight, au revoir Switzerland!	2016-09-06T20:33:28+0000	Geneva, Geneva, Switzerland	46.2	6.15	GVA	
 262	1333582268933187489	BKB1gIKhaeh	public/media/ourearthsandwich_262.jpg	If you throw away all of your old luggage in a sweeping fit of Japanese minimalism, sometimes there can be consequences	2016-09-06T20:56:56+0000	Seattle-Tacoma International Airport, Seattle, United States	47.441076763889	-122.30377622327	SEA	
-263	1370696753741062547	BMFsW9thGGT	public/media/ourearthsandwich_263.jpg	Big grape or little watermelon?	2016-10-28T01:56:47+0000	Seattle-Tacoma International Airport, Seattle, United States				fallback: no observable evidence in image/caption; location copied from prior post (Seattle-Tacoma International Airport, Seattle, United States). lat/lng/region left empty so downstream consumers can identify fallback rows.
-264	1376273158772177297	BMZgSVmhTmR	public/media/ourearthsandwich_264.jpg	um, I don't think that's what I ordered...	2016-11-04T18:36:07+0000	Freetown Christiania, Copenhagen, Denmark				fallback: no observable evidence in image/caption; location copied from prior post (Freetown Christiania, Copenhagen, Denmark). lat/lng/region left empty so downstream consumers can identify fallback rows.
+263	1370696753741062547	BMFsW9thGGT	public/media/ourearthsandwich_263.jpg	Big grape or little watermelon?	2016-10-28T01:56:47+0000	Seattle	47.441076763889	-122.30377622327	SEA	fallback: no observable evidence in image/caption; used the prior post's city (Seattle, derived from 'Seattle-Tacoma International Airport, Seattle, United States'); lat/lng/region inherited from that post.
+264	1376273158772177297	BMZgSVmhTmR	public/media/ourearthsandwich_264.jpg	um, I don't think that's what I ordered...	2016-11-04T18:36:07+0000	Copenhagen	55.673588888889	12.599711111111	CPH	fallback: no observable evidence in image/caption; used the prior post's city (Copenhagen, derived from 'Freetown Christiania, Copenhagen, Denmark'); lat/lng/region inherited from that post.
 265	1382903039505348467	BMxDvzMhjdz	public/media/ourearthsandwich_265.jpg	Asian grocery stores are so fun	2016-11-13T22:08:30+0000	Uwajimaya, Seattle, United States	47.597108946852	-122.32698748927	SEA	
 266	1422185682742634504	BO8nlfohWgI	public/media/ourearthsandwich_266.jpg	If you ever wondered what singed hair looks like, I present Exhibit A. Also when starting a grill, light match first, then turn on gas.	2017-01-07T02:56:06+0000	Seattle, Washington, United States	47.6046	-122.3308	SEA	
 267	1512716285178320754	BT-P3JYAJdy	public/media/ourearthsandwich_267.jpg	Suck it West Cost liberals, this is how NYC does inclusiveness #hatehasnohomehere	2017-05-12T00:44:15+0000	New York, New York, United States	40.7142	-74.0064	JFK	
@@ -531,15 +278,15 @@ Friend: What?"	2017-09-03T21:19:28+0000	Houston, Texas, United States	29.7602	-9
 271	1645879968771972985	BbXVxyBlZ95	public/media/ourearthsandwich_271.jpg	One day 70 degrees and the next freezing. Trees missed autumn too.	2017-11-11T18:16:43+0000	Hell's Kitchen, New York City, United States	40.763744	-73.994641	JFK	
 272	1655574133818725681	Bb5x-cxlxUx	public/media/ourearthsandwich_272.jpg	Caption contest	2017-11-25T03:17:18+0000	Matrix Hotel, Edmonton, Alberta, Canada	53.5444	-113.4909	YEG	
 273	1681569231604500125	BdWIk6LA0ad	public/media/ourearthsandwich_273.jpg	Camo and ammo. Merica! #murderontheorientexpress	2017-12-31T00:04:55+0000	Matagorda Bay, Matagorda, United States	28.6333333333	-96.25	VCT	
-274	1692271361864629061	Bd8J9ZrgftF	public/media/ourearthsandwich_274.jpg	First panel of our art project complete. 1 down, 14 to go.	2018-01-14T18:28:08+0000	Matagorda Bay, Matagorda, United States				fallback: no observable evidence in image/caption; location copied from prior post (Matagorda Bay, Matagorda, United States). lat/lng/region left empty so downstream consumers can identify fallback rows.
-275	1727813437460910168	Bf6bSrCARBY	public/media/ourearthsandwich_275.jpg	I have arrived at our Westminster embassy to press Texan geopolitical concerns with the Queen	2018-03-04T19:23:54+0000	Texas Legation, St. James's Street, London, UK	51.5057	-0.1378	LHR	"The plaque reads ""Texas Legation"" and mentions it was the legation for ministers from the Republic of Texas to the Court of St. James, 1842-1845. The sign above reads ""STMINSTER"" (Westminster). The Texas Legation historic site is located at 3 St. James's Street, London, near Westminster."
+274	1692271361864629061	Bd8J9ZrgftF	public/media/ourearthsandwich_274.jpg	First panel of our art project complete. 1 down, 14 to go.	2018-01-14T18:28:08+0000	Matagorda	28.6333333333	-96.25	VCT	fallback: no observable evidence in image/caption; used the prior post's city (Matagorda, derived from 'Matagorda Bay, Matagorda, United States'); lat/lng/region inherited from that post.
+275	1727813437460910168	Bf6bSrCARBY	public/media/ourearthsandwich_275.jpg	I have arrived at our Westminster embassy to press Texan geopolitical concerns with the Queen	2018-03-04T19:23:54+0000	Texas Legation, Westminster, London, UK	51.5074	-0.1357	LHR	
 276	1731301794497391032	BgG0c8sA2m4	public/media/ourearthsandwich_276.jpg	I am loving this crazy brain coral pattern spicing up the classic arch	2018-03-09T14:54:38+0000	Porte Saint-Martin, Paris, France	48.869171	2.355601	CDG	
 277	1731313952148895622	BgG3N3YgzeG	public/media/ourearthsandwich_277.jpg	This makes me feel a little guillotine-y... Vive le revolution!	2018-03-09T15:18:47+0000	Palace of Versailles, Versailles, France	48.803968082293	2.123059630394	CDG	
 278	1731321992747032125	BgG5C3xgh49	public/media/ourearthsandwich_278.jpg	Not all modern art is garbage, garbage can't give you seizures	2018-03-09T15:34:46+0000	Tate Modern, London, United Kingdom	51.507447857925	-0.099332865793258	LHR	
 279	1732851951676385090	BgMU6tEA2dC	public/media/ourearthsandwich_279.jpg	A soaring cathedral for a dozen aging parishioners, religion might be done if a venue like this can't fill the seats	2018-03-11T18:14:31+0000	St. Paul's Church, Munich, Germany	48.136388888889	11.552222222222	MUC	
 280	1742343317284432685	BguDAQHg6st	public/media/ourearthsandwich_280.jpg	Final day of our excursion, bright sun, a beautiful library, and a monestary complex to put kings to shame	2018-03-24T20:32:10+0000	San Lorenzo de El Escorial, Madrid, Spain	40.5833	-4.15	MAD	
-281	1794687275482144713	BjoApGCBt_J	public/media/ourearthsandwich_281.jpg	Our Orwellian future is kinda cool when you can see 5 years of your life summarized in GPS history #r	2018-06-05T01:50:16+0000	New York City, New York, United States	40.7142	-74.0064	JFK	
-282	1797333834749289428	BjxaZmbBaPU	public/media/ourearthsandwich_282.jpg	This is some phenomenal cover design, Bravo Economist	2018-06-08T17:28:31+0000	New York City, New York, United States				fallback: no observable evidence in image/caption; location copied from prior post (New York City, New York, United States). lat/lng/region left empty so downstream consumers can identify fallback rows.
+281	1794687275482144713	BjoApGCBt_J	public/media/ourearthsandwich_281.jpg	Our Orwellian future is kinda cool when you can see 5 years of your life summarized in GPS history #r	2018-06-05T01:50:16+0000	New York, New York, United States	40.7142	-74.0064	JFK	
+282	1797333834749289428	BjxaZmbBaPU	public/media/ourearthsandwich_282.jpg	This is some phenomenal cover design, Bravo Economist	2018-06-08T17:28:31+0000	New York	40.7142	-74.0064	JFK	fallback: no observable evidence in image/caption; used the prior post's city (New York, derived from 'New York, New York, United States'); lat/lng/region inherited from that post.
 283	1798161752132120759	Bj0WpYkh3C3	public/media/ourearthsandwich_283.jpg	More fun with maps, really nailed New Zealand. #ourearthsandwich	2018-06-09T20:53:26+0000	New Zealand	-41.2865	174.7762	WLG	
 284	1809300828457332129	Bkb7YR0BO2h	public/media/ourearthsandwich_284.jpg	I think this is Hamlet, but I don't remember goofy stalker amongst all the murderous insanity scenes	2018-06-25T05:44:48+0000	Kronborg Castle, Helsingør, Denmark	55.688545771186	12.559016864639	CPH	
 285	1812997623838588423	BkpD7uzhr4H	public/media/ourearthsandwich_285.jpg	Posh graffiti in the other Soho	2018-06-30T08:09:40+0000	Soho, London, United Kingdom	51.512694462662	-0.13259368591323	LHR	
@@ -561,7 +308,7 @@ Friend: What?"	2017-09-03T21:19:28+0000	Houston, Texas, United States	29.7602	-9
 301	2042972187610485424	BxaGGFohpKw	public/media/ourearthsandwich_301.jpg	Only got to overlap a couple days with my bro. Parents baton is yours now, good luck!	2019-05-13T15:28:04+0000	La Piedra del Peñol, Guatapé, Colombia	6.2213446787243	-75.179479389846	MDE	
 302	2043279152135862229	BxbL5AoBPfV	public/media/ourearthsandwich_302.jpg	That is some admirably succinct visual symbolgy	2019-05-14T01:37:57+0000	Medellín, Antioquia, Colombia	6.24901	-75.56699	MDE	
 303	2043283313556633220	BxbM1kQBraE	public/media/ourearthsandwich_303.jpg	Mom being casually fabulous	2019-05-14T01:46:13+0000	Plaza Botero, Medellín, Colombia	6.2520361	-75.5684474	MDE	
-304	2043294661833254116	BxbPatKBeTk	public/media/ourearthsandwich_304.jpg	Botched translation or profound truth, I genuinely cannot say.	2019-05-14T02:08:46+0000	Jose Maria Cordova Airport, Mexico City, Mexico	19.305743390295	-99.231525928347	MEX	The coordinates (19.305743, -99.231525) point to Mexico City, Mexico area — not Medellín, Colombia. The latitude/longitude are authoritative.
+304	2043294661833254116	BxbPatKBeTk	public/media/ourearthsandwich_304.jpg	Botched translation or profound truth, I genuinely cannot say.	2019-05-14T02:08:46+0000	José María Córdova International Airport, Medellín, Colombia	6.1645	-75.4232	MDE	
 305	2137353881876165615	B2paAgIh_Pv	public/media/ourearthsandwich_305.jpg	Thanks for the memories 540. Onward and upward!	2019-09-20T20:47:39+0000	Hell's Kitchen, New York City, United States	40.763744	-73.994641	JFK	
 306	2149322870848626845	B3T7cNwjiCd	public/media/ourearthsandwich_306.jpg	Soft serve and plywood. Our pilgrimage to the OG temple of Swedish culture is truly complete.	2019-10-07T09:07:54+0000	Stockholm, Stockholm, Sweden	59.3298	18.0615	ARN	
 307	2162199463073809575	B4BrPSyDgSn	public/media/ourearthsandwich_307.jpg	Courtesy of the most passionate volunteer iphone photographer ever. Really brought the levity to an evening with adolf	2019-10-25T03:31:23+0000	Alamo Drafthouse Cinema, Brooklyn, United States	40.691077255782	-73.983262214989	JFK	
@@ -574,10 +321,10 @@ Friend: What?"	2017-09-03T21:19:28+0000	Houston, Texas, United States	29.7602	-9
 314	2173123822911044352	B4ofJptjTsA	public/media/ourearthsandwich_314.jpg	High brow vandalism	2019-11-09T05:16:08+0000	Coyoacán, Mexico City, Mexico	19.4326	-99.1332	MEX	
 315	2173845904137455346	B4rDVUQjQby	public/media/ourearthsandwich_315.jpg	"Fun fact from Lucha arena: Spanish for little person is ""enano"""	2019-11-10T05:10:47+0000	Arena Mexico, Mexico City, Mexico	19.4292359	-99.1302765	MEX	
 316	2295957798955830455	B_c4XQiDMy3	public/media/ourearthsandwich_316.jpg	Essential	2020-04-26T16:45:19+0000	Times Square, New York, USA	40.7580	-73.9855	JFK	
-317	3304981813507515445	C3dp3LnPeQ1	public/media/ourearthsandwich_317.jpg	Where even a cooking school is beautiful.	2024-02-17T21:15:55+0000	Centro, Oaxaca City, Mexico	17.062445704618	-96.723000560355	OAX	
-318	3304984015357661840	C3dqXOPvNKQ	public/media/ourearthsandwich_318.jpg	Some places can find the joy in anything	2024-02-17T21:20:18+0000	Oaxaca Centro, Oaxaca City, Mexico	17.062445704618	-96.723000560355	OAX	
+317	3304981813507515445	C3dp3LnPeQ1	public/media/ourearthsandwich_317.jpg	Where even a cooking school is beautiful.	2024-02-17T21:15:55+0000	Oaxaca Centro, Oaxaca City, Mexico	17.062445704618	-96.723000560355	OAX	
+318	3304984015357661840	C3dqXOPvNKQ	public/media/ourearthsandwich_318.jpg	Some places can find the joy in anything	2024-02-17T21:20:18+0000	Oaxaca Centro, Oaxaca, Mexico	17.062445704618	-96.723000560355	OAX	
 319	3305879785388058162	C3g2CZGMyYy	public/media/ourearthsandwich_319.jpg	Cthulhu in tree form. Reaching through the millennia.	2024-02-19T03:00:02+0000	El Árbol del Tule, Santa María del Tule, Mexico	17.046473290768	-96.636753696747	OAX	
-320	3305881285422030763	C3g2YOHMR-r	public/media/ourearthsandwich_320.jpg	For your safety, do not approach the abyss.	2024-02-19T03:03:01+0000	Hierve el Agua, San Isidro Roaguía, Oaxaca, Mexico	16.8653	-96.2757	OAX	"The sign reads ""POR SU SEGURIDAD NO ACERCARSE AL ABISMO"" / ""FOR YOUR SAFETY DO NOT APPROACH THE ABISS"" — this is a well-known warning sign at **Hierve el Agua**, a petrified waterfall/natural rock formation near Oaxaca, Mexico. The landscape (dry mountains, rocky plateau edge) and the bilingual Spanish/English sign are consistent with this tourist site in the Sierra Juárez mountains of Oaxaca state."
+320	3305881285422030763	C3g2YOHMR-r	public/media/ourearthsandwich_320.jpg	For your safety, do not approach the abyss.	2024-02-19T03:03:01+0000	Hierve el Agua, Oaxaca, Mexico	16.8655	-96.2757	OAX	
 321	3306529540606553058	C3jJxkzMGvi	public/media/ourearthsandwich_321.jpg	Never a wrong time or place for hot chocolate	2024-02-20T00:30:59+0000	Oaxaca, Oaxaca, Mexico	17.1201537289	-96.7670225425	OAX	
 322	3306588068964833801	C3jXFRlMZoJ	public/media/ourearthsandwich_322.jpg	East meets Southwest	2024-02-20T02:27:16+0000	Centro, Oaxaca City, Mexico	17.062445704618	-96.723000560355	OAX	
 323	3892575482365124847	DYFNMcHxKDv	public/media/ourearthsandwich_323.jpg	Test!	2026-05-08T14:39:41+0000	Mexico City, Mexico City, Mexico	19.432901	-99.131846	MEX	

@@ -91,7 +91,7 @@ def patched(monkeypatch):
         patched.infer_post_location      — default returns ("", "", "", "", "")
     """
     download = MagicMock(return_value="")
-    canonicalize = MagicMock(return_value=("", "", ""))
+    canonicalize = MagicMock(return_value=("", "", "", "", ""))
     inferred = MagicMock(return_value=("", "", "", "", ""))
     monkeypatch.setattr(load_posts_tsv, "download_media", download)
     monkeypatch.setattr(load_posts_tsv, "canonicalize_tagged_location", canonicalize)
@@ -108,16 +108,18 @@ def patched(monkeypatch):
 # ---------------------------------------------------------------------------
 
 class TestDualPathBranching:
-    def test_tagged_path_uses_canonical_name_when_available(self, patched):
-        """When Media.location is populated, lat/lng come from the geo-tag
-        and Claude is consulted to canonicalize the name + pick the IATA
-        region in one call. infer_post_location must NOT be called."""
-        patched.canonicalize_tagged_location.return_value = ("Mexico City, Mexico", "MEX", "")
+    def test_tagged_path_uses_canonical_name_and_coords_when_available(self, patched):
+        """When Media.location is populated, canonicalize returns canonical
+        name + coords + IATA. Tagged path uses all of them; infer_post_location
+        must NOT be called."""
+        patched.canonicalize_tagged_location.return_value = (
+            "Mexico City, Mexico", "19.432", "-99.131", "MEX", "",
+        )
         m = make_media(location=make_location("Mexico City", 19.432, -99.131))
 
         row = process_media(m, target="acct", local_id=999, media_dir="/tmp", recent_locations=[])
 
-        assert row["location"] == "Mexico City, Mexico"  # canonicalized form
+        assert row["location"] == "Mexico City, Mexico"
         assert row["lat"] == "19.432"
         assert row["lng"] == "-99.131"
         assert row["region"] == "MEX"
@@ -126,24 +128,59 @@ class TestDualPathBranching:
         )
         patched.infer_post_location.assert_not_called()
 
-    def test_tagged_path_falls_back_to_verbatim_when_canonical_empty(self, patched):
-        """When Claude's canonicalize call returns an empty canonical_name,
-        keep the poster's verbatim tag rather than blanking the location."""
-        patched.canonicalize_tagged_location.return_value = ("", "", "")
+    def test_tagged_path_name_authoritative_overrides_conflicting_coords(self, patched):
+        """When tag name and instagrapi coords conflict, the model produces
+        canonical coords FOR THE NAMED PLACE — and the row stores those,
+        not the conflicting instagrapi coords. This is the Sucre→Bolivia
+        regression case: don't let bad coords flip the location to China."""
+        patched.canonicalize_tagged_location.return_value = (
+            "Sucre, Chuquisaca, Bolivia", "-19.04", "-65.26", "SRE", "",
+        )
+        # instagrapi returned coords pointing to China — but tag NAME says Bolivia
+        m = make_media(location=make_location("Sucre, Bolivia", 28.99, 118.85))
+
+        row = process_media(m, target="acct", local_id=999, media_dir="/tmp", recent_locations=[])
+
+        assert row["location"] == "Sucre, Chuquisaca, Bolivia"
+        assert row["lat"] == "-19.04"  # canonical Bolivian coords, NOT the China coords
+        assert row["lng"] == "-65.26"
+        assert row["region"] == "SRE"
+
+    def test_tagged_path_falls_back_to_verbatim_coords_when_canonical_coords_empty(self, patched):
+        """For hyper-local tags where the model can't determine precise coords,
+        canonicalize returns empty lat/lng. The row falls back to the
+        instagrapi-provided coords (they're approximately right for the
+        named place, just not precise)."""
+        patched.canonicalize_tagged_location.return_value = (
+            "Some Hyper-Local Place, City, Country", "", "", "XYZ", "",
+        )
+        m = make_media(location=make_location("hyperlocal tag", 47.58, -122.41))
+
+        row = process_media(m, target="acct", local_id=999, media_dir="/tmp", recent_locations=[])
+
+        assert row["location"] == "Some Hyper-Local Place, City, Country"
+        assert row["lat"] == "47.58"  # verbatim fallback
+        assert row["lng"] == "-122.41"
+        assert row["region"] == "XYZ"
+
+    def test_tagged_path_falls_back_to_verbatim_name_when_canonical_empty(self, patched):
+        """When the canonicalize call returns nothing usable, keep the
+        poster's verbatim tag rather than blanking the location."""
+        patched.canonicalize_tagged_location.return_value = ("", "", "", "", "")
         m = make_media(location=make_location("Oxaca", 17.06, -96.72))
 
         row = process_media(m, target="acct", local_id=999, media_dir="/tmp", recent_locations=[])
 
-        assert row["location"] == "Oxaca"  # verbatim fallback
-        assert row["lat"] == "17.06"
+        assert row["location"] == "Oxaca"  # verbatim name fallback
+        assert row["lat"] == "17.06"       # verbatim coords fallback
         assert row["lng"] == "-96.72"
         assert row["region"] == ""
 
     def test_tagged_path_records_canonicalize_reasoning(self, patched):
-        """When Claude prefixes prose before its JSON during canonicalization,
-        that prose is captured in the reasoning column."""
+        """When the model writes prose during canonicalization, that prose is
+        captured in the reasoning column."""
         patched.canonicalize_tagged_location.return_value = (
-            "Oaxaca City, Mexico", "OAX", "Note: original tag had a typo"
+            "Oaxaca City, Mexico", "17.06", "-96.72", "OAX", "Note: original tag had a typo",
         )
         m = make_media(location=make_location("Oxaca", 17.06, -96.72))
 
@@ -301,7 +338,7 @@ class TestDualPathBranching:
         """instagrapi sometimes returns Location with lat/lng = (0.0, 0.0)
         when coords are absent. We keep the name but blank the coords so
         the TSV doesn't accumulate bogus 0,0 points."""
-        patched.canonicalize_tagged_location.return_value = ("Some Place, Country", "", "")
+        patched.canonicalize_tagged_location.return_value = ("Some Place, Country", "", "", "", "")
         m = make_media(location=make_location("Some Place", 0.0, 0.0))
 
         row = process_media(m, target="acct", local_id=999, media_dir="/tmp", recent_locations=[])
@@ -314,7 +351,7 @@ class TestDualPathBranching:
     def test_tagged_path_with_no_coord_attrs_keeps_name_only(self, patched):
         """Location with no lat/lng attributes at all (only name). Coords
         come out empty, the canonicalize call still fires."""
-        patched.canonicalize_tagged_location.return_value = ("Name Only, Country", "ABC", "")
+        patched.canonicalize_tagged_location.return_value = ("Name Only, Country", "", "", "ABC", "")
         loc = SimpleNamespace(name="Name Only")  # no lat / lng attrs
         m = make_media(location=loc)
 

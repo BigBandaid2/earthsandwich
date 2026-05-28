@@ -52,77 +52,121 @@ def mock_anthropic_client(monkeypatch):
 # ---------------------------------------------------------------------------
 
 class TestCanonicalizeTaggedLocation:
-    VALID_JSON = '{"canonical_name":"Alki Beach Park, Seattle, USA","region":"SEA"}'
-    PARSED = ("Alki Beach Park, Seattle, USA", "SEA", "")
+    """Tag NAME is authoritative (poster's intent); the model returns canonical
+    name + canonical coords + IATA. When name and input coords conflict, the
+    model produces coords for the *named* place rather than echoing the
+    conflicting input."""
+
+    VALID_JSON = (
+        '{"canonical_name":"Alki Beach Park, Seattle, USA",'
+        '"lat":"47.58","lng":"-122.41","region":"SEA"}'
+    )
+    PARSED = ("Alki Beach Park, Seattle, USA", "47.58", "-122.41", "SEA", "")
 
     def test_parses_clean_json(self, mock_anthropic_client):
         mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
         assert canonicalize_tagged_location("Alki Beach Park", "47.58", "-122.41") == self.PARSED
 
+    def test_name_coord_conflict_overrides_with_named_place_coords(self, mock_anthropic_client):
+        """Regression for the @ourearthsandwich corpus's tag-coord mismatches:
+        a tag named 'Sucre, Bolivia' with coordinates in China should be
+        canonicalized to Sucre with Bolivian coordinates, not Lishui with
+        Chinese coordinates. The model trusts the NAME."""
+        mock_anthropic_client.messages.create.return_value = _mock_response(
+            '{"canonical_name":"Sucre, Chuquisaca, Bolivia",'
+            '"lat":"-19.04","lng":"-65.26","region":"SRE"}'
+        )
+        result = canonicalize_tagged_location("Sucre, Bolivia", "28.99", "118.85")
+        # Despite the input coords pointing to China, the model produced
+        # canonical Bolivian coords for the named place. Caller will use these.
+        assert result == ("Sucre, Chuquisaca, Bolivia", "-19.04", "-65.26", "SRE", "")
+
+    def test_matching_name_and_coords_echoes_input_coords(self, mock_anthropic_client):
+        """Common case: name and coords agree. The model echoes the input
+        coords verbatim (or near-verbatim) as the canonical coords."""
+        mock_anthropic_client.messages.create.return_value = _mock_response(
+            '{"canonical_name":"Paris, France",'
+            '"lat":"48.8566","lng":"2.3522","region":"CDG"}'
+        )
+        result = canonicalize_tagged_location("Paris", "48.8566", "2.3522")
+        assert result == ("Paris, France", "48.8566", "2.3522", "CDG", "")
+
     def test_lowercased_region_is_uppercased_and_validated(self, mock_anthropic_client):
         mock_anthropic_client.messages.create.return_value = _mock_response(
-            '{"canonical_name":"Paris, France","region":"cdg"}'
+            '{"canonical_name":"Paris, France","lat":"48.85","lng":"2.35","region":"cdg"}'
         )
         result = canonicalize_tagged_location("Paris", "48.85", "2.35")
-        assert result == ("Paris, France", "CDG", "")
+        assert result == ("Paris, France", "48.85", "2.35", "CDG", "")
 
     def test_punctuated_region_is_stripped(self, mock_anthropic_client):
         mock_anthropic_client.messages.create.return_value = _mock_response(
-            '{"canonical_name":"Los Angeles, USA","region":"LAX."}'
+            '{"canonical_name":"Los Angeles, USA","lat":"34.05","lng":"-118.24","region":"LAX."}'
         )
         result = canonicalize_tagged_location("LA", "34.05", "-118.24")
-        assert result == ("Los Angeles, USA", "LAX", "")
+        assert result == ("Los Angeles, USA", "34.05", "-118.24", "LAX", "")
 
     def test_typo_in_tag_gets_corrected_when_canonicalize_does(self, mock_anthropic_client):
         """Passes the typo through to the model; the test mocks the canonical
         form. Real correction quality is exercised by the integration test."""
         mock_anthropic_client.messages.create.return_value = _mock_response(
-            '{"canonical_name":"Oaxaca City, Oaxaca, Mexico","region":"OAX"}'
+            '{"canonical_name":"Oaxaca City, Oaxaca, Mexico",'
+            '"lat":"17.06","lng":"-96.72","region":"OAX"}'
         )
         result = canonicalize_tagged_location("Oxaca", "17.06", "-96.72")
-        assert result == ("Oaxaca City, Oaxaca, Mexico", "OAX", "")
+        assert result == ("Oaxaca City, Oaxaca, Mexico", "17.06", "-96.72", "OAX", "")
 
     def test_empty_canonical_name_returns_empty(self, mock_anthropic_client):
-        """All-empty JSON (Claude couldn't determine anything) → empty fields.
+        """All-empty JSON (model couldn't determine anything) → empty fields.
         Callers fall back to the verbatim tag in that case."""
         mock_anthropic_client.messages.create.return_value = _mock_response(
-            '{"canonical_name":"","region":""}'
+            '{"canonical_name":"","lat":"","lng":"","region":""}'
         )
-        assert canonicalize_tagged_location("???", "", "") == ("", "", "")
+        assert canonicalize_tagged_location("???", "", "") == ("", "", "", "", "")
+
+    def test_empty_canonical_lat_lng_returns_empty_strings(self, mock_anthropic_client):
+        """For hyper-local tags where the model can produce a canonical name
+        but can't determine precise coords, the lat/lng come back empty so
+        the caller can fall back to the verbatim instagrapi-provided coords."""
+        mock_anthropic_client.messages.create.return_value = _mock_response(
+            '{"canonical_name":"Some Hyper-Local Place, Some City, Country",'
+            '"lat":"","lng":"","region":"XYZ"}'
+        )
+        result = canonicalize_tagged_location("hyperlocal tag", "1.23", "4.56")
+        assert result == ("Some Hyper-Local Place, Some City, Country", "", "", "XYZ", "")
 
     def test_invalid_region_format_is_blanked(self, mock_anthropic_client):
         """A region that isn't a clean 3-letter code is rejected — better empty
-        than wrong. Canonical name still passes through."""
+        than wrong. Other fields pass through."""
         mock_anthropic_client.messages.create.return_value = _mock_response(
-            '{"canonical_name":"Somewhere, Country","region":"NOT-VALID"}'
+            '{"canonical_name":"Somewhere, Country","lat":"0","lng":"0","region":"NOT-VALID"}'
         )
-        assert canonicalize_tagged_location("X", "0", "0") == ("Somewhere, Country", "", "")
+        assert canonicalize_tagged_location("X", "0", "0") == ("Somewhere, Country", "0", "0", "", "")
 
     def test_returns_empty_when_api_raises(self, mock_anthropic_client):
         mock_anthropic_client.messages.create.side_effect = RuntimeError("rate limit")
-        assert canonicalize_tagged_location("Anywhere", "0", "0") == ("", "", "")
+        assert canonicalize_tagged_location("Anywhere", "0", "0") == ("", "", "", "", "")
 
     def test_returns_empty_on_unparseable_response(self, mock_anthropic_client):
-        """When Claude writes prose with no JSON at all, both fields blank and
-        the prose is surfaced as reasoning."""
+        """When the model writes prose with no JSON at all, all fields blank
+        and the prose is surfaced as reasoning."""
         mock_anthropic_client.messages.create.return_value = _mock_response(
             "I'm not sure where this is"
         )
-        canonical, region, reasoning = canonicalize_tagged_location("???", "0", "0")
+        canonical, lat, lng, region, reasoning = canonicalize_tagged_location("???", "0", "0")
         assert canonical == ""
-        assert region == ""
+        assert lat == lng == region == ""
         assert "I'm not sure" in reasoning
 
     def test_does_not_send_image(self, mock_anthropic_client):
-        """The canonicalize call is text-only — coordinates and the verbatim
-        tag are authoritative, no vision required."""
+        """The canonicalize call is text-only — no vision required since the
+        tag name + coords carry all the necessary input."""
         mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
         canonicalize_tagged_location("Alki Beach Park", "47.58", "-122.41")
         messages = mock_anthropic_client.messages.create.call_args.kwargs["messages"]
         assert isinstance(messages[0]["content"], str)
 
     def test_prompt_includes_verbatim_tag_and_coords(self, mock_anthropic_client):
-        """Sanity check that the prompt carries the inputs Claude needs."""
+        """Sanity check that the prompt carries the inputs the model needs."""
         mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
         canonicalize_tagged_location("Oxaca", "17.06", "-96.72")
         prompt = mock_anthropic_client.messages.create.call_args.kwargs["messages"][0]["content"]
@@ -130,18 +174,30 @@ class TestCanonicalizeTaggedLocation:
         assert "17.06" in prompt
         assert "-96.72" in prompt
 
+    def test_prompt_states_tag_name_is_authoritative(self, mock_anthropic_client):
+        """Regression: the prompt MUST tell the model the tag NAME is
+        authoritative when conflicting with coords. Removing this language
+        previously caused Sucre→Lishui and Medellín→Mexico City failures."""
+        mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
+        canonicalize_tagged_location("Anywhere", "0", "0")
+        prompt = mock_anthropic_client.messages.create.call_args.kwargs["messages"][0]["content"]
+        assert "AUTHORITATIVE" in prompt
+        assert "TRUST THE NAME" in prompt or "trust the name" in prompt.lower()
+
     def test_extracts_json_from_prose_preamble(self, mock_anthropic_client):
-        """Regression: Claude sometimes writes reasoning prose before the
+        """Regression: the model sometimes writes reasoning prose before the
         JSON. The parser must skip the prose and parse the trailing object,
         and preserve the prose as `reasoning`."""
         mock_anthropic_client.messages.create.return_value = _mock_response(
-            "Looking at the lat/lng, this is clearly in Mexico City.\n\n"
-            '{"canonical_name":"Mexico City, Mexico","region":"MEX"}'
+            "The tag name and coords both point to Mexico City — they agree.\n\n"
+            '{"canonical_name":"Mexico City, Mexico","lat":"19.43","lng":"-99.13","region":"MEX"}'
         )
-        canonical, region, reasoning = canonicalize_tagged_location("Mexico City", "19.43", "-99.13")
+        canonical, lat, lng, region, reasoning = canonicalize_tagged_location("Mexico City", "19.43", "-99.13")
         assert canonical == "Mexico City, Mexico"
+        assert lat == "19.43"
+        assert lng == "-99.13"
         assert region == "MEX"
-        assert "Looking at the lat/lng" in reasoning
+        assert "tag name and coords both point" in reasoning
 
 
 # ---------------------------------------------------------------------------
