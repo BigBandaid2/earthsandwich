@@ -1,26 +1,32 @@
 # Earth Sandwich — Vision & Roadmap
 
-> **What this doc is** (per the [constitution](../.specify/memory/constitution.md)'s catalogue): **Vision**, **App definitions** (pile-app, bridge-app, useful-app, bridge-builder-app), **current and planned spec list**, **boundary rules between Apps**, and **explicit non-goals**. Addressed to a product-manager reader who has personal experience with the "pile → bridge → useful" problem (data lake / data warehouse / centralization → ETL+EDM → production app). Frames vision from product, architecture, market, and business perspectives; technical detail lives in specs.
->
-> **What this doc is not**: a spec, a workflow guide, or the constitution. It doesn't get a JIRA Epic, drift scans, or any `/speckit.*` ceremony. Living document — edit via PR. Cardinal Rules (see [constitution](../.specify/memory/constitution.md)) apply.
+> Addressed to a product-manager reader with personal experience of the **pile → bridge → useful** problem (data lake → ETL+EDM → production app). Frames vision from product, architecture, market, and business angles; technical detail lives in specs. Not a spec, workflow guide, or constitution — see the [constitution](../.specify/memory/constitution.md) for the full doc catalogue.
 
 ---
 
 ## Vision
 
-The project serves three distinct purposes:
+ETLs and EDMs exist to turn raw data into shaped, cleaned, useful data. These solutions are hard to configure and require teams of people to operate. Our goal for **Data Unification** is to use AI to collapse this effort by 100x.
+
+In the future there will be no more people writing JavaScript, C#, and YAML rules and configurations — demanding esoteric knowledge of a cumbersome framework. Instead, an orchestrator and an LLM will look at a raw data pile and a target model and build the pipe in days.
+
+In the future there will be no more data-quality operators clearing an endless queue of daily exception tickets and fixing individual data points. Instead, issues will be detected instantly, checked against a source of truth, fixes applied at the global root cause, and presented to data managers as permanent solutions already pre-tested at scale and ready for push-button deployment.
+
+This project is the first attempt to approach the problem at toy scale and probe the feasibility of this vision — and the capabilities of frontier AI at developing and operating such a solution.
+
+To that end, the project serves three distinct purposes:
 
 ### travelogue-purpose — A visual travelogue for our trips
 
-A web app for friends and family to follow where we went on our last earth-sandwich trip and where we intend to go on the next big round-the-world trip. It may also help us record more detailed trip plans in a structured way and display content for smaller upcoming trips (Montenegro, India) — but those are secondary objectives that exist mainly to enhance or test functionality built primarily for the round-the-world use case.
+A useful and fun web app for friends and family to follow where we went on our last earth-sandwich trip and where we intend to go on the next big round-the-world trip. This provides a context to ingest and clean several sources messy data, while not being so boring that you want to kill yourself.
 
 ### ai-learning-purpose — A hands-on experiment in AI-driven development
 
-A learning sandbox for AI-assisted software development, with **Spec Kit** chosen as the starting framework. Ethan and Evan / Elena are using this project to learn how to drive Claude Code productively, compensate for its limitations, and project-manage well enough to actually ship useful features — instead of slipping into the easy defaults of producing more raw code and more useless documentation.
+A learning sandbox for AI-assisted software development, with **Spec Kit** chosen as the starting framework. We are using this project to learn how to drive Claude Code productively, compensate for its limitations, and project-manage well enough to actually ship useful features.
 
 ### data-unification-purpose — A toy case for the Data Unification project
 
-The more serious **Data Unification** work was started and paused due to spiraling complexity. Earth Sandwich involves the same core problems at toy scale: data pipelines, raw data tables, normalization, and matching related records. Tackling them here lets us deliberately apply methods that would normally be overkill for a personal app, with the goal of generalizing those patterns back into the larger project later.
+A dedicated **Data Unification** project was started earlier and paused due to spiraling complexity. Earth Sandwich involves the same core problems at toy scale: data pipelines, raw data tables, normalization, and matching related records. Tackling them here lets us deliberately apply methods that would normally be overkill for a personal app, with the goal of generalizing those patterns back into the larger project later.
 
 ---
 
@@ -72,7 +78,7 @@ When work is ambiguous between specs (e.g. a new stop type), default to whicheve
 
 ## data-unification-purpose — Data Unification outline
 
-> Transcription of `docs/images/data-unification-outline.jpeg` (handwritten notebook page). From a Data Unification perspective there are 4 distinct apps. The Earth Sandwich App mapping is in the Apps section above and surfaced at each subsection header below.
+> Transcription of `docs/images/data-unification-outline.jpeg` (handwritten notebook page).
 
 ### App 1 — Raw Data Pile (Input for Data Unification) — pile-app in this project
 
