@@ -18,9 +18,13 @@ Three active specs:
 
 **`003-ingestion-pipeline`** — the current **pile-app**. A physically self-contained collection of segregated pipeline services (Instagram, future Substack, future others) that extract content from upstream sources and deposit it in a local "pile" of TSVs + media files. The pile is the App's sole downstream surface; no other App reads it directly. Re-authored from scratch on 2026-05-27 to reflect the App-shaped scope that emerged after the original 002→002+003 split.
 - Spec: `specs/003-ingestion-pipeline/spec.md`
-- Tasks: `specs/003-ingestion-pipeline/tasks.md` (historical phases preserved per Cardinal Rule #1; new phases pending `/speckit.plan`)
+- Plan: `specs/003-ingestion-pipeline/plan.md`
+- Research: `specs/003-ingestion-pipeline/research.md`
+- Data model: `specs/003-ingestion-pipeline/data-model.md`
+- Contracts: `specs/003-ingestion-pipeline/contracts/` (pile-artifact-instagram.md, pile-artifact-substack.md, cli.md)
+- Quickstart: `specs/003-ingestion-pipeline/quickstart.md`
+- Tasks: `specs/003-ingestion-pipeline/tasks.md` (historical phases preserved per Cardinal Rule #1; new phases pending `/speckit.tasks`)
 - Specify-prompt draft: `specs/003-ingestion-pipeline/specify-prompt-draft.md`
-- Plan / data-model / research / quickstart: pending regeneration via `/speckit.plan` (old versions removed on 2026-05-27 since they referenced the dropped scope)
 
 **Apps and architectural relationships** (see [`docs/roadmap.md`](docs/roadmap.md) for the canonical Apps catalogue):
 - The project's Apps are **pile-app**, **bridge-app**, **useful-app**, **bridge-builder-app**. Specs do NOT map 1:1 to Apps.
