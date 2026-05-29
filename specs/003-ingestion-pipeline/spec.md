@@ -11,7 +11,7 @@ This spec defines the **Ingestion Pipeline App** — a self-contained collection
 
 The App is **physically self-contained**: all of its code, tests, configuration, run artifacts, and pile contents live within a single root directory at the project level. The App's directory is movable as a unit to a different project or repository without requiring changes to either the App or to the source project's other code. Only the speckit working-process artifacts (this spec, JIRA mapping, planning docs) remain at the parent project's root since they're part of the cross-App PM scaffolding.
 
-The pile is the App's sole downstream surface. Other Apps in the project **never read the pile directly**. A future **Data Unification (DU) ETL App** sits between the pile and any consumer (the Travelogue DB, the front-end, future consumers); the DU layer is responsible for cleaning, normalization, and mapping pile artifacts into consumer-ready shapes. The pile-to-DU handoff is the only contract this App exposes; what happens downstream of that is out of scope.
+The pile is the App's sole downstream surface. Other Apps in the project **never read the pile directly**. A future **bridge-app** (see [roadmap.md](../../docs/roadmap.md)) sits between the pile and any consumer (the Travelogue DB, the front-end, future consumers); the bridge-app is responsible for cleaning, normalization, and mapping pile artifacts into consumer-ready shapes. The pile-to-bridge handoff is the only contract this App exposes; what happens downstream of that is out of scope.
 
 The pile is intentionally messy — it represents the kind of artifact a real organization gets when it "centralizes" disparate sources into a common vicinity (data lake / warehouse / Snowflake repository). Each pipeline service is treated as an opaque external workflow from the perspective of downstream consumers; the App is the toy-scale stand-in for the Data Unification project's App 1 (Raw Data Pile) in the project roadmap.
 
@@ -52,9 +52,9 @@ Instagram (and other social sources) aggressively detect automated access. The I
 
 ---
 
-### User Story 3 - The pile is consumed only via a DU ETL layer, never directly (Priority: P2)
+### User Story 3 - The pile is consumed only via a bridge-app, never directly (Priority: P2)
 
-The pile is produced by this App and is read by exactly one consumer: a future Data Unification (DU) ETL App. The DU App handles cleaning, normalization, and mapping pile artifacts to consumer-ready data for downstream Apps (Travelogue DB, front-end, etc.). The DU App is out of scope here; what matters in this spec is that the pile's structure is the App's contract with DU, and that no other consumer reaches into the pile.
+The pile is produced by this App and is read by exactly one consumer: a future bridge-app. The bridge-app handles cleaning, normalization, and mapping pile artifacts to consumer-ready data for downstream Apps (Travelogue DB, front-end, etc.). The bridge-app is out of scope here; what matters in this spec is that the pile's structure is the App's contract with the bridge-app, and that no other consumer reaches into the pile.
 
 The App itself is also **physically self-contained**: code, tests, run artifacts, and pile contents all live in a single root directory that's movable to a separate project or repo without affecting either side.
 
@@ -64,8 +64,8 @@ The App itself is also **physically self-contained**: code, tests, run artifacts
 
 **Acceptance Scenarios**:
 
-1. **Given** the pile contains artifacts from multiple pipeline services, **When** the DU ETL App reads from the pile, **Then** it accesses artifacts through pile-level conventions (file paths, table names) without referring to any pipeline service's code or names.
-2. **Given** a pipeline service is replaced with a different implementation (same pile output contract), **When** the DU App reads the pile, **Then** it observes no difference.
+1. **Given** the pile contains artifacts from multiple pipeline services, **When** the bridge-app reads from the pile, **Then** it accesses artifacts through pile-level conventions (file paths, table names) without referring to any pipeline service's code or names.
+2. **Given** a pipeline service is replaced with a different implementation (same pile output contract), **When** the bridge-app reads the pile, **Then** it observes no difference.
 3. **Given** the App's root directory is copied to a fresh project, **When** the test suite is run inside the new copy, **Then** all tests pass.
 4. **Given** any non-spec file in the parent project, **When** searched for references reaching into the App's pile, **Then** zero matches are found (the project's other code never points into the App's data).
 
@@ -137,7 +137,7 @@ The operator extends the App with a new pipeline service for a new upstream sour
 These principles overrule any contradicting requirement detail below:
 
 1. **The App is physically self-contained.** All code, tests, configuration, run artifacts, and pile contents reside within a single root directory. The directory is movable to a different project or repository as a unit without affecting either the App or the source project's other code. Speckit / working-process artifacts (this spec, JIRA mapping, planning docs) live at the parent project's root and are NOT part of the App.
-2. **The pile is the App's sole surface.** Downstream consumers see only the pile, and only through a future Data Unification (DU) ETL layer — no consumer reads the pile directly. No service-level details (which pipeline service ran when, internal data structures, etc.) leak to consumers.
+2. **The pile is the App's sole surface.** Downstream consumers see only the pile, and only through a future bridge-app — no consumer reads the pile directly. No service-level details (which pipeline service ran when, internal data structures, etc.) leak to consumers.
 3. **Pipeline services are segregated and opaque.** Each service is a self-contained workflow. From the downstream perspective they are "unknown and mysterious" — like an unrelated upstream organization.
 4. **Inference steps preserve their inputs.** Any step that calls a model to infer something MUST persist the original inputs alongside the output, so the inference can be re-run, audited, or replaced with a different model without re-fetching the source.
 5. **The pile is intentionally messy.** Heterogeneous artifact types (TSV files, media files, relational tables, blob stores) coexist. The mess is the point — it simulates the result of "centralizing" disparate sources without enforcing a unified schema.
@@ -151,7 +151,7 @@ These principles overrule any contradicting requirement detail below:
 - **FR-100**: The App MUST consist of one or more segregated pipeline services, each responsible for exactly one upstream source.
 - **FR-101**: Each pipeline service MUST be runnable independently of the others. Adding, modifying, disabling, or removing one service MUST NOT require changes to other services' code or configuration.
 - **FR-102**: All pipeline services MUST write into a single conceptual pile — a collection of file folders and/or databases that constitutes the App's sole downstream surface.
-- **FR-103**: Downstream Apps MUST NOT read the pile directly. Pile access is mediated by a future Data Unification (DU) ETL App — separate from this spec — which is the only consumer of the pile and the only producer of consumer-ready data for downstream Apps (Travelogue DB, front-end, etc.).
+- **FR-103**: Downstream Apps MUST NOT read the pile directly. Pile access is mediated by a future bridge-app — separate from this spec — which is the only consumer of the pile and the only producer of consumer-ready data for downstream Apps (Travelogue DB, front-end, etc.).
 - **FR-104**: The pile MAY contain heterogeneous artifact types — a single pile may be backed by TSV files, image/video files, relational databases, blob stores, or any combination. Each pipeline service feeds exactly one pile; one pile MAY be fed by one or more pipeline services.
 - **FR-105**: Any pipeline service that performs an inference step (LLM call, ML model invocation, heuristic resolution, etc.) MUST persist the original inputs to that inference alongside the output, so the inference can be re-evaluated, audited, or re-run with a different model without re-fetching from the upstream source.
 
@@ -160,7 +160,7 @@ These principles overrule any contradicting requirement detail below:
 - **FR-110**: All of the App's code, tests, configuration, run artifacts (per-run logs, sessions, scratch files), and pile contents (TSV files, media files, databases, blob stores) MUST reside within a single root directory at the project level. The App MUST NOT write any runtime artifact to a project-shared directory (e.g., a frontend's `public/`, a backend's data directory, the project root). The App MUST NOT read any runtime artifact from outside its own root directory.
 - **FR-111**: The App's root directory MUST be movable as a self-contained unit to a different project or repository. The move MUST NOT require modifying any file outside the App's directory and MUST NOT require modifying any file inside the App's directory beyond what's needed to run it in the new location (e.g., wiring up Python environment, secrets).
 - **FR-112**: Speckit / working-process artifacts — this spec, `tasks.md`, `jira-mapping.json`, `specify-prompt-draft.md`, planning notes, the cross-project roadmap — MAY remain at the parent project's root since they're part of the cross-App PM scaffolding, not the App itself. The App MUST be moveable independently of these artifacts (e.g., a future repo containing only the App will be a working, runnable codebase, even without any speckit metadata).
-- **FR-113**: Downstream Apps in the same project access pile data ONLY through the future Data Unification (DU) ETL App (see FR-103). The DU App is the bridge between the messy pile and consumer-ready data; it is out of scope for this spec but is the assumed consumer of the pile.
+- **FR-113**: Downstream Apps in the same project access pile data ONLY through the future bridge-app (see FR-103). The bridge-app is the hand-crafted ETL/EDM between the messy pile and consumer-ready data; it is out of scope for this spec but is the assumed consumer of the pile.
 
 #### Instagram Pipeline Service
 
@@ -205,9 +205,9 @@ The following FR numbers are reserved and intentionally retired so historical `t
 
 ### Key Entities
 
-- **Pile**: The App's downstream surface. A collection of file folders and/or databases located **within the App's root directory** at well-known relative paths. Heterogeneous in artifact type. The sole interface between this App and the future DU ETL App; never read directly by Travelogue or other downstream consumers.
+- **Pile**: The App's downstream surface. A collection of file folders and/or databases located **within the App's root directory** at well-known relative paths. Heterogeneous in artifact type. The sole interface between this App and the future bridge-app; never read directly by Travelogue or other downstream consumers.
 - **App Root Directory**: The single physical directory at the parent project's root that contains all of this App's code, tests, configuration, run artifacts, and pile contents. Movable as a unit (FR-110, FR-111).
-- **DU ETL App** (out of scope, referenced): A separate future App that consumes the pile and produces consumer-ready data for downstream Apps. This spec assumes its existence but defines none of its behavior.
+- **Bridge App** (out of scope, referenced): A separate future App that consumes the pile and produces consumer-ready data for downstream Apps. Hand-crafted ETL/EDM; see [`docs/roadmap.md`](../../docs/roadmap.md) for the Apps catalogue and the distinction from the much-later **bridge-builder-app** (Data Unification itself).
 - **Pipeline Service**: A self-contained workflow that extracts content from one upstream source and writes artifacts to the pile. Independently runnable. Opaque to downstream consumers.
 - **Pile Artifact**: A single record (TSV row, file, DB row) produced by a pipeline service. The atomic unit downstream consumers read.
 - **Inference Step**: Any step within a pipeline service that calls a model (LLM, ML model, heuristic) to derive output from raw inputs. Subject to FR-105: original inputs preserved.
@@ -241,5 +241,5 @@ The following FR numbers are reserved and intentionally retired so historical `t
 - Inference is currently performed by an LLM, but FR-105 (input preservation) is intentionally model-agnostic — other inference types in future services follow the same rule.
 - Operators have access to the crawler accounts on a separate device (e.g., phone) to complete verification challenges when FR-052 surfaces an operator prompt.
 - The pile is read-only from the downstream perspective; downstream consumers must not mutate pile artifacts. Mutations are the producing pipeline service's exclusive responsibility.
-- The handoff from the pile to downstream consumers (the Travelogue DB, the front-end, future Apps) passes through a Data Unification (DU) ETL App, defined in a separate future spec / Epic. The DU App is the only consumer of this App's output; this spec defines the pile as the producer's contract; what the DU App does with it (cleaning, normalization, mapping to downstream schemas, conflict resolution between pipelines, etc.) is out of scope.
+- The handoff from the pile to downstream consumers (the Travelogue DB, the front-end, future Apps) passes through a bridge-app, defined in a separate future spec / Epic. The bridge-app is the only consumer of this App's output; this spec defines the pile as the producer's contract; what the bridge-app does with it (cleaning, normalization, mapping to downstream schemas, conflict resolution between pipelines, etc.) is out of scope.
 - The current codebase has some artifacts that pre-date the FR-110 / FR-111 segregation rule (the pipeline code lives in `scripts/instagram-fetch-latest/`, pile data lives at the project root and in `public/media/`). Migrating those into a single App root directory is a planned implementation task under this spec; once complete, the App will satisfy FR-110 / FR-111. Until that task lands, the spec is the source of truth for the target state.
