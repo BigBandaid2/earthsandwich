@@ -12,7 +12,7 @@ Roughly once per week, the Team Lead is responsible for grasping the current sta
 
 ### Before Weekly Team Meeting
 
-1. **Merge open feature branches into the default branch** — get all shipped work onto a coherent base so the drift scan + JIRA sync read from a single source. Open WIP branches stay open; coordinate hand-offs at the meeting if needed.
+1. **Merge open feature branches into the default branch** — get all shipped work onto a coherent base so the drift scan + JIRA sync read from a single source.
 2. **Reconcile Code to Tasks** — drift scan against previous drift reconciliation → HEAD (see [§Reconciliation](#reconciliation-claudespec-drift-scan)).
 3. **New Phase/Story for Code Drift** — bundle detected changes as a new Phase appended to the relevant `tasks.md`.
 4. **Sync Spec State to JIRA** — push new phases as Stories and flip completion statuses so the planning meeting reads off current JIRA state (see [§JIRA sync](#jira-sync)).
@@ -224,7 +224,7 @@ Capture the week's intent in two places: the JIRA Sprint goal (one sentence) and
 > Good: "Ship the scheduled Instagram pull and a draft SDLC workflow guide; explore the legacy comment-bot integration."
 > Bad: "Do all the things from the planning meeting."
 
-**Planning notes**: each Monday produces `docs/planning/YYYY-WW.md` (ISO week number). Required fields: `**Sprint**` (OCS Sprint N), `**Goal**` (matches the JIRA Sprint goal), `## Goals` (numbered list, each item names its OCS Epic), `## Out of scope this week`, `## Dependencies / blockers`. Each Goal becomes (or maps to) an OCS Epic; spec-needing Goals run through `/speckit.specify`, and the Epic appears when you run `/speckit.jira.specstoissues`.
+**Planning notes**: each Monday produces `docs/planning/YYYY-WW.md` (ISO week number). Header: `**Sprint**` (`OCS Sprint N` + date range) and `**Goal**` (matches the JIRA Sprint goal). Body: one `### <Person>` sub-section per team member, each listing that person's stories for the sprint. See [`2026-W22.md`](planning/2026-W22.md) for the template.
 
 ---
 
