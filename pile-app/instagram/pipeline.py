@@ -27,6 +27,7 @@ from typing import Iterator, Optional
 import requests
 
 from common.anti_throttle import is_challenge_error, jittered_sleep
+from common.inference import InferenceHardBlockError
 from common.pile import (
     RECENT_LOCATION_COUNT,
     TSV_COLUMNS,
@@ -67,13 +68,31 @@ def fmt_duration(seconds: float) -> str:
     return f"{hours}h {minutes}m"
 
 
+SCRAPE_SETUP_OVERHEAD_SEC = 15.0
+"""Fixed overhead at the start of every run: instagrapi auth / session resume,
+user_info_by_username for the target, and the first page fetch's network
+round-trip. Empirically ~10-20s on a warm session, so 15s is a reasonable
+midpoint. Without this constant, small scrapes (e.g., 1-2 posts) wildly
+under-estimate — the integration test's 1-post scrape takes ~25s end-to-end
+but the per-post math alone would give ~6s. The overhead is negligible for
+larger scrapes (sub-1% on a 300-post run)."""
+
+PER_POST_WORK_SEC = 4.0
+"""Per-post processing budget: ~1s media download + ~3s LLM round-trip
+(canonicalize for tagged path, full inference for inferred path). Observed
+average across the @ourearthsandwich + @welawen corpora."""
+
+
 def estimate_scrape_seconds(num_posts: int, rate_config: dict) -> float:
     """Rough scrape-duration estimate in seconds for `num_posts` posts.
 
     Computed from the rate_config's average page/long-rest/media delays plus
-    a fixed per-post-processing budget (download + LLM canonicalize/infer).
+    a fixed per-post-processing budget (download + LLM canonicalize/infer)
+    plus a once-per-run setup overhead constant.
+
     Inputs are averages, so the estimate is a midpoint — actual runtime can
-    be ±30% depending on which way the random jitter lands.
+    be ±30% depending on which way the random jitter lands. SC-008 targets
+    ±30% for ≥80% of runs.
     """
     if num_posts <= 0:
         return 0.0
@@ -84,11 +103,11 @@ def estimate_scrape_seconds(num_posts: int, rate_config: dict) -> float:
     long_rest_every = rate_config["long_rest_every"]
     long_rest_avg = sum(rate_config["long_rest"]) / 2
     n_long_rests = (pages - 1) // long_rest_every if long_rest_every else 0
-    per_post_work = 4.0  # observed average: ~1s media download + ~3s LLM round-trip
     return (
-        (pages - 1) * page_delay_avg
+        SCRAPE_SETUP_OVERHEAD_SEC
+        + (pages - 1) * page_delay_avg
         + n_long_rests * long_rest_avg
-        + num_posts * (per_post_work + media_delay_avg)
+        + num_posts * (PER_POST_WORK_SEC + media_delay_avg)
     )
 
 
@@ -312,6 +331,10 @@ def process_media(
                 media_type=media_type,
                 recent_locations=recent_locations,
             )
+        except InferenceHardBlockError:
+            # Inference exhaustion — FR-052 hard-block. Let it propagate so
+            # run_for_target halts cleanly with partial pile preserved.
+            raise
         except Exception as exc:
             print(f"  ! pk={instagram_id}  location inference failed ({exc})")
         else:
@@ -486,6 +509,18 @@ def run_for_target(
                 print(f"  + [{local_id}] pk={row['instagram_id']}  shortcode={row['shortcode']}")
 
                 jittered_sleep(*media_delay, label="inter-post pause")
+    except InferenceHardBlockError as exc:
+        # FR-052 edge case: inference rate-limit / auth failure / credit
+        # exhaustion. Treated as a hard block — same handling as an
+        # Instagram challenge. No retry, partial pile preserved, operator
+        # must intervene before re-running.
+        print(
+            f"\n  ! HARD BLOCK from inference provider: {exc}\n"
+            f"  ! Halting @{target} scrape. {total_written} row(s) already "
+            f"persisted to {output_path} are preserved.\n"
+            f"  ! Operator action required: check ANTHROPIC_API_KEY validity "
+            f"and account credit balance, then re-run."
+        )
     except Exception as exc:
         print(f"\nERROR during streaming for @{target}: {exc}")
         print(f"  ! {total_written} row(s) persisted before failure; partial TSV will still be re-sorted.")

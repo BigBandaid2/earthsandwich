@@ -57,12 +57,26 @@ def jittered_sleep(low: float, high: float, label: str = "") -> None:
 
 
 def is_challenge_error(exc: Exception) -> bool:
-    """Identify Instagram challenge-response errors that can't be auto-resolved.
+    """Identify Instagram hard-block errors that can't be auto-resolved.
 
-    Distinguishes these from transient network/5xx errors: a challenge requires
-    the operator to verify the account in the Instagram app, so retrying the
-    same request is pointless. Transient errors are worth retrying / sleeping
-    through; challenges are not.
+    Distinguishes these from transient network/5xx errors: a hard block (a
+    `challenge_required` / `checkpoint_required` / `login_required` response
+    from the upstream) requires the operator to verify the account in the
+    Instagram app or re-seed the crawler session, so retrying the same
+    request is pointless. Transient errors are worth retrying / sleeping
+    through; hard blocks are not.
+
+    Per FR-052: this is the FIRST line of the transient-vs-hard categorization.
+    Matches the lowercase form of `str(exc)` against several common spellings
+    (instagrapi raises exception classes whose name AND message both end up
+    in the str — both `LoginRequired` and `login_required` patterns are
+    covered without committing to a specific spelling).
     """
     s = str(exc).lower()
-    return "challenge" in s or "step_name" in s or "checkpoint" in s
+    return (
+        "challenge" in s
+        or "step_name" in s
+        or "checkpoint" in s
+        or "login_required" in s
+        or "loginrequired" in s
+    )

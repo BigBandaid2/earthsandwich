@@ -2,6 +2,11 @@
 
 Provides:
   - `get_anthropic_client()` — single source of truth for the SDK client.
+  - `call_messages(client, **kwargs)` — wraps `client.messages.create` and
+    translates Anthropic's no-retry-will-help error classes (auth failure,
+    permanent rate limit, credit exhaustion, permission denied) into
+    `InferenceHardBlockError`. Callers MUST let that propagate — it's the
+    inference-side equivalent of an Instagram checkpoint per FR-052.
   - `extract_json_and_reasoning(raw)` — handles markdown code fences AND
     prose preambles, so a model that writes reasoning before its JSON
     doesn't lose either piece. The prose lands in the `reasoning` column
@@ -23,9 +28,48 @@ import anthropic
 ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 
 
+class InferenceHardBlockError(Exception):
+    """Raised when the LLM provider returns an error no retry can recover.
+
+    Per FR-052's edge-case bullet, the spec treats inference exhaustion the
+    same as an Instagram challenge: halt the scrape, preserve everything
+    already written to the pile, surface an operator-facing prompt.
+
+    Callers between the SDK and the run-loop MUST let this propagate — do
+    not catch it in `except Exception`, do not absorb it into a returned
+    empty tuple. `run_for_target` is the only legitimate catch site.
+    """
+
+
+# The Anthropic SDK exception classes that mean "no retry will help":
+#   - RateLimitError (429) — exhausted quota; usually rolls over at the
+#     monthly cycle but a mid-run retry won't help.
+#   - AuthenticationError (401) — bad / revoked key.
+#   - PermissionDeniedError (403) — disabled key, missing scope, etc.
+# Transient classes (APIConnectionError, APITimeoutError, 5xx APIStatusError)
+# are intentionally NOT in this set — they should percolate up as ordinary
+# exceptions for the caller's existing soft-failure handling.
+_HARD_BLOCK_EXC = (
+    anthropic.RateLimitError,
+    anthropic.AuthenticationError,
+    anthropic.PermissionDeniedError,
+)
+
+
 def get_anthropic_client() -> anthropic.Anthropic:
     """Build a fresh Anthropic SDK client. Cheap; safe to call per request."""
     return anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+
+
+def call_messages(client: anthropic.Anthropic, **kwargs):
+    """Wrap `client.messages.create(**kwargs)` so the hard-block exception
+    classes get translated to `InferenceHardBlockError`. Other exceptions
+    pass through unchanged for the caller's existing soft-failure handling.
+    """
+    try:
+        return client.messages.create(**kwargs)
+    except _HARD_BLOCK_EXC as exc:
+        raise InferenceHardBlockError(f"{type(exc).__name__}: {exc}") from exc
 
 
 def extract_json_and_reasoning(raw: str) -> tuple[Optional[dict], str]:

@@ -11,7 +11,12 @@ that agree with the named place.
 
 from __future__ import annotations
 
-from common.inference import extract_json_and_reasoning, get_anthropic_client
+from common.inference import (
+    InferenceHardBlockError,
+    call_messages,
+    extract_json_and_reasoning,
+    get_anthropic_client,
+)
 
 
 def canonicalize_tagged_location(name: str, lat: str, lng: str) -> tuple[str, str, str, str, str]:
@@ -64,11 +69,16 @@ def canonicalize_tagged_location(name: str, lat: str, lng: str) -> tuple[str, st
         "Do not wrap the JSON in markdown code fences."
     )
     try:
-        response = client.messages.create(
+        response = call_messages(
+            client,
             model="claude-sonnet-4-6",
             max_tokens=256,
             messages=[{"role": "user", "content": prompt}],
         )
+    except InferenceHardBlockError:
+        # Inference exhaustion — let it propagate so run_for_target halts
+        # the scrape cleanly per FR-052's edge-case bullet.
+        raise
     except Exception as exc:
         print(f"  ! canonicalize call failed ({exc})")
         return ("", "", "", "", "")

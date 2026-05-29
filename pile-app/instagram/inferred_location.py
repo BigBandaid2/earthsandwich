@@ -18,7 +18,7 @@ import base64
 import os
 from typing import Optional
 
-from common.inference import extract_json_and_reasoning, get_anthropic_client
+from common.inference import call_messages, extract_json_and_reasoning, get_anthropic_client
 
 # Inferred-location sanity bounds. Models occasionally return prose-as-location
 # despite the prompt — a "location" longer than this or containing newlines is
@@ -95,7 +95,8 @@ def infer_post_location(
 
     content.append({"type": "text", "text": prompt})
 
-    response = client.messages.create(
+    response = call_messages(
+        client,
         model="claude-sonnet-4-6",
         max_tokens=256,
         messages=[{"role": "user", "content": content}],
