@@ -149,6 +149,24 @@
 
 ---
 
+## Phase 11: User Story 7 — Frontend API Integration (Priority: P1)
+
+**Goal**: Replace all hardcoded TypeScript data imports and the `/posts.json` static fetch with live calls to the backend REST API. After this phase, trips, stops, and posts are all served from the database with no TypeScript data files imported at runtime.
+
+**Independent Test**: Start both backend and frontend (`uvicorn` + `npm run dev`). Open the browser — confirm trips load from the API. Switch trips in the dropdown — confirm stops update from the API. Open a stop modal — confirm post data (image or article) appears. Kill the backend — confirm the frontend shows an error/loading state rather than crashing.
+
+- [ ] T056 [P] [US7] Add `VITE_API_BASE_URL=http://localhost:8000` to `frontend/.env.example`; this env var points the frontend at the backend API in all environments; in the Docker Compose setup this will be overridden to the backend service name
+- [ ] T057 [P] [US7] Create `frontend/src/api/client.ts`: define TypeScript interfaces for all API response shapes (`ApiTrip`, `ApiTripDetail`, `ApiStop`, `ApiInstagramPost`, `ApiSubstackPost`); implement typed async fetch functions `getTrips(params?: { status?: string })`, `getTripDetail(id: string)`, `getStops(params?)`, `getInstagramPosts(params?)`, `getSubstackPosts(params?)`; each reads `import.meta.env.VITE_API_BASE_URL` as the base URL and throws `Error` on non-2xx responses using the `{"error", "detail"}` error shape from contracts/api.md
+- [ ] T058 [P] [US7] Create `frontend/src/api/adapters.ts`: implement `adaptStop(apiStop: ApiStop): Stop` mapping flat `lat`/`lng` → `coords: { lat, lng }`, `post_type` + post object → `StopPost` with `type` discriminator (`media_url` → `image`, `instagram_id` → `instagramId` for instagram stops; substack shape maps directly; planned stop → `{ type: 'planned', caption: stop.caption ?? undefined }`); implement `adaptTrip(apiTrip: ApiTripDetail): Trip` mapping its stop list through `adaptStop`; implement `adaptTripSummary(apiTrip: ApiTrip): Trip` returning the trip with `stops: []` for the list view
+- [ ] T059 [P] [US7] Create `frontend/src/hooks/useTrips.ts`: fetch `getTrips()` on mount, map each result through `adaptTripSummary`, return `{ trips: Trip[], loading: boolean, error: string | null }`; this hook drives the trip selector dropdown in App.tsx
+- [ ] T060 [P] [US7] Create `frontend/src/hooks/useTrip.ts`: accept `tripId: string | null`; fetch `getTripDetail(tripId)` whenever `tripId` changes (skip if null), map through `adaptTrip`, return `{ trip: Trip | null, loading: boolean, error: string | null }`; this hook provides full stop and post data for the active trip, replacing the hardcoded data import and the `usePosts` merge in App.tsx
+- [ ] T061 [US7] Update `frontend/src/App.tsx`: remove `import { trips } from './data/itinerary'`; replace the hardcoded `TRIPS` constant with the `trips` array from `useTrips()`; use `useTrip(activeTrip?.id ?? null)` to get full stop data for the active trip; remove the `usePosts()` call and the `effectiveActiveTrip` merge logic (API now returns all stops); initialize `activeTrip` by resolving `window.location.hash` against the fetched trips list once loaded (keep `tripFromHash` logic, run it after trips arrive); render a loading indicator while initial trips fetch is in flight; keep all hash-based navigation and `handleSelectTrip` working as before
+- [ ] T062 [US7] Delete `frontend/src/hooks/usePosts.ts` (its function is now covered by `useTrip`); confirm no remaining `import.*usePosts` references exist in the codebase; the `frontend/public/posts.json` static file can remain in place as a data artifact but is no longer fetched by the frontend
+
+**Checkpoint**: US7 complete — browser renders all trip/stop/post content from the live backend; no TypeScript data modules are imported at runtime. Validate by inspecting browser DevTools network tab for API calls.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -160,6 +178,7 @@
 - **US4 (Phase 6)**: Depends on Phase 2; T040 depends on T037 (contract must be defined first)
 - **US6 (Phase 8)**: Depends on Phase 2; practically benefits from US1 (seed-dump.sql) existing; T045 Dockerfile.frontend COPY paths must reflect T002 frontend/ move
 - **Polish (Phase 9)**: Depends on all user story phases in this spec
+- **US7 (Phase 11)**: Depends on US2 (Phase 4) completion — API endpoints must exist before frontend consumes them; T061 depends on T056–T060 all completing first; T062 can run after T061
 
 ### Parallel Opportunities
 
@@ -170,6 +189,7 @@
 - T037, T038, T039 in US4: all parallel (T040 waits on T037)
 - T044, T045 in US6: parallel (different Dockerfiles)
 - T048, T049, T050 in Polish: all parallel
+- T056, T057, T058, T059, T060 in US7: all parallel (different files); T061 waits for all five; T062 runs after T061
 
 ---
 
@@ -208,6 +228,19 @@ Task T039: Add PUT /trips/:id handler
 Task T040: Create backend/app/api/regions.py  ← after T037 only
 ```
 
+### US7 Frontend API Integration (T056–T060 parallel first, then T061):
+```
+In parallel:
+Task T056: Add VITE_API_BASE_URL to frontend/.env.example
+Task T057: Create frontend/src/api/client.ts
+Task T058: Create frontend/src/api/adapters.ts
+Task T059: Create frontend/src/hooks/useTrips.ts
+Task T060: Create frontend/src/hooks/useTrip.ts
+Then sequentially:
+Task T061: Update frontend/src/App.tsx  ← after all five above
+Task T062: Delete frontend/src/hooks/usePosts.ts  ← after T061
+```
+
 ---
 
 ## Implementation Strategy
@@ -219,16 +252,19 @@ Task T040: Create backend/app/api/regions.py  ← after T037 only
 3. Complete Phase 3: US1 (seed pipeline)
 4. Complete Phase 4: US2 (read API)
 5. **STOP and VALIDATE**: Seed data loads; API returns trips/stops/posts; quickstart sections 2–3 and 6 pass
-6. Deploy/demo if ready
+6. Complete Phase 11: US7 (frontend API integration)
+7. **STOP and VALIDATE**: Browser renders live data from API; no hardcoded TS data imported at runtime
+8. Deploy/demo if ready
 
 ### Incremental Delivery
 
 1. Setup + Foundational → skeleton ready
 2. US1 → database seeded, SQL dump committed → **demo: data in DB**
-3. US2 → read API live → **demo: frontend can query backend** (MVP!)
-4. US4 → trip management + region end dates → **demo: operator can create trips via API**
-5. US6 → containerized → **demo: `docker compose up` works from scratch**
-6. Polish → health endpoint, E2E validation
+3. US2 → read API live → **demo: API returns trips/stops/posts**
+4. US7 → frontend calls API → **demo: browser renders live data from DB** (MVP!)
+5. US4 → trip management + region end dates → **demo: operator can create trips via API**
+6. US6 → containerized → **demo: `docker compose up` works from scratch**
+7. Polish → health endpoint, E2E validation
 
 ---
 
