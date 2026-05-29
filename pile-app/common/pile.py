@@ -16,6 +16,7 @@ from __future__ import annotations
 import csv
 import os
 import posixpath
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
@@ -184,6 +185,127 @@ def resort_tsv_and_sweep_media(
             sample = ", ".join(swept[:5])
             more = f" (+{len(swept) - 5} more)" if len(swept) > 5 else ""
             print(f"  swept {len(swept)} orphan media file(s): {sample}{more}")
+
+
+class RunSnapshot:
+    """Pre-scrape snapshot of a target's TSV + media-files state.
+
+    Used by `run_for_target` to make scrapes atomic: on any failure the
+    pile is restored to its pre-run state via `.rollback()`, so a scheduler
+    can safely retry without LLM-assisted recovery (the user/owner can
+    troubleshoot later via the structured failure log in
+    `<log_dir>/scrape-failures.jsonl`).
+
+    Lifecycle:
+      1. `snapshot = RunSnapshot(tsv_path, media_dir, target)`
+      2. (Optional) `if snapshot.exists(): snapshot.rollback()` — recover
+         from a previously-killed run before starting a new one.
+      3. `snapshot.take()` — capture pre-scrape state.
+      4. Run scrape...
+      5. On success: `snapshot.commit()` — delete the snapshot.
+         On failure: `summary = snapshot.rollback()` — restore pile state.
+
+    What's snapshotted:
+      - The full TSV file (cheap copy with shutil.copy2 preserves mtimes).
+      - The set of `<target>_*` filenames currently in `media_dir`.
+
+    What's restored on rollback:
+      - TSV: live file replaced by the snapshot copy (or removed if the
+        TSV didn't exist pre-scrape).
+      - Media files: every `<target>_*` file in `media_dir` that wasn't
+        in the pre-scrape snapshot is deleted. Files that existed before
+        AND were overwritten during the scrape stay where they are — the
+        Instagram CDN returns the same bytes for the same shortcode, so
+        their content is still valid for the restored TSV's references.
+    """
+
+    SNAPSHOT_SUFFIX = ".snapshot"
+
+    def __init__(self, tsv_path: str, media_dir: str, target: str):
+        self.tsv_path = tsv_path
+        self.media_dir = media_dir
+        self.target = target
+        self.snapshot_tsv_path = tsv_path + self.SNAPSHOT_SUFFIX
+        self.tsv_existed_pre_scrape = False
+        self.pre_scrape_media_filenames: set[str] = set()
+
+    def exists(self) -> bool:
+        """Whether a leftover snapshot already exists at the expected path.
+
+        True means a previous run was killed (or crashed) before either
+        committing or rolling back. Caller should rollback first, log it,
+        then proceed with the new scrape.
+        """
+        return os.path.exists(self.snapshot_tsv_path)
+
+    def take(self) -> None:
+        """Capture the pre-scrape pile state for this target.
+
+        Idempotent against a leftover snapshot: if `self.exists()` is True
+        when this is called, the caller almost certainly intends to take
+        a fresh snapshot — overwrite, don't error.
+        """
+        self.tsv_existed_pre_scrape = os.path.exists(self.tsv_path)
+        if self.tsv_existed_pre_scrape:
+            shutil.copy2(self.tsv_path, self.snapshot_tsv_path)
+        else:
+            # No live TSV → no snapshot file to write. Rollback later
+            # means "remove the live TSV that this run created".
+            if os.path.exists(self.snapshot_tsv_path):
+                os.remove(self.snapshot_tsv_path)
+
+        self.pre_scrape_media_filenames = set()
+        if os.path.isdir(self.media_dir):
+            prefix = f"{self.target}_"
+            self.pre_scrape_media_filenames = {
+                f for f in os.listdir(self.media_dir) if f.startswith(prefix)
+            }
+
+    def rollback(self) -> dict:
+        """Restore TSV from snapshot, delete media files added since snapshot.
+
+        Returns `{'files_deleted': N}` for the caller's failure log.
+
+        Best-effort with respect to OS errors: a file the OS won't let us
+        delete is logged but doesn't abort the rollback. The TSV restore
+        is the atomic-critical step; the media-file cleanup is hygiene.
+        """
+        files_deleted = 0
+
+        # 1. Restore TSV.
+        if os.path.exists(self.snapshot_tsv_path):
+            try:
+                os.replace(self.snapshot_tsv_path, self.tsv_path)
+            except OSError as exc:
+                print(f"  ! could not restore TSV from snapshot ({exc}); leaving live TSV in place")
+        elif not self.tsv_existed_pre_scrape and os.path.exists(self.tsv_path):
+            # The TSV didn't exist pre-scrape; the live one is entirely this
+            # run's work. Remove it.
+            try:
+                os.remove(self.tsv_path)
+            except OSError as exc:
+                print(f"  ! could not remove partial TSV ({exc})")
+
+        # 2. Delete media files added since the snapshot.
+        if os.path.isdir(self.media_dir):
+            prefix = f"{self.target}_"
+            for f in os.listdir(self.media_dir):
+                if f.startswith(prefix) and f not in self.pre_scrape_media_filenames:
+                    try:
+                        os.remove(os.path.join(self.media_dir, f))
+                        files_deleted += 1
+                    except OSError as exc:
+                        print(f"  ! could not delete partial media file {f} ({exc})")
+
+        return {"files_deleted": files_deleted}
+
+    def commit(self) -> None:
+        """Discard the snapshot — scrape completed successfully."""
+        if os.path.exists(self.snapshot_tsv_path):
+            try:
+                os.remove(self.snapshot_tsv_path)
+            except OSError as exc:
+                print(f"  ! could not remove snapshot {self.snapshot_tsv_path} ({exc})")
 
 
 def apply_tombstones(path: str, tombstone_shortcodes: set[str]) -> int:

@@ -21,6 +21,7 @@ from __future__ import annotations
 import csv
 import os
 import time
+import traceback
 from datetime import datetime, timedelta, timezone
 from typing import Iterator, Optional
 
@@ -31,13 +32,14 @@ from common.inference import InferenceHardBlockError
 from common.pile import (
     RECENT_LOCATION_COUNT,
     TSV_COLUMNS,
+    RunSnapshot,
     apply_tombstones,
     download_media,
     normalize_media_url_for_tsv,
     read_tsv_rows,
     resort_tsv_and_sweep_media,
 )
-from common.run_logging import prune_scrape_logs
+from common.run_logging import prune_scrape_logs, write_failure_record
 from instagram.deletion_detection import find_tombstones_in_page
 from instagram.inferred_location import extract_city_heuristic, infer_post_location
 from instagram.instagrapi_client import resolve_target_user_id
@@ -81,6 +83,61 @@ PER_POST_WORK_SEC = 4.0
 """Per-post processing budget: ~1s media download + ~3s LLM round-trip
 (canonicalize for tagged path, full inference for inferred path). Observed
 average across the @ourearthsandwich + @welawen corpora."""
+
+
+def _rollback_run(
+    *,
+    snapshot: "RunSnapshot",
+    target: str,
+    output_path: str,
+    failure_type: str,
+    failure_detail: str,
+    operator_hint: str,
+    run_started_at_iso: str,
+    run_started_at_mono: float,
+    attempted_rows: int,
+    log_dir: str,
+    traceback_text: str = "",
+) -> None:
+    """Roll back the pile to its pre-scrape state and write a structured
+    failure record. Called from every failure branch in `run_for_target`.
+
+    Always prints a human-readable failure banner to stdout AND appends a
+    JSON-Lines record to `<log_dir>/scrape-failures.jsonl` so an admin can
+    grep the failure history after the scheduler reports a bad run.
+    """
+    summary = snapshot.rollback()
+    elapsed = time.monotonic() - run_started_at_mono
+
+    banner = "=" * 80
+    print(f"\n{banner}")
+    print(f"FAILURE — @{target} scrape rolled back ({failure_type})")
+    print(banner)
+    print(f"  Run started at: {run_started_at_iso}")
+    print(f"  Elapsed:        {fmt_duration(elapsed)}")
+    print(f"  Failure detail: {failure_detail}")
+    print(f"  Atomicity rollback:")
+    print(f"    Rows discarded:        {attempted_rows}")
+    print(f"    Media files deleted:   {summary['files_deleted']}")
+    print(f"  Pile state: restored to pre-run snapshot — no corruption.")
+    print(f"  Operator action: {operator_hint}")
+    print(banner)
+
+    record = {
+        "target": target,
+        "service": "instagram",
+        "failure_type": failure_type,
+        "failure_detail": failure_detail,
+        "run_started_at": run_started_at_iso,
+        "elapsed_seconds": round(elapsed, 2),
+        "rows_discarded": attempted_rows,
+        "files_deleted": summary["files_deleted"],
+        "output_path": output_path,
+        "operator_hint": operator_hint,
+    }
+    if traceback_text:
+        record["traceback"] = traceback_text
+    write_failure_record(log_dir, record)
 
 
 def estimate_scrape_seconds(num_posts: int, rate_config: dict) -> float:
@@ -476,17 +533,29 @@ def run_for_target(
     total_written = 0
     media_delay = rate_config["media_delay"]
 
-    # Tracks whether the streaming loop exited via clean termination (end of
-    # feed or hit-since-ts boundary) vs an exception. Only a clean run is
-    # safe for the post-pass orphan sweep — interrupted runs leave older
-    # posts un-re-pulled, and their valid media files would be mis-classified
-    # as orphans by a sweep that assumes the TSV is complete (the 2026-05-29
-    # DNS-hiccup incident: 179 valid media files were deleted before this
-    # guard was added).
-    scrape_completed_cleanly = True
-
     # Ensure the parent dir exists (e.g., pile-app/pile/ on first scrape).
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    # ===== Atomicity setup (FR-052 / scheduler-safe self-healing) =====
+    # Take a snapshot of the pre-scrape pile state so any failure can roll
+    # back to it. If a leftover snapshot is present, a previous run was
+    # killed before committing or rolling back — auto-rollback first, then
+    # take a fresh snapshot.
+    snapshot = RunSnapshot(output_path, media_dir, target)
+    if snapshot.exists():
+        recovery = snapshot.rollback()
+        print(
+            f"  · detected leftover snapshot from prior killed run; auto-rollback complete "
+            f"(files_deleted={recovery['files_deleted']})"
+        )
+        write_failure_record(log_dir, {
+            "target": target,
+            "failure_type": "leftover_snapshot_recovered",
+            "files_deleted": recovery["files_deleted"],
+        })
+    snapshot.take()
+    run_started_at_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S%z")
+    run_started_at_mono = time.monotonic()
 
     try:
         with open(output_path, "a", newline="", encoding="utf-8") as out_file:
@@ -533,35 +602,54 @@ def run_for_target(
 
                 jittered_sleep(*media_delay, label="inter-post pause")
     except FetchInterruptedError as exc:
-        # Hard-block or transient-after-retry from instagrapi. Halt cleanly,
-        # preserve partial pile state, and (critically) skip the orphan
-        # sweep so we don't delete media for posts the scrape never reached.
-        scrape_completed_cleanly = False
-        print(
-            f"\n  ! Pagination interrupted: {exc}\n"
-            f"  ! {total_written} row(s) already persisted to {output_path} are preserved.\n"
-            f"  ! Orphan media-file sweep SKIPPED — older posts' files stay on disk."
+        _rollback_run(
+            snapshot=snapshot, target=target, output_path=output_path,
+            failure_type="fetch_interrupted",
+            failure_detail=str(exc),
+            operator_hint=(
+                "Investigate connectivity (DNS, network) and instagrapi session "
+                "health. If Instagram raised a challenge, complete verification in "
+                "the Instagram app before re-running."
+            ),
+            run_started_at_iso=run_started_at_iso,
+            run_started_at_mono=run_started_at_mono,
+            attempted_rows=total_written,
+            log_dir=log_dir,
         )
+        return
     except InferenceHardBlockError as exc:
-        # FR-052 edge case: inference rate-limit / auth failure / credit
-        # exhaustion. Treated as a hard block — same handling as an
-        # Instagram challenge. No retry, partial pile preserved, operator
-        # must intervene before re-running.
-        scrape_completed_cleanly = False
-        print(
-            f"\n  ! HARD BLOCK from inference provider: {exc}\n"
-            f"  ! Halting @{target} scrape. {total_written} row(s) already "
-            f"persisted to {output_path} are preserved.\n"
-            f"  ! Orphan media-file sweep SKIPPED — older posts' files stay on disk.\n"
-            f"  ! Operator action required: check ANTHROPIC_API_KEY validity "
-            f"and account credit balance, then re-run."
+        _rollback_run(
+            snapshot=snapshot, target=target, output_path=output_path,
+            failure_type="inference_hard_block",
+            failure_detail=str(exc),
+            operator_hint=(
+                "Check ANTHROPIC_API_KEY validity and account credit balance. "
+                "FR-052: inference exhaustion is treated as a hard block per the spec."
+            ),
+            run_started_at_iso=run_started_at_iso,
+            run_started_at_mono=run_started_at_mono,
+            attempted_rows=total_written,
+            log_dir=log_dir,
         )
+        return
     except Exception as exc:
-        scrape_completed_cleanly = False
-        print(f"\nERROR during streaming for @{target}: {exc}")
-        print(f"  ! {total_written} row(s) persisted before failure; partial TSV will still be re-sorted "
-              f"but orphan sweep SKIPPED.")
+        _rollback_run(
+            snapshot=snapshot, target=target, output_path=output_path,
+            failure_type="unexpected_error",
+            failure_detail=f"{type(exc).__name__}: {exc}",
+            operator_hint=(
+                "Unexpected exception during streaming — inspect the run log for "
+                "the full traceback. Pile state was restored; safe to re-run."
+            ),
+            run_started_at_iso=run_started_at_iso,
+            run_started_at_mono=run_started_at_mono,
+            attempted_rows=total_written,
+            log_dir=log_dir,
+            traceback_text=traceback.format_exc(),
+        )
+        return
 
+    # ===== Success path =====
     if pending_tombstones:
         tombstoned = apply_tombstones(output_path, pending_tombstones)
         print(f"  FR-106: tombstoned {tombstoned} row(s) absent from fetched pages: "
@@ -569,11 +657,11 @@ def run_for_target(
               + (f" (+{len(pending_tombstones) - 5} more)" if len(pending_tombstones) > 5 else ""))
 
     if total_written == 0:
+        snapshot.commit()
         print(f"No new posts found for @{target}.")
         return
 
     print(f"\nStreaming done — re-sorting {output_path} by timestamp ASC + renumbering ids.")
-    resort_tsv_and_sweep_media(
-        output_path, target, media_dir, sweep_orphans=scrape_completed_cleanly
-    )
+    resort_tsv_and_sweep_media(output_path, target, media_dir, sweep_orphans=True)
+    snapshot.commit()
     print(f"Done. {total_written} new post(s) written to {output_path}.")
