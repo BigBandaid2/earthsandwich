@@ -1,6 +1,6 @@
 {
   "created_at": "2026-05-25T00:00:00Z",
-  "updated_at": "2026-05-25T00:00:00Z",
+  "updated_at": "2026-05-29T00:00:00Z",
   "spec": "003-ingestion-pipeline",
   "project": "OCS",
   "jira_base_url": "https://datacommlab.atlassian.net",
@@ -12,59 +12,120 @@
   },
   "stories": [
     {
+      "key": "OCS-86",
+      "phase": 17,
+      "summary": "Phase 17: Drift Reconciliation (2026-05-25 weekly scan)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-86"
+    },
+    {
+      "key": "OCS-96",
+      "phase": 18,
+      "summary": "Phase 18: Setup — pile-app/ skeleton",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-96"
+    },
+    {
+      "key": "OCS-97",
+      "phase": 19,
+      "summary": "Phase 19: Foundational — migrate Instagram service into pile-app/",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-97"
+    },
+    {
+      "key": null,
+      "phase": 20,
+      "summary": "Phase 20: US1 — Scrape Instagram into pile (P1, MVP)",
+      "note": "Creation blocked by Cloudflare WAF during the 2026-05-29 sync (3rd successive create triggered the block). Retry /speckit.jira.specstoissues after the cooldown, or create manually in Jira."
+    },
+    {
+      "key": "OCS-98",
+      "phase": 21,
+      "summary": "Phase 21: US2 — Pipeline service survives upstream throttling (P1)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-98"
+    },
+    {
+      "key": "OCS-99",
+      "phase": 22,
+      "summary": "Phase 22: US3 — Pile via bridge-app / physical segregation (P2)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-99"
+    },
+    {
+      "key": null,
+      "phase": 23,
+      "summary": "Phase 23: US4 — Scrape a Substack publication into the pile (P2)",
+      "note": "Creation blocked by Cloudflare WAF during the 2026-05-29 sync. Retry after cooldown or create manually."
+    },
+    {
+      "key": null,
+      "phase": 24,
+      "summary": "Phase 24: US5 — Pipeline services run on a recurring schedule (P3)",
+      "note": "Creation blocked by Cloudflare WAF during the 2026-05-29 sync. Retry after cooldown or create manually."
+    },
+    {
+      "key": "OCS-100",
+      "phase": 25,
+      "summary": "Phase 25: US6 — A new pipeline service is added for a new source (P3)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-100"
+    },
+    {
+      "key": "OCS-101",
+      "phase": 26,
+      "summary": "Phase 26: Polish & Cross-Cutting Concerns",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-101"
+    }
+  ],
+  "closed_in_overhaul_2026_05_29": [
+    {
       "key": "OCS-83",
-      "summary": "Phase 1: US1 - Instagram Ingestion (P1, MVP)",
-      "url": "https://datacommlab.atlassian.net/browse/OCS-83",
-      "status": "in_progress",
-      "tasks": [
-        { "key": "OCS-87", "id": "T028", "summary": "location.py — Claude-only IATA determination (tagged + inferred dual paths)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-87" },
-        { "key": "OCS-88", "id": "T029", "summary": "instagram.py — instagrapi auth + since-timestamp fetch + idempotency", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-88" },
-        { "key": "OCS-89", "id": "T030", "summary": "Wire location resolution into the ingestion loop", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-89" },
-        { "key": "OCS-90", "id": "T031", "summary": "Trip assignment logic (FR-040)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-90" },
-        { "key": "OCS-91", "id": "T032", "summary": "Media download to public/media/<stop_id>.{jpg|mp4}", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-91" },
-        { "key": null, "id": "T033", "summary": "Instagram Graph API fallback", "status": "retired", "note": "FR-043 retired by 2026-05-25 spec amendment; intentionally not created in JIRA." },
-        { "key": "OCS-92", "id": "T034", "summary": "Session error handling — SMTP alert email and clean exit", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-92" },
-        { "key": null, "id": "T035", "summary": "CLI manage.py login — interactive instagrapi auth + session persist", "status": "pending", "note": "JIRA creation hit a Cloudflare rate-limit block on 2026-05-25 — needs manual creation or a retry." },
-        { "key": "OCS-93", "id": "T036", "summary": "scheduler.py — APScheduler BackgroundScheduler wired into FastAPI lifespan", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-93" }
-      ]
+      "summary": "Phase 1: US1 — Instagram Ingestion (P1, MVP) [pre-overhaul]"
     },
     {
       "key": "OCS-84",
-      "summary": "Phase 2: US2 - Substack Ingestion (P2)",
-      "url": "https://datacommlab.atlassian.net/browse/OCS-84",
-      "status": "pending",
-      "tasks": []
+      "summary": "Phase 2: US2 — Substack Ingestion (P2) [pre-overhaul]"
     },
     {
       "key": "OCS-85",
-      "summary": "Phase 3: Polish & Cross-Cutting Concerns",
-      "url": "https://datacommlab.atlassian.net/browse/OCS-85",
-      "status": "pending",
-      "tasks": []
+      "summary": "Phase 3: Polish & Cross-Cutting Concerns [pre-overhaul]"
     },
     {
-      "key": "OCS-86",
-      "summary": "Phase 17: Drift Reconciliation (2026-05-25 weekly scan)",
-      "url": "https://datacommlab.atlassian.net/browse/OCS-86",
-      "status": "completed",
-      "tasks": []
+      "key": "OCS-87",
+      "summary": "T028: location.py — Claude-only IATA determination [pre-overhaul subtask of OCS-83]"
+    },
+    {
+      "key": "OCS-88",
+      "summary": "T029: instagram.py — instagrapi auth + since-timestamp fetch + idempotency [pre-overhaul subtask of OCS-83]"
+    },
+    {
+      "key": "OCS-89",
+      "summary": "T030: Wire location resolution into the ingestion loop [pre-overhaul subtask of OCS-83]"
+    },
+    {
+      "key": "OCS-90",
+      "summary": "T031: Trip assignment logic (FR-040) [pre-overhaul subtask of OCS-83]"
+    },
+    {
+      "key": "OCS-91",
+      "summary": "T032: Media download to public/media/<stop_id>.{jpg|mp4} [pre-overhaul subtask of OCS-83]"
+    },
+    {
+      "key": "OCS-92",
+      "summary": "T034: Session error handling — SMTP alert email and clean exit [pre-overhaul subtask of OCS-83]"
+    },
+    {
+      "key": "OCS-93",
+      "summary": "T036: scheduler.py — APScheduler BackgroundScheduler wired into FastAPI lifespan [pre-overhaul subtask of OCS-83]"
     }
   ],
   "summary": {
-    "total_stories": 4,
-    "completed_stories": 1,
-    "in_progress_stories": 1,
-    "pending_stories": 2,
-    "total_tasks": 9,
-    "tasks_in_jira": 7,
-    "tasks_retired": 1,
-    "tasks_blocked_from_creation": 1
+    "total_stories": 10,
+    "stories_in_jira": 7,
+    "stories_blocked_from_creation": 3,
+    "stories_closed_in_overhaul": 3,
+    "subtasks_closed_in_overhaul": 7
   },
   "notes": [
-    "All Stories created 2026-05-25 after the 2026-05-22 split from 002-data-ingestion.",
-    "Phase 17 transitioned to Done; Phase 1 (OCS-83) transitioned to In Progress on 2026-05-25 because a prototype lives in scripts/instagram-fetch-latest/load_posts_tsv.py while the backend implementation is waiting on 002's DB + read/write API.",
-    "Subtasks for Phase 1 were created because the story is partially complete — the prototype script implements parts of T028/T029/T030/T032 and the challenge-handler pattern needed for T035. Other Phases (2, 3, 17) are stories-only per the team convention.",
-    "T033 (Instagram Graph API fallback) is intentionally NOT created in JIRA — FR-043 was retired by the 2026-05-25 spec amendment. The task remains in tasks.md per Cardinal Rule #1 but is a no-op for implementation.",
-    "T035 (CLI manage.py login) creation hit a Cloudflare rate-limit block during the 2026-05-25 batch sync. Create manually in JIRA or retry the sync later — then update this mapping with the issue key."
+    "2026-05-29: Spec overhaul (initiated 2026-05-27) replaced Phases 1–3 (T028–T049) with Phases 18–26 (T200–T253). Per Cardinal Rule #1 nuance, envisioned-but-not-started tasks were discarded.",
+    "2026-05-29: Pre-overhaul Stories OCS-83, OCS-84, OCS-85 and their seven OCS-87…OCS-93 subtasks were transitioned to Done (the only terminal transition available in this project's workflow). T033 (Graph API fallback) was never created in Jira; T035 (CLI login) was originally rate-limit-blocked on 2026-05-25 and remains uncreated.",
+    "2026-05-29: New Stories OCS-96 through OCS-101 created for Phases 18, 19, 21, 22, 25, 26. Phases 20, 23, 24 hit Cloudflare WAF block during the sync — re-run /speckit.jira.specstoissues after the cooldown or create manually.",
+    "Subtasks for new Phases 18–26 are intentionally NOT created — stories-only per team convention for not-yet-started work; subtasks added once implementation begins on a given phase (mirrors the 2026-05-25 OCS-83 pattern).",
+    "Per Cardinal Rule #2 (no PM state in synced artifacts), status / sprint / owner fields are intentionally absent from this mapping. Track per-issue status in Jira directly."
   ]
 }
