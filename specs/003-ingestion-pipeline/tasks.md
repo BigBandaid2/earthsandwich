@@ -57,6 +57,19 @@
 
 ---
 
+## Phase 17: Drift Reconciliation (2026-05-25 weekly scan)
+
+**Status**: Backfill of prototype work for the location module (T028) and CLI login (T035), plus test scaffolding that landed before the implementation tasks. Work lives in `scripts/instagram-fetch-latest/` rather than the planned `backend/app/ingestion/` — patterns (instagrapi session resume, challenge handler, fence-strip parser, dual-path branching) should port over when backend implementation begins.
+
+- [x] T100 Standalone-execution prep on `scripts/instagram-fetch-latest/load_posts_tsv.py`: UTF-8 stdout, token redaction, JSON fence stripping, env var rename. Commit: `504c617`.
+- [x] T101 Pivot `load_posts_tsv.py` to instagrapi as primary fetcher with dual-path location logic (FR-016, FR-019, FR-020 prototyped). Adds `instagrapi` session resume + interactive `_challenge_code_handler`. Commit: `a5f5d9f`.
+- [x] T102 Add live integration smoke test + `tests/` scaffolding with CI/CD wiring notes. Commit: `2629535`.
+- [x] T103 Add 21 unit tests for `get_region_only_via_claude` and `get_location_via_claude` with mocked Anthropic. Commit: `8feb24e`.
+- [x] T104 Extract `process_media(...)` from `main()` + 22 unit tests covering dual-path branching, media URL/type, timestamp, path normalization, field extraction. Commit: `df40169`.
+- [x] T105 Retire FR-043 / T033 (Graph API fallback) per the 2026-05-25 spec amendment. `spec.md`, `quickstart.md`, and `research.md` updated; `tasks.md` T033 left in place per Cardinal Rule #1, but is now a no-op for the implementation phase.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

@@ -12,7 +12,6 @@ All inserts use ON CONFLICT DO NOTHING so the script is safe to re-run.
 import asyncio
 import json
 import os
-import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -29,6 +28,10 @@ def _load_json(name: str) -> list[dict]:
     with open(path, encoding="utf-8") as f:
         return json.load(f)
 
+def _parse_date(value: str | None) -> datetime | None:
+    if value is None:
+        return None
+    return datetime.strptime(value, "%Y-%m-%d").date()
 
 def _parse_ts(value: str | None) -> datetime | None:
     if value is None:
@@ -50,11 +53,11 @@ async def seed(conn: asyncpg.Connection) -> None:
     result = await conn.executemany(
         """
         INSERT INTO trips (id, title, description, start_date, end_date)
-        VALUES ($1, $2, $3, $4::date, $5::date)
+        VALUES ($1, $2, $3, $4, $5)
         ON CONFLICT DO NOTHING
         """,
         [
-            (t["id"], t["title"], t["description"], t["start_date"], t["end_date"])
+            (t["id"], t["title"], t["description"], _parse_date(t["start_date"]), _parse_date(t["end_date"]))
             for t in trips
         ],
     )
@@ -73,7 +76,7 @@ async def seed(conn: asyncpg.Connection) -> None:
             (
                 s["id"],
                 s["trip_id"],
-                s["date"],
+                _parse_date(s["date"]),
                 s["location"],
                 s["lat"],
                 s["lng"],
@@ -132,22 +135,6 @@ async def seed(conn: asyncpg.Connection) -> None:
     print(f"substack_posts:  {len(substack_posts)} records processed  ({result})")
 
 
-def _dump(database_url: str) -> None:
-    dump_path = SCRIPTS_DIR / "seed-dump.sql"
-    # pg_dump expects a plain postgresql:// URL
-    pg_url = _pg_url(database_url)
-    result = subprocess.run(
-        ["pg_dump", "--no-owner", "--no-acl", pg_url],
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode != 0:
-        print(f"WARNING: pg_dump failed:\n{result.stderr}", file=sys.stderr)
-        return
-    dump_path.write_text(result.stdout, encoding="utf-8")
-    print(f"Dump written → {dump_path}")
-
-
 async def main() -> None:
     # Load DATABASE_URL — check backend/.env first, then environment
     env_path = SCRIPTS_DIR.parent / "backend" / ".env"
@@ -166,8 +153,6 @@ async def main() -> None:
         print("Seed complete.")
     finally:
         await conn.close()
-
-    _dump(database_url)
 
 
 if __name__ == "__main__":

@@ -5,12 +5,16 @@ import structlog
 import structlog.stdlib
 import structlog.dev
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
+from app.api.posts import router as posts_router
+from app.api.stops import router as stops_router
+from app.api.trips import router as trips_router
 from app.config import settings
 from app.ingestion.scheduler import scheduler
 
@@ -20,7 +24,6 @@ from app.ingestion.scheduler import scheduler
 def _configure_logging() -> None:
     shared_processors: list = [
         structlog.stdlib.add_log_level,
-        structlog.stdlib.add_logger_name,
         structlog.processors.TimeStamper(fmt="iso"),
     ]
 
@@ -85,11 +88,27 @@ app.add_middleware(
 )
 
 
+# ── Routers ───────────────────────────────────────────────────────────────────
+
+app.include_router(trips_router)
+app.include_router(stops_router)
+app.include_router(posts_router)
+
+
 # ── Error handlers ────────────────────────────────────────────────────────────
 
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc: Exception) -> JSONResponse:
-    return JSONResponse(status_code=404, content={"error": "Not Found", "detail": str(exc)})
+    detail = getattr(exc, "detail", "Not found.")
+    return JSONResponse(status_code=404, content={"error": "Not Found", "detail": detail})
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    return JSONResponse(
+        status_code=422,
+        content={"error": "Unprocessable Entity", "detail": "Invalid request parameters."},
+    )
 
 
 @app.exception_handler(500)

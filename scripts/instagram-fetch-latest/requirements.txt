@@ -1,3 +1,7 @@
 anthropic>=0.40.0
+instagrapi>=2.7
 python-dotenv==1.1.0
 requests==2.33.1
+
+# Test deps
+pytest>=8.0

@@ -1,0 +1,70 @@
+{
+  "created_at": "2026-05-25T00:00:00Z",
+  "updated_at": "2026-05-25T00:00:00Z",
+  "spec": "003-ingestion-pipeline",
+  "project": "OCS",
+  "jira_base_url": "https://datacommlab.atlassian.net",
+  "mode": "story-only",
+  "epic": {
+    "key": "OCS-74",
+    "summary": "Ingestion Pipeline (Instagram + Substack)",
+    "url": "https://datacommlab.atlassian.net/browse/OCS-74"
+  },
+  "stories": [
+    {
+      "key": "OCS-83",
+      "summary": "Phase 1: US1 - Instagram Ingestion (P1, MVP)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-83",
+      "status": "in_progress",
+      "tasks": [
+        { "key": "OCS-87", "id": "T028", "summary": "location.py — Claude-only IATA determination (tagged + inferred dual paths)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-87" },
+        { "key": "OCS-88", "id": "T029", "summary": "instagram.py — instagrapi auth + since-timestamp fetch + idempotency", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-88" },
+        { "key": "OCS-89", "id": "T030", "summary": "Wire location resolution into the ingestion loop", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-89" },
+        { "key": "OCS-90", "id": "T031", "summary": "Trip assignment logic (FR-040)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-90" },
+        { "key": "OCS-91", "id": "T032", "summary": "Media download to public/media/<stop_id>.{jpg|mp4}", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-91" },
+        { "key": null, "id": "T033", "summary": "Instagram Graph API fallback", "status": "retired", "note": "FR-043 retired by 2026-05-25 spec amendment; intentionally not created in JIRA." },
+        { "key": "OCS-92", "id": "T034", "summary": "Session error handling — SMTP alert email and clean exit", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-92" },
+        { "key": null, "id": "T035", "summary": "CLI manage.py login — interactive instagrapi auth + session persist", "status": "pending", "note": "JIRA creation hit a Cloudflare rate-limit block on 2026-05-25 — needs manual creation or a retry." },
+        { "key": "OCS-93", "id": "T036", "summary": "scheduler.py — APScheduler BackgroundScheduler wired into FastAPI lifespan", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-93" }
+      ]
+    },
+    {
+      "key": "OCS-84",
+      "summary": "Phase 2: US2 - Substack Ingestion (P2)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-84",
+      "status": "pending",
+      "tasks": []
+    },
+    {
+      "key": "OCS-85",
+      "summary": "Phase 3: Polish & Cross-Cutting Concerns",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-85",
+      "status": "pending",
+      "tasks": []
+    },
+    {
+      "key": "OCS-86",
+      "summary": "Phase 17: Drift Reconciliation (2026-05-25 weekly scan)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-86",
+      "status": "completed",
+      "tasks": []
+    }
+  ],
+  "summary": {
+    "total_stories": 4,
+    "completed_stories": 1,
+    "in_progress_stories": 1,
+    "pending_stories": 2,
+    "total_tasks": 9,
+    "tasks_in_jira": 7,
+    "tasks_retired": 1,
+    "tasks_blocked_from_creation": 1
+  },
+  "notes": [
+    "All Stories created 2026-05-25 after the 2026-05-22 split from 002-data-ingestion.",
+    "Phase 17 transitioned to Done; Phase 1 (OCS-83) transitioned to In Progress on 2026-05-25 because a prototype lives in scripts/instagram-fetch-latest/load_posts_tsv.py while the backend implementation is waiting on 002's DB + read/write API.",
+    "Subtasks for Phase 1 were created because the story is partially complete — the prototype script implements parts of T028/T029/T030/T032 and the challenge-handler pattern needed for T035. Other Phases (2, 3, 17) are stories-only per the team convention.",
+    "T033 (Instagram Graph API fallback) is intentionally NOT created in JIRA — FR-043 was retired by the 2026-05-25 spec amendment. The task remains in tasks.md per Cardinal Rule #1 but is a no-op for implementation.",
+    "T035 (CLI manage.py login) creation hit a Cloudflare rate-limit block during the 2026-05-25 batch sync. Create manually in JIRA or retry the sync later — then update this mapping with the issue key."
+  ]
+}

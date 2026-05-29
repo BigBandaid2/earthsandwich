@@ -6,9 +6,9 @@
 
 ## Decision 1: Instagram Ingestion Library
 
-**Decision**: `instagrapi` (session-based) as primary; existing Instagram Graph API code as fallback
+**Decision**: `instagrapi` (session-based) as the sole method. _Updated 2026-05-25 — Graph API fallback dropped per the amended FR-016._
 
-**Rationale**: The travelers' account is a personal account — the Instagram Graph API requires a Business or Creator account and cannot access personal feeds. `instagrapi` uses the private Instagram API with session-based authentication (no account type restriction). It provides structured location objects including country code, which eliminates the need for a separate geocoding step when a tag exists. The existing `load_posts_tsv.py` Graph API code is retained as the fallback per FR-043/FR-044.
+**Rationale**: The travelers' account is a personal account — the Instagram Graph API requires a Business or Creator account and cannot access personal feeds, so a Graph API fallback never had a realistic surface area for the primary use case. `instagrapi` uses the private Instagram API with session-based authentication (no account type restriction) and provides structured location objects including country code, eliminating the need for a separate geocoding step when a tag exists. The 2026-05-25 amendment retired the Graph API fallback to avoid maintaining two ingestion code paths for marginal robustness gain.
 
 **Alternatives considered**:
 - Instagram Graph API only: ruled out — does not support personal accounts

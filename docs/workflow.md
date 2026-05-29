@@ -14,15 +14,22 @@ Roughly once per week, the Team Lead is responsible for grasping the current sta
 
 1. **Reconcile Code to Tasks** — drift scan against preview drift reconciliation → HEAD (see [§Reconciliation](#reconciliation-claudespec-drift-scan)).
 2. **New Phase/Story for Code Drift** - bundle detected changes to a new Phase in appended to relevant `tasks.md` for shipped work.
-3. **Check Progress Against Previous Sprint Plan** - append sprint review notes.
+3. **Sync Spec State to JIRA** — push new phases as Stories and flip completion statuses so the planning meeting reads off current JIRA state (see [§JIRA sync](#jira-sync)).
+4. **Log estimated hours** — append daily rows to `docs/planning/time-log.tsv` and add a person/story hours summary to the current sprint plan (see [§Time logging](#time-logging)).
+5. **Check Progress Against Previous Sprint Plan** - append sprint review notes.
+
+### During Weekly Team Meeting
+
+6. **Attest hours** — each team member confirms their estimated hours, adds meeting time, fills the `Hours Attested` column (see [§Time logging](#time-logging)).
+7. **Plan the week in JIRA's UI** — drag stories into the sprint, assign owners, set story points, write the Sprint goal.
 
 ### After Weekly Team Meeting
 
-4. **Create New Sprint Plan** - Create new sprint plan via Jira tickets or directly
-5. **Push to JIRA** — new phases become new Stories in OCS, placed in the current sprint for velocity attribution.
-6. **Plan the week in JIRA's UI** — drag stories into the sprint, assign owners, set story points, write the Sprint goal.
-7. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
-8. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
+8. **Link related tickets** — `Duplicate` for 1-to-1 parallels with a spec-kit Story, `Blocks` for prerequisite dependencies between tickets, `Relates` for everything else (see [§JIRA sync](#jira-sync)).
+9. **Create New Sprint Plan** - Create new sprint plan via Jira tickets or directly
+10. **Push to JIRA** — any phases newly decided in the meeting become new Stories in OCS, placed in the current sprint for velocity attribution. (Drift-discovered phases were already synced in step 3.)
+11. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
+12. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
 
 The weekly cadence is the contract. The per-feature ceremony (below) is the optional discipline for serious architectural work.
 
@@ -92,6 +99,73 @@ Claude enumerates changed files per commit, buckets them by spec, greps `tasks.m
 | Weekly Monday | Full drift scan. Append misses as new phases. |
 
 Per-commit is too noisy. Per-push and weekly catch-up is the right cadence.
+
+---
+
+## JIRA sync
+
+Two commands keep JIRA aligned with the spec state:
+
+- `/speckit.jira.specstoissues <spec>` — creates an Epic for the spec and a Story for each `## Phase N: ...` in its `tasks.md`. Existing Stories are left alone; only new phases are pushed. Subtasks are *not* created by default — sync at the Story level unless there's a clear reason to break out individual tasks (e.g. active forward-sprint work that needs triage in JIRA).
+- `/speckit.jira.sync-status <spec>` — reads `[ ]` / `[~]` / `[x]` task flips in `tasks.md` and transitions the corresponding JIRA issues to `To Do` / `In Progress` / `Done`.
+
+### Sprint membership rule
+
+Any Story flipped to **Done** must belong to a sprint — default to the currently-open sprint unless the work demonstrably happened in a different one (in which case set that sprint explicitly). This keeps velocity attribution accurate at sprint-review time.
+
+In-progress stories are *not* automatically added to the current sprint. Add one case-by-case when partial work has shipped this sprint and the team wants velocity credit for it.
+
+### User-created tickets — reconciliation
+
+JIRA accumulates two kinds of issues: those produced by `/speckit.jira.specstoissues` (labeled `spec-kit`) and those created ad-hoc in the JIRA UI (typically during weekly meetings or stakeholder discussions). When the two describe the same work, the spec-kit Story is the canonical record and the user ticket gets linked to it rather than left orphaned.
+
+Convention:
+- **`Duplicate`** link when the user ticket and spec-kit Story describe the same work 1-to-1. Direction: the user ticket *duplicates* the spec-kit Story (`outwardIssue` = user ticket, `inwardIssue` = spec-kit Story).
+- **`Blocks`** link when one ticket must finish before another can start (cross-ticket dependency, in either direction — spec-kit ↔ user, spec-kit ↔ spec-kit, or user ↔ user). Direction: `inwardIssue` = the blocker, `outwardIssue` = the blocked ticket (so "A is blocked by B" → `inwardIssue: B, outwardIssue: A`). Surface these at planning so blocked work doesn't get committed before its prereq.
+- **`Relates`** link when the connection is tangential — a spike whose outcome shaped another story, a follow-on idea, historical context (e.g. a webfetch-blocking spike whose outcome was the instagrapi pivot).
+- **Don't touch the Subtasks attached to spec-kit Stories** — those are managed by the speckit-jira agents. Linking happens at the user-ticket / Story level only.
+
+This OCS workflow has only `To Do` / `In Progress` / `Done` — no `Blocked` status. The `Blocks` link is the canonical record of a dependency; the blocked ticket stays in `To Do` (or `In Progress` if partial work has shipped) until the blocker clears.
+
+True close-cascade requires a Parent-Subtask relationship, which would mean converting the user ticket's issue type. That's out of scope for the weekly cadence; manually close the duplicate when the spec-kit Story closes (or leave it for next-week reconciliation).
+
+### What never goes into the sync
+
+Per Cardinal Rule 6, `specs/<spec>/jira-mapping.json` must not record sprint, owner, status, story points, or priority. Those PM fields live in JIRA's UI; the mapping file carries only identity (key, summary, URL, parent/child structure).
+
+---
+
+## Time logging
+
+`docs/planning/time-log.tsv` is an append-only daily ledger of estimated and attested hours. One row per day per person per Story (or per `Overhead` category). It exists to make velocity attribution honest at sprint review and to build a calibration loop: the gap between *estimated* and *attested* hours tells you whether your future estimates need adjustment.
+
+### Columns
+
+| Column | Notes |
+|---|---|
+| Date | YYYY-MM-DD |
+| DOW | Day of week |
+| Sprint | `OCS Sprint N` (the sprint the work calendar-attributes to) |
+| Story | JIRA key (`OCS-NN`). Use `Overhead` for non-Story work (sprint planning, workflow doc updates, JIRA sync, spec restructures). |
+| Person | Full name matching git author / JIRA assignee |
+| Commits | Commit hash + brief description. Include qualitative notes that explain the estimate (e.g. "AI-assisted burst, 8 commits in 24 min"). |
+| Time Span | Calendar span of commits that day (`HH:MM-HH:MM`). Reference only — not the same as active work time. |
+| Hours Estimated | Single decimal. Filled before the weekly team meeting from commit history + judgment. |
+| Hours Attested | Filled by the team member after the meeting. Includes meeting time on top of work time. Empty until attested. |
+
+### Before the weekly team meeting
+
+After the drift scan and JIRA sync, the team lead enumerates commits since the last sync, groups them by Story + person + day, and writes one row each with `Hours Estimated`. Add a person/story summary block at the bottom of `docs/planning/YYYY-WW.md` so the meeting has a quick read of where effort went.
+
+### After the weekly team meeting (attestation)
+
+Each team member reviews their rows and fills `Hours Attested`:
+
+- **Add meeting time on top of work time.** The weekly meeting itself counts — add it to one of your existing rows for that day, or create a dedicated `Overhead — meeting` row.
+- **Adjust the number** if your actual time differed significantly from the estimate. The gap is feedback for tuning future estimates; don't silently re-baseline.
+- Leave a note in the Commits column if context is important (e.g. "deeper than estimated — blocked 2h on instagrapi challenge").
+
+Attested numbers are the source of truth for sprint velocity. Estimated numbers stay in place for the calibration history.
 
 ---
 
