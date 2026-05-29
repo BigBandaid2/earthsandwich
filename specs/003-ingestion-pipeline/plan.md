@@ -75,6 +75,11 @@ pile-app/                              # The Ingestion Pipeline App root (migrat
 │   ├── tagged_location.py             # FR-019: canonicalize verbatim tag + IATA
 │   ├── inferred_location.py           # FR-020: caption+media inference
 │   ├── deletion_detection.py          # FR-106: tombstone on naturally-encountered absence
+│   ├── validation/                    # Hand-curated truth baseline + scrape diffs
+│   │   ├── posts.local.tsv            # Truth baseline (hand-curated locations)
+│   │   ├── scrape-diff.txt            # Earliest diff output (preserved for history)
+│   │   ├── scrape-diff-v3.txt
+│   │   └── scrape-diff-v4.txt
 │   └── README.md
 ├── substack/                          # Substack pipeline service (new)
 │   ├── __init__.py

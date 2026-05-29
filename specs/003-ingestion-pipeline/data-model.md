@@ -17,6 +17,8 @@ The pile is the only data surface that crosses the App boundary. Everything else
 | **Run Log** | Internal observability | `common/run_logging.py` | `pile-app/logs/scrape-<service>-<target>-<YYYYMMDD-HHMMSS>.log` |
 | **Service Schedule Config** | Configuration | `common/scheduler.py` | `pile-app/config.yml` |
 | **Rate Preset** | Configuration enum | `common/anti_throttle.py` | code constant |
+| **Truth Baseline TSV** | Validation scaffolding (informal) | Instagram service maintainer (hand-curated) | `pile-app/instagram/validation/posts.local.tsv` |
+| **Scrape Diff Report** | Validation scaffolding (informal) | Ad-hoc diff tooling vs. truth baseline | `pile-app/instagram/validation/scrape-diff*.txt` |
 
 ---
 
@@ -250,6 +252,21 @@ Implemented as a `dataclass` constant lookup in `common/anti_throttle.py`. Three
 - `per_post_jitter: tuple[float, float]` — random sleep range between individual post processings
 
 No runtime mutation; presets are constants. The `--rate` CLI flag selects which preset's values flow through the run.
+
+---
+
+## Informal: Instagram validation scaffolding
+
+**Path**: `pile-app/instagram/validation/`
+
+These artefacts support the iterative scraper-improvement loop ("produce pile → diff against truth → tweak scraper → re-produce → diff again"). They are NOT pile artefacts and are NOT consumed by the bridge-app. They live under the Instagram service so they travel with the App per FR-110/FR-111.
+
+| File | Kind | Notes |
+|---|---|---|
+| `posts.local.tsv` | Truth baseline | Hand-curated TSV with the same shape as the Instagram pile TSV. Locations were entered by the operator from memory + photos and treated as ground truth when iterating the canonicalization + inference logic. Schema may drift from the producer's current TSV columns; that's tolerated until the comparison process is formalized. |
+| `scrape-diff.txt`, `scrape-diff-v3.txt`, `scrape-diff-v4.txt` | Diff reports | Output from ad-hoc tooling that compared a fresh scrape against `posts.local.tsv`. Bucketed by failure mode (e.g., `old_appends_country`, `truly_different`). Preserved as a history of scraper-improvement deltas; not regenerated automatically. |
+
+A future spec amendment will formalize the truth-baseline + diff workflow (likely with a `python -m pile_app validate instagram <target>` subcommand and a structured-diff format). Until that lands, these files are an informal but tracked-in-git scaffold.
 
 ---
 

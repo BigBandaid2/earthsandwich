@@ -94,7 +94,11 @@ Findings consolidated below. Each decision section follows:
 1. Create `pile-app/` at repo root with the structure laid out in `plan.md`.
 2. Split the existing `scripts/instagram-fetch-latest/load_posts_tsv.py` module into per-service + common files (`instagram/pipeline.py`, `instagram/instagrapi_client.py`, `instagram/tagged_location.py`, `instagram/inferred_location.py`, `common/pile.py`, `common/inference.py`, `common/anti_throttle.py`, `common/run_logging.py`).
 3. Move existing pile artefacts to the new locations: `posts.<target>.local.tsv` → `pile-app/pile/posts.<target>.local.tsv`; `public/media/<target>_*.jpg` → `pile-app/pile/media/instagram/<target>_*.jpg`; existing log files → `pile-app/logs/`.
-4. Update `.gitignore`: drop `instagrapi_session.json` from the project root; add `pile-app/.env`, `pile-app/pile/`, `pile-app/logs/`, `pile-app/instagrapi_session.json` patterns.
+3a. Move Instagram-service validation artefacts (NOT pile artefacts — these are the historical scaffolding of the scraper-iteration loop):
+    - `posts.local.tsv` (hand-curated truth baseline) → `pile-app/instagram/validation/posts.local.tsv`
+    - `docs/planning/scrape-diff.txt`, `scrape-diff-v3.txt`, `scrape-diff-v4.txt` (diff outputs from successive scraper iterations) → `pile-app/instagram/validation/`
+    These remain in version control (unlike the pile under `pile-app/pile/` which is gitignored). The "truth baseline + diff" workflow that produced them will be formalized in a later spec amendment; until then this directory is the canonical home for the artefacts so they travel with the App per FR-110/FR-111.
+4. Update `.gitignore`: drop `instagrapi_session.json` from the project root; add `pile-app/.env`, `pile-app/pile/`, `pile-app/logs/`, `pile-app/instagrapi_session.json` patterns. The `pile-app/instagram/validation/` directory is NOT gitignored — its contents are tracked.
 5. Update CLAUDE.md, README.md, and roadmap.md pointers to reference `pile-app/` instead of `scripts/instagram-fetch-latest/`.
 6. Migrate the test suite: move `scripts/instagram-fetch-latest/tests/` → `pile-app/tests/` and update test-target imports.
 7. Verify SC-010 (copy `pile-app/` to a fresh empty repo; tests pass; scrape runs).
