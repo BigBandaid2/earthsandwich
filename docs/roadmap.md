@@ -129,6 +129,12 @@ When work is ambiguous between specs (e.g. a new stop type), default to whicheve
 - Violators
 - Corrections
 
+In addition to creating a clean, query-able data source, DU will also provide:
+
+- **Cost Visibility and Allocation**, both for the consumer and provider of the data. Create an internal marketplace for data, and build the foundations for DU to evolve into a 3rd-party marketplace and purveyor of data.
+- **Data Quality Quantified** — certain datasets will be marked as base truth for a particular slice/node of data. All other nodes will inherit a degree of credibility based on their variance and distance from these base-truth nodes. Provides source trace for any delivered data point.
+- **Searchable Data Dictionary** — AI-assisted dataset curation: what do I want to do, and what datasets might help me do it? Ideally both within the pile and beyond. Crawl data catalogues, inventories, contracts, the internet. Guidance for new data acquisition and onboarding.
+
 ### App 4 — Target Useful Production App (Client of Data Unification) — useful-app in this project
 
 This is the downstream app / operating user that we are meant to serve. The owner of this app outlines what they need and Data Unification (DU) is meant to help them extract it out of the dog pile, clean it up, and present it as a push data export or queryable end-point.
