@@ -244,6 +244,85 @@ class TestSortAndReid:
         assert (media_dir / f"{target}_SC2.jpg").read_bytes() == b"only this exists"
 
 
+class TestSweepOrphansFlag:
+    """The `sweep_orphans` kwarg is the post-2026-05-29 guard against the
+    "interrupted scrape mis-classifies older posts' media as orphans"
+    failure mode. Sort + reid always runs (always safe); the sweep only
+    runs when the scrape completed cleanly.
+    """
+
+    def test_sweep_orphans_false_preserves_unreferenced_files(self, sandbox):
+        """The regression test for the 2026-05-29 incident: an interrupted
+        scrape's TSV contains only the rows that got re-pulled. The on-disk
+        media files for older, un-re-pulled posts look like orphans relative
+        to that partial TSV. With sweep_orphans=False, they MUST stay."""
+        tsv_path, media_dir, target = sandbox
+
+        # Simulate the post-incident state: 2 rows in the partial TSV,
+        # 5 files on disk (the missing 3 represent un-re-pulled older posts
+        # whose media files should NOT be swept).
+        for sc in ("SC_old1", "SC_old2", "SC_old3"):
+            (media_dir / f"{target}_{sc}.jpg").write_bytes(b"older post - must not be swept")
+        (media_dir / f"{target}_SC_new1.jpg").write_bytes(b"newly re-pulled")
+        (media_dir / f"{target}_SC_new2.jpg").write_bytes(b"newly re-pulled")
+
+        rows = [
+            _row(1, "2026-03-01T00:00:00+0000", _media_url(media_dir, target, "SC_new1"), shortcode="SC_new1"),
+            _row(2, "2026-03-02T00:00:00+0000", _media_url(media_dir, target, "SC_new2"), shortcode="SC_new2"),
+        ]
+        _write_tsv(tsv_path, rows)
+
+        resort_tsv_and_sweep_media(str(tsv_path), target, str(media_dir), sweep_orphans=False)
+
+        # All 5 files survive — the 3 "older" ones are preserved despite
+        # not being in the TSV.
+        survivors = sorted(p.name for p in media_dir.iterdir())
+        assert f"{target}_SC_old1.jpg" in survivors
+        assert f"{target}_SC_old2.jpg" in survivors
+        assert f"{target}_SC_old3.jpg" in survivors
+        assert f"{target}_SC_new1.jpg" in survivors
+        assert f"{target}_SC_new2.jpg" in survivors
+
+    def test_sweep_orphans_false_still_sorts_and_reids_rows(self, sandbox):
+        """The sweep guard MUST NOT block the sort + reid step — partial
+        scrapes still benefit from canonical row ordering."""
+        tsv_path, media_dir, target = sandbox
+        (media_dir / f"{target}_SC1.jpg").write_bytes(b"a")
+        (media_dir / f"{target}_SC2.jpg").write_bytes(b"b")
+
+        rows = [
+            _row(1, "2026-03-15T00:00:00+0000", _media_url(media_dir, target, "SC1"), shortcode="SC1"),
+            _row(2, "2026-02-15T00:00:00+0000", _media_url(media_dir, target, "SC2"), shortcode="SC2"),
+        ]
+        _write_tsv(tsv_path, rows)
+
+        resort_tsv_and_sweep_media(str(tsv_path), target, str(media_dir), sweep_orphans=False)
+
+        result = _read_tsv(tsv_path)
+        # Sort + reid still happened — even though the run was interrupted.
+        assert [r["timestamp"] for r in result] == [
+            "2026-02-15T00:00:00+0000",
+            "2026-03-15T00:00:00+0000",
+        ]
+        assert [r["id"] for r in result] == ["1", "2"]
+
+    def test_sweep_orphans_true_still_works_for_clean_runs(self, sandbox):
+        """The default behavior must be unchanged — clean scrapes get their
+        orphan files swept as before."""
+        tsv_path, media_dir, target = sandbox
+        (media_dir / f"{target}_SC1.jpg").write_bytes(b"keep")
+        (media_dir / f"{target}_orphan.mp4").write_bytes(b"orphan")
+
+        rows = [_row(1, "2026-01-01T00:00:00+0000", _media_url(media_dir, target, "SC1"), shortcode="SC1")]
+        _write_tsv(tsv_path, rows)
+
+        # Explicit default — clean run, sweep allowed
+        resort_tsv_and_sweep_media(str(tsv_path), target, str(media_dir), sweep_orphans=True)
+
+        assert (media_dir / f"{target}_SC1.jpg").exists()
+        assert not (media_dir / f"{target}_orphan.mp4").exists()
+
+
 class TestPruneScrapeLogs:
     def _make_log(self, log_dir: Path, name: str, age_offset: int) -> Path:
         """Create a log file with mtime = now + age_offset (negative for older)."""

@@ -111,19 +111,32 @@ def estimate_scrape_seconds(num_posts: int, rate_config: dict) -> float:
     )
 
 
+class FetchInterruptedError(Exception):
+    """Raised when `_fetch_page_with_retry` exhausts its options (hard block
+    or transient-after-retry) and pagination must halt.
+
+    Propagating an exception (instead of returning None like the older code
+    did) is what lets `run_for_target` distinguish a clean end-of-feed stop
+    from a mid-scrape interruption — critical because the orphan sweep at
+    the end of `resort_tsv_and_sweep_media` MUST NOT fire on an interrupted
+    scrape (the 2026-05-29 DNS-hiccup incident: the sweep mis-classified
+    179 valid media files as orphans because their TSV rows hadn't been
+    re-pulled yet).
+    """
+
+
 def _fetch_page_with_retry(
     cl: "object",
     user_id: int,
     end_cursor: str,
     page_size: int,
     page_num: int,
-) -> Optional[tuple[list, str]]:
+) -> tuple[list, str]:
     """Fetch one page from instagrapi with single retry on transient errors.
 
-    Returns (medias, new_end_cursor) on success, or None to signal "give up,
-    let the caller persist partial progress." A challenge error is NOT
-    retried (manual verification required); transient errors get one retry
-    after a 60–180s backoff before giving up.
+    Returns (medias, new_end_cursor) on success. Raises FetchInterruptedError
+    when no retry will help — either a hard block (challenge / checkpoint /
+    login_required) or a transient error whose single retry also failed.
     """
     try:
         return cl.user_medias_paginated_v1(user_id, page_size, end_cursor=end_cursor)
@@ -135,7 +148,7 @@ def _fetch_page_with_retry(
                 f"Instagram app, complete any 'Was this you?' / 2FA prompt, "
                 f"then re-run."
             )
-            return None
+            raise FetchInterruptedError(f"page {page_num} hard-blocked: {exc}") from exc
         # Transient — back off then retry once.
         print(f"\n  ! page {page_num} fetch failed transiently ({type(exc).__name__}: {exc})")
         jittered_sleep(60.0, 180.0, label=f"backoff before retry of page {page_num}")
@@ -146,7 +159,9 @@ def _fetch_page_with_retry(
                 print(f"  ! retry of page {page_num} hit a challenge — {exc2}")
             else:
                 print(f"  ! retry of page {page_num} also failed — {exc2}; giving up.")
-            return None
+            raise FetchInterruptedError(
+                f"page {page_num} retry failed: {exc2}"
+            ) from exc2
 
 
 def iter_new_media(
@@ -188,11 +203,10 @@ def iter_new_media(
             if long_rest_every and (page_num - 1) % long_rest_every == 0:
                 jittered_sleep(*long_rest, label=f"long rest after {long_rest_every} pages")
         page_start = time.monotonic()
-        result = _fetch_page_with_retry(cl, user_id, end_cursor, page_size, page_num)
-        if result is None:
-            print(f"  ! stopping pagination — {total_yielded} post(s) already streamed to disk.")
-            return
-        medias, end_cursor = result
+        # _fetch_page_with_retry raises FetchInterruptedError on unrecoverable
+        # failures. We DON'T catch it here — let it propagate to run_for_target
+        # so the sweep-orphans guard fires.
+        medias, end_cursor = _fetch_page_with_retry(cl, user_id, end_cursor, page_size, page_num)
         print(f"  [page {page_num}] {len(medias)} posts (cursor={'…' if end_cursor else 'end'})")
         if not medias:
             return
@@ -462,6 +476,15 @@ def run_for_target(
     total_written = 0
     media_delay = rate_config["media_delay"]
 
+    # Tracks whether the streaming loop exited via clean termination (end of
+    # feed or hit-since-ts boundary) vs an exception. Only a clean run is
+    # safe for the post-pass orphan sweep — interrupted runs leave older
+    # posts un-re-pulled, and their valid media files would be mis-classified
+    # as orphans by a sweep that assumes the TSV is complete (the 2026-05-29
+    # DNS-hiccup incident: 179 valid media files were deleted before this
+    # guard was added).
+    scrape_completed_cleanly = True
+
     # Ensure the parent dir exists (e.g., pile-app/pile/ on first scrape).
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
@@ -509,21 +532,35 @@ def run_for_target(
                 print(f"  + [{local_id}] pk={row['instagram_id']}  shortcode={row['shortcode']}")
 
                 jittered_sleep(*media_delay, label="inter-post pause")
+    except FetchInterruptedError as exc:
+        # Hard-block or transient-after-retry from instagrapi. Halt cleanly,
+        # preserve partial pile state, and (critically) skip the orphan
+        # sweep so we don't delete media for posts the scrape never reached.
+        scrape_completed_cleanly = False
+        print(
+            f"\n  ! Pagination interrupted: {exc}\n"
+            f"  ! {total_written} row(s) already persisted to {output_path} are preserved.\n"
+            f"  ! Orphan media-file sweep SKIPPED — older posts' files stay on disk."
+        )
     except InferenceHardBlockError as exc:
         # FR-052 edge case: inference rate-limit / auth failure / credit
         # exhaustion. Treated as a hard block — same handling as an
         # Instagram challenge. No retry, partial pile preserved, operator
         # must intervene before re-running.
+        scrape_completed_cleanly = False
         print(
             f"\n  ! HARD BLOCK from inference provider: {exc}\n"
             f"  ! Halting @{target} scrape. {total_written} row(s) already "
             f"persisted to {output_path} are preserved.\n"
+            f"  ! Orphan media-file sweep SKIPPED — older posts' files stay on disk.\n"
             f"  ! Operator action required: check ANTHROPIC_API_KEY validity "
             f"and account credit balance, then re-run."
         )
     except Exception as exc:
+        scrape_completed_cleanly = False
         print(f"\nERROR during streaming for @{target}: {exc}")
-        print(f"  ! {total_written} row(s) persisted before failure; partial TSV will still be re-sorted.")
+        print(f"  ! {total_written} row(s) persisted before failure; partial TSV will still be re-sorted "
+              f"but orphan sweep SKIPPED.")
 
     if pending_tombstones:
         tombstoned = apply_tombstones(output_path, pending_tombstones)
@@ -536,5 +573,7 @@ def run_for_target(
         return
 
     print(f"\nStreaming done — re-sorting {output_path} by timestamp ASC + renumbering ids.")
-    resort_tsv_and_sweep_media(output_path, target, media_dir)
+    resort_tsv_and_sweep_media(
+        output_path, target, media_dir, sweep_orphans=scrape_completed_cleanly
+    )
     print(f"Done. {total_written} new post(s) written to {output_path}.")

@@ -97,9 +97,14 @@ def normalize_media_url_for_tsv(local_media_path: str) -> str:
     return local_media_path.replace(os.sep, posixpath.sep)
 
 
-def resort_tsv_and_sweep_media(path: str, target: str, media_dir: str) -> None:
+def resort_tsv_and_sweep_media(
+    path: str,
+    target: str,
+    media_dir: str,
+    sweep_orphans: bool = True,
+) -> None:
     """Restore canonical oldest-first row order after a streaming scrape, then
-    sweep orphan media files.
+    (optionally) sweep orphan media files.
 
     Streaming writes rows in pagination order (newest-page first, oldest-of-
     page first within each page). After the scrape, we want the file to match
@@ -109,12 +114,17 @@ def resort_tsv_and_sweep_media(path: str, target: str, media_dir: str) -> None:
       1. Read all rows, sort by timestamp ASC.
       2. Reassign local `id` values 1..N. Media filenames are now keyed on
          `shortcode` (FR-022 + T225), so no media-file rename is needed —
-         only the in-TSV `id` column changes.
+         only the in-TSV `id` column changes. Sort + reid is ALWAYS safe.
       3. Write the sorted, re-id'd rows back to the TSV.
-      4. Sweep orphan media files in `media_dir` matching `<target>_*` that
-         aren't referenced by any TSV row — e.g., a `.mp4` left over from a
-         prior scrape where that shortcode is now a different media type.
-         Cross-target safe: only files matching THIS target's prefix are touched.
+      4. If `sweep_orphans=True`: sweep orphan media files in `media_dir`
+         matching `<target>_*` that aren't referenced by any TSV row.
+
+    `sweep_orphans` MUST be False when the scrape was interrupted mid-flight
+    (any `FetchInterruptedError`, `InferenceHardBlockError`, or generic
+    exception during streaming) — otherwise files belonging to posts the
+    scrape didn't reach get mis-classified as orphans and deleted. The
+    2026-05-29 rescrape DNS hiccup taught us this the hard way: 179 media
+    files lost before the bug was found and recovered separately.
     """
     with open(path, encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f, delimiter="\t")
@@ -133,12 +143,16 @@ def resort_tsv_and_sweep_media(path: str, target: str, media_dir: str) -> None:
         writer.writeheader()
         writer.writerows(rows)
 
+    if not sweep_orphans:
+        return
+
     # Orphan sweep: any file in media_dir matching this target's prefix that
     # isn't referenced by a row is a leftover from a prior scrape. Safe to
-    # delete. Path comparison uses absolute + normcase'd paths on both sides
-    # so a relative media_dir or a relative media_url doesn't cause a phantom
-    # mismatch (the bug that previously wiped 323 real files because the
-    # `referenced` set had absolute paths and the scan produced relative ones).
+    # delete WHEN the scrape completed cleanly. Path comparison uses absolute
+    # + normcase'd paths on both sides so a relative media_dir or a relative
+    # media_url doesn't cause a phantom mismatch (the bug that previously
+    # wiped 323 real files because the `referenced` set had absolute paths
+    # and the scan produced relative ones).
     app_root_str = str(APP_ROOT)
 
     def _abs_norm(p: str) -> str:
