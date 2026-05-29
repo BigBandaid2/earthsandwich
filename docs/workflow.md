@@ -126,24 +126,11 @@ Between Monday meetings, Claude makes small changes that don't always make it in
 
 Ask Claude: *"Run a spec drift scan. For each commit touching `src/`, `public/`, or `package.json`, list whether it has a corresponding line in any `tasks.md`. Flag everything that doesn't, grouped by spec."*
 
-**Determining the scan's starting point.** Claude derives the `<last_known_good_commit>` automatically — do not pass a date by hand. The rule:
+**Starting point.** Claude derives `<last_known_good_commit>` itself — never pass a date. The most recent `## Phase N: Drift Reconciliation (YYYY-MM-DD …)` heading across all `specs/**/tasks.md` defines the baseline; scan `<that-commit>..HEAD`. Fall back to last Monday 00:00 if no such phase exists. Scans are idempotent across re-runs and consecutive weeks chain without overlap.
 
-1. Grep every `specs/**/tasks.md` for phase headings matching `## Phase N: Drift Reconciliation (YYYY-MM-DD …)`.
-2. Take the **most recent date** across all matches (whichever spec it appears in).
-3. Use the commit that introduced that heading as the baseline. Find it with `git log -S "Phase N: Drift Reconciliation" --pretty=format:"%h" -- specs/**/tasks.md` (or the equivalent diff scan), then scan `<that-commit>..HEAD`.
-4. If no Drift Reconciliation phase exists anywhere, fall back to the last commit before last Monday 00:00 local time.
+Claude enumerates changed files per commit, buckets them by spec, greps `tasks.md` for matches, and outputs unmatched commits as a proposed Phase N+1. Always *propose* — never append directly ([Cardinal Rule #1](../.specify/memory/constitution.md#cardinal-rules)).
 
-This means scans are idempotent across re-runs and consecutive weeks chain without overlap — the next scan starts exactly where the last one ended, regardless of how many weeks have passed.
-
-Claude enumerates changed files per commit, buckets them by spec, greps `tasks.md` for matches, and outputs the unmatched commits as a proposed Phase N+1 task list. Always *propose* — never append to `tasks.md` directly. The user decides whether and how to record each item (Cardinal Rule #1).
-
-| Trigger | What runs |
-|---|---|
-| Per commit | Nothing automated. Use whatever interface (VS Code, CLI). |
-| Per push to default | Lightweight `tasks.md` drift check via `after_implement` hook (see [§Hook customization](#hook-customization)). |
-| Weekly Monday | Full drift scan. Append misses as new phases. |
-
-Per-commit is too noisy. Per-push and weekly catch-up is the right cadence.
+Cadence: per-commit is too noisy; per-push (lightweight drift check via `after_implement` hook) and the weekly Monday scan together are the right catch-up rhythm.
 
 ---
 
@@ -164,15 +151,13 @@ In-progress stories are *not* automatically added to the current sprint. Add one
 
 JIRA accumulates two kinds of issues: those produced by `/speckit.jira.specstoissues` (labeled `spec-kit`) and those created ad-hoc in the JIRA UI (typically during weekly meetings or stakeholder discussions). When the two describe the same work, the spec-kit Story is the canonical record and the user ticket gets linked to it rather than left orphaned.
 
-Convention:
-- **`Duplicate`** link when the user ticket and spec-kit Story describe the same work 1-to-1. Direction: the user ticket *duplicates* the spec-kit Story (`outwardIssue` = user ticket, `inwardIssue` = spec-kit Story).
-- **`Blocks`** link when one ticket must finish before another can start (cross-ticket dependency, in either direction — spec-kit ↔ user, spec-kit ↔ spec-kit, or user ↔ user). Direction: `inwardIssue` = the blocker, `outwardIssue` = the blocked ticket (so "A is blocked by B" → `inwardIssue: B, outwardIssue: A`). Surface these at planning so blocked work doesn't get committed before its prereq.
-- **`Relates`** link when the connection is tangential — a spike whose outcome shaped another story, a follow-on idea, historical context (e.g. a webfetch-blocking spike whose outcome was the instagrapi pivot).
-- **Don't touch the Subtasks attached to spec-kit Stories** — those are managed by the speckit-jira agents. Linking happens at the user-ticket / Story level only.
+| Link | When | Direction (`inwardIssue` / `outwardIssue`) |
+|---|---|---|
+| `Duplicate` | User ticket and spec-kit Story describe the same work 1-to-1 | spec-kit Story / user ticket |
+| `Blocks` | One ticket must finish before another can start | blocker / blocked |
+| `Relates` | Tangential — spike, follow-on, historical context | either |
 
-This OCS workflow has only `To Do` / `In Progress` / `Done` — no `Blocked` status. The `Blocks` link is the canonical record of a dependency; the blocked ticket stays in `To Do` (or `In Progress` if partial work has shipped) until the blocker clears.
-
-True close-cascade requires a Parent-Subtask relationship, which would mean converting the user ticket's issue type. That's out of scope for the weekly cadence; manually close the duplicate when the spec-kit Story closes (or leave it for next-week reconciliation).
+Don't touch the Subtasks under spec-kit Stories — those are managed by the speckit-jira agents; link at the Story level only. Surface `Blocks` chains at planning. OCS has no `Blocked` status; the `Blocks` link IS the dependency record. True close-cascade requires Parent-Subtask conversion (out of scope) — manually close duplicates when the spec-kit Story closes.
 
 ### What never goes into the sync
 
@@ -239,59 +224,7 @@ Capture the week's intent in two places: the JIRA Sprint goal (one sentence) and
 > Good: "Ship the scheduled Instagram pull and a draft SDLC workflow guide; explore the legacy comment-bot integration."
 > Bad: "Do all the things from the planning meeting."
 
-**Planning notes**: each Monday produces `docs/planning/YYYY-WW.md` (ISO week number). Format:
-
-```markdown
-# Sprint planning — Week of YYYY-MM-DD
-
-**Sprint**: OCS Sprint N
-**Goal**: <one sentence, matches JIRA Sprint goal>
-
-## Goals
-1. **<Name>** — <one paragraph>. Tracking: OCS-XX (Epic).
-2. **<Name>** — <one paragraph>. Tracking: OCS-YY.
-
-## Out of scope this week
-- <Things explicitly deferred>
-
-## Dependencies / blockers
-- <External dependencies, decisions still needed>
-```
-
-Each goal becomes (or maps to) an OCS Epic. Spec-needing goals run through `/speckit.specify`; the Epic appears when you run `/speckit.jira.specstoissues`.
-
----
-
-## Hook customization
-
-### git extension (`auto_commit`)
-
-`.specify/extensions/git/git-config.yml` — recommended team-wide settings (currently active in this repo):
-
-```yaml
-auto_commit:
-  default: false
-  after_specify:    { enabled: true,  message: "[Spec Kit] Add specification" }
-  after_clarify:    { enabled: true,  message: "[Spec Kit] Apply clarifications" }
-  after_plan:       { enabled: true,  message: "[Spec Kit] Add implementation plan" }
-  after_tasks:      { enabled: true,  message: "[Spec Kit] Add task breakdown" }
-  before_implement: { enabled: true,  message: "[Spec Kit] Save progress before implementation" }
-  # after_implement intentionally disabled — implementations should be human-reviewed PRs.
-```
-
-This auto-commits the spec/clarify/plan/tasks artifacts (themselves PR-reviewable text) but keeps human-driven commits for implementation diffs.
-
-### Custom pre-commit checks (proposed)
-
-`git.commit` can be extended with team-specific *advisory* checks (warn, never block — hard blocks belong in CI):
-
-1. **Spec-drift scan** — for each changed `src/` file, look for a matching `[x]` / `[~]` task. Warn if missing.
-2. **Diagram freshness** — if `src/components/*.tsx` changed, suggest `/speckit.learn.review`.
-3. **JIRA reference** — if commit message lacks `OCS-NNN`, prompt for one.
-
-### When to use `git.commit` vs. VS Code's git UI
-
-`git.commit` runs lifecycle-specific checks and ties commits to Spec Kit events (`after_specify`, etc.). VS Code's UI is fine for ad-hoc commits but doesn't know which lifecycle event it's serving. **Use VS Code for ad-hoc; let Spec Kit hooks fire `git.commit` at lifecycle moments.**
+**Planning notes**: each Monday produces `docs/planning/YYYY-WW.md` (ISO week number). Required fields: `**Sprint**` (OCS Sprint N), `**Goal**` (matches the JIRA Sprint goal), `## Goals` (numbered list, each item names its OCS Epic), `## Out of scope this week`, `## Dependencies / blockers`. Each Goal becomes (or maps to) an OCS Epic; spec-needing Goals run through `/speckit.specify`, and the Epic appears when you run `/speckit.jira.specstoissues`.
 
 ---
 
@@ -327,48 +260,6 @@ The `before_implement` onboard hook is already enabled in `.specify/extensions.y
 2. **Quiz** — run `/speckit.onboard.quiz`. Generates 5 questions calibrated to your profile level (`junior` / `mid` / `senior`), grounded in real project artifacts, and persisted in `.onboard/profiles/<name>.json` so questions never repeat.
 
 No enforcement, no scoring, no surveillance — just a structured nudge for context refresh. If a quiz reveals confusion, that's a signal to update the spec or the docs.
-
----
-
-## A typical week
-
-```
-Mon 09:00  Planning meeting (30 min)
-Mon 09:30  Each dev: ask Claude for weekly digest, then /speckit.onboard.quiz (5 min)
-Mon 09:35  Lead: drift scan, append new phases (15 min)
-Mon 09:50  /speckit.jira.specstoissues for new specs; place Stories in current sprint (10 min)
-Mon 10:00  Sprint plan in JIRA UI: drag stories, assign owners, set points (20 min)
-Mon 10:20  /speckit.learn.review to refresh diagrams (5 min, lead)
-Mon        Goals captured in docs/planning/YYYY-WW.md and JIRA Sprint goal field.
-
-Tue–Fri    Implementation. /speckit.implement for major work; ad-hoc Claude
-           sessions for small changes. Mark [x] in tasks.md as you ship.
-           /speckit.jira.sync-status as needed (or batch on Friday).
-
-Fri 16:00  Optional pre-Monday triage. Note anything that should become a new phase.
-```
-
----
-
-## Common questions
-
-**Q: I made a small change. Update `tasks.md` now?**
-Wait for Monday's reconciliation pass and append a new phase covering the week's small changes as a single bundle. Architecturally meaningful changes warrant a phase now.
-
-**Q: A change doesn't fit any existing spec.**
-You probably needed a new spec. Small change → append to the closest spec. Substantial → run `/speckit.specify` after the fact and reference the merged commits as historical context.
-
-**Q: I want to abandon a feature already pushed to JIRA.**
-Transition the Epic and Stories to **"Won't Do"** (not Delete). Append `Phase N: Abandonment` to `tasks.md`. Keep the Spec Kit directory.
-
-**Q: My VS Code git UI is faster than `git.commit` for ad-hoc commits.**
-Keep using it. `git.commit`'s value is at lifecycle moments (`after_specify`, etc.), not at every save.
-
-**Q: Push every shipped task to JIRA as a Subtask?**
-No. Completed phases live at the Story level only. Per-task Subtasks exist for the active phase, where they help triage owners and points.
-
-**Q: Story Points missing — does that block sprint planning?**
-No, but velocity charts will be inaccurate. Set them during planning meeting.
 
 ---
 
