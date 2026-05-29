@@ -224,7 +224,7 @@ Capture the week's intent in two places: the JIRA Sprint goal (one sentence) and
 > Good: "Ship the scheduled Instagram pull and a draft SDLC workflow guide; explore the legacy comment-bot integration."
 > Bad: "Do all the things from the planning meeting."
 
-**Planning notes**: each Monday produces `docs/planning/YYYY-WW.md` (ISO week number). Header: `**Sprint**` (`OCS Sprint N` + date range) and `**Goal**` (matches the JIRA Sprint goal). Body: one `### <Person>` sub-section per team member, each listing that person's stories for the sprint. See [`2026-W22.md`](planning/2026-W22.md) for the template.
+**Planning notes**: each Monday produces `docs/planning/YYYY-WW.md` (ISO week number). Header: `**Sprint**` (`OCS Sprint N` + date range) and `**Goal**` (matches the JIRA Sprint goal). Body: one `### <Person>` sub-section per team member, each listing that person's stories for the sprint.
 
 ---
 
