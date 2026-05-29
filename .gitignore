@@ -47,5 +47,3 @@ htmlcov/
 # whole team conforms to the same JIRA mappings.
 .specify/extensions/jira/jira-config.local.yml
 
-# Strategic / private docs — not for the public repo.
-docs/du-vision.md

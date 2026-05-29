@@ -26,7 +26,7 @@ Generalized from 003 FR-105. Any step in any App that calls a model to infer som
 
 Non-negotiable conventions that apply across all Apps. Stated here as the authoritative one-liners; the *why* and the worked examples live in [`docs/workflow.md`](../../docs/workflow.md) and the memory entries under [`.specify/memory/`](.).
 
-1. **`tasks.md` is a historical record.** New work appends new phases to the bottom; never restructure or rewrite completed phases.
+1. **`tasks.md` is a historical record for completed and in-progress work.** New work appends new phases to the bottom; never restructure or rewrite phases whose tasks are completed or in progress. Stories and tasks that were envisioned but **never started** MAY be discarded during a spec overhaul or split — only what was actually worked on is sacred.
 2. **No sprint / owner / status state in JIRA-synced artefacts.** PM state belongs in narrative docs (`docs/planning/`), not in `jira-mapping.json` or other synced files.
 3. **No model-specific names in code or data model.** Identifiers describe the *role* (`infer_post_location`, `reasoning`), not the model (`get_location_via_claude`, `claude_reasoning`).
 4. **Inference inputs are preserved** (Principle V above, stated procedurally here so it's enforceable in code review).
@@ -49,7 +49,6 @@ The authoritative catalogue. Each row states the document's **Purpose** and **Bo
 | `.specify/memory/constitution.md` | This file. Cross-App principles, Cardinal Rules, foundational tech, the documents catalogue itself. | Doesn't enumerate Apps, sprint plans, or workflow steps — those have dedicated homes below. |
 | `docs/roadmap.md` | Vision (the three Purposes), App definitions, current and planned spec list, boundary rules between Apps, explicit non-goals. | Doesn't dictate workflow or restate principles. Doesn't catalogue non-vision docs. |
 | `docs/workflow.md` | How we actually work: weekly cadence (Before / During / After), JIRA sync conventions, sprint planning, time logging, emergent process notes. | Doesn't define what we're building (that's roadmap + specs). Doesn't enumerate principles (those are constitutional). |
-| `docs/du-vision.md` | Private strategic Data Unification notes (gitignored). Personal to the author. | Carries no binding constraints on the project's specs or code. |
 | `CLAUDE.md` | Active-spec status + cross-App relationships, surfaced to Claude Code as on-load context every session. Updated as specs come and go. | Carries no policy. Reads as a directory pointer for Claude sessions, not as an authority. |
 | `README.md` | Public-facing entry point: what the project is, how to run each part locally, where to look next. | No architecture or policy. |
 | `docs/planning/YYYY-WNN.md` | Per-sprint plans (one per ISO week) — goals, attestation, retros. | Per-sprint, not project-level. Don't accumulate workflow rules here. |

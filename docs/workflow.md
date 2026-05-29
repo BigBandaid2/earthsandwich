@@ -60,18 +60,66 @@ If unsure where a change belongs, match the question it answers to the table abo
 
 ---
 
-## Per-feature cadence (full ceremony)
+## New Specs and Spec Overhauls
 
-Use for new product surfaces, breaking architectural changes, anything warranting stakeholder review. The weekly cadence (top of doc) is the default — reach for this ladder only when the work warrants it.
+Use this section when a spec changes shape in a way the weekly cadence can't absorb: an existing spec needs to be carved in two, an existing spec needs to be re-authored from the ground up, or a brand-new spec is needed. The weekly cadence (top of doc) is the default for incremental work; reach for the ladders below only when the change is structural.
 
-1. `/speckit.specify "<description>"` — creates `specs/00N-feature/spec.md` and a feature branch.
-2. `/speckit.clarify` — interactive ambiguity scan, up to 5 questions.
-3. `/speckit.plan` — produces `plan.md`.
-4. `/speckit.tasks` — generates `tasks.md`.
-5. `/speckit.implement` — Claude executes tasks, flipping `[ ]` → `[~]` → `[x]`.
-6. `/speckit.jira.specstoissues 00N-feature` — creates Epic + Stories + active-phase Subtasks in OCS.
-7. PR to default branch — review, merge, delete branch.
-8. `/speckit.jira.sync-status 00N-feature` — flip JIRA tickets to Done.
+The **Project-Level Doc Propagation** sub-section at the bottom is common to all three flows.
+
+### Splitting features out of an existing spec
+
+When a spec has grown beyond a single coherent concern and needs to become two. Worked example: `002-data-ingestion` → `002-database-backend` + `003-ingestion-pipeline` on 2026-05-22.
+
+1. **Decide the split.** Identify which user stories, FRs, edge cases, success criteria, and assumptions belong to each side. Sketch the list before touching files — it makes step 4 mechanical instead of judgmental.
+2. **Reserve the new spec's NNN.** Next available three-digit prefix; pick a slug.
+3. **Create the new spec dir.** `mkdir -p specs/<NNN>-<slug>/checklists`. Either:
+   - **Copy approach**: copy the original spec files into the new dir and trim each side, OR
+   - **Run `/speckit.specify`** for the new side if the carved-out scope is large enough to deserve a fresh prompt-driven authoring.
+4. **Trim the original spec.** For each item moving to the new spec, replace the moved content with a one-line pointer of the form `> [Description] moved to specs/<NNN>-<slug>/spec.md on <date>.` Do **not** delete — pointers preserve cross-reference legibility. Update any FR/US/SC numbers that referenced the moved content.
+5. **Handle `tasks.md` on both sides.** Preserve phases whose tasks are completed or in progress on the original (Cardinal Rule #1); start a fresh phase list on the new spec. **Phases of envisioned-but-not-started work MAY be discarded or rewritten** during the split — only what was actually worked on is sacred. **Phase numbers carry across the split** — if the original was at Phase 16, the next phase on either side is Phase 17, so reconciliation reports remain comparable.
+6. **Create a fresh `jira-mapping.json`** for the new spec. Existing JIRA tickets stay associated with whichever spec their work actually shipped under; new tickets follow the new mapping.
+7. **Run `/speckit.plan`** for the new spec if you didn't author via `/speckit.specify`. `/speckit.tasks` is optional at the split moment — historical phases in step 5 may already be the right starting point.
+8. **Propagate to project-level docs** (see [§Project-Level Doc Propagation](#project-level-doc-propagation)).
+
+### Overhauling an existing spec from scratch
+
+When a spec has drifted so far from the actual codebase that patching it would produce an incoherent document, re-author from scratch rather than continuing to amend. Worked example: `003-ingestion-pipeline` on 2026-05-27 — the split-time spec (2026-05-22) had assumed an APScheduler-in-backend layout, but reality had become a standalone CLI App with multi-target, anti-throttle, streaming, dual-path geocoding, and physical self-containment. Patches couldn't bridge that gap.
+
+1. **Draft a specify-prompt** at `specs/<NNN>-<slug>/specify-prompt-draft.md`. Structure: (a) original scope at the time of last authoring, (b) a numbered list of what's actually been built or decided since, (c) the vision section to be re-authored. Have Claude help draft from the existing spec + recent commits; you edit. The prompt is paste-and-discard input for `/speckit.specify` — you can delete the file after the run.
+2. **Stash files to preserve OUTSIDE `specs/`.** Move `tasks.md`, `jira-mapping.json`, and any other files you want to keep into a temp dir at the repo root (`_<NNN>-keep/`). This matters because `/speckit.specify`'s NNN scan would otherwise see the existing dir and allocate the *next* number, not reuse the slot.
+3. **Delete the old spec dir.** `rm -rf specs/<NNN>-<slug>/`. (Safety alternative: rename to a non-`NNN-` prefix so the NNN scan ignores it — easier to recover from if step 4 misbehaves.)
+4. **Run `/speckit.specify`** with the prompt content pasted in. With the dir gone, sequential numbering reallocates the slot.
+5. **Restore the stashed files** into the new spec dir. `mv _<NNN>-keep/* specs/<NNN>-<slug>/ && rmdir _<NNN>-keep`.
+6. **Iterate on the new spec** based on your reading. Re-authoring is the moment to capture decisions that had been latent — make them explicit in clarifications / key principles / new FRs while the context is fresh.
+7. **`/speckit.plan` / `/speckit.tasks` regeneration is OPTIONAL** at this stage. Phases whose tasks are completed or in progress are sacred (Cardinal Rule #1) and must be preserved at the top of `tasks.md` when you regenerate. Phases of envisioned-but-not-started work MAY be discarded — an overhaul is the cheapest moment to drop work that the new spec no longer wants. Merge by hand: completed-or-in-progress at the top, new phases append at the bottom.
+8. **Propagate to project-level docs** (see [§Project-Level Doc Propagation](#project-level-doc-propagation)).
+9. **Sync cross-referencing sibling specs.** Any sibling spec that points at the overhauled one likely has stale FR numbers, retired-FR references, or moved-FR attributions. `grep -rn "<spec-slug>" specs/` and clean up. Pay special attention to clarifications and assumption pointers that say "moved to <spec> on <date>."
+
+### Brand-new spec
+
+When adding a feature with no prior history.
+
+1. `/speckit.specify "<description>"` — creates `specs/<NNN>-<slug>/spec.md`. The `before_specify` hook handles the feature branch.
+2. `/speckit.clarify` — interactive ambiguity scan if needed.
+3. `/speckit.plan` → `/speckit.tasks` → `/speckit.implement`.
+4. `/speckit.jira.specstoissues <slug>` — creates Epic + Stories + active-phase Subtasks in OCS.
+5. PR to default branch — review, merge, delete branch.
+6. `/speckit.jira.sync-status <slug>` — flip JIRA tickets to Done.
+7. **Propagate to project-level docs** (see [§Project-Level Doc Propagation](#project-level-doc-propagation)).
+
+### Project-Level Doc Propagation
+
+After any of the three flows above, sweep the project-level docs that catalogue or cross-reference specs. The [constitution's Documents catalogue](../.specify/memory/constitution.md#project-level-planning-documents) is authoritative on what each doc owns; the table below is the operational "which doc to touch, when":
+
+| Doc | Update when |
+|---|---|
+| [`docs/roadmap.md`](roadmap.md) | **Always.** Add/remove/update the spec row in the Specs table, update the affected App's row in the Apps table, update boundary rules, add or edit the Spec Reference paragraph. |
+| [`CLAUDE.md`](../CLAUDE.md) | **Always.** Keep the active-specs catalogue (between `<!-- SPECKIT START -->` and `<!-- SPECKIT END -->`) current. |
+| [`README.md`](../README.md) | When the spec corresponds to a user-visible part of the project layout (front-end, backend, ingestion service, etc.). |
+| [`.specify/memory/constitution.md`](../.specify/memory/constitution.md) | **Rarely.** Only when a cross-cutting principle, Cardinal Rule, or App-level assumption changes. Spec-local decisions do NOT belong here. |
+| Sibling specs | When cross-references go stale (retired FRs, moved-out FRs, renamed concepts, changed attributions). |
+
+Per Cardinal Rule #5, prefer references over duplication: a sibling spec or project-level doc should point at the changed spec rather than restate its content. Linking is cheap; staying in sync after duplication is not.
 
 ---
 
