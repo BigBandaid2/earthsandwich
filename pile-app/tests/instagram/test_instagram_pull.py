@@ -51,10 +51,10 @@ EXPECTED_LNG_PREFIX = "-99."
 
 ACCEPTABLE_REGIONS = {"MEX", "NLU"}
 
-TSV_COLUMNS = [
-    "id", "instagram_id", "shortcode", "media_url", "caption",
-    "timestamp", "location", "lat", "lng", "region", "reasoning",
-]
+# Import the canonical column list from the producer so the truncate-and-
+# rewrite step stays in lockstep with the schema (Phase 20 widened it from
+# 11 → 16 columns; future spec amendments may widen further).
+from common.pile import TSV_COLUMNS
 
 
 def _read_rows() -> list[dict]:

@@ -388,7 +388,7 @@ class TestMediaUrlExtraction:
         process_media(m, target="acct", local_id=10, media_dir="/tmp", recent_locations=[])
 
         patched.download_media.assert_called_once_with(
-            "https://cdn.example/img.jpg", "acct", 10, "IMAGE", "/tmp"
+            "https://cdn.example/img.jpg", "acct", "ABCDEF", "IMAGE", "/tmp"
         )
 
     def test_video_uses_video_url(self, patched):
@@ -398,7 +398,7 @@ class TestMediaUrlExtraction:
         process_media(m, target="acct", local_id=10, media_dir="/tmp", recent_locations=[])
 
         patched.download_media.assert_called_once_with(
-            "https://cdn.example/vid.mp4", "acct", 10, "VIDEO", "/tmp"
+            "https://cdn.example/vid.mp4", "acct", "ABCDEF", "VIDEO", "/tmp"
         )
 
     def test_album_image_resource(self, patched):
@@ -412,7 +412,7 @@ class TestMediaUrlExtraction:
         process_media(m, target="acct", local_id=10, media_dir="/tmp", recent_locations=[])
 
         patched.download_media.assert_called_once_with(
-            "https://cdn.example/a.jpg", "acct", 10, "IMAGE", "/tmp"
+            "https://cdn.example/a.jpg", "acct", "ABCDEF", "IMAGE", "/tmp"
         )
 
     def test_album_video_resource(self, patched):
@@ -426,7 +426,7 @@ class TestMediaUrlExtraction:
         process_media(m, target="acct", local_id=10, media_dir="/tmp", recent_locations=[])
 
         patched.download_media.assert_called_once_with(
-            "https://cdn.example/a.mp4", "acct", 10, "VIDEO", "/tmp"
+            "https://cdn.example/a.mp4", "acct", "ABCDEF", "VIDEO", "/tmp"
         )
 
     def test_album_with_no_resources_falls_back_to_image(self, patched):
@@ -437,7 +437,7 @@ class TestMediaUrlExtraction:
         process_media(m, target="acct", local_id=10, media_dir="/tmp", recent_locations=[])
 
         patched.download_media.assert_called_once_with(
-            "https://cdn.example/fallback.jpg", "acct", 10, "IMAGE", "/tmp"
+            "https://cdn.example/fallback.jpg", "acct", "ABCDEF", "IMAGE", "/tmp"
         )
 
     def test_empty_media_url_skips_download(self, patched):
@@ -550,3 +550,87 @@ class TestFieldExtraction:
         row = process_media(m, target="acct", local_id=10, media_dir="/tmp", recent_locations=[])
 
         assert row["shortcode"] == ""
+
+
+# ---------------------------------------------------------------------------
+# TestVerbatimAndTombstoneColumns — FR-105 / Cardinal Rule #4 + FR-106 defaults
+# ---------------------------------------------------------------------------
+
+class TestVerbatimAndTombstoneColumns:
+    """The Instagram TSV's verbatim-input columns (tag_verbatim, lat_verbatim,
+    lng_verbatim) preserve the canonicalization call's inputs (FR-105 /
+    Cardinal Rule #4). The tombstone columns (deleted_upstream,
+    deleted_upstream_at) default to empty at row-creation time; FR-106
+    detection runs as a separate post-pass against the existing pile.
+    """
+
+    def test_tagged_path_populates_verbatim_triple(self, patched):
+        """When Media.location is populated, the row captures the raw
+        instagrapi name/lat/lng verbatim — regardless of what canonicalization
+        returns. The principle: the inference call's inputs must be
+        recoverable from the row alone."""
+        patched.canonicalize_tagged_location.return_value = (
+            "Mexico City, Mexico", "19.432", "-99.131", "MEX", "",
+        )
+        m = make_media(location=make_location("Mexico City", 19.432, -99.131))
+
+        row = process_media(m, target="acct", local_id=999, media_dir="/tmp", recent_locations=[])
+
+        assert row["tag_verbatim"] == "Mexico City"
+        assert row["lat_verbatim"] == "19.432"
+        assert row["lng_verbatim"] == "-99.131"
+
+    def test_tagged_path_verbatim_preserved_when_canonical_overrides(self, patched):
+        """The Sucre→Bolivia case: canonical coords differ from the verbatim
+        ones. The verbatim columns MUST still carry the original instagrapi
+        values, not the canonical override — that's the whole point of FR-105."""
+        patched.canonicalize_tagged_location.return_value = (
+            "Sucre, Chuquisaca, Bolivia", "-19.04", "-65.26", "SRE", "",
+        )
+        m = make_media(location=make_location("Sucre, Bolivia", 28.99, 118.85))
+
+        row = process_media(m, target="acct", local_id=999, media_dir="/tmp", recent_locations=[])
+
+        # Canonical wins in the resolved columns
+        assert row["lat"] == "-19.04"
+        assert row["lng"] == "-65.26"
+        # Verbatim is the original instagrapi triple
+        assert row["tag_verbatim"] == "Sucre, Bolivia"
+        assert row["lat_verbatim"] == "28.99"
+        assert row["lng_verbatim"] == "118.85"
+
+    def test_tagged_path_with_zero_zero_coords_records_empty_lat_lng_verbatim(self, patched):
+        """instagrapi sometimes returns Location with (0,0) coords. The
+        verbatim columns for lat/lng should be empty (matching how the
+        tagged tuple is populated), since (0,0) is semantically 'no coords'."""
+        patched.canonicalize_tagged_location.return_value = ("Some Place, Country", "", "", "", "")
+        m = make_media(location=make_location("Some Place", 0.0, 0.0))
+
+        row = process_media(m, target="acct", local_id=999, media_dir="/tmp", recent_locations=[])
+
+        assert row["tag_verbatim"] == "Some Place"
+        assert row["lat_verbatim"] == ""
+        assert row["lng_verbatim"] == ""
+
+    def test_inferred_path_leaves_verbatim_triple_empty(self, patched):
+        """No tag → verbatim columns are all empty (there was nothing to
+        verbatim-capture). The inferred path's input preservation comes
+        from `caption` + `media_url`, not from the verbatim columns."""
+        patched.infer_post_location.return_value = ("Paris", "48.85", "2.35", "CDG", "")
+        m = make_media(location=None)
+
+        row = process_media(m, target="acct", local_id=999, media_dir="/tmp", recent_locations=[])
+
+        assert row["tag_verbatim"] == ""
+        assert row["lat_verbatim"] == ""
+        assert row["lng_verbatim"] == ""
+
+    def test_tombstone_columns_default_to_empty(self, patched):
+        """A fresh row never starts tombstoned. FR-106 detection runs
+        downstream of process_media."""
+        m = make_media(location=make_location("Somewhere"))
+
+        row = process_media(m, target="acct", local_id=1, media_dir="/tmp", recent_locations=[])
+
+        assert row["deleted_upstream"] == ""
+        assert row["deleted_upstream_at"] == ""

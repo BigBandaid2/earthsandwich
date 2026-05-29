@@ -1,4 +1,4 @@
-"""Unit tests for `resort_tsv_and_rename_media` (the post-streaming step
+"""Unit tests for `resort_tsv_and_sweep_media` (the post-streaming step
 that restores canonical row order and cleans up orphan media files), plus
 `prune_scrape_logs` and `extract_city_heuristic`.
 
@@ -6,8 +6,8 @@ Covers:
   - Orphan sweep: target-prefixed files not referenced by any TSV row get
     deleted; other-target files and referenced files are preserved.
   - Sort + re-id: rows are written back in timestamp-ASC order with
-    sequential ids.
-  - Two-pass rename: id swaps survive without colliding.
+    sequential ids. Media filenames stay put (T225 — they're now keyed
+    on shortcode, not id, so id changes never trigger a rename).
   - Log pruning retention policy.
   - City-heuristic edge cases for the no-inference fallback.
 """
@@ -20,7 +20,7 @@ from pathlib import Path
 import pytest
 
 import common.pile
-from common.pile import TSV_COLUMNS, resort_tsv_and_rename_media
+from common.pile import TSV_COLUMNS, resort_tsv_and_sweep_media
 from common.run_logging import prune_scrape_logs
 from instagram.inferred_location import extract_city_heuristic
 
@@ -83,7 +83,7 @@ class TestOrphanSweep:
         rows = [_row(1, "2026-01-01T00:00:00+0000", _media_url(media_dir, target, 1, "jpg"))]
         _write_tsv(tsv_path, rows)
 
-        resort_tsv_and_rename_media(str(tsv_path), target, str(media_dir))
+        resort_tsv_and_sweep_media(str(tsv_path), target, str(media_dir))
 
         assert (media_dir / f"{target}_1.jpg").exists()
         assert not (media_dir / f"{target}_1.mp4").exists()
@@ -98,7 +98,7 @@ class TestOrphanSweep:
         rows = [_row(1, "2026-01-01T00:00:00+0000", _media_url(media_dir, target, 1, "jpg"))]
         _write_tsv(tsv_path, rows)
 
-        resort_tsv_and_rename_media(str(tsv_path), target, str(media_dir))
+        resort_tsv_and_sweep_media(str(tsv_path), target, str(media_dir))
 
         assert (media_dir / "otheraccount_1.jpg").exists()
 
@@ -113,7 +113,7 @@ class TestOrphanSweep:
         rows = [_row(1, "2026-01-01T00:00:00+0000", _media_url(media_dir, target, 1, "jpg"))]
         _write_tsv(tsv_path, rows)
 
-        resort_tsv_and_rename_media(str(tsv_path), target, str(media_dir))
+        resort_tsv_and_sweep_media(str(tsv_path), target, str(media_dir))
 
         assert (media_dir / f"{target}_1.jpg").exists()
         assert not (media_dir / f"{target}_99.jpg.rename-tmp").exists()
@@ -126,7 +126,7 @@ class TestOrphanSweep:
         _write_tsv(tsv_path, rows)
 
         bogus = str(tmp_path / "nonexistent")
-        resort_tsv_and_rename_media(str(tsv_path), target, bogus)
+        resort_tsv_and_sweep_media(str(tsv_path), target, bogus)
 
     def test_relative_media_dir_path_does_not_misclassify_referenced_files(
         self, sandbox, monkeypatch
@@ -151,7 +151,7 @@ class TestOrphanSweep:
         monkeypatch.chdir(str(media_dir.parent.parent.parent))
         rel_media_dir = os.path.relpath(str(media_dir))
 
-        resort_tsv_and_rename_media(str(tsv_path), target, rel_media_dir)
+        resort_tsv_and_sweep_media(str(tsv_path), target, rel_media_dir)
 
         assert keep.exists(), "referenced file was wrongly swept under relative media_dir"
         assert not orphan.exists(), "orphan was not swept under relative media_dir"
@@ -172,7 +172,7 @@ class TestSortAndReid:
         ]
         _write_tsv(tsv_path, rows)
 
-        resort_tsv_and_rename_media(str(tsv_path), target, str(media_dir))
+        resort_tsv_and_sweep_media(str(tsv_path), target, str(media_dir))
 
         result = _read_tsv(tsv_path)
         assert [r["timestamp"] for r in result] == [
@@ -182,47 +182,66 @@ class TestSortAndReid:
         ]
         assert [r["id"] for r in result] == ["1", "2", "3"]
 
-    def test_rename_handles_full_id_swap(self, sandbox):
-        """All ids change in a full reversal — every media file must be
-        renamed without colliding. Two-pass `.rename-tmp` makes this safe."""
+    def test_id_swap_does_not_rename_media_files(self, sandbox):
+        """Post-T225 the on-disk media filename is keyed on `shortcode` (not
+        `<id>`), so the canonical sort+reid pass MUST NOT rename any media
+        file even when every row's id changes. Files stay where the original
+        download_media call placed them; only the in-TSV `id` column moves."""
         tsv_path, media_dir, target = sandbox
-        (media_dir / f"{target}_1.jpg").write_bytes(b"newest-content")
-        (media_dir / f"{target}_2.jpg").write_bytes(b"middle-content")
-        (media_dir / f"{target}_3.jpg").write_bytes(b"oldest-content")
+        # Files named with shortcode (e.g., SC1, SC2, SC3 from _row's default).
+        (media_dir / f"{target}_SC1.jpg").write_bytes(b"newest-content")
+        (media_dir / f"{target}_SC2.jpg").write_bytes(b"middle-content")
+        (media_dir / f"{target}_SC3.jpg").write_bytes(b"oldest-content")
 
         rows = [
-            _row(1, "2026-03-15T00:00:00+0000", _media_url(media_dir, target, 1)),
-            _row(2, "2026-02-15T00:00:00+0000", _media_url(media_dir, target, 2)),
-            _row(3, "2026-01-15T00:00:00+0000", _media_url(media_dir, target, 3)),
+            _row(1, "2026-03-15T00:00:00+0000", _media_url(media_dir, target, "SC1")),
+            _row(2, "2026-02-15T00:00:00+0000", _media_url(media_dir, target, "SC2")),
+            _row(3, "2026-01-15T00:00:00+0000", _media_url(media_dir, target, "SC3")),
         ]
         _write_tsv(tsv_path, rows)
 
-        resort_tsv_and_rename_media(str(tsv_path), target, str(media_dir))
+        resort_tsv_and_sweep_media(str(tsv_path), target, str(media_dir))
 
-        assert (media_dir / f"{target}_1.jpg").read_bytes() == b"oldest-content"
-        assert (media_dir / f"{target}_2.jpg").read_bytes() == b"middle-content"
-        assert (media_dir / f"{target}_3.jpg").read_bytes() == b"newest-content"
+        # Files stay PUT — content unchanged at the original filenames.
+        assert (media_dir / f"{target}_SC1.jpg").read_bytes() == b"newest-content"
+        assert (media_dir / f"{target}_SC2.jpg").read_bytes() == b"middle-content"
+        assert (media_dir / f"{target}_SC3.jpg").read_bytes() == b"oldest-content"
 
+        # No `.rename-tmp` leftovers (the rename pass is gone entirely).
         leftovers = [f.name for f in media_dir.iterdir() if ".rename-tmp" in f.name]
         assert leftovers == []
 
+        # In-TSV ids re-numbered to match the timestamp-ASC order.
+        result = _read_tsv(tsv_path)
+        assert [r["timestamp"] for r in result] == [
+            "2026-01-15T00:00:00+0000",
+            "2026-02-15T00:00:00+0000",
+            "2026-03-15T00:00:00+0000",
+        ]
+        assert [r["id"] for r in result] == ["1", "2", "3"]
+        # And the shortcode→media_url linkage in each row is preserved
+        # exactly (no row's media_url got rewritten).
+        assert result[0]["media_url"].endswith("_SC3.jpg")
+        assert result[2]["media_url"].endswith("_SC1.jpg")
+
     def test_missing_media_file_does_not_crash(self, sandbox):
         """If a row's media_url points to a file that doesn't exist (download
-        failed earlier), the id is still updated but no rename happens."""
+        failed earlier), the resort+sweep pass still completes cleanly."""
         tsv_path, media_dir, target = sandbox
-        (media_dir / f"{target}_2.jpg").write_bytes(b"only this exists")
+        (media_dir / f"{target}_SC2.jpg").write_bytes(b"only this exists")
 
         rows = [
-            _row(1, "2026-02-15T00:00:00+0000", _media_url(media_dir, target, 1)),
-            _row(2, "2026-01-15T00:00:00+0000", _media_url(media_dir, target, 2)),
+            _row(1, "2026-02-15T00:00:00+0000", _media_url(media_dir, target, "SC1")),
+            _row(2, "2026-01-15T00:00:00+0000", _media_url(media_dir, target, "SC2")),
         ]
         _write_tsv(tsv_path, rows)
 
-        resort_tsv_and_rename_media(str(tsv_path), target, str(media_dir))
+        resort_tsv_and_sweep_media(str(tsv_path), target, str(media_dir))
 
         result = _read_tsv(tsv_path)
         assert [r["id"] for r in result] == ["1", "2"]
-        assert (media_dir / f"{target}_1.jpg").read_bytes() == b"only this exists"
+        # The on-disk file that did exist is still there, untouched.
+        assert (media_dir / f"{target}_SC2.jpg").read_bytes() == b"only this exists"
 
 
 class TestPruneScrapeLogs:

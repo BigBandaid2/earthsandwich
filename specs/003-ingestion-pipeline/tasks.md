@@ -76,14 +76,14 @@
 
 **Independent Test**: Quickstart §"Run a real first-scrape" — configure crawler creds + a small public target, run `python -m pile_app run instagram <target>`, verify TSV has the new column shape and media files use `<target>_<shortcode>.ext` naming. Re-run; verify zero new rows.
 
-- [ ] T221 [P] [US1] Add `tag_verbatim` column to the Instagram TSV writer in `pile-app/common/pile.py` (column 4 per data-model.md)
-- [ ] T222 [P] [US1] Add `lat_verbatim` + `lng_verbatim` columns to the Instagram TSV writer in `pile-app/common/pile.py` (columns 5–6)
-- [ ] T223 [US1] Wire `tag_verbatim` + `lat_verbatim` + `lng_verbatim` population into `pile-app/instagram/tagged_location.py` so the verbatim instagrapi `Media.location.{name,lat,lng}` triple is written BEFORE the canonicalization LLM call dispatches
-- [ ] T224 [US1] Migrate dedup key from numeric `instagram_id` to `shortcode` in `pile-app/common/pile.py` (re-read existing TSV rows, key the in-memory dedup set on column 3 not column 2)
-- [ ] T225 [US1] Rename media file scheme from `<target>_<id>.<ext>` to `<target>_<shortcode>.<ext>` in `pile-app/instagram/pipeline.py` (download step) and `pile-app/common/pile.py` (sort+reid post-pass: stop renaming media files, since the on-disk name is now stable per `shortcode`)
-- [ ] T226 [US1] Add `deleted_upstream` + `deleted_upstream_at` columns (15–16) to the Instagram TSV writer; default empty on row creation
-- [ ] T227 [US1] Implement incidental deletion detection (FR-106) in `pile-app/instagram/deletion_detection.py`: on each fetched page, compare its timestamp range against existing pile rows; mark `deleted_upstream=true` + `_at=<now>` for any row whose `shortcode` is absent from the fetched page despite its timestamp falling in the page's range
-- [ ] T228 [US1] One-time backfill: re-process `pile-app/pile/posts.ourearthsandwich.local.tsv` + `pile-app/pile/posts.welawen.local.tsv` to populate the new verbatim columns and rename media files to use `<shortcode>` (re-run with `--backfill` flag or write a one-shot migration script at `pile-app/instagram/migrate_2026_05_29.py` that's deleted after use)
+- [X] T221 [P] [US1] Added `tag_verbatim` column to `TSV_COLUMNS` in `pile-app/common/pile.py` (column 4 per data-model.md)
+- [X] T222 [P] [US1] Added `lat_verbatim` + `lng_verbatim` columns (columns 5–6)
+- [X] T223 [US1] Wired verbatim triple population in `pile-app/instagram/pipeline.py:process_media` — captured from the `tagged` tuple BEFORE the canonicalization call dispatches, so even if the call later fails the inputs are preserved (canonicalize_tagged_location already catches its own exceptions, so this is belt-and-suspenders per Cardinal Rule #4)
+- [X] T224 [US1] Added `known_shortcodes` set in `run_for_target` built from existing TSV rows; per-post loop skips any returned media whose shortcode is already in the pile before any LLM/download spend. Timestamp filter still drives pagination-stop; this is a defensive second layer
+- [X] T225 [US1] `download_media` signature changed: `local_id` → `shortcode`; filename is now `<target>_<shortcode>.<ext>`. `resort_tsv_and_rename_media` renamed to `resort_tsv_and_sweep_media` — sort + re-id is preserved; the two-pass media-rename block is gone since the on-disk name is now stable. Orphan sweep continues to work via `<target>_` prefix matching
+- [X] T226 [US1] Added `deleted_upstream` + `deleted_upstream_at` columns (15–16); default to empty in `process_media`'s row dict
+- [X] T227 [US1] Implemented in `pile-app/instagram/deletion_detection.py:find_tombstones_in_page`. Wired via an `on_page_fetched` callback in `iter_new_media`; `run_for_target` accumulates the tombstoned shortcodes and `common/pile.py:apply_tombstones` writes them after the scrape completes. Set-once-monotonic — re-detections never overwrite the original `_at`
+- [X] T228 [US1] Wrote one-shot `pile-app/instagram/migrate_2026_05_29.py`, ran it against both pile TSVs (323 + 693 = 1016 rows + 1016 media files renamed to `<target>_<shortcode>.<ext>`), then deleted the script. Verbatim columns left empty on legacy rows (the canonicalization that produced them didn't preserve its inputs). Re-running the integration test against the migrated TSV passes and row 323's verbatim columns now populate correctly on a fresh scrape
 
 **Checkpoint**: US1 complete — the Instagram service produces TSVs matching the data-model.md schema; existing pile data is conformant; dedup is shortcode-keyed; tombstoning works.
 

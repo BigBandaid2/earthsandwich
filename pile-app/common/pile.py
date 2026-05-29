@@ -16,6 +16,7 @@ from __future__ import annotations
 import csv
 import os
 import posixpath
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -33,6 +34,9 @@ TSV_COLUMNS = [
     "id",
     "instagram_id",
     "shortcode",
+    "tag_verbatim",          # FR-105 / Cardinal Rule #4 — tagged-path input (raw instagrapi Media.location.name)
+    "lat_verbatim",          # FR-105 — raw instagrapi Media.location.lat (matches `lat` today; column is forward-compatible if canonicalization later snaps lat/lng)
+    "lng_verbatim",          # FR-105 — raw instagrapi Media.location.lng
     "media_url",
     "caption",
     "timestamp",
@@ -41,6 +45,8 @@ TSV_COLUMNS = [
     "lng",
     "region",
     "reasoning",
+    "deleted_upstream",      # FR-106 — set-once tombstone; "true" or empty
+    "deleted_upstream_at",   # FR-106 — ISO 8601 UTC of first detection; never overwritten
 ]
 
 
@@ -53,17 +59,18 @@ def read_tsv_rows(tsv_path: str) -> list[dict]:
         return list(reader)
 
 
-def download_media(media_url: str, target: str, local_id: int, media_type: str, media_dir: str) -> str:
-    """Download media from the Instagram CDN and save to media_dir/<target>_<local_id>.jpg or .mp4.
+def download_media(media_url: str, target: str, shortcode: str, media_type: str, media_dir: str) -> str:
+    """Download media from the Instagram CDN and save to media_dir/<target>_<shortcode>.jpg or .mp4.
 
-    The target prefix keeps filenames unique across accounts when multiple
-    target TSVs share one media directory (each TSV has its own id sequence
-    starting at 1, so the raw id alone would collide).
+    The shortcode is the canonical Instagram post identifier (FR-022), so the
+    on-disk filename is stable across reruns and the sort+reid post-pass no
+    longer has to rename media files. The target prefix keeps filenames
+    unique across accounts when multiple target TSVs share one media dir.
 
     Returns the local relative path.
     """
     ext = "mp4" if media_type == "VIDEO" else "jpg"
-    local_path = os.path.join(media_dir, f"{target}_{local_id}.{ext}")
+    local_path = os.path.join(media_dir, f"{target}_{shortcode}.{ext}")
 
     resp = requests.get(media_url, timeout=60, stream=True)
     resp.raise_for_status()
@@ -90,8 +97,9 @@ def normalize_media_url_for_tsv(local_media_path: str) -> str:
     return local_media_path.replace(os.sep, posixpath.sep)
 
 
-def resort_tsv_and_rename_media(path: str, target: str, media_dir: str) -> None:
-    """Restore canonical oldest-first row order after a streaming scrape.
+def resort_tsv_and_sweep_media(path: str, target: str, media_dir: str) -> None:
+    """Restore canonical oldest-first row order after a streaming scrape, then
+    sweep orphan media files.
 
     Streaming writes rows in pagination order (newest-page first, oldest-of-
     page first within each page). After the scrape, we want the file to match
@@ -99,19 +107,14 @@ def resort_tsv_and_rename_media(path: str, target: str, media_dir: str) -> None:
 
     Steps:
       1. Read all rows, sort by timestamp ASC.
-      2. Reassign ids 1..N.
-      3. Rename media files whose id changed so `media_url` stays consistent
-         with the on-disk filename. Uses a two-pass `.tmp` suffix rename so
-         id swaps (e.g., file A→2 while file B→A's old id) don't collide.
-      4. Write the sorted, re-id'd rows back to the TSV.
-      5. Sweep orphan media files in `media_dir` matching `<target>_*` that
+      2. Reassign local `id` values 1..N. Media filenames are now keyed on
+         `shortcode` (FR-022 + T225), so no media-file rename is needed —
+         only the in-TSV `id` column changes.
+      3. Write the sorted, re-id'd rows back to the TSV.
+      4. Sweep orphan media files in `media_dir` matching `<target>_*` that
          aren't referenced by any TSV row — e.g., a `.mp4` left over from a
-         prior scrape where that id was a video but this scrape made it an
-         image. Cross-target safe: only files matching THIS target's prefix
-         are touched.
-
-    Safe on partial files: if a row's media file is missing (download failed
-    earlier), the rename is skipped for that row but the id is still updated.
+         prior scrape where that shortcode is now a different media type.
+         Cross-target safe: only files matching THIS target's prefix are touched.
     """
     with open(path, encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f, delimiter="\t")
@@ -122,42 +125,8 @@ def resort_tsv_and_rename_media(path: str, target: str, media_dir: str) -> None:
 
     rows.sort(key=lambda r: r.get("timestamp", ""))
 
-    rename_plan: list[tuple[str, str]] = []  # (old_abs, new_abs)
-    app_root_str = str(APP_ROOT)
     for new_id, row in enumerate(rows, start=1):
-        try:
-            old_id = int(row.get("id", 0))
-        except (TypeError, ValueError):
-            old_id = 0
-
-        old_media = row.get("media_url", "")
-        if old_media and old_id != new_id:
-            old_abs = os.path.join(app_root_str, *old_media.split(posixpath.sep))
-            if os.path.exists(old_abs):
-                ext = os.path.splitext(old_abs)[1].lstrip(".")
-                old_dir_rel = posixpath.dirname(old_media)
-                new_media_rel = posixpath.join(old_dir_rel, f"{target}_{new_id}.{ext}")
-                new_abs = os.path.join(app_root_str, *new_media_rel.split(posixpath.sep))
-                rename_plan.append((old_abs, new_abs))
-                row["media_url"] = new_media_rel
         row["id"] = str(new_id)
-
-    # Two-pass rename: stage every source to a `.rename-tmp` suffix first so
-    # swaps (file at id=2 → 5 while file at id=5 → 2) don't clobber. Then
-    # move each `.rename-tmp` to its final name.
-    for old, _ in rename_plan:
-        try:
-            os.rename(old, old + ".rename-tmp")
-        except OSError as exc:
-            print(f"  ! failed to stage rename of {old}: {exc}")
-    for old, new in rename_plan:
-        staged = old + ".rename-tmp"
-        if os.path.exists(staged):
-            os.makedirs(os.path.dirname(new), exist_ok=True)
-            try:
-                os.replace(staged, new)
-            except OSError as exc:
-                print(f"  ! failed to finalize rename {staged} → {new}: {exc}")
 
     with open(path, "w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=cols, delimiter="\t")
@@ -170,6 +139,8 @@ def resort_tsv_and_rename_media(path: str, target: str, media_dir: str) -> None:
     # so a relative media_dir or a relative media_url doesn't cause a phantom
     # mismatch (the bug that previously wiped 323 real files because the
     # `referenced` set had absolute paths and the scan produced relative ones).
+    app_root_str = str(APP_ROOT)
+
     def _abs_norm(p: str) -> str:
         return os.path.normcase(os.path.normpath(os.path.abspath(p)))
 
@@ -199,3 +170,34 @@ def resort_tsv_and_rename_media(path: str, target: str, media_dir: str) -> None:
             sample = ", ".join(swept[:5])
             more = f" (+{len(swept) - 5} more)" if len(swept) > 5 else ""
             print(f"  swept {len(swept)} orphan media file(s): {sample}{more}")
+
+
+def apply_tombstones(path: str, tombstone_shortcodes: set[str]) -> int:
+    """Mark the given shortcodes' rows with `deleted_upstream=true` and
+    `deleted_upstream_at=<now>` (FR-106). Set-once-monotonic: rows already
+    tombstoned are skipped (their original detection timestamp is preserved).
+    Returns the count of rows actually updated.
+    """
+    if not tombstone_shortcodes:
+        return 0
+    with open(path, encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f, delimiter="\t")
+        cols = reader.fieldnames
+        rows = list(reader)
+    if not rows:
+        return 0
+    now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S%z")
+    updated = 0
+    for row in rows:
+        sc = row.get("shortcode", "")
+        if sc and sc in tombstone_shortcodes and not row.get("deleted_upstream"):
+            row["deleted_upstream"] = "true"
+            row["deleted_upstream_at"] = now_iso
+            updated += 1
+    if updated == 0:
+        return 0
+    with open(path, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=cols, delimiter="\t")
+        writer.writeheader()
+        writer.writerows(rows)
+    return updated

@@ -30,12 +30,14 @@ from common.anti_throttle import is_challenge_error, jittered_sleep
 from common.pile import (
     RECENT_LOCATION_COUNT,
     TSV_COLUMNS,
+    apply_tombstones,
     download_media,
     normalize_media_url_for_tsv,
     read_tsv_rows,
-    resort_tsv_and_rename_media,
+    resort_tsv_and_sweep_media,
 )
 from common.run_logging import prune_scrape_logs
+from instagram.deletion_detection import find_tombstones_in_page
 from instagram.inferred_location import extract_city_heuristic, infer_post_location
 from instagram.instagrapi_client import resolve_target_user_id
 from instagram.tagged_location import canonicalize_tagged_location
@@ -137,6 +139,7 @@ def iter_new_media(
     page_delay: tuple[float, float] = (0.0, 0.0),
     long_rest_every: int = 0,
     long_rest: tuple[float, float] = (0.0, 0.0),
+    on_page_fetched=None,
 ) -> "Iterator":
     """Generator yielding one Media object at a time from the target's feed.
 
@@ -174,6 +177,11 @@ def iter_new_media(
         print(f"  [page {page_num}] {len(medias)} posts (cursor={'…' if end_cursor else 'end'})")
         if not medias:
             return
+        if on_page_fetched is not None:
+            try:
+                on_page_fetched(medias)
+            except Exception as exc:
+                print(f"  ! on_page_fetched callback raised ({exc}); continuing")
         page_new: list = []
         hit_since = False
         for m in medias:
@@ -254,10 +262,10 @@ def process_media(
         remote_media_url = str(m.thumbnail_url) if getattr(m, "thumbnail_url", None) else ""
 
     local_media_path = ""
-    if remote_media_url:
+    if remote_media_url and shortcode:
         try:
             local_media_path = download_media(
-                remote_media_url, target, local_id, media_type, media_dir
+                remote_media_url, target, shortcode, media_type, media_dir
             )
             print(f"  ↓ saved {local_media_path}")
         except (requests.RequestException, OSError) as exc:
@@ -265,6 +273,7 @@ def process_media(
 
     location, lat, lng, region = "", "", "", ""
     reasoning = ""
+    tag_verbatim, lat_verbatim, lng_verbatim = "", "", ""
     tagged: Optional[tuple[str, str, str]] = None
     loc = getattr(m, "location", None)
     if loc and getattr(loc, "name", None):
@@ -279,6 +288,11 @@ def process_media(
 
     if tagged:
         verbatim_name, verbatim_lat, verbatim_lng = tagged
+        # Capture verbatim columns (FR-105 / Cardinal Rule #4) BEFORE the
+        # canonicalization LLM call so they're preserved even if the call
+        # fails. canonicalize_tagged_location internally catches its own
+        # exceptions, so this is belt-and-suspenders.
+        tag_verbatim, lat_verbatim, lng_verbatim = verbatim_name, verbatim_lat, verbatim_lng
         canonical_name, canonical_lat, canonical_lng, region, reasoning = canonicalize_tagged_location(
             verbatim_name, verbatim_lat, verbatim_lng
         )
@@ -325,6 +339,9 @@ def process_media(
         "id": local_id,
         "instagram_id": instagram_id,
         "shortcode": shortcode,
+        "tag_verbatim": tag_verbatim,
+        "lat_verbatim": lat_verbatim,
+        "lng_verbatim": lng_verbatim,
         "media_url": local_media_path,
         "caption": caption,
         "timestamp": timestamp,
@@ -333,6 +350,8 @@ def process_media(
         "lng": lng,
         "region": region,
         "reasoning": reasoning,
+        "deleted_upstream": "",
+        "deleted_upstream_at": "",
     }
 
 
@@ -367,6 +386,18 @@ def run_for_target(
     existing_rows = read_tsv_rows(output_path)
     timestamped = [r for r in existing_rows if r.get("timestamp")]
 
+    # FR-022: shortcode is the canonical dedup key. Build a set from the
+    # existing pile so the per-post loop can skip anything that's already
+    # present without spending an LLM call on it. Tombstoned rows still
+    # count as "known" — we don't want to re-create them.
+    known_shortcodes: set[str] = {
+        r.get("shortcode", "") for r in existing_rows if r.get("shortcode")
+    }
+    existing_rows_by_shortcode: dict[str, dict] = {
+        r["shortcode"]: r for r in existing_rows if r.get("shortcode")
+    }
+    pending_tombstones: set[str] = set()
+
     if timestamped:
         last_timestamp_str = max(r["timestamp"] for r in timestamped)
         since_ts = parse_unix_timestamp(last_timestamp_str)
@@ -378,6 +409,14 @@ def run_for_target(
         last_timestamp_str = "(fresh scrape — no prior rows)"
         since_ts = 0
         next_id = 1
+
+    def _on_page_fetched(page_medias: list) -> None:
+        # FR-106: incidental deletion detection. The page implicitly defines
+        # a timestamp range; any in-range existing row whose shortcode is
+        # absent from the page is tombstoned (set-once-monotonic).
+        toms = find_tombstones_in_page(page_medias, existing_rows_by_shortcode)
+        if toms:
+            pending_tombstones.update(toms)
 
     expected_new = max(0, media_count - len(existing_rows)) if media_count else 0
     if expected_new > 0:
@@ -417,12 +456,25 @@ def run_for_target(
                 page_delay=rate_config["page_delay"],
                 long_rest_every=rate_config["long_rest_every"],
                 long_rest=rate_config["long_rest"],
+                on_page_fetched=_on_page_fetched,
             ):
+                # FR-022: shortcode-keyed dedup. Belt-and-suspenders against
+                # the timestamp filter — if the same shortcode somehow comes
+                # back (e.g., timestamp ties at the cursor boundary), skip
+                # it before any LLM/download spend.
+                m_code = getattr(m, "code", "") or ""
+                if m_code and m_code in known_shortcodes:
+                    print(f"  · skipping {m_code} — already in pile")
+                    continue
+
                 local_id = next_id
                 row = process_media(m, target, local_id, media_dir, recent_locations, previous_row)
 
                 writer.writerow(row)
                 out_file.flush()
+
+                if m_code:
+                    known_shortcodes.add(m_code)
 
                 if row["location"]:
                     recent_locations.insert(0, row["location"])
@@ -438,10 +490,16 @@ def run_for_target(
         print(f"\nERROR during streaming for @{target}: {exc}")
         print(f"  ! {total_written} row(s) persisted before failure; partial TSV will still be re-sorted.")
 
+    if pending_tombstones:
+        tombstoned = apply_tombstones(output_path, pending_tombstones)
+        print(f"  FR-106: tombstoned {tombstoned} row(s) absent from fetched pages: "
+              f"{sorted(pending_tombstones)[:5]}"
+              + (f" (+{len(pending_tombstones) - 5} more)" if len(pending_tombstones) > 5 else ""))
+
     if total_written == 0:
         print(f"No new posts found for @{target}.")
         return
 
     print(f"\nStreaming done — re-sorting {output_path} by timestamp ASC + renumbering ids.")
-    resort_tsv_and_rename_media(output_path, target, media_dir)
+    resort_tsv_and_sweep_media(output_path, target, media_dir)
     print(f"Done. {total_written} new post(s) written to {output_path}.")
