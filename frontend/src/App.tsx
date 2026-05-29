@@ -4,6 +4,7 @@ import { groupStopsByRegion } from './utils/regionUtils';
 import type { Trip } from './data/types';
 import { useTrips } from './hooks/useTrips';
 import { useTrip } from './hooks/useTrip';
+import { ErrorBoundary } from 'react-error-boundary';
 import WorldMap from './components/MapView';
 import TripFeed from './components/Sidebar';
 import RegionSidebar from './components/RegionSidebar';
@@ -44,24 +45,16 @@ function App() {
     }
   }, [trips, activeTripId]);
 
-  const { trip: tripDetail } = useTrip(activeTripId);
-
-  // Trip summary from the list (stops: []); replaced by tripDetail once it loads.
-  const activeTrip = useMemo(
-    () => trips.find((t) => t.id === activeTripId) ?? trips[0] ?? null,
-    [trips, activeTripId]
-  );
-
-  const effectiveActiveTrip: Trip | null = tripDetail ?? activeTrip;
+  const { trip: activeTrip } = useTrip(activeTripId);
 
   const regionGroups = useMemo(
-    () => (effectiveActiveTrip ? groupStopsByRegion(effectiveActiveTrip) : []),
-    [effectiveActiveTrip]
+    () => (activeTrip ? groupStopsByRegion(activeTrip) : []),
+    [activeTrip]
   );
 
   const openStop = useMemo(
-    () => effectiveActiveTrip?.stops.find((s) => s.id === openStopId) ?? null,
-    [effectiveActiveTrip, openStopId]
+    () => activeTrip?.stops.find((s) => s.id === openStopId) ?? null,
+    [activeTrip, openStopId]
   );
 
   const handleExpandRegion = (regionCode: string) => {
@@ -126,7 +119,7 @@ function App() {
     };
   }, [trips, activeTripId]);
 
-  if (tripsLoading || !effectiveActiveTrip) {
+  if (tripsLoading || !activeTrip) {
     return (
       <div className="app-shell app-loading">
         <p>Loading…</p>
@@ -153,7 +146,7 @@ function App() {
                   ← BACK TO TRIP
                 </button>
               ) : (
-                <span className="trip-title-card">{effectiveActiveTrip.title}</span>
+                <span className="trip-title-card">{activeTrip.title}</span>
               )}
               {tripSelectorOpen && (
                 <div className="trip-selector-dropdown">
@@ -171,44 +164,50 @@ function App() {
               )}
             </div>
 
-            <WorldMap
-              regionGroups={regionGroups}
-              viewMode={viewMode}
-              activeRegionCode={activeRegionCode}
-              openStopId={openStopId}
-              onSelectRegion={handleExpandRegion}
-              onOpenStop={handleOpenStop}
-            />
+            <ErrorBoundary fallback={<div className="error-boundary-fallback"><p>Something went wrong.</p></div>}>
+              <WorldMap
+                regionGroups={regionGroups}
+                viewMode={viewMode}
+                activeRegionCode={activeRegionCode}
+                openStopId={openStopId}
+                onSelectRegion={handleExpandRegion}
+                onOpenStop={handleOpenStop}
+              />
+            </ErrorBoundary>
           </div>
 
           <div className="sidebar-pane">
-            {viewMode === 'trip' ? (
-              <TripFeed
-                regionGroups={regionGroups}
-                trip={effectiveActiveTrip}
-                onExpandRegion={handleExpandRegion}
-                onOpenStop={handleOpenStop}
-              />
-            ) : (
-              <RegionSidebar
-                regionGroups={regionGroups}
-                activeRegionCode={activeRegionCode}
-                onSelectRegion={handleSelectRegion}
-                onOpenStop={handleOpenStop}
-              />
-            )}
+            <ErrorBoundary fallback={<div className="error-boundary-fallback"><p>Something went wrong.</p></div>}>
+              {viewMode === 'trip' ? (
+                <TripFeed
+                  regionGroups={regionGroups}
+                  trip={activeTrip}
+                  onExpandRegion={handleExpandRegion}
+                  onOpenStop={handleOpenStop}
+                />
+              ) : (
+                <RegionSidebar
+                  regionGroups={regionGroups}
+                  activeRegionCode={activeRegionCode}
+                  onSelectRegion={handleSelectRegion}
+                  onOpenStop={handleOpenStop}
+                />
+              )}
+            </ErrorBoundary>
           </div>
         </div>
 
         {openStop && (
-          <StopModal
-            stop={openStop}
-            stopList={modalStopList}
-            allStops={effectiveActiveTrip.stops}
-            regionGroups={regionGroups}
-            onClose={handleCloseStop}
-            onNav={handleModalNav}
-          />
+          <ErrorBoundary fallback={<div className="error-boundary-fallback"><p>Something went wrong.</p></div>}>
+            <StopModal
+              stop={openStop}
+              stopList={modalStopList}
+              allStops={activeTrip.stops}
+              regionGroups={regionGroups}
+              onClose={handleCloseStop}
+              onNav={handleModalNav}
+            />
+          </ErrorBoundary>
         )}
       </div>
     </APIProvider>
