@@ -6,11 +6,13 @@
 
 ## Vision
 
-ETLs and EDMs exist to turn raw data into shaped, cleaned, useful data. These solutions are hard to configure and require teams of people to operate. Our goal for **Data Unification** is to use AI to collapse this effort by 100x.
+ETLs and EDMs exist to turn raw sources into shaped, trusted, useful data models. In practice they fall short in two ways. First, the data store they produce isn't fit for direct production consumption — downstream apps still need bespoke read layers tuned to their use cases. Second, they take months of esoteric configuration and teams of people to operate. **Our goal for Data Unification** is to use AI to collapse both costs by 100x, and to build an architecture native to a future dominated by MCPs and agentic workflows.
 
-In the future there will be no more people writing JavaScript, C#, and YAML rules and configurations — demanding esoteric knowledge of a cumbersome framework. Instead, an orchestrator and an LLM will look at a raw data pile and a target model and build the pipe in days.
+We believe in a future dominated by headless enterprise apps that are essentially a database + MCP + agents. In such a world, a premium will be placed on flexible responsive data modeling that can quickly adapt to new use cases, while keeping data trustworthiness always at the fore.
 
-In the future there will be no more data-quality operators clearing an endless queue of daily exception tickets and fixing individual data points. Instead, issues will be detected instantly, checked against a source of truth, fixes applied at the global root cause, and presented to data managers as permanent solutions already pre-tested at scale and ready for push-button deployment.
+To serve these high velocity needs, there can be no more people writing JavaScript, C#, and YAML rules and configurations for months— demanding esoteric knowledge of a cumbersome EDM/ETL framework for implementation. Instead, a non-expert user with primary knowledge in their business domain will be able to define a use case and rely on an AI orchestrator and an LLM to shape the target model, look at the raw data pile, and build the pipe in days.
+
+In the future there will also be no more data-quality operators clearing an endless queue of daily exception tickets and fixing individual data points. Instead, issues will be detected instantly, checked against a source of truth, fixes applied at the global root cause, and presented to data managers as permanent solutions already pre-tested at scale and ready for push-button deployment.
 
 This project is the first attempt to approach the problem at toy scale and probe the feasibility of this vision — and the capabilities of frontier AI at developing and operating such a solution.
 
