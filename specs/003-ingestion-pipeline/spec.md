@@ -15,6 +15,15 @@ The pile is the App's sole downstream surface. Other Apps in the project **never
 
 The pile is intentionally messy — it represents the kind of artifact a real organization gets when it "centralizes" disparate sources into a common vicinity (data lake / warehouse / Snowflake repository). Each pipeline service is treated as an opaque external workflow from the perspective of downstream consumers; the App is the toy-scale stand-in for the Data Unification project's App 1 (Raw Data Pile) in the project roadmap.
 
+## Clarifications
+
+### Session 2026-05-29
+
+- Q: What's the canonical dedup identity per source for pile artifacts? → A: Per Option A with Instagram canonical = `shortcode`. Instagram pile records carry both `shortcode` (canonical, used for dedup + downstream lookups) and `instagram_id` (the numeric Instagram pk, retained alongside for traceability). Substack pile records carry both `<guid>` (canonical, used for dedup) and `<link>` (retained alongside).
+- Q: Do pile artifacts have a retention policy or do they persist indefinitely? → A: Indefinite. Pile artifacts are not auto-pruned. The operator handles manual pruning if storage becomes an issue. Matches the App's role as a raw data pile producer — the bridge-app and the eventual bridge-builder-app's value depend on full historical content being available.
+- Q: What happens when an upstream post is deleted after the pile already has it? → A: Option B with light-touch detection only. When the pipeline service naturally encounters source-side absence during normal operation (a previously-stored post is missing from a source response that should have contained it), it marks the pile record with a tombstone field (e.g., `deleted_upstream: true` plus the date detected). The service does NOT run a separate audit pass to proactively check older records — detection is incidental, not exhaustive. Pile records are never physically removed by the service.
+- Q: What's the concurrency model when schedules fire at overlapping times? → A: Option C — each source type IS its own pipeline service, fully independent and indifferent of other pipeline services; they may run concurrently when their schedules coincide. **Within** a single pipeline service, work is sequential by default (one target, one page, one record at a time) unless a specific run is justified to deviate. Anti-detection constraints live entirely within a single service.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Scrape a target Instagram account into the pile (Priority: P1)
@@ -129,6 +138,7 @@ The operator extends the App with a new pipeline service for a new upstream sour
 - What happens when a target Instagram account becomes private or is deleted between runs? *(Service halts on the auth/visibility error, logs the cause, preserves prior artifacts. Operator decides whether to remove the target from configuration.)*
 - What happens when two pipeline services are configured to write to artifacts with overlapping namespaces? *(Each service is expected to own its own namespace within the pile; collisions are a configuration error, surfaced at service startup.)*
 - What happens when the crawler account itself is suspended? *(Service halts on auth failure across all targets; operator must provision a replacement crawler.)*
+- What happens when a previously-stored pile record is no longer present in the upstream source (the original post was deleted)? *(Per FR-106, the service marks the pile record with a tombstone field if it naturally encounters the absence during a normal run. The record is never physically removed. No proactive deletion-audit pass is performed.)*
 
 ## Requirements *(mandatory)*
 
@@ -154,6 +164,8 @@ These principles overrule any contradicting requirement detail below:
 - **FR-103**: Downstream Apps MUST NOT read the pile directly. Pile access is mediated by a future bridge-app — separate from this spec — which is the only consumer of the pile and the only producer of consumer-ready data for downstream Apps (Travelogue DB, front-end, etc.).
 - **FR-104**: The pile MAY contain heterogeneous artifact types — a single pile may be backed by TSV files, image/video files, relational databases, blob stores, or any combination. Each pipeline service feeds exactly one pile; one pile MAY be fed by one or more pipeline services.
 - **FR-105**: Any pipeline service that performs an inference step (LLM call, ML model invocation, heuristic resolution, etc.) MUST persist the original inputs to that inference alongside the output, so the inference can be re-evaluated, audited, or re-run with a different model without re-fetching from the upstream source.
+- **FR-106**: When a pipeline service naturally encounters source-side absence during normal operation (a previously-stored pile record is missing from a source response that should have contained it), the service MUST mark that pile record with a tombstone field (e.g., `deleted_upstream` boolean + detection timestamp) but MUST NOT physically delete the record. The service MUST NOT run a separate audit pass to proactively check for upstream deletions — detection is incidental, not exhaustive.
+- **FR-107**: Pipeline services MAY run concurrently with each other; the App MUST NOT serialize one service's runs behind another's. Anti-detection and rate-limiting concerns are scoped to a single pipeline service, not coordinated across the App. Within a single pipeline service, work MUST be sequential by default (one target at a time, one page at a time, one record at a time); any deviation requires explicit justification in that service's design.
 
 #### App Boundary (Physical Segregation)
 
@@ -170,7 +182,7 @@ These principles overrule any contradicting requirement detail below:
 - **FR-019**: For each post with an explicit geo-tag, the service MUST persist BOTH the verbatim tag string AND a canonical "Venue, City, Country" form, plus the original lat/lng and an IATA region code. The verbatim tag preservation satisfies the inference-input-preservation principle (FR-105) when the canonical form is derived by inference.
 - **FR-020**: For each post without a geo-tag, the service MUST invoke an inference step using the post's caption and media as inputs, producing a location, lat/lng, region, and an audit-able reasoning record. The caption and media path (the inference inputs) MUST be preserved in the pile (FR-105).
 - **FR-021**: Each post MUST have its media (image or video) downloaded into the pile. A media download failure MUST log a warning, leave the media reference empty for that record, and NOT abort processing of remaining posts.
-- **FR-022**: The service MUST be idempotent — re-running on a stable pile state MUST NOT create duplicate records, matched by the upstream post identifier.
+- **FR-022**: The service MUST be idempotent — re-running on a stable pile state MUST NOT create duplicate records. Dedup is keyed on the canonical Instagram post identifier (`shortcode`); the numeric `instagram_id` (Instagram pk) MUST be retained alongside in each pile record for traceability.
 - **FR-050**: The service MUST support scraping multiple target accounts in a single invocation. Target accounts are independent — failure to fetch one MUST NOT prevent processing of the others.
 - **FR-051**: The service MUST apply anti-detection behaviors when paginating the upstream feed: randomized inter-request delays, smaller page sizes than the upstream API's max, periodic longer rests at configurable intervals, and a configurable rate-preset that bundles these settings.
 - **FR-052**: The service MUST distinguish between transient errors (network blip, 5xx, connection reset) and hard-block errors (Instagram challenge / checkpoint flows, account suspension). Transient errors trigger a single retry after randomized backoff; hard blocks trigger immediate halt without retry, with an operator-facing prompt explaining the required manual verification.
@@ -181,7 +193,7 @@ These principles overrule any contradicting requirement detail below:
 #### Substack Pipeline Service
 
 - **FR-023**: The Substack pipeline service MUST poll one or more configured RSS feed URLs on a recurring schedule or via one-off CLI invocation.
-- **FR-024**: For each RSS entry not already represented in the pile (matched by a stable Substack post identifier such as `<guid>` or `<link>`), the service MUST persist a record containing title, subtitle, body, and publication date.
+- **FR-024**: For each RSS entry not already represented in the pile, the service MUST persist a record containing title, subtitle, body, and publication date. Dedup is keyed on the canonical Substack post identifier (`<guid>`); `<link>` MUST be retained alongside in each pile record for traceability.
 - **FR-025**: The service MUST be idempotent — re-running on a stable pile state MUST NOT create duplicate records.
 - **FR-026**: If an RSS feed URL is unreachable or returns an invalid feed, the service MUST log the error and exit cleanly for that feed without affecting existing pile artifacts or other configured feeds.
 
@@ -241,5 +253,6 @@ The following FR numbers are reserved and intentionally retired so historical `t
 - Inference is currently performed by an LLM, but FR-105 (input preservation) is intentionally model-agnostic — other inference types in future services follow the same rule.
 - Operators have access to the crawler accounts on a separate device (e.g., phone) to complete verification challenges when FR-052 surfaces an operator prompt.
 - The pile is read-only from the downstream perspective; downstream consumers must not mutate pile artifacts. Mutations are the producing pipeline service's exclusive responsibility.
+- Pile artifact retention is indefinite. The App does not auto-prune; the operator handles any pruning manually if storage becomes an issue. The pile's value is its completeness — full historical content underwrites both the bridge-app's accuracy and the eventual bridge-builder-app's training surface.
 - The handoff from the pile to downstream consumers (the Travelogue DB, the front-end, future Apps) passes through a bridge-app, defined in a separate future spec / Epic. The bridge-app is the only consumer of this App's output; this spec defines the pile as the producer's contract; what the bridge-app does with it (cleaning, normalization, mapping to downstream schemas, conflict resolution between pipelines, etc.) is out of scope.
 - The current codebase has some artifacts that pre-date the FR-110 / FR-111 segregation rule (the pipeline code lives in `scripts/instagram-fetch-latest/`, pile data lives at the project root and in `public/media/`). Migrating those into a single App root directory is a planned implementation task under this spec; once complete, the App will satisfy FR-110 / FR-111. Until that task lands, the spec is the source of truth for the target state.
