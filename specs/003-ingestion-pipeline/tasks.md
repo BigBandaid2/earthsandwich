@@ -31,12 +31,14 @@
 
 **Purpose**: Stand up the App root directory and packaging so subsequent migration tasks have a destination.
 
-- [ ] T200 Create `pile-app/` directory at repo root with subdirs: `instagram/`, `instagram/validation/`, `substack/`, `common/`, `tests/`, `pile/`, `pile/media/instagram/`, `logs/`
-- [ ] T201 [P] Create `pile-app/pyproject.toml` with project metadata, console_scripts entry `pile_app = pile_app.cli:main`, and a Python 3.14 floor
-- [ ] T202 [P] Create `pile-app/requirements.txt` enumerating: instagrapi, anthropic, requests, python-dotenv, feedparser, APScheduler, PyYAML, pytest
-- [ ] T203 [P] Create `pile-app/.env.example` with documented placeholders for `INSTA_USERNAME`, `INSTA_PASSWORD`, `ANTHROPIC_API_KEY`, optional `ANTHROPIC_MODEL`
-- [ ] T204 [P] Create `pile-app/.gitignore` with patterns: `.env`, `pile/`, `logs/`, `instagrapi_session.json`, `venv/`, `__pycache__/`, `*.pyc`
-- [ ] T205 [P] Create `pile-app/README.md` with App-level overview, install instructions linking to `specs/003-ingestion-pipeline/quickstart.md`, and the FR-110/FR-111 portability note
+- [X] T200 Create `pile-app/` directory at repo root with subdirs: `instagram/`, `instagram/validation/`, `substack/`, `common/`, `tests/`, `pile/`, `pile/media/instagram/`, `logs/`
+- [X] T201 [P] Create `pile-app/pyproject.toml` with project metadata, console_scripts entry `pile_app = cli:main` (flat-layout reconciliation — see Phase 18 note), and a Python 3.14 floor
+- [X] T202 [P] Create `pile-app/requirements.txt` enumerating: instagrapi, anthropic, requests, python-dotenv, feedparser, APScheduler, PyYAML, pytest
+- [X] T203 [P] Create `pile-app/.env.example` with documented placeholders for `INSTA_USERNAME`, `INSTA_PASSWORD`, `ANTHROPIC_API_KEY`, optional `ANTHROPIC_MODEL`
+- [X] T204 [P] Create `pile-app/.gitignore` with patterns: `.env`, `pile/`, `logs/`, `instagrapi_session.json`, `venv/`, `__pycache__/`, `*.pyc`
+- [X] T205 [P] Create `pile-app/README.md` with App-level overview, install instructions linking to `specs/003-ingestion-pipeline/quickstart.md`, and the FR-110/FR-111 portability note
+
+> Phase 18 implementation note (2026-05-29): T200 prescribed a flat directory layout (`pile-app/instagram/`, `pile-app/substack/`, `pile-app/common/`) but T201 originally specified `pyproject.toml` console_scripts entry `pile_app = pile_app.cli:main` — implying a wrapped `pile-app/pile_app/` package. The two were inconsistent. Resolved in favor of the flat layout per T200 (the structural source of truth). Console_scripts entry adjusted to `pile_app = cli:main`. Consequence: the `python -m pile_app ...` invocation pattern documented in `quickstart.md` and `contracts/cli.md` no longer works directly; the equivalents are `pile_app ...` (after `pip install -e .`) or `python cli.py ...` (dev, from inside `pile-app/`). Updating those docs is a follow-up before Phase 19 closes.
 
 **Checkpoint**: Skeleton exists; nothing functional yet.
 
