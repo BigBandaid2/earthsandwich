@@ -1,28 +1,24 @@
-"""Shared pytest fixtures and config for the instagram-fetch-latest test suite."""
+"""Shared pytest fixtures and config for the pile-app test suite."""
 
 import os
 import sys
 from pathlib import Path
 
-from dotenv import load_dotenv
-
 # These run at module-load time (when pytest first imports this conftest),
 # which happens before any test files are collected — so test-file imports
-# can rely on the load_posts_tsv module being importable.
+# can rely on the pile-app modules being on sys.path and ANTHROPIC_API_KEY
+# being set.
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-SCRIPT_DIR = Path(__file__).resolve().parent.parent
+PILE_APP_ROOT = Path(__file__).resolve().parent.parent
 
-# Load real .env so live tests inherit credentials.
-load_dotenv(PROJECT_ROOT / ".env")
+# Allow `from common.pile import ...` / `from instagram.pipeline import ...`
+# without requiring a prior `pip install -e .` of pile-app.
+if str(PILE_APP_ROOT) not in sys.path:
+    sys.path.insert(0, str(PILE_APP_ROOT))
 
-# Allow `import load_posts_tsv` from test modules.
-if str(SCRIPT_DIR) not in sys.path:
-    sys.path.insert(0, str(SCRIPT_DIR))
-
-# load_posts_tsv.py dereferences ANTHROPIC_API_KEY at module load. In
-# environments without it (e.g. clean CI for unit-only runs), set a dummy
-# so the import succeeds — unit tests mock the Anthropic client anyway.
+# common/inference.py dereferences ANTHROPIC_API_KEY at module load. In
+# environments without it (e.g. CI for unit-only runs), set a dummy so the
+# import succeeds — unit tests mock the Anthropic client anyway.
 os.environ.setdefault("ANTHROPIC_API_KEY", "test-dummy-key-do-not-use")
 
 

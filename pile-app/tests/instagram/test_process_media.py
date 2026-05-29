@@ -1,21 +1,22 @@
-"""Unit tests for the `process_media` function in load_posts_tsv.
+"""Unit tests for the `process_media` function in instagram.pipeline.
 
-`process_media` is the per-post handler extracted from `main()`. It does
-field extraction, media URL/type resolution, media download, dual-path
-location resolution (FR-019 tagged vs FR-020 inferred), and path
-normalization — returning a row dict ready for `csv.DictWriter`.
+`process_media` is the per-post handler. It does field extraction, media
+URL/type resolution, media download, dual-path location resolution (FR-019
+tagged vs FR-020 inferred), and path normalization — returning a row dict
+ready for `csv.DictWriter`.
 
 All external collaborators (`download_media`, `canonicalize_tagged_location`,
-`infer_post_location`) are mocked via monkeypatch. The whole module
-runs in well under a second with no network and no credentials.
+`infer_post_location`) are mocked via monkeypatch on the import site
+(`instagram.pipeline`). The whole module runs in well under a second with
+no network and no credentials.
 
 Test groups:
-  - TestDualPathBranching: tagged vs. inferred dispatch, including the
-    edge cases of (0,0) coords, name-only tags, and missing locations.
+  - TestDualPathBranching: tagged vs. inferred dispatch, including edge
+    cases of (0,0) coords, name-only tags, and missing locations.
   - TestMediaUrlExtraction: IMAGE / VIDEO / Album (`media_type` 1 / 2 / 8)
     URL selection and the no-resources fallback.
   - TestTimestamp: ISO-with-`+0000` formatting matching the existing TSV.
-  - TestPathNormalization: relative POSIX paths in the TSV row.
+  - TestPathNormalization: APP_ROOT-relative POSIX paths in the TSV row.
   - TestFieldExtraction: pk → instagram_id, code → shortcode, caption_text
     → caption, local_id → id.
 """
@@ -28,8 +29,9 @@ from unittest.mock import MagicMock
 import pytest
 import requests
 
-import load_posts_tsv
-from load_posts_tsv import process_media, PROJECT_ROOT
+import instagram.pipeline
+from common import APP_ROOT
+from instagram.pipeline import process_media
 
 
 # ---------------------------------------------------------------------------
@@ -83,19 +85,15 @@ def make_resource(media_type=1, thumbnail_url="", video_url=""):
 
 @pytest.fixture
 def patched(monkeypatch):
-    """Patch the three external collaborators of `process_media`. Returns a
-    SimpleNamespace exposing each mock so tests can set behavior and
-    assert calls:
-        patched.download_media               — default returns ""
-        patched.canonicalize_tagged_location — default returns ("", "", "")
-        patched.infer_post_location      — default returns ("", "", "", "", "")
-    """
+    """Patch the three external collaborators of `process_media` at the
+    import site in `instagram.pipeline`. Returns a SimpleNamespace exposing
+    each mock so tests can set behavior and assert calls."""
     download = MagicMock(return_value="")
     canonicalize = MagicMock(return_value=("", "", "", "", ""))
     inferred = MagicMock(return_value=("", "", "", "", ""))
-    monkeypatch.setattr(load_posts_tsv, "download_media", download)
-    monkeypatch.setattr(load_posts_tsv, "canonicalize_tagged_location", canonicalize)
-    monkeypatch.setattr(load_posts_tsv, "infer_post_location", inferred)
+    monkeypatch.setattr(instagram.pipeline, "download_media", download)
+    monkeypatch.setattr(instagram.pipeline, "canonicalize_tagged_location", canonicalize)
+    monkeypatch.setattr(instagram.pipeline, "infer_post_location", inferred)
     return SimpleNamespace(
         download_media=download,
         canonicalize_tagged_location=canonicalize,
@@ -136,13 +134,12 @@ class TestDualPathBranching:
         patched.canonicalize_tagged_location.return_value = (
             "Sucre, Chuquisaca, Bolivia", "-19.04", "-65.26", "SRE", "",
         )
-        # instagrapi returned coords pointing to China — but tag NAME says Bolivia
         m = make_media(location=make_location("Sucre, Bolivia", 28.99, 118.85))
 
         row = process_media(m, target="acct", local_id=999, media_dir="/tmp", recent_locations=[])
 
         assert row["location"] == "Sucre, Chuquisaca, Bolivia"
-        assert row["lat"] == "-19.04"  # canonical Bolivian coords, NOT the China coords
+        assert row["lat"] == "-19.04"
         assert row["lng"] == "-65.26"
         assert row["region"] == "SRE"
 
@@ -159,7 +156,7 @@ class TestDualPathBranching:
         row = process_media(m, target="acct", local_id=999, media_dir="/tmp", recent_locations=[])
 
         assert row["location"] == "Some Hyper-Local Place, City, Country"
-        assert row["lat"] == "47.58"  # verbatim fallback
+        assert row["lat"] == "47.58"
         assert row["lng"] == "-122.41"
         assert row["region"] == "XYZ"
 
@@ -171,8 +168,8 @@ class TestDualPathBranching:
 
         row = process_media(m, target="acct", local_id=999, media_dir="/tmp", recent_locations=[])
 
-        assert row["location"] == "Oxaca"  # verbatim name fallback
-        assert row["lat"] == "17.06"       # verbatim coords fallback
+        assert row["location"] == "Oxaca"
+        assert row["lat"] == "17.06"
         assert row["lng"] == "-96.72"
         assert row["region"] == ""
 
@@ -190,7 +187,7 @@ class TestDualPathBranching:
         assert row["reasoning"] == "Note: original tag had a typo"
 
     def test_inferred_path_used_when_no_location(self, patched):
-        """When Media.location is None, the inferred Claude call carries the
+        """When Media.location is None, the inferred call carries the
         full burden and canonicalize_tagged_location is NOT called."""
         patched.infer_post_location.return_value = ("Paris", "48.85", "2.35", "CDG", "")
         m = make_media(location=None)
@@ -203,11 +200,10 @@ class TestDualPathBranching:
         assert row["region"] == "CDG"
         patched.infer_post_location.assert_called_once()
         patched.canonicalize_tagged_location.assert_not_called()
-        # The inferred path receives the recent_locations list for context.
         assert patched.infer_post_location.call_args.kwargs["recent_locations"] == ["Tokyo"]
 
     def test_inferred_path_records_reasoning(self, patched):
-        """When Claude's inferred call returns prose-before-JSON, the prose
+        """When the inferred call returns prose-before-JSON, the prose
         lands in the reasoning column instead of being lost."""
         patched.infer_post_location.return_value = (
             "JFK Airport, Queens, NY, USA", "40.6413", "-73.7781", "JFK",
@@ -225,7 +221,7 @@ class TestDualPathBranching:
         """When inference returns no location AND a previous_row is provided,
         the row's location becomes the prior post's CITY (not its exact venue),
         and lat/lng/region are inherited from that prior post."""
-        patched.infer_post_location.return_value = ("", "", "", "", "")  # empty inference
+        patched.infer_post_location.return_value = ("", "", "", "", "")
         m = make_media(location=None)
 
         prior = {
@@ -240,8 +236,8 @@ class TestDualPathBranching:
             previous_row=prior,
         )
 
-        assert row["location"] == "Vatican City"  # heuristic city extraction
-        assert row["lat"] == "41.9029"            # inherited from prior
+        assert row["location"] == "Vatican City"
+        assert row["lat"] == "41.9029"
         assert row["lng"] == "12.4534"
         assert row["region"] == "FCO"
         assert "fallback" in row["reasoning"]
@@ -259,7 +255,7 @@ class TestDualPathBranching:
             previous_row=prior,
         )
 
-        assert row["location"] == "Lisbon"  # parts[0] for 'City, Country'
+        assert row["location"] == "Lisbon"
         assert row["region"] == "LIS"
 
     def test_inferred_path_no_fallback_when_no_previous_row(self, patched):
@@ -299,7 +295,7 @@ class TestDualPathBranching:
             recent_locations=["Kyoto, Japan"],
         )
 
-        assert row["location"] == "Tokyo, Japan"  # inference, not fallback
+        assert row["location"] == "Tokyo, Japan"
         assert "fallback" not in row["reasoning"]
 
     def test_inferred_path_fallback_preserves_existing_reasoning(self, patched):
@@ -317,8 +313,8 @@ class TestDualPathBranching:
             previous_row=prior,
         )
 
-        assert row["location"] == "Kyoto"  # city heuristic from 'Kyoto, Japan'
-        assert row["region"] == "ITM"      # inherited
+        assert row["location"] == "Kyoto"
+        assert row["region"] == "ITM"
         assert "I considered Tokyo" in row["reasoning"]
         assert "fallback" in row["reasoning"]
 
@@ -352,7 +348,7 @@ class TestDualPathBranching:
         """Location with no lat/lng attributes at all (only name). Coords
         come out empty, the canonicalize call still fires."""
         patched.canonicalize_tagged_location.return_value = ("Name Only, Country", "", "", "ABC", "")
-        loc = SimpleNamespace(name="Name Only")  # no lat / lng attrs
+        loc = SimpleNamespace(name="Name Only")
         m = make_media(location=loc)
 
         row = process_media(m, target="acct", local_id=999, media_dir="/tmp", recent_locations=[])
@@ -376,7 +372,6 @@ class TestDualPathBranching:
         assert row["lng"] == ""
         assert row["region"] == ""
         assert row["reasoning"] == ""
-        # Non-location fields still extracted
         assert row["instagram_id"] == "12345"
         assert row["shortcode"] == "ABCDEF"
 
@@ -494,18 +489,17 @@ class TestTimestamp:
 # ---------------------------------------------------------------------------
 
 class TestPathNormalization:
-    def test_absolute_path_under_project_root_becomes_relative_posix(self, patched):
-        """download_media returns an absolute path inside PROJECT_ROOT;
+    def test_absolute_path_under_app_root_becomes_relative_posix(self, patched):
+        """download_media returns an absolute path inside APP_ROOT;
         the row should carry the relative POSIX form so it stays portable
         across Windows/Linux."""
-        downloaded = os.path.join(PROJECT_ROOT, "public", "media", "10.jpg")
+        downloaded = os.path.join(str(APP_ROOT), "pile", "media", "instagram", "acct_10.jpg")
         patched.download_media.return_value = downloaded
         m = make_media(media_type=1, thumbnail_url="x")
 
         row = process_media(m, target="acct", local_id=10, media_dir="/tmp", recent_locations=[])
 
-        assert row["media_url"] == "public/media/10.jpg"
-        # No native separators leak through regardless of platform
+        assert row["media_url"] == "pile/media/instagram/acct_10.jpg"
         assert "\\" not in row["media_url"]
 
 

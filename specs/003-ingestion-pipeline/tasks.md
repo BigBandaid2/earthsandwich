@@ -50,21 +50,21 @@
 
 **⚠️ CRITICAL**: No user-story work can begin until this phase is complete. Per FR-110/FR-111 the migration is what makes the App physically self-contained.
 
-- [ ] T206 Split `scripts/instagram-fetch-latest/load_posts_tsv.py`'s instagrapi auth + session resume into `pile-app/instagram/instagrapi_client.py`
-- [ ] T207 Split the dual-path orchestration loop (page fetch, per-post processing, write-then-advance) into `pile-app/instagram/pipeline.py`
-- [ ] T208 [P] Extract the FR-019 tagged-path canonicalization into `pile-app/instagram/tagged_location.py`
-- [ ] T209 [P] Extract the FR-020 inferred-path + fallback into `pile-app/instagram/inferred_location.py`
-- [ ] T210 [P] Extract TSV read/write + sort+reid + orphan-sweep helpers into `pile-app/common/pile.py`
-- [ ] T211 [P] Extract LLM SDK wrapper + JSON-and-prose parser into `pile-app/common/inference.py`
-- [ ] T212 [P] Extract rate presets + jittered sleep + challenge detection into `pile-app/common/anti_throttle.py`
-- [ ] T213 [P] Extract per-run log file + 5-most-recent sweep into `pile-app/common/run_logging.py`
-- [ ] T214 Create top-level CLI entry at `pile-app/cli.py` exposing `python -m pile_app run instagram <target>` (mirrors current `--rate` flag); preserve current invocation shape so the existing operator muscle-memory survives
-- [ ] T215 Move existing pile data: `posts.ourearthsandwich.local.tsv` + `posts.welawen.local.tsv` → `pile-app/pile/`; `public/media/ourearthsandwich_*.jpg` + `public/media/welawen_*.jpg` → `pile-app/pile/media/instagram/`
-- [ ] T216 Move Instagram validation scaffolding: repo-root `posts.local.tsv` → `pile-app/instagram/validation/posts.local.tsv`; `docs/planning/scrape-diff.txt` + `scrape-diff-v3.txt` + `scrape-diff-v4.txt` → `pile-app/instagram/validation/`
-- [ ] T217 Move tests: `scripts/instagram-fetch-latest/tests/` → `pile-app/tests/instagram/`; update imports from `load_posts_tsv` to the new module paths
-- [ ] T218 Update repo-root `.gitignore` to drop `instagrapi_session.json` (now lives inside `pile-app/`); update repo-root `CLAUDE.md`, `README.md`, and `docs/roadmap.md` references from `scripts/instagram-fetch-latest/` to `pile-app/`
-- [ ] T219 Run the migrated test suite (`cd pile-app && pytest`) to confirm all 79 unit tests + the integration test still pass after the split
-- [ ] T220 Delete `scripts/instagram-fetch-latest/` once T219 passes
+- [X] T206 Split `scripts/instagram-fetch-latest/load_posts_tsv.py`'s instagrapi auth + session resume into `pile-app/instagram/instagrapi_client.py`
+- [X] T207 Split the dual-path orchestration loop (page fetch, per-post processing, write-then-advance) into `pile-app/instagram/pipeline.py`
+- [X] T208 [P] Extract the FR-019 tagged-path canonicalization into `pile-app/instagram/tagged_location.py`
+- [X] T209 [P] Extract the FR-020 inferred-path + fallback into `pile-app/instagram/inferred_location.py`
+- [X] T210 [P] Extract TSV read/write + sort+reid + orphan-sweep helpers into `pile-app/common/pile.py`
+- [X] T211 [P] Extract LLM SDK wrapper + JSON-and-prose parser into `pile-app/common/inference.py`
+- [X] T212 [P] Extract rate presets + jittered sleep + challenge detection into `pile-app/common/anti_throttle.py`
+- [X] T213 [P] Extract per-run log file + 5-most-recent sweep into `pile-app/common/run_logging.py`
+- [X] T214 Create top-level CLI entry at `pile-app/cli.py` exposing `pile_app run instagram <target>` (post-pip-install) or `python cli.py run instagram <target>` (dev). Note: the `python -m pile_app ...` form documented in `quickstart.md` and `contracts/cli.md` doesn't work with the flat layout chosen in Phase 18; updating those docs is deferred to Phase 26 polish (T249)
+- [X] T215 Moved existing pile data: `posts.ourearthsandwich.local.tsv` + `posts.welawen.local.tsv` → `pile-app/pile/` (with `media_url` column path rewrite `public/media/` → `pile/media/instagram/`); `public/media/ourearthsandwich_*` + `public/media/welawen_*` (1016 files) → `pile-app/pile/media/instagram/`; `scripts/instagram-fetch-latest/instagrapi_session.json{,.bak}` → `pile-app/`
+- [X] T216 Moved Instagram validation scaffolding: repo-root `posts.local.tsv` → `pile-app/instagram/validation/posts.local.tsv`; `docs/planning/scrape-diff.txt` + `scrape-diff-v3.txt` + `scrape-diff-v4.txt` → `pile-app/instagram/validation/`
+- [X] T217 Moved tests: `scripts/instagram-fetch-latest/tests/` → `pile-app/tests/instagram/`. Updated monkeypatches to target import sites in `instagram.pipeline` (download_media, canonicalize_tagged_location, infer_post_location), `common.inference.anthropic` (Anthropic client class), and `common.pile.APP_ROOT` (replacing `load_posts_tsv.PROJECT_ROOT`). Added `pile-app/tests/conftest.py` to wire sys.path + dummy `ANTHROPIC_API_KEY`
+- [X] T218 Updated repo-root `README.md` (Apps section + project layout + pile-app section), `docs/roadmap.md` (004 spec reference to `pile-app/tests/`). Repo-root `.gitignore`'s `instagrapi_session.json` and `public/media/` patterns left in place as defense-in-depth (no longer-active patterns but harmless). `CLAUDE.md` already updated in earlier phase
+- [X] T219 Ran `cd pile-app && pytest tests/instagram` → **85 passed, 1 skipped** (the integration test, which requires `INSTA_USERNAME`/`INSTA_PASSWORD`/`ANTHROPIC_API_KEY` — skipped automatically without them)
+- [X] T220 Deleted `scripts/instagram-fetch-latest/` (including the local venv — operator needs to recreate at `pile-app/venv` via `pip install -e .`). Preserved `export_posts_json.py` at `scripts/export_posts_json.py` since the frontend still depends on the public/posts.json data path; updated its DEFAULT_INPUT to point at the new truth-file location (`pile-app/instagram/validation/posts.local.tsv`) — flagged as a transitional cross-App-boundary read until the bridge-app replaces it
 
 **Checkpoint**: All Instagram-service behaviour preserved; codebase now satisfies the App-root structural property of FR-110/FR-111.
 

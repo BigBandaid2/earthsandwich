@@ -1,30 +1,30 @@
-"""Unit tests for the location helper functions in load_posts_tsv.
+"""Unit tests for the location helper functions.
 
 These tests mock `anthropic.Anthropic` so they're fast (<1s total), don't
 require credentials, and don't hit any external service. Safe to run on
 every PR push and in pre-commit hooks.
 
 What they cover:
-  - `get_region_only_via_claude` sanitizing Claude's reply into a 3-letter
-    IATA code (or empty string) — the FR-019 tagged-path tail.
-  - `infer_post_location` parsing JSON responses, including markdown-
-    fenced variants Claude occasionally returns despite the prompt — the
-    FR-020 inferred path.
+  - `canonicalize_tagged_location` (FR-019 tagged path) — canonical name +
+    coords + IATA in one call, with the tag-name-authoritative semantics.
+  - `infer_post_location` (FR-020 inferred path) — JSON parsing including
+    markdown-fenced variants and prose preambles.
   - Image inclusion semantics: included for IMAGE posts with a real file,
     skipped for VIDEO and for IMAGE posts where the download failed.
   - Recent-locations injection into the inferred prompt, and the bias-
-    guard wording that prevents Claude from defaulting to nearby context.
+    guard wording that prevents the model from defaulting to nearby context.
 
-The end-to-end branching logic in `main()` (tagged vs. inferred dispatch)
-is covered by the live integration test in `test_instagram_pull.py`.
+The end-to-end branching logic (tagged vs. inferred dispatch in
+`process_media`) is covered by `test_process_media.py`.
 """
 
 from unittest.mock import MagicMock
 
 import pytest
 
-import load_posts_tsv
-from load_posts_tsv import infer_post_location, canonicalize_tagged_location
+import common.inference
+from instagram.inferred_location import infer_post_location
+from instagram.tagged_location import canonicalize_tagged_location
 
 
 def _mock_response(text: str) -> MagicMock:
@@ -38,12 +38,12 @@ def _mock_response(text: str) -> MagicMock:
 
 @pytest.fixture
 def mock_anthropic_client(monkeypatch):
-    """Patch `anthropic.Anthropic` inside load_posts_tsv to return a mock
-    client. Tests configure `mock_client.messages.create.return_value` (or
-    `.side_effect`) to control Claude's reply."""
+    """Patch `anthropic.Anthropic` (referenced inside common.inference) to
+    return a mock client. Tests configure `mock_client.messages.create.return_value`
+    (or `.side_effect`) to control the model's reply."""
     mock_client = MagicMock()
     mock_class = MagicMock(return_value=mock_client)
-    monkeypatch.setattr(load_posts_tsv.anthropic, "Anthropic", mock_class)
+    monkeypatch.setattr(common.inference.anthropic, "Anthropic", mock_class)
     return mock_client
 
 
@@ -77,8 +77,6 @@ class TestCanonicalizeTaggedLocation:
             '"lat":"-19.04","lng":"-65.26","region":"SRE"}'
         )
         result = canonicalize_tagged_location("Sucre, Bolivia", "28.99", "118.85")
-        # Despite the input coords pointing to China, the model produced
-        # canonical Bolivian coords for the named place. Caller will use these.
         assert result == ("Sucre, Chuquisaca, Bolivia", "-19.04", "-65.26", "SRE", "")
 
     def test_matching_name_and_coords_echoes_input_coords(self, mock_anthropic_client):
@@ -206,7 +204,7 @@ class TestCanonicalizeTaggedLocation:
 
 class TestInferPostLocation:
     VALID_JSON = '{"location":"Paris","lat":"48.8566","lng":"2.3522","region":"CDG"}'
-    PARSED = ("Paris", "48.8566", "2.3522", "CDG", "")  # 5th slot = reasoning, empty when no prose
+    PARSED = ("Paris", "48.8566", "2.3522", "CDG", "")
 
     def test_parses_clean_json(self, mock_anthropic_client):
         mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
@@ -216,7 +214,7 @@ class TestInferPostLocation:
         assert result == self.PARSED
 
     def test_strips_json_code_fences(self, mock_anthropic_client):
-        """Regression: Claude sometimes wraps the JSON in ```json fences
+        """Regression: the model sometimes wraps the JSON in ```json fences
         despite the prompt asking not to. The parser must tolerate this."""
         wrapped = f"```json\n{self.VALID_JSON}\n```"
         mock_anthropic_client.messages.create.return_value = _mock_response(wrapped)
@@ -235,7 +233,7 @@ class TestInferPostLocation:
 
     def test_extracts_json_from_prose_preamble(self, mock_anthropic_client):
         """Regression for the prose-preamble bug found during the @ourearthsandwich
-        from-scratch scrape (23 rows affected). Claude sometimes writes
+        from-scratch scrape (23 rows affected). The model sometimes writes
         reasoning before the JSON object — the parser must skip the prose,
         parse the JSON, and preserve the prose as `reasoning`."""
         response = (
@@ -269,14 +267,14 @@ class TestInferPostLocation:
         )
         assert location == ""
         assert lat == lng == region == ""
-        assert "France" in reasoning  # raw text preserved as audit trail
+        assert "France" in reasoning
 
     def test_rejects_location_exceeding_max_length(self, mock_anthropic_client):
         """The model occasionally puts prose into the JSON's `location` field
         despite the prompt — a 'location' string over 200 chars is rejected
         as malformed; location returns empty and the rejected text plus a
         rejection note end up in `reasoning`."""
-        long_loc = "I can see a sign that says XYZ " * 10  # well over 200 chars
+        long_loc = "I can see a sign that says XYZ " * 10
         payload = (
             '{"location":"' + long_loc + '","lat":"","lng":"","region":""}'
         )
@@ -300,7 +298,7 @@ class TestInferPostLocation:
         assert "parser rejected location" in reasoning
 
     def test_handles_empty_string_fields(self, mock_anthropic_client):
-        """All-empty JSON (Claude couldn't determine anything) → all-empty tuple
+        """All-empty JSON (model couldn't determine anything) → all-empty tuple
         with no reasoning preamble."""
         mock_anthropic_client.messages.create.return_value = _mock_response(
             '{"location":"","lat":"","lng":"","region":""}'
@@ -312,9 +310,9 @@ class TestInferPostLocation:
 
     def test_includes_image_for_photo_when_file_exists(self, mock_anthropic_client, tmp_path):
         """IMAGE posts with a downloaded media file send the image bytes to
-        Claude (vision input)."""
+        the model (vision input)."""
         img = tmp_path / "post.jpg"
-        img.write_bytes(b"\xff\xd8\xff" + b"\x00" * 50)  # minimal JPEG header
+        img.write_bytes(b"\xff\xd8\xff" + b"\x00" * 50)
         mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
 
         infer_post_location(
@@ -329,7 +327,7 @@ class TestInferPostLocation:
 
     def test_skips_image_for_video(self, mock_anthropic_client, tmp_path):
         """VIDEO posts must not send the video file as an image input —
-        Claude's vision API rejects video bytes and we'd waste tokens."""
+        the vision API rejects video bytes and we'd waste tokens."""
         vid = tmp_path / "post.mp4"
         vid.write_bytes(b"\x00\x00\x00\x18ftypmp42" + b"\x00" * 100)
         mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
@@ -388,13 +386,11 @@ class TestInferPostLocation:
         prompt_text = next(p["text"] for p in content if p.get("type") == "text")
         assert "Tokyo" in prompt_text
         assert "Kyoto" in prompt_text
-        # An empty entry would render as the bullet "- " followed by newline
-        # or end-of-string. Spot-check neither pattern exists.
         assert "\n- \n" not in prompt_text
         assert not prompt_text.rstrip().endswith("- ")
 
     def test_prompt_includes_recent_locations_bias_guard(self, mock_anthropic_client):
-        """Regression: the bias-guard wording prevents Claude from defaulting
+        """Regression: the bias-guard wording prevents the model from defaulting
         to a recent-context location. Removing it caused the Mexico City =>
         Oaxaca bug. Keep this assertion strict."""
         mock_anthropic_client.messages.create.return_value = _mock_response(self.VALID_JSON)
