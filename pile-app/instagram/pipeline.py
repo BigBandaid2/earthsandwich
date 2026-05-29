@@ -477,6 +477,26 @@ def run_for_target(
         return
     user_id, media_count = resolved
 
+    # ===== Self-healing recovery BEFORE we read the (possibly corrupt) TSV =====
+    # If a previous run was killed before commit/rollback, the .snapshot file
+    # holds the last-known-good state and the live TSV may be corrupt (the
+    # crashed run wrote rows up until the kill point). Recover first; trying
+    # to read a corrupt TSV before recovery would crash on a bad timestamp
+    # in the since_ts computation below.
+    snapshot = RunSnapshot(output_path, media_dir, target)
+    if snapshot.exists():
+        recovery = snapshot.rollback()
+        print(
+            f"  · detected leftover snapshot from prior killed run; auto-rollback complete "
+            f"(files_deleted={recovery['files_deleted']})"
+        )
+        write_failure_record(log_dir, {
+            "target": target,
+            "service": "instagram",
+            "failure_type": "leftover_snapshot_recovered",
+            "files_deleted": recovery["files_deleted"],
+        })
+
     existing_rows = read_tsv_rows(output_path)
     timestamped = [r for r in existing_rows if r.get("timestamp")]
 
@@ -536,23 +556,10 @@ def run_for_target(
     # Ensure the parent dir exists (e.g., pile-app/pile/ on first scrape).
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
-    # ===== Atomicity setup (FR-052 / scheduler-safe self-healing) =====
-    # Take a snapshot of the pre-scrape pile state so any failure can roll
-    # back to it. If a leftover snapshot is present, a previous run was
-    # killed before committing or rolling back — auto-rollback first, then
-    # take a fresh snapshot.
-    snapshot = RunSnapshot(output_path, media_dir, target)
-    if snapshot.exists():
-        recovery = snapshot.rollback()
-        print(
-            f"  · detected leftover snapshot from prior killed run; auto-rollback complete "
-            f"(files_deleted={recovery['files_deleted']})"
-        )
-        write_failure_record(log_dir, {
-            "target": target,
-            "failure_type": "leftover_snapshot_recovered",
-            "files_deleted": recovery["files_deleted"],
-        })
+    # ===== Take the pre-scrape snapshot AFTER any leftover recovery =====
+    # Leftover-snapshot recovery already ran up top (before read_tsv_rows).
+    # This .take() captures the post-recovery state so any failure during
+    # THIS run can roll back atomically.
     snapshot.take()
     run_started_at_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S%z")
     run_started_at_mono = time.monotonic()

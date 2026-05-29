@@ -227,7 +227,11 @@ class RunSnapshot:
         self.target = target
         self.snapshot_tsv_path = tsv_path + self.SNAPSHOT_SUFFIX
         self.tsv_existed_pre_scrape = False
-        self.pre_scrape_media_filenames: set[str] = set()
+        # None until `.take()` runs. Distinguishes "no files existed pre-scrape"
+        # (empty set after take) from "take never ran" (None — happens when
+        # rollback is called for a leftover snapshot from a previously-killed
+        # run; in that case the file set is derived from the snapshot TSV).
+        self.pre_scrape_media_filenames: Optional[set[str]] = None
 
     def exists(self) -> bool:
         """Whether a leftover snapshot already exists at the expected path.
@@ -269,8 +273,24 @@ class RunSnapshot:
         Best-effort with respect to OS errors: a file the OS won't let us
         delete is logged but doesn't abort the rollback. The TSV restore
         is the atomic-critical step; the media-file cleanup is hygiene.
+
+        Two modes:
+          - In-process rollback: `.take()` ran, so `pre_scrape_media_filenames`
+            is the set captured at snapshot time. Files in `media_dir` not in
+            that set are deleted.
+          - Leftover-snapshot recovery: `.take()` never ran (the caller just
+            constructed a RunSnapshot to check `.exists()` after a killed
+            previous run). In that case the pre-scrape file set is derived
+            from the snapshot TSV's `media_url` columns BEFORE the TSV is
+            restored, since that's the only record we have of what was
+            legitimate at snapshot time.
         """
         files_deleted = 0
+
+        # If we're recovering a leftover snapshot (no prior .take()), derive
+        # the pre-scrape file set from the snapshot TSV BEFORE we overwrite it.
+        if self.pre_scrape_media_filenames is None:
+            self.pre_scrape_media_filenames = self._referenced_files_from_snapshot()
 
         # 1. Restore TSV.
         if os.path.exists(self.snapshot_tsv_path):
@@ -306,6 +326,28 @@ class RunSnapshot:
                 os.remove(self.snapshot_tsv_path)
             except OSError as exc:
                 print(f"  ! could not remove snapshot {self.snapshot_tsv_path} ({exc})")
+
+    def _referenced_files_from_snapshot(self) -> set[str]:
+        """Derive the set of media filenames legitimately present at snapshot
+        time from the snapshot TSV's `media_url` columns.
+
+        Used by leftover-snapshot recovery (rollback without a prior take):
+        any file in `media_dir` matching `<target>_*` that ISN'T in this set
+        is something the killed scrape created — safe to delete.
+        """
+        if not os.path.exists(self.snapshot_tsv_path):
+            return set()
+        filenames: set[str] = set()
+        try:
+            with open(self.snapshot_tsv_path, encoding="utf-8", newline="") as f:
+                reader = csv.DictReader(f, delimiter="\t")
+                for row in reader:
+                    media_url = (row.get("media_url") or "").strip()
+                    if media_url:
+                        filenames.add(posixpath.basename(media_url))
+        except (OSError, csv.Error):
+            pass
+        return filenames
 
 
 def apply_tombstones(path: str, tombstone_shortcodes: set[str]) -> int:
