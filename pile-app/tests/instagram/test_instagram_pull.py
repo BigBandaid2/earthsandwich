@@ -24,6 +24,10 @@ Optional env:
 
 Side effect: this test rewrites the TSV to drop row 323 each run.
 That's intentional — it's how the test guarantees row 323 gets pulled fresh.
+
+A follow-up extension (planned: after a no-geotag post is added to
+@ourearthsandwich) will widen the truncation to also cover the FR-020
+inferred-location path on a recent post — keeping the per-PR cost flat.
 """
 
 import csv
