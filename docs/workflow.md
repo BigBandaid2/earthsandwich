@@ -12,24 +12,25 @@ Roughly once per week, the Team Lead is responsible for grasping the current sta
 
 ### Before Weekly Team Meeting
 
-1. **Reconcile Code to Tasks** — drift scan against preview drift reconciliation → HEAD (see [§Reconciliation](#reconciliation-claudespec-drift-scan)).
-2. **New Phase/Story for Code Drift** - bundle detected changes to a new Phase in appended to relevant `tasks.md` for shipped work.
-3. **Sync Spec State to JIRA** — push new phases as Stories and flip completion statuses so the planning meeting reads off current JIRA state (see [§JIRA sync](#jira-sync)).
-4. **Log estimated hours** — append daily rows to `docs/planning/time-log.tsv` and add a person/story hours summary to the current sprint plan (see [§Time logging](#time-logging)).
-5. **Check Progress Against Previous Sprint Plan** - append sprint review notes.
+1. **Merge open feature branches into the default branch** — get all shipped work onto a coherent base so the drift scan + JIRA sync read from a single source. Open WIP branches stay open; coordinate hand-offs at the meeting if needed.
+2. **Reconcile Code to Tasks** — drift scan against previous drift reconciliation → HEAD (see [§Reconciliation](#reconciliation-claudespec-drift-scan)).
+3. **New Phase/Story for Code Drift** — bundle detected changes as a new Phase appended to the relevant `tasks.md`.
+4. **Sync Spec State to JIRA** — push new phases as Stories and flip completion statuses so the planning meeting reads off current JIRA state (see [§JIRA sync](#jira-sync)).
+5. **Log estimated hours** — append daily rows to `docs/planning/time-log.tsv` and add a person/story hours summary to the current sprint plan (see [§Time logging](#time-logging)).
+6. **Check Progress Against Previous Sprint Plan** — append sprint review notes.
 
 ### During Weekly Team Meeting
 
-6. **Attest hours** — each team member confirms their estimated hours, adds meeting time, fills the `Hours Attested` column (see [§Time logging](#time-logging)).
-7. **Plan the week in JIRA's UI** — drag stories into the sprint, assign owners, set story points, write the Sprint goal.
+7. **Attest hours** — each team member confirms their estimated hours, adds meeting time, fills the `Hours Attested` column (see [§Time logging](#time-logging)).
+8. **Plan the week in JIRA's UI** — drag stories into the sprint, assign owners, set story points, write the Sprint goal.
 
 ### After Weekly Team Meeting
 
-8. **Link related tickets** — `Duplicate` for 1-to-1 parallels with a spec-kit Story, `Blocks` for prerequisite dependencies between tickets, `Relates` for everything else (see [§JIRA sync](#jira-sync)).
-9. **Create New Sprint Plan** - Create new sprint plan via Jira tickets or directly
-10. **Push to JIRA** — any phases newly decided in the meeting become new Stories in OCS, placed in the current sprint for velocity attribution. (Drift-discovered phases were already synced in step 3.)
-11. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
-12. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
+9. **Link related tickets** — `Duplicate` for 1-to-1 parallels with a spec-kit Story, `Blocks` for prerequisite dependencies between tickets, `Relates` for everything else (see [§JIRA sync](#jira-sync)).
+10. **Create New Sprint Plan** — via JIRA tickets or directly.
+11. **Push to JIRA** — any phases newly decided in the meeting become new Stories in OCS, placed in the current sprint for velocity attribution. (Drift-discovered phases were already synced in step 4.)
+12. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
+13. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
 
 The weekly cadence is the contract. The per-feature ceremony (below) is the optional discipline for serious architectural work.
 
@@ -49,77 +50,73 @@ If unsure where a change belongs, match the question it answers to the table abo
 
 ---
 
-## Cardinal rules
+## Spec Kit + JIRA conventions
 
-1. **`tasks.md` is a historical record.** New work goes in **new phases** appended to the bottom. Never restructure or rewrite past phases. Status flips (`[ ]` ↔ `[x]` ↔ `[~]`) are progress, not rewrites.
-2. **Spec Kit drives spec content. JIRA drives schedule and assignment.** Don't put owners or sprints into `spec.md`. Don't put requirements into JIRA descriptions.
-3. **One Spec Kit feature = one JIRA Epic. One Phase = one Story.** Subtasks exist in JIRA only for genuinely active phases. Completed phases live at the Story level only.
-4. **Default branch is the source of truth for shipped work.** Anything unmerged isn't shipped, regardless of how good the demo was.
-5. **One-way sync: Spec Kit → JIRA, never the reverse.** PM fields are author-time inputs in JIRA's UI. Don't mirror them into the repo.
-6. **Synced artifacts carry identity, not state.** Files that `spec-kit-jira` reads or writes — primarily `specs/<spec>/jira-mapping.json` — must not record sprint, owner, status, story points, or priority. They store only key, summary, URL, and parent/child structure. Two writers (this file + JIRA's UI) on the same field guarantees drift. Narrative artifacts that humans read but tools don't sync (`docs/planning/YYYY-WW.md`, this guide) are exempt.
+The [constitution's Cardinal Rules](../.specify/memory/constitution.md#cardinal-rules) apply project-wide. The conventions below are workflow-specific — how Spec Kit and JIRA should interact:
+
+1. **Spec Kit drives spec content. JIRA drives schedule and assignment.** Owners and sprints don't go into `spec.md`; requirements don't go into JIRA descriptions.
+2. **One Spec Kit feature = one JIRA Epic. One Phase = one Story.** Subtasks exist only for genuinely active phases; completed phases live at the Story level.
+3. **One-way sync: Spec Kit → JIRA, never the reverse.** PM fields live in JIRA's UI; they're not mirrored into the repo.
 
 ---
 
 ## New Specs and Spec Overhauls
 
-Use this section when a spec changes shape in a way the weekly cadence can't absorb: an existing spec needs to be carved in two, an existing spec needs to be re-authored from the ground up, or a brand-new spec is needed. The weekly cadence (top of doc) is the default for incremental work; reach for the ladders below only when the change is structural.
-
-The **Project-Level Doc Propagation** sub-section at the bottom is common to all three flows.
+For structural changes the weekly cadence can't absorb: carving a spec in two, re-authoring a spec from scratch, or starting a brand-new spec. [§Project-Level Doc Propagation](#project-level-doc-propagation) at the bottom is common to all three.
 
 ### Splitting features out of an existing spec
 
-When a spec has grown beyond a single coherent concern and needs to become two. Worked example: `002-data-ingestion` → `002-database-backend` + `003-ingestion-pipeline` on 2026-05-22.
+When a spec has grown beyond a single coherent concern.
 
-1. **Decide the split.** Identify which user stories, FRs, edge cases, success criteria, and assumptions belong to each side. Sketch the list before touching files — it makes step 4 mechanical instead of judgmental.
-2. **Reserve the new spec's NNN.** Next available three-digit prefix; pick a slug.
-3. **Create the new spec dir.** `mkdir -p specs/<NNN>-<slug>/checklists`. Either:
-   - **Copy approach**: copy the original spec files into the new dir and trim each side, OR
-   - **Run `/speckit.specify`** for the new side if the carved-out scope is large enough to deserve a fresh prompt-driven authoring.
-4. **Trim the original spec.** For each item moving to the new spec, replace the moved content with a one-line pointer of the form `> [Description] moved to specs/<NNN>-<slug>/spec.md on <date>.` Do **not** delete — pointers preserve cross-reference legibility. Update any FR/US/SC numbers that referenced the moved content.
-5. **Handle `tasks.md` on both sides.** Preserve phases whose tasks are completed or in progress on the original (Cardinal Rule #1); start a fresh phase list on the new spec. **Phases of envisioned-but-not-started work MAY be discarded or rewritten** during the split — only what was actually worked on is sacred. **Phase numbers carry across the split** — if the original was at Phase 16, the next phase on either side is Phase 17, so reconciliation reports remain comparable.
-6. **Create a fresh `jira-mapping.json`** for the new spec. Existing JIRA tickets stay associated with whichever spec their work actually shipped under; new tickets follow the new mapping.
-7. **Run `/speckit.plan`** for the new spec if you didn't author via `/speckit.specify`. `/speckit.tasks` is optional at the split moment — historical phases in step 5 may already be the right starting point.
-8. **Propagate to project-level docs** (see [§Project-Level Doc Propagation](#project-level-doc-propagation)).
+1. **Decide the split.** Sketch which user stories, FRs, edge cases, success criteria, and assumptions go to each side before touching files.
+2. **Create the new spec dir** at next available NNN: `mkdir -p specs/<NNN>-<slug>/checklists`. Either copy the original files and trim, or run `/speckit.specify` for the new side if scope warrants.
+3. **Trim the original.** Replace each moved item with a one-line pointer: `> [Description] moved to specs/<NNN>-<slug>/spec.md on <date>.` Update inline FR/US/SC numbers.
+4. **`tasks.md` on both sides.** Phases with completed-or-in-progress tasks stay on the original ([Cardinal Rule #1](../.specify/memory/constitution.md#cardinal-rules)); envisioned-but-not-started phases may be discarded or rewritten. Phase numbers carry across the split (if original was at Phase 16, both sides continue at Phase 17).
+5. **Fresh `jira-mapping.json`** on the new spec. Existing JIRA tickets stay where their work actually shipped.
+6. **`/speckit.plan`** for the new spec if you didn't author via `/speckit.specify`.
+7. **Propagate** (see [§Project-Level Doc Propagation](#project-level-doc-propagation)).
+
+Worked example: `002-data-ingestion` → `002-database-backend` + `003-ingestion-pipeline` on 2026-05-22.
 
 ### Overhauling an existing spec from scratch
 
-When a spec has drifted so far from the actual codebase that patching it would produce an incoherent document, re-author from scratch rather than continuing to amend. Worked example: `003-ingestion-pipeline` on 2026-05-27 — the split-time spec (2026-05-22) had assumed an APScheduler-in-backend layout, but reality had become a standalone CLI App with multi-target, anti-throttle, streaming, dual-path geocoding, and physical self-containment. Patches couldn't bridge that gap.
+When patches won't bridge the gap between the spec and reality.
 
-1. **Draft a specify-prompt** at `specs/<NNN>-<slug>/specify-prompt-draft.md`. Structure: (a) original scope at the time of last authoring, (b) a numbered list of what's actually been built or decided since, (c) the vision section to be re-authored. Have Claude help draft from the existing spec + recent commits; you edit. The prompt is paste-and-discard input for `/speckit.specify` — you can delete the file after the run.
-2. **Stash files to preserve OUTSIDE `specs/`.** Move `tasks.md`, `jira-mapping.json`, and any other files you want to keep into a temp dir at the repo root (`_<NNN>-keep/`). This matters because `/speckit.specify`'s NNN scan would otherwise see the existing dir and allocate the *next* number, not reuse the slot.
-3. **Delete the old spec dir.** `rm -rf specs/<NNN>-<slug>/`. (Safety alternative: rename to a non-`NNN-` prefix so the NNN scan ignores it — easier to recover from if step 4 misbehaves.)
-4. **Run `/speckit.specify`** with the prompt content pasted in. With the dir gone, sequential numbering reallocates the slot.
-5. **Restore the stashed files** into the new spec dir. `mv _<NNN>-keep/* specs/<NNN>-<slug>/ && rmdir _<NNN>-keep`.
-6. **Iterate on the new spec** based on your reading. Re-authoring is the moment to capture decisions that had been latent — make them explicit in clarifications / key principles / new FRs while the context is fresh.
-7. **`/speckit.plan` / `/speckit.tasks` regeneration is OPTIONAL** at this stage. Phases whose tasks are completed or in progress are sacred (Cardinal Rule #1) and must be preserved at the top of `tasks.md` when you regenerate. Phases of envisioned-but-not-started work MAY be discarded — an overhaul is the cheapest moment to drop work that the new spec no longer wants. Merge by hand: completed-or-in-progress at the top, new phases append at the bottom.
-8. **Propagate to project-level docs** (see [§Project-Level Doc Propagation](#project-level-doc-propagation)).
-9. **Sync cross-referencing sibling specs.** Any sibling spec that points at the overhauled one likely has stale FR numbers, retired-FR references, or moved-FR attributions. `grep -rn "<spec-slug>" specs/` and clean up. Pay special attention to clarifications and assumption pointers that say "moved to <spec> on <date>."
+1. **Draft a specify-prompt** at `specs/<NNN>-<slug>/specify-prompt-draft.md`: (a) original scope, (b) what's been built/decided since, (c) the new vision. Paste-and-discard input to `/speckit.specify`.
+2. **Stash preserved files OUTSIDE `specs/`.** Move `tasks.md`, `jira-mapping.json`, etc. into `_<NNN>-keep/` at the repo root — otherwise the NNN scan allocates a new number instead of reusing the slot.
+3. **Swap.** `rm -rf specs/<NNN>-<slug>/` → run `/speckit.specify` with the prompt → `mv _<NNN>-keep/* specs/<NNN>-<slug>/ && rmdir _<NNN>-keep`.
+4. **Iterate on the new spec.** An overhaul is the cheapest moment to capture latent decisions explicitly.
+5. **`/speckit.plan` and `/speckit.tasks` regeneration is OPTIONAL.** Phases with completed-or-in-progress tasks must stay at the top of `tasks.md` ([Cardinal Rule #1](../.specify/memory/constitution.md#cardinal-rules)); envisioned-but-not-started phases may be discarded. Merge by hand if needed.
+6. **Propagate** (see [§Project-Level Doc Propagation](#project-level-doc-propagation)).
+7. **Sync sibling specs** for stale cross-references: `grep -rn "<spec-slug>" specs/` and fix retired FRs, moved-FR attributions, etc.
+
+Worked example: `003-ingestion-pipeline` re-author on 2026-05-27 — the split-time spec assumed APScheduler-in-backend; reality was a standalone CLI App. Patches couldn't bridge that gap.
 
 ### Brand-new spec
 
-When adding a feature with no prior history.
+Standard ceremony for a feature with no prior history:
 
-1. `/speckit.specify "<description>"` — creates `specs/<NNN>-<slug>/spec.md`. The `before_specify` hook handles the feature branch.
-2. `/speckit.clarify` — interactive ambiguity scan if needed.
+1. `/speckit.specify "<description>"` (the `before_specify` hook handles the feature branch).
+2. `/speckit.clarify` if needed.
 3. `/speckit.plan` → `/speckit.tasks` → `/speckit.implement`.
-4. `/speckit.jira.specstoissues <slug>` — creates Epic + Stories + active-phase Subtasks in OCS.
+4. `/speckit.jira.specstoissues <slug>` — Epic + Stories + active-phase Subtasks.
 5. PR to default branch — review, merge, delete branch.
 6. `/speckit.jira.sync-status <slug>` — flip JIRA tickets to Done.
-7. **Propagate to project-level docs** (see [§Project-Level Doc Propagation](#project-level-doc-propagation)).
+7. **Propagate** (see [§Project-Level Doc Propagation](#project-level-doc-propagation)).
 
 ### Project-Level Doc Propagation
 
-After any of the three flows above, sweep the project-level docs that catalogue or cross-reference specs. The [constitution's Documents catalogue](../.specify/memory/constitution.md#project-level-planning-documents) is authoritative on what each doc owns; the table below is the operational "which doc to touch, when":
+Sweep these after any flow above. The [constitution's Documents catalogue](../.specify/memory/constitution.md#project-level-planning-documents) is authoritative on what each doc owns; the table is the operational "which doc to touch, when":
 
 | Doc | Update when |
 |---|---|
-| [`docs/roadmap.md`](roadmap.md) | **Always.** Add/remove/update the spec row in the Specs table, update the affected App's row in the Apps table, update boundary rules, add or edit the Spec Reference paragraph. |
-| [`CLAUDE.md`](../CLAUDE.md) | **Always.** Keep the active-specs catalogue (between `<!-- SPECKIT START -->` and `<!-- SPECKIT END -->`) current. |
-| [`README.md`](../README.md) | When the spec corresponds to a user-visible part of the project layout (front-end, backend, ingestion service, etc.). |
-| [`.specify/memory/constitution.md`](../.specify/memory/constitution.md) | **Rarely.** Only when a cross-cutting principle, Cardinal Rule, or App-level assumption changes. Spec-local decisions do NOT belong here. |
-| Sibling specs | When cross-references go stale (retired FRs, moved-out FRs, renamed concepts, changed attributions). |
+| [`docs/roadmap.md`](roadmap.md) | **Always.** Add/remove the spec row, update the App row + boundary rules, add or edit the Spec Reference paragraph. |
+| [`CLAUDE.md`](../CLAUDE.md) | **Always.** Keep the active-specs catalogue current (between `<!-- SPECKIT START -->` and `<!-- SPECKIT END -->`). |
+| [`README.md`](../README.md) | When the spec corresponds to a user-visible part of the project layout. |
+| [`.specify/memory/constitution.md`](../.specify/memory/constitution.md) | **Rarely.** Only when a cross-cutting principle, Cardinal Rule, or App-level assumption changes. |
+| Sibling specs | When cross-references go stale (retired FRs, moved-out FRs, renamed concepts). |
 
-Per Cardinal Rule #5, prefer references over duplication: a sibling spec or project-level doc should point at the changed spec rather than restate its content. Linking is cheap; staying in sync after duplication is not.
+Per [Cardinal Rule #5](../.specify/memory/constitution.md#cardinal-rules), prefer references over duplication.
 
 ---
 
@@ -179,7 +176,7 @@ True close-cascade requires a Parent-Subtask relationship, which would mean conv
 
 ### What never goes into the sync
 
-Per Cardinal Rule 6, `specs/<spec>/jira-mapping.json` must not record sprint, owner, status, story points, or priority. Those PM fields live in JIRA's UI; the mapping file carries only identity (key, summary, URL, parent/child structure).
+Per [Cardinal Rule #2](../.specify/memory/constitution.md#cardinal-rules), `specs/<spec>/jira-mapping.json` must not record sprint, owner, status, story points, or priority. Those PM fields live in JIRA's UI; the mapping file carries only identity (key, summary, URL, parent/child structure). Two writers (this file + JIRA's UI) on the same field guarantees drift. Narrative artefacts that humans read but tools don't sync (`docs/planning/YYYY-WW.md`, this guide) are exempt.
 
 ---
 
@@ -302,7 +299,7 @@ This auto-commits the spec/clarify/plan/tasks artifacts (themselves PR-reviewabl
 
 Targets in `specs/00N-feature/`: `component-diagram.md`, `system-design.md`, `software-architecture.md`. They rot the moment code changes without a refresh.
 
-**Recommended**: weekly batch. Run `/speckit.learn.review` in the Monday cadence (step 6).
+**Recommended**: weekly batch. Run `/speckit.learn.review` as the Monday cadence **Diagrams** step.
 
 **Optional, for architecturally-sensitive work**: hook into `after_implement` so diagrams refresh after every implementation pass:
 
@@ -324,7 +321,7 @@ Goal: keep team-wide understanding sharp without a daily standup. The `onboard` 
 
 The `before_implement` onboard hook is already enabled in `.specify/extensions.yml` (`speckit.onboard.before-implement`) — it nudges you to skim recent project changes before touching code.
 
-**Weekly review (Monday cadence step 5)** — two parts, ~5 min per developer:
+**Weekly review** (Monday cadence **Knowledge refresh** step) — two parts, ~5 min per developer:
 
 1. **Digest** — ask Claude: *"Give me a weekly review since last Monday — what shipped, what's active, what's blocked."* Claude composes a `git log` summary plus an Atlassian MCP query for active sprint state. Three sections expected: shipped commits mapped to phases, active sprint issues with owners, items with no movement in 7+ days.
 2. **Quiz** — run `/speckit.onboard.quiz`. Generates 5 questions calibrated to your profile level (`junior` / `mid` / `senior`), grounded in real project artifacts, and persisted in `.onboard/profiles/<name>.json` so questions never repeat.
