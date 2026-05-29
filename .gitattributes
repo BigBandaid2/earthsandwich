@@ -1,0 +1,10 @@
+# Ensure shell scripts always use LF line endings (required for Linux containers).
+*.sh text eol=lf
+
+# Ensure Python files use LF.
+*.py text eol=lf
+
+# Windows-native files can keep CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
