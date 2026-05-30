@@ -20,7 +20,7 @@ from instagram.instagrapi_client import (
     INSTAGRAPI_SESSION_FILE,
     init_instagrapi_client,
 )
-from instagram.pipeline import run_for_target
+from instagram.pipeline import parse_unix_timestamp, run_for_target
 
 DEFAULT_TARGETS = os.environ.get("INSTAGRAM_TARGET_ACCOUNTS", "ourearthsandwich")
 
@@ -33,6 +33,18 @@ def _run_instagram(args: argparse.Namespace) -> int:
     if len(targets) > 1 and "{target}" not in args.output:
         print("\nERROR: multiple targets require '{target}' in --output template.")
         return 1
+
+    newer_than_ts = None
+    if args.newer_than:
+        try:
+            newer_than_ts = parse_unix_timestamp(args.newer_than)
+        except ValueError as exc:
+            print(
+                f"\nERROR: --newer-than value {args.newer_than!r} is not a valid ISO 8601 "
+                f"timestamp ({exc}). Examples: '2024-02-20', '2024-02-20T02:27:16+0000', "
+                f"'2024-02-20T02:27:16+00:00'."
+            )
+            return 1
 
     ig_client = init_instagrapi_client()
     if ig_client is None:
@@ -50,7 +62,10 @@ def _run_instagram(args: argparse.Namespace) -> int:
     os.makedirs(log_dir, exist_ok=True)
 
     for target in targets:
-        run_for_target(ig_client, target, args.output, args.media_dir, rate_config, log_dir=log_dir)
+        run_for_target(
+            ig_client, target, args.output, args.media_dir, rate_config,
+            log_dir=log_dir, newer_than_ts=newer_than_ts,
+        )
     return 0
 
 
@@ -97,6 +112,21 @@ def build_parser() -> argparse.ArgumentParser:
             "'aggressive' = no delays (fast but trips Instagram challenges); "
             "'normal' = ~300 posts/hr, random 30-90s between pages + long rests; "
             "'gentle' = ~120 posts/hr, the safest sustained rate."
+        ),
+    )
+    ig.add_argument(
+        "--newer-than",
+        metavar="ISO",
+        default=None,
+        help=(
+            "Cutoff timestamp (ISO 8601). When set, the existing TSV is "
+            "truncated in place to rows with timestamp <= cutoff, and the "
+            "scrape fetches everything strictly newer. Used to size "
+            "integration tests in one command (replaces 'manually truncate, "
+            "then re-run'). Examples: '2024-02-20', "
+            "'2024-02-20T02:27:16+0000', '2024-02-20T02:27:16+00:00'. "
+            "Naive timestamps (no offset) are treated as UTC. Truncation "
+            "rolls back atomically on scrape failure via the run snapshot."
         ),
     )
     ig.set_defaults(func=_run_instagram)

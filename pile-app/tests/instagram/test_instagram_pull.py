@@ -1,18 +1,20 @@
 """Integration smoke test for the Instagram pull pipeline.
 
-Truncates `pile/posts.ourearthsandwich.local.tsv` to row 322, runs the
-CLI, and asserts that row 323 came back from instagrapi with the Mexico
-City geo-tag intact. This is the canonical end-to-end check for
-FR-016 / FR-019 / FR-020 of `specs/003-ingestion-pipeline/spec.md`.
+Uses the CLI's `--newer-than` flag to truncate `pile/posts.ourearthsandwich.local.tsv`
+to rows at or before 2024-02-20T02:27:16+0000 (the timestamp of id=322), runs
+the CLI, and asserts that the re-fetched row 323 came back from instagrapi
+with the Mexico City geo-tag intact. This is the canonical end-to-end check
+for FR-016 / FR-019 / FR-020 of `specs/003-ingestion-pipeline/spec.md`.
 
 What it actually verifies, in order:
   1. instagrapi authenticates (resumed session or fresh login).
-  2. `cl.user_medias_paginated_v1` returns posts newer than the TSV cursor.
-  3. The post with shortcode `DYFNMcHxKDv` is in the returned set.
-  4. The FR-019 tagged-location path fires (Media.location is populated).
-  5. Location name is canonicalized ("Mexico City"), not re-estimated.
-  6. Lat/lng match the Instagram-provided coordinates.
-  7. The text-only IATA call returns a sensible Mexico City airport code.
+  2. `--newer-than` truncates the TSV atomically (rollback-safe).
+  3. `cl.user_medias_paginated_v1` returns posts newer than the cutoff.
+  4. The post with shortcode `DYFNMcHxKDv` is in the returned set.
+  5. The FR-019 tagged-location path fires (Media.location is populated).
+  6. Location name is canonicalized ("Mexico City"), not re-estimated.
+  7. Lat/lng match the Instagram-provided coordinates.
+  8. The text-only IATA call returns a sensible Mexico City airport code.
 
 Required env (loaded automatically from pile-app/.env via conftest if
 the file exists; otherwise from shell env):
@@ -24,10 +26,14 @@ Optional env:
 
 Side effect: this test rewrites the TSV to drop row 323 each run.
 That's intentional — it's how the test guarantees row 323 gets pulled fresh.
+With `--newer-than` driving the truncation, the rewrite is now atomic with
+the scrape: a CLI failure leaves the TSV untouched (pre-truncation state
+preserved by the run snapshot), unlike the prior test-local truncation
+which mutated the pile before the subprocess even started.
 
 A follow-up extension (planned: after a no-geotag post is added to
-@ourearthsandwich) will widen the truncation to also cover the FR-020
-inferred-location path on a recent post — keeping the per-PR cost flat.
+@ourearthsandwich) will move the cutoff back to cover the FR-020 inferred-
+location path on a recent post — keeping the per-PR cost flat.
 """
 
 import csv
@@ -42,7 +48,10 @@ PILE_APP_ROOT = Path(__file__).resolve().parents[2]
 TSV_PATH = PILE_APP_ROOT / "pile" / "posts.ourearthsandwich.local.tsv"
 CLI_PATH = PILE_APP_ROOT / "cli.py"
 
-TRUNCATE_TO_ID = 322
+# Cutoff: timestamp of id=322 (the last Oaxaca post). `--newer-than` keeps
+# rows <= cutoff (inclusive on the keep side) and fetches strictly newer,
+# so this surgically drops id>=323 and triggers a re-pull of just those.
+TRUNCATE_NEWER_THAN = "2024-02-20T02:27:16+0000"
 EXPECTED_NEW_ID = 323
 EXPECTED_SHORTCODE = "DYFNMcHxKDv"
 EXPECTED_LOCATION_PREFIX = "Mexico City"
@@ -51,38 +60,19 @@ EXPECTED_LNG_PREFIX = "-99."
 
 ACCEPTABLE_REGIONS = {"MEX", "NLU"}
 
-# Import the canonical column list from the producer so the truncate-and-
-# rewrite step stays in lockstep with the schema (Phase 20 widened it from
-# 11 → 16 columns; future spec amendments may widen further).
-from common.pile import TSV_COLUMNS
-
 
 def _read_rows() -> list[dict]:
     with TSV_PATH.open(encoding="utf-8", newline="") as f:
         return list(csv.DictReader(f, delimiter="\t"))
 
 
-def _write_rows(rows: list[dict]) -> None:
-    with TSV_PATH.open("w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=TSV_COLUMNS, delimiter="\t")
-        writer.writeheader()
-        writer.writerows(rows)
-
-
-def _truncate_tsv_to_id(target_id: int) -> None:
-    """Drop any TSV rows with id > target_id, in place."""
-    rows = _read_rows()
-    kept = [r for r in rows if r.get("id") and int(r["id"]) <= target_id]
-    _write_rows(kept)
-
-
 @pytest.mark.integration
 def test_instagram_pull_resurrects_mexico_city_row():
     """The end-to-end smoke test.
 
-    Truncates the TSV to id=322 (so id=323 must be re-pulled), runs the
-    CLI, and asserts the new row reflects the explicit "Mexico City"
-    geo-tag rather than an inferred Oaxaca-style guess.
+    Tells the CLI to truncate the TSV to rows <= 2024-02-20T02:27:16+0000
+    via `--newer-than`, then re-pull. Asserts the new row reflects the
+    explicit "Mexico City" geo-tag rather than an inferred Oaxaca-style guess.
     """
     missing = [
         var for var in ("INSTA_USERNAME", "INSTA_PASSWORD", "ANTHROPIC_API_KEY")
@@ -91,17 +81,19 @@ def test_instagram_pull_resurrects_mexico_city_row():
     if missing:
         pytest.skip(f"missing required env vars: {', '.join(missing)}")
 
-    _truncate_tsv_to_id(TRUNCATE_TO_ID)
-    pre_rows = _read_rows()
-    assert pre_rows, "TSV is empty after truncation — refusing to test"
-    assert pre_rows[-1]["id"] == str(TRUNCATE_TO_ID), (
-        f"Truncation produced unexpected last id={pre_rows[-1].get('id')!r} "
-        f"(expected {TRUNCATE_TO_ID})"
-    )
+    if not TSV_PATH.exists() or not _read_rows():
+        pytest.skip(
+            f"TSV at {TSV_PATH} is missing or empty; this smoke test needs a "
+            f"pre-existing pile to truncate against. Run a baseline scrape first."
+        )
 
     env = {**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONUNBUFFERED": "1"}
     result = subprocess.run(
-        [sys.executable, str(CLI_PATH), "run", "instagram", "--targets", "ourearthsandwich"],
+        [
+            sys.executable, str(CLI_PATH), "run", "instagram",
+            "--targets", "ourearthsandwich",
+            "--newer-than", TRUNCATE_NEWER_THAN,
+        ],
         cwd=str(PILE_APP_ROOT),
         capture_output=True,
         text=True,

@@ -60,6 +60,55 @@ def read_tsv_rows(tsv_path: str) -> list[dict]:
         return list(reader)
 
 
+def truncate_tsv_to_timestamp(tsv_path: str, cutoff_ts: int) -> int:
+    """Drop rows with timestamp > cutoff_ts from the TSV; keep rows <= cutoff_ts.
+
+    `cutoff_ts` is a Unix timestamp (int). The caller is responsible for
+    parsing the operator's ISO-format input via the same parser the rest of
+    the pipeline uses (`parse_unix_timestamp`) so that comparison is numeric
+    and immune to ISO format variations (date-only vs full, `+0000` vs
+    `+00:00`, etc.).
+
+    Returns the number of rows removed (0 if the file doesn't exist or no
+    rows match). Does NOT touch media files — orphan-media cleanup for the
+    removed rows happens in the success-path `resort_tsv_and_sweep_media`
+    call, so a mid-run failure can still be cleanly rolled back via the
+    snapshot (which captures pre-truncation TSV + media file set).
+
+    Used by the `--newer-than` CLI flag to set up integration-test pile
+    sizes in a single command, replacing the manual "truncate then re-run"
+    pattern.
+    """
+    if not os.path.exists(tsv_path):
+        return 0
+    with open(tsv_path, "r", encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f, delimiter="\t")
+        cols = reader.fieldnames or TSV_COLUMNS
+        rows = list(reader)
+
+    def _row_ts(row: dict) -> Optional[int]:
+        ts_str = row.get("timestamp", "")
+        if not ts_str:
+            return None
+        try:
+            ts_str = ts_str.strip().replace(" ", "T")
+            if ts_str.endswith("+00"):
+                ts_str += ":00"
+            return int(datetime.fromisoformat(ts_str).timestamp())
+        except ValueError:
+            return None
+
+    kept = [r for r in rows if (_row_ts(r) is not None and _row_ts(r) <= cutoff_ts)]
+    removed = len(rows) - len(kept)
+    if removed == 0:
+        return 0
+    with open(tsv_path, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=cols, delimiter="\t")
+        writer.writeheader()
+        writer.writerows(kept)
+    return removed
+
+
 def download_media(media_url: str, target: str, shortcode: str, media_type: str, media_dir: str) -> str:
     """Download media from the Instagram CDN and save to media_dir/<target>_<shortcode>.jpg or .mp4.
 
