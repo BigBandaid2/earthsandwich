@@ -15,7 +15,7 @@ Roughly once per week, the Team Lead is responsible for grasping the current sta
 1. **Merge open feature branches into the default branch** — get all shipped work onto a coherent base so the drift scan + JIRA sync read from a single source.
 2. **Reconcile Code to Tasks** — drift scan against previous drift reconciliation → HEAD (see [§Reconciliation](#reconciliation-claudespec-drift-scan)).
 3. **New Phase/Story for Code Drift** — bundle detected changes as a new Phase appended to the relevant `tasks.md`.
-4. **Sync Spec State to JIRA** — push new phases as Stories and flip completion statuses so the planning meeting reads off current JIRA state (see [§JIRA sync](#jira-sync)).
+4. **Sync Spec State to JIRA** — push new phases as Stories, flip completion statuses, and check each newly-created Story for `Duplicate` relationships with existing Stories (overhauled predecessors, user tickets) — link them when found (see [§JIRA sync](#jira-sync)).
 5. **Backfill sprint on Done items** — any Done Story missing a sprint goes into the currently-open sprint (see [§Sprint membership rule](#sprint-membership-rule)).
 6. **Log estimated hours** — append daily rows to `docs/planning/time-log.tsv` and add a person/story hours summary to the current sprint plan (see [§Time logging](#time-logging)).
 7. **Check Progress Against Previous Sprint Plan** — append sprint review notes.
@@ -154,15 +154,17 @@ Any Story flipped to **Done** must belong to a sprint — default to the current
 
 In-progress stories are *not* automatically added to the current sprint. Add one case-by-case when partial work has shipped this sprint and the team wants velocity credit for it.
 
-### User-created tickets — reconciliation
+### Issue-link reconciliation
 
-JIRA accumulates two kinds of issues: those produced by `/speckit.jira.specstoissues` (labeled `spec-kit`) and those created ad-hoc in the JIRA UI (typically during weekly meetings or stakeholder discussions). When the two describe the same work, the spec-kit Story is the canonical record and the user ticket gets linked to it rather than left orphaned.
+JIRA accumulates parallel issues that describe the same or related work — typically: (a) user-created tickets vs. spec-kit Stories, and (b) pre-overhaul spec-kit Stories vs. their post-overhaul replacements. When two issues describe the same work, the *current canonical* one (post-overhaul Story, or the spec-kit Story over a user ticket) is the record of truth and the older / informal one gets linked to it rather than left orphaned.
 
 | Link | When | Direction (`inwardIssue` / `outwardIssue`) |
 |---|---|---|
-| `Duplicate` | User ticket and spec-kit Story describe the same work 1-to-1 | spec-kit Story / user ticket |
+| `Duplicate` | Two issues describe the same work 1-to-1 (user ticket ↔ spec-kit Story; pre-overhaul Story ↔ post-overhaul Story) | canonical / duplicate |
 | `Blocks` | One ticket must finish before another can start | blocker / blocked |
-| `Relates` | Tangential — spike, follow-on, historical context | either |
+| `Relates` | Tangential or non-1-to-1 overlap — spike, follow-on, historical context, **or a pre-overhaul Story whose scope was split across multiple post-overhaul Stories** | either |
+
+**Duplicate-check is step 4 of the weekly cadence** (`Sync Spec State to JIRA`). For each Story `/speckit.jira.specstoissues` just created, scan: (1) user-created tickets describing the same work; (2) pre-overhaul Stories the new one supersedes. Auto-link on a clean 1-to-1; use `Relates` when scope diverges. Surface candidates in the sprint review when judgement is needed.
 
 Don't touch the Subtasks under spec-kit Stories — those are managed by the speckit-jira agents; link at the Story level only. Surface `Blocks` chains at planning. OCS has no `Blocked` status; the `Blocks` link IS the dependency record. True close-cascade requires Parent-Subtask conversion (out of scope) — manually close duplicates when the spec-kit Story closes.
 
