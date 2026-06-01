@@ -30,8 +30,9 @@ Roughly once per week, the Team Lead is responsible for grasping the current sta
 10. **Link related tickets** — `Duplicate` for 1-to-1 parallels with a spec-kit Story, `Blocks` for prerequisite dependencies between tickets, `Relates` for everything else (see [§JIRA sync](#jira-sync)).
 11. **Create New Sprint Plan** — via JIRA tickets or directly.
 12. **Push to JIRA** — any phases newly decided in the meeting become new Stories in OCS, placed in the current sprint for velocity attribution. (Drift-discovered phases were already synced + sprint-attributed in steps 4–5.)
-13. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
-14. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
+13. **Merge master into your feature branch.** Project-level updates from steps 3–6 land on master; each team member merges master into their active feature branch so subsequent work reads off the current state.
+14. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
+15. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
 
 The weekly cadence is the contract. The per-feature ceremony (below) is the optional discipline for serious architectural work.
 
