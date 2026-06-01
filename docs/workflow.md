@@ -88,8 +88,9 @@ When patches won't bridge the gap between the spec and reality.
 3. **Swap.** `rm -rf specs/<NNN>-<slug>/` → run `/speckit.specify` with the prompt → `mv _<NNN>-keep/* specs/<NNN>-<slug>/ && rmdir _<NNN>-keep`.
 4. **Iterate on the new spec.** An overhaul is the cheapest moment to capture latent decisions explicitly.
 5. **`/speckit.plan` and `/speckit.tasks` regeneration is OPTIONAL.** Phases with completed-or-in-progress tasks must stay at the top of `tasks.md` ([Cardinal Rule #1](../.specify/memory/constitution.md#cardinal-rules)); envisioned-but-not-started phases may be discarded. Merge by hand if needed.
-6. **Propagate** (see [§Project-Level Doc Propagation](#project-level-doc-propagation)).
-7. **Sync sibling specs** for stale cross-references: `grep -rn "<spec-slug>" specs/` and fix retired FRs, moved-FR attributions, etc.
+6. **Sync to JIRA + mark overhauled.** Push new Stories via `/speckit.jira.specstoissues`; suffix pre-overhaul Stories' titles with `(overhauled)` (leave at `Done`); add `Duplicate` / `Relates` links per [§Issue-link reconciliation](#issue-link-reconciliation).
+7. **Propagate** (see [§Project-Level Doc Propagation](#project-level-doc-propagation)).
+8. **Update cross-references in sibling specs.** Other specs may reference this one's FRs or concepts by number or name. `grep -rn "<spec-slug>" specs/` to find them; update or remove references that now point to retired or renumbered FRs.
 
 Worked example: `003-ingestion-pipeline` re-author on 2026-05-27 — the split-time spec assumed APScheduler-in-backend; reality was a standalone CLI App. Patches couldn't bridge that gap.
 
