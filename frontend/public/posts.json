@@ -1,0 +1,56 @@
+[
+  {
+    "id": "ig-17990443415376031",
+    "date": "2024-02-20",
+    "location": "Oaxaca City, Oaxaca, Mexico",
+    "coords": {
+      "lat": 17.0732,
+      "lng": -96.7266
+    },
+    "status": "visited",
+    "regionCode": "OAX",
+    "post": {
+      "type": "instagram",
+      "image": "/media/1.jpg",
+      "caption": "East meets Southwest",
+      "instagramId": "17990443415376031",
+      "shortcode": "C3jXFRlMZoJ"
+    }
+  },
+  {
+    "id": "ig-17996821559305682",
+    "date": "2024-02-20",
+    "location": "Oaxaca City, Oaxaca, Mexico",
+    "coords": {
+      "lat": 17.0732,
+      "lng": -96.7266
+    },
+    "status": "visited",
+    "regionCode": "OAX",
+    "post": {
+      "type": "instagram",
+      "image": "/media/2.jpg",
+      "caption": "Never a wrong time or place for hot chocolate",
+      "instagramId": "17996821559305682",
+      "shortcode": "C3jJxkzMGvi"
+    }
+  },
+  {
+    "id": "ig-18025886506939141",
+    "date": "2024-02-19",
+    "location": "Hierve el Agua, Oaxaca, Mexico",
+    "coords": {
+      "lat": 16.8656,
+      "lng": -96.2753
+    },
+    "status": "visited",
+    "regionCode": "OAX",
+    "post": {
+      "type": "instagram",
+      "image": "/media/3.jpg",
+      "caption": "For your safety, do not approach the abyss.",
+      "instagramId": "18025886506939141",
+      "shortcode": "C3g2YOHMR-r"
+    }
+  }
+]

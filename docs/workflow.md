@@ -6,6 +6,28 @@
 
 ---
 
+## Weekly Cadence
+
+Roughly once per week, the Team Lead is responsible for grasping the current state of the project, capturing all progress since the last sprint review, planning objectives for the sprint to come, and keeping the core spec readable and coherent. 
+
+### Before Weekly Team Meeting
+
+1. **Reconcile Code to Tasks** — drift scan against preview drift reconciliation → HEAD (see [§Reconciliation](#reconciliation-claudespec-drift-scan)).
+2. **New Phase/Story for Code Drift** - bundle detected changes to a new Phase in appended to relevant `tasks.md` for shipped work.
+3. **Check Progress Against Previous Sprint Plan** - append sprint review notes.
+
+### After Weekly Team Meeting
+
+4. **Create New Sprint Plan** - Create new sprint plan via Jira tickets or directly
+5. **Push to JIRA** — new phases become new Stories in OCS, placed in the current sprint for velocity attribution.
+6. **Plan the week in JIRA's UI** — drag stories into the sprint, assign owners, set story points, write the Sprint goal.
+7. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
+8. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
+
+The weekly cadence is the contract. The per-feature ceremony (below) is the optional discipline for serious architectural work.
+
+---
+
 ## TL;DR — what each system owns
 
 | System | Owns |
@@ -31,11 +53,9 @@ If unsure where a change belongs, match the question it answers to the table abo
 
 ---
 
-## The two cadences: per-feature and weekly
+## Per-feature cadence (full ceremony)
 
-### Per-feature (full ceremony)
-
-Use for new product surfaces, breaking architectural changes, anything warranting stakeholder review.
+Use for new product surfaces, breaking architectural changes, anything warranting stakeholder review. The weekly cadence (top of doc) is the default — reach for this ladder only when the work warrants it.
 
 1. `/speckit.specify "<description>"` — creates `specs/00N-feature/spec.md` and a feature branch.
 2. `/speckit.clarify` — interactive ambiguity scan, up to 5 questions.
@@ -46,28 +66,24 @@ Use for new product surfaces, breaking architectural changes, anything warrantin
 7. PR to default branch — review, merge, delete branch.
 8. `/speckit.jira.sync-status 00N-feature` — flip JIRA tickets to Done.
 
-### Weekly (the realistic default)
-
-Claude Code is fast enough that small changes don't need full ceremony. Catch up the bookkeeping in batch every Monday morning (~30 min):
-
-1. **Reconcile** — drift scan against last Monday → HEAD (see [§Reconciliation](#reconciliation-claudespec-drift-scan)).
-2. **Append new phases** to relevant `tasks.md` for shipped work.
-3. **Push to JIRA** — new phases become new Stories in OCS, placed in the current sprint for velocity attribution.
-4. **Plan the week in JIRA's UI** — drag stories into the sprint, assign owners, set story points, write the Sprint goal.
-5. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
-6. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
-
-The weekly cadence is the contract. Per-feature ceremony is the optional discipline for serious architectural work.
-
 ---
 
 ## Reconciliation: Claude/spec drift scan
 
 Between Monday meetings, Claude makes small changes that don't always make it into `tasks.md`. The drift scan catches them.
 
-Ask Claude: *"Run a spec drift scan from `<last_known_good_commit>` to `HEAD`. For each commit touching `src/`, `public/`, or `package.json`, list whether it has a corresponding line in any `tasks.md`. Flag everything that doesn't, grouped by spec."*
+Ask Claude: *"Run a spec drift scan. For each commit touching `src/`, `public/`, or `package.json`, list whether it has a corresponding line in any `tasks.md`. Flag everything that doesn't, grouped by spec."*
 
-Claude enumerates changed files per commit, buckets them by spec, greps `tasks.md` for matches, and outputs the unmatched commits as a proposed Phase N+1 task list.
+**Determining the scan's starting point.** Claude derives the `<last_known_good_commit>` automatically — do not pass a date by hand. The rule:
+
+1. Grep every `specs/**/tasks.md` for phase headings matching `## Phase N: Drift Reconciliation (YYYY-MM-DD …)`.
+2. Take the **most recent date** across all matches (whichever spec it appears in).
+3. Use the commit that introduced that heading as the baseline. Find it with `git log -S "Phase N: Drift Reconciliation" --pretty=format:"%h" -- specs/**/tasks.md` (or the equivalent diff scan), then scan `<that-commit>..HEAD`.
+4. If no Drift Reconciliation phase exists anywhere, fall back to the last commit before last Monday 00:00 local time.
+
+This means scans are idempotent across re-runs and consecutive weeks chain without overlap — the next scan starts exactly where the last one ended, regardless of how many weeks have passed.
+
+Claude enumerates changed files per commit, buckets them by spec, greps `tasks.md` for matches, and outputs the unmatched commits as a proposed Phase N+1 task list. Always *propose* — never append to `tasks.md` directly. The user decides whether and how to record each item (Cardinal Rule #1).
 
 | Trigger | What runs |
 |---|---|
@@ -242,5 +258,4 @@ No, but velocity charts will be inaccurate. Set them during planning meeting.
 This document is itself part of the workflow it describes:
 
 - Material changes → PR review.
-- Append a `## Changelog` entry for each meaningful update.
 - If the workflow surprises you, the doc is wrong — fix the doc, then fix the workflow.

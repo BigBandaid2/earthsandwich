@@ -1,0 +1,191 @@
+# Tasks: Database & Backend
+
+**Input**: Design documents from `specs/002-database-backend/`
+**Prerequisites**: plan.md ✓, spec.md ✓, data-model.md ✓, contracts/api.md ✓, research.md ✓, quickstart.md ✓
+
+**Tests**: Not explicitly requested — no test tasks generated. Tests directory structure is created in Phase 2 for future use.
+
+**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
+
+> **2026-05-22 split**: This spec was originally `002-data-ingestion`. The automated ingestion phases (Phase 5 — US3 Instagram, Phase 7 — US5 Substack) and the ingestion-side Phase 9 polish tasks (T048, T049) were moved to `003-ingestion-pipeline/tasks.md`. Their original numbering is preserved here as stubs to maintain traceability. Per Cardinal Rule #1 (`tasks.md` is a historical record), all completed phases (1, 2, 3) remain in place untouched.
+
+> **Note on spec/plan drift**: The spec was updated (2026-05-15) to use Claude-only for all IATA region code determination. `plan.md` and `quickstart.md` are aligned; the prompt-engineering polish task lives in `003-ingestion-pipeline` (T049).
+
+## Format: `[ID] [P?] [Story] Description`
+
+- **[P]**: Can run in parallel (different files, no dependencies on incomplete tasks)
+- **[Story]**: Which user story this task belongs to
+
+---
+
+## Phase 1: Setup (Project Initialization)
+
+**Purpose**: Create the directory skeleton and base configuration files before any implementation begins.
+
+- [x] T001 Create backend/ directory structure: app/, app/models/, app/schemas/, app/api/, app/ingestion/, app/cli/, alembic/versions/, tests/unit/, tests/integration/, tests/contract/ with __init__.py files per plan.md
+- [x] T002 Move all frontend-specific files and folders from the project root into a new frontend/ directory: src/, index.html, vite.config.ts, tsconfig.json, tsconfig.node.json, public/images/, public/posts.json; keep public/media/ at project root (backend writes Instagram media here); package.json and package-lock.json live in frontend/ (backend is Python — no shared JS tooling at root); scripts/ stays at project root
+- [x] T003 [P] Create backend/requirements.txt with all dependencies: fastapi==0.115.*, uvicorn[standard], sqlalchemy==2.0.*, asyncpg, alembic, apscheduler==3.*, instagrapi, feedparser, anthropic, slowapi, structlog, pydantic-settings, httpx, pytest, pytest-asyncio
+- [x] T004 [P] Add tsx to package.json devDependencies for the TypeScript seed export script
+- [x] T005 [P] Create .env.example listing all required variables from contracts/api.md (ANTHROPIC_API_KEY required for all location logic; AIRPORT_API_KEY excluded per updated spec)
+
+---
+
+## Phase 2: Foundational (Blocking Prerequisites)
+
+**Purpose**: Core infrastructure — config, database connection, ORM models, migrations, app skeleton, and response schemas — that MUST be complete before any user story can be implemented.
+
+**⚠️ CRITICAL**: No user story work can begin until this phase is complete.
+
+- [x] T006 Create backend/app/config.py with pydantic-settings BaseSettings; validate all required env vars at startup (INSTA_USERNAME, INSTA_PASSWORD, ANTHROPIC_API_KEY, DATABASE_URL, API_SECRET_KEY, SUBSTACK_RSS_URL, FRONTEND_ORIGIN, INSTAGRAPI_SESSION_FILE); optional vars with defaults (INSTAGRAM_POLL_INTERVAL_MINUTES=60, SUBSTACK_POLL_INTERVAL_MINUTES=60, SMTP_*, LOG_LEVEL, ENVIRONMENT); raise clear ValidationError on missing required vars
+- [x] T007 [P] Create backend/app/database.py with SQLAlchemy 2.0 async engine (asyncpg), AsyncSession factory, and get_db dependency for FastAPI injection
+- [x] T008 Create backend/app/main.py with FastAPI app, lifespan hook (scheduler start/stop), CORS middleware (FRONTEND_ORIGIN), slowapi rate limiter (60 req/min per IP → 429), and structlog setup (JSONRenderer in production, ConsoleRenderer in development)
+- [x] T009 Create backend/app/models/trip.py with Trip SQLAlchemy ORM model: id VARCHAR(100) PK, title, description, start_date DATE, end_date DATE, created_at TIMESTAMPTZ, updated_at TIMESTAMPTZ; index on (start_date, end_date)
+- [x] T010 [P] Create backend/app/models/stop.py with Stop SQLAlchemy ORM model: id VARCHAR(100) PK, trip_id FK→trips, date DATE, location VARCHAR(500), lat DECIMAL(10,7) nullable, lng DECIMAL(10,7) nullable, status CHECK('visited','planned'), region_code VARCHAR(10) nullable, post_type CHECK('instagram','substack','planned'), sequence_order INTEGER, caption TEXT nullable, created_at TIMESTAMPTZ; indexes on (trip_id, sequence_order), (trip_id, status), (trip_id, region_code), (date)
+- [x] T011 [P] Create backend/app/models/instagram_post.py with InstagramPost SQLAlchemy ORM model: id UUID PK default gen_random_uuid(), stop_id FK→stops UNIQUE, instagram_id VARCHAR(100) UNIQUE, shortcode, media_url VARCHAR(500), caption TEXT, timestamp TIMESTAMPTZ, created_at TIMESTAMPTZ; indexes on instagram_id UNIQUE, timestamp, stop_id
+- [x] T012 [P] Create backend/app/models/substack_post.py with SubstackPost SQLAlchemy ORM model: id UUID PK, stop_id FK→stops nullable, substack_id VARCHAR(500) UNIQUE, title, subtitle TEXT nullable, body TEXT, published_at TIMESTAMPTZ, created_at TIMESTAMPTZ; indexes on substack_id UNIQUE, published_at, stop_id
+- [x] T013 Update backend/app/models/__init__.py to import Trip, Stop, InstagramPost, SubstackPost so Alembic autogenerate detects all tables
+- [x] T014 Initialize Alembic in backend/ (alembic.ini, alembic/env.py); configure env.py for async SQLAlchemy using asyncpg and target_metadata from app.models
+- [x] T015 Generate initial Alembic migration (`alembic revision --autogenerate -m "initial schema"`) creating all four tables with all columns, constraints, and indexes from data-model.md; apply with `alembic upgrade head`
+- [x] T016 [P] Create backend/app/schemas/trip.py with Pydantic v2 TripBase, TripCreate (id + title + description + start_date + end_date), TripUpdate (all optional), TripResponse (adds created_at, updated_at), TripDetailResponse (adds stops list)
+- [x] T017 [P] Create backend/app/schemas/stop.py with StopResponse including all stop fields and a nullable post field (InstagramPostResponse | SubstackPostResponse | None)
+- [x] T018 [P] Create backend/app/schemas/post.py with InstagramPostResponse and SubstackPostResponse matching the shapes in contracts/api.md
+
+**Checkpoint**: Foundation ready — all four ORM models exist, migration applied, app skeleton starts without errors, schemas defined. User story implementation can begin.
+
+---
+
+## Phase 3: User Story 1 — Seed the Database (Priority: P1) 🎯 MVP
+
+**Goal**: Migrate all hard-coded TypeScript trip/stop/post data into PostgreSQL via a two-step seed pipeline; generate a SQL dump for Docker initialization.
+
+**Independent Test**: Run `npx tsx scripts/export-seed-data.ts` → confirm JSON files appear in scripts/seed-data/. Run `python scripts/seed.py` against a fresh DB → inspect record counts match the TS source arrays. Re-run → verify no duplicates. Confirm scripts/seed-dump.sql is generated.
+
+- [x] T019 [US1] Create scripts/export-seed-data.ts using tsx: import src/data/miscellaneous-adventures.ts, earth-sandwich-2015.ts, earth-club-sandwich-2027.ts (update import paths if frontend/ move in T002 changed these locations); serialize trips, stops, instagram_posts, and substack_posts to scripts/seed-data/{trips,stops,instagram_posts,substack_posts}.json preserving all fields and array ordering
+- [x] T020 [US1] Create scripts/seed.py: read the four JSON files from scripts/seed-data/; insert records into PostgreSQL in FK order (trips first, then stops, then instagram_posts and substack_posts) using `INSERT ... ON CONFLICT DO NOTHING` on all primary keys and unique indexes
+- [x] T021 [US1] ~~Add sequence_order assignment to scripts/seed.py~~ Removed sequence_order from the data model entirely — stop ordering is derived from (trip_id, date, region_code); updated Stop model, migration, schemas, export script, and seed script accordingly
+- [x] T022 [US1] Add pg_dump invocation to scripts/seed.py after successful seeding: call `pg_dump` via subprocess using DATABASE_URL env var; write output to scripts/seed-dump.sql; log the dump path on completion
+
+**Checkpoint**: US1 complete — database seeded, seed-dump.sql committed; run quickstart.md sections 2–3 to validate.
+
+---
+
+## Phase 4: User Story 2 — Read API Endpoints (Priority: P1)
+
+**Goal**: Expose trips, stops, and posts as a filterable REST API consumed by the frontend and other clients.
+
+**Independent Test**: Start backend with `uvicorn app.main:app --reload`; run all curl commands from quickstart.md section 6; verify response shapes match contracts/api.md exactly. Test invalid trip id → 404. Test invalid filter value → 422.
+
+- [ ] T023 [P] [US2] Create backend/app/api/trips.py with GET /trips handler (reverse-chronological by start_date, optional status filter: active/completed/upcoming derived from dates vs. today) and GET /trips/:id handler (returns full trip with nested stops and each stop's post data using a join query; returns 404 if trip not found)
+- [ ] T024 [P] [US2] Create backend/app/api/stops.py with GET /stops handler supporting all query filters from contracts/api.md: trip_id, status, region_code, post_type, after (date ≥), before (date ≤)
+- [ ] T025 [P] [US2] Create backend/app/api/posts.py with GET /instagram-posts handler (filters: stop_id, after timestamp, before timestamp) and GET /substack-posts handler (same filters; only return rows where stop_id IS NOT NULL)
+- [ ] T026 [US2] Register all read routers (trips, stops, posts) in backend/app/main.py with appropriate prefixes
+- [ ] T027 [US2] Implement structured error responses in all route handlers: `{"error": "...", "detail": "..."}` for 404 (trip/stop not found), 422 (invalid query params), 500 (unexpected); ensure no stack traces or internal identifiers leak (FR-033)
+
+**Checkpoint**: US1 + US2 complete — frontend can query trips, stops, and posts from the database; validate with quickstart.md section 6.
+
+---
+
+## Phase 5: User Story 3 — Instagram Ingestion (MOVED)
+
+> **Moved to `003-ingestion-pipeline/tasks.md` on 2026-05-22 as that spec's Phase 1.** T028 through T036 are tracked there. Task IDs preserved.
+
+---
+
+## Phase 6: User Story 4 — Trip Management & Region End Date (Priority: P2)
+
+**Goal**: Allow authorized operators to create/update trips and record region end dates via the API.
+
+**Independent Test**: Use curl with `Authorization: Bearer <API_SECRET_KEY>` to POST /trips (201 response), PUT /trips/:id (200 response with updated fields), and POST /regions/end-date (200 response). Verify 401 for all three without a token. Verify 409 on duplicate trip id. Verify 422 on bad date format.
+
+- [ ] T037 [P] [US4] Define POST /regions/end-date contract in specs/002-database-backend/contracts/api.md: request body (optional trip string, optional region string, optional date ISO 8601), response shape, storage strategy (e.g. new region_end_dates table or existing schema extension), and any new migration required — this task MUST be completed before T040
+- [ ] T038 [P] [US4] Add POST /trips handler to backend/app/api/trips.py: validate body via TripCreate schema; insert trip; return 201 TripResponse; return 401 on missing/invalid bearer token; return 409 if trip id already exists; return 422 on invalid date format (FR-013, FR-029)
+- [ ] T039 [P] [US4] Add PUT /trips/:id handler to backend/app/api/trips.py: validate body via TripUpdate (all fields optional); apply partial update; update updated_at; return 200 TripResponse; return 401/404/422 as appropriate
+- [ ] T040 [US4] Create backend/app/api/regions.py with POST /regions/end-date handler per contract defined in T037: resolve defaults (most recent trip by created_at if trip omitted; most recent region_code seen in that trip's stops if region omitted; current date if date omitted); require bearer auth (FR-045) — depends on T037
+- [ ] T041 [US4] Register POST /trips, PUT /trips/:id write handlers and POST /regions/end-date router in backend/app/main.py; add shared bearer token auth dependency enforcing FR-029 across all write endpoints
+
+**Checkpoint**: US4 complete — operators can manage trips and record region transitions without code changes.
+
+---
+
+## Phase 7: User Story 5 — Substack Ingestion (MOVED)
+
+> **Moved to `003-ingestion-pipeline/tasks.md` on 2026-05-22 as that spec's Phase 2.** T042 and T043 are tracked there. Task IDs preserved.
+
+---
+
+## Phase 8: User Story 6 — Containerization (Priority: P3)
+
+**Goal**: Full stack (backend + frontend + database) starts with `docker compose up` on a clean machine; database is pre-populated from seed-dump.sql.
+
+**Independent Test**: On a machine with Docker and no local Python/Node setup, run `docker compose up`; navigate to frontend URL; confirm travelogue loads data from backend. Stop and restart → data still present.
+
+- [ ] T044 [P] [US6] Create backend/Dockerfile: Python 3.12 slim base; COPY requirements.txt and RUN pip install; COPY app/; EXPOSE 8000; CMD uvicorn app.main:app --host 0.0.0.0 --port 8000
+- [ ] T045 [P] [US6] Create Dockerfile.frontend: multi-stage — stage 1 Node 18 alpine, COPY package*.json, RUN npm ci, COPY frontend/src/ (updated path after T002 migration), RUN npm run build; stage 2 nginx:alpine, COPY --from=stage1 /app/dist /usr/share/nginx/html
+- [ ] T046 [US6] Create docker-compose.yml: db service (postgres:16, named volume for data persistence, mounts scripts/seed-dump.sql into /docker-entrypoint-initdb.d/seed-dump.sql, health check via pg_isready); backend service (build backend/, depends_on db with health condition, env_file .env, health check via GET /health); frontend service (build Dockerfile.frontend, depends_on backend); all services on shared network (FR-036, FR-038, FR-039)
+- [ ] T047 [US6] Verify backend can connect to db service using Docker Compose service name in DATABASE_URL (postgresql+asyncpg://user:pass@db:5432/earthsandwich); confirm Alembic migrations run on backend container start before accepting traffic
+
+**Checkpoint**: US6 complete — validate with quickstart.md section 2 end-to-end (docker compose up → browser loads travelogue).
+
+---
+
+## Phase 9: Polish & Cross-Cutting Concerns
+
+**Purpose**: Container health endpoint and end-to-end validation. Ingestion-side polish (T048 supporting-artifact cleanup, T049 Claude prompt engineering) moved to `003-ingestion-pipeline/tasks.md` Phase 3.
+
+- [ ] T050 [P] Add GET /health endpoint to backend/app/main.py returning `{"status": "ok"}` with 200; used by Docker Compose health check on the backend service (FR-039)
+- [ ] T051 Validate end-to-end developer workflow per quickstart.md: `docker compose up` → seed pipeline → API queries → confirm all user stories in this spec work together; document any deviations in quickstart.md (cross-spec E2E that also covers ingestion is run from `003-ingestion-pipeline/quickstart.md`)
+
+---
+
+## Dependencies & Execution Order
+
+### Phase Dependencies
+
+- **Setup (Phase 1)**: No dependencies — start immediately
+- **Foundational (Phase 2)**: Depends on Phase 1 completion — **BLOCKS all user stories**
+- **US1 (Phase 3)**: Depends on Phase 2; T019 should run after T002 (frontend move may shift TS data import paths)
+- **US2 (Phase 4)**: Depends on Phase 2; no dependency on US1 (but seeded data needed for manual testing)
+- **US4 (Phase 6)**: Depends on Phase 2; T040 depends on T037 (contract must be defined first)
+- **US6 (Phase 8)**: Depends on Phase 2; practically benefits from US1 (seed-dump.sql) existing; T045 Dockerfile.frontend COPY paths must reflect T002 frontend/ move
+- **Polish (Phase 9)**: Depends on all user story phases in this spec
+
+### Parallel Opportunities
+
+- T003, T004, T005 in Phase 1: all parallel (different files); T002 is sequential (filesystem move)
+- T007, T010, T011, T012, T016, T017, T018 in Phase 2: all parallel (different files)
+- T023, T024, T025 in US2: all parallel (different files)
+- T037, T038, T039 in US4: all parallel (T040 waits on T037)
+- T044, T045 in US6: parallel (different Dockerfiles)
+
+---
+
+## Implementation Strategy
+
+### MVP First (US1 + US2 — both P1)
+
+1. Complete Phase 1: Setup (including T002 frontend move)
+2. Complete Phase 2: Foundational (**CRITICAL** — blocks everything)
+3. Complete Phase 3: US1 (seed pipeline)
+4. Complete Phase 4: US2 (read API)
+5. **STOP and VALIDATE**: Seed data loads; API returns trips/stops/posts; quickstart sections 2–3 and 6 pass
+6. Deploy/demo if ready
+
+### Incremental Delivery
+
+1. Setup + Foundational → skeleton ready
+2. US1 → database seeded, SQL dump committed → **demo: data in DB**
+3. US2 → read API live → **demo: frontend can query backend** (MVP!)
+4. US4 → trip management + region end dates → **demo: operator can create trips via API**
+5. US6 → containerized → **demo: `docker compose up` works from scratch**
+6. Polish → health endpoint, E2E validation
+
+---
+
+## Notes
+
+- **[P]** = different files, no incomplete dependencies; safe to run in parallel
+- **[Story]** label maps each task to a specific user story for traceability
+- **T002** (frontend/ move) is a Setup task that affects T019 (TS data import paths) and T045 (Dockerfile.frontend COPY paths) — complete T002 before those tasks
+- **T037** (contract) is a blocking dependency for T040 — do not implement the region end-date handler before the contract is defined
+- Phase 5 (US3) and Phase 7 (US5) stubs preserve the original phase numbering after the 2026-05-22 split — the actual tasks live in `003-ingestion-pipeline/tasks.md`
+- Commit after each task or logical group; stop at any checkpoint to validate the story independently

@@ -22,6 +22,7 @@ import csv
 import json
 import os
 import posixpath
+import re
 import sys
 from datetime import datetime, timezone
 
@@ -33,12 +34,14 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..
 
 load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
 
-ACCESS_TOKEN = os.environ["INSTA_ACCESS_TOKEN"]
+ACCESS_TOKEN = os.environ["INSTAGRAM_GRAPH_API_TOKEN"]
+ACCESS_TOKEN_2 = os.environ.get("INSTAGRAM_GRAPH_API_TOKEN_2", "")
+TOKENS = [t for t in [ACCESS_TOKEN, ACCESS_TOKEN_2] if t]
 ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 BASE_URL = "https://graph.instagram.com/v25.0"
 POST_FIELDS = "caption,media_type,media_url,shortcode,timestamp"
 
-TSV_COLUMNS = ["id", "instagram_id", "shortcode", "media_url", "caption", "timestamp", "location", "lat", "lng"]
+TSV_COLUMNS = ["id", "instagram_id", "shortcode", "media_url", "caption", "timestamp", "location", "lat", "lng", "region"]
 DEFAULT_OUTPUT = os.path.join(PROJECT_ROOT, "posts.local.tsv")
 DEFAULT_MEDIA_DIR = os.path.join(PROJECT_ROOT, "public/media")
 RECENT_LOCATION_COUNT = 5
@@ -73,10 +76,10 @@ def fetch_media_page(url: str) -> dict:
     return resp.json()
 
 
-def fetch_post_details(post_id: str) -> dict:
+def fetch_post_details(post_id: str, access_token: str) -> dict:
     resp = requests.get(
         f"{BASE_URL}/{post_id}",
-        params={"fields": POST_FIELDS, "access_token": ACCESS_TOKEN},
+        params={"fields": POST_FIELDS, "access_token": access_token},
         timeout=30,
     )
     resp.raise_for_status()
@@ -99,18 +102,19 @@ def download_media(media_url: str, local_id: int, media_type: str, media_dir: st
         for chunk in resp.iter_content(chunk_size=8192):
             f.write(chunk)
 
-    return local_path
+    return os.path.normpath(local_path)
 
 
 def get_location_via_claude(
+    url: str,
     caption: str,
     local_media_path: str,
     media_type: str,
     recent_locations: list[str],
-) -> tuple[str, str, str]:
+) -> tuple[str, str, str, str]:
     """Use Claude to determine the location, latitude, and longitude of a post.
 
-    Returns a (location, lat, lng) tuple. Any field may be an empty string if
+    Returns a (location, lat, lng, region) tuple. Any field may be an empty string if
     undetermined.
     """
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
@@ -122,18 +126,24 @@ def get_location_via_claude(
         recent_loc_text = f"\n\nLocations of recent nearby posts (for context):\n{loc_list}"
 
     prompt = (
+        f"Instagram URL: {url}\n"
         f"Caption: {caption or '(none)'}"
         f"{recent_loc_text}\n\n"
         "Based on the caption, image content, and the locations of recent posts, "
         "what is the location of this Instagram post? "
+        "Additionally, return the latitude, longitude, and airport code of the nearest international airport where possible. "
+        "First, try to pull up the Instagram post using the URL and see if it has an explicitly geotagged location. "
         "If a location is explicitly tagged or clearly stated in the caption, use that. "
-        "Otherwise, estimate based on visual cues and the context of nearby posts. "
-        "Respond with only a JSON object with three keys: "
+        "Otherwise, estimate based on visual cues and the context of recent posts. "
+        "Respond with only a JSON object with four keys: "
         '"location" (human-readable name, e.g. \'Times Square, New York, USA\'), '
         '"lat" (decimal latitude as a string, e.g. \'40.7580\'), '
-        'and "lng" (decimal longitude as a string, e.g. \'-73.9855\'). '
-        "If you cannot determine the location, set all three values to empty strings. "
-        "Do not include any text outside the JSON object."
+        '"lng" (decimal longitude as a string, e.g. \'-73.9855\'), '
+        'and "region" (code of the nearest international airport, e.g. \'JFK\'). '
+        "If you cannot determine the location, set all four values to empty strings. "
+        "If you cannot determine the lat/lng, provide the location and region but leave lat and lng as empty strings. "
+        "If you cannot determine the nearest international airport, provide the location and lat/lng but leave region as an empty string. "
+        "Do not include any text outside the JSON object. Do not wrap the JSON in markdown code fences."
     )
 
     content: list[dict] = []
@@ -154,22 +164,60 @@ def get_location_via_claude(
     content.append({"type": "text", "text": prompt})
 
     response = client.messages.create(
-        model="claude-opus-4-5",
+        model="claude-sonnet-4-6",
         max_tokens=256,
         messages=[{"role": "user", "content": content}],
     )
 
     raw = response.content[0].text.strip()
+    # Strip markdown code fences if Claude wrapped the JSON despite the prompt.
+    if raw.startswith("```"):
+        first_nl = raw.find("\n")
+        if first_nl != -1:
+            raw = raw[first_nl + 1 :]
+        if raw.endswith("```"):
+            raw = raw[:-3]
+        raw = raw.strip()
     try:
         data = json.loads(raw)
         return (
             str(data.get("location", "")),
             str(data.get("lat", "")),
             str(data.get("lng", "")),
+            str(data.get("region", "")),
         )
     except (json.JSONDecodeError, AttributeError):
         # Fallback: treat the raw text as just a location name
-        return (raw, "", "")
+        return (raw, "", "", "")
+
+
+def fetch_new_post_ids(access_token: str, since_ts: int, until_ts: int) -> list[str]:
+    """Return all new post IDs for one account since since_ts, newest-first."""
+    next_url: str | None = (
+        f"{BASE_URL}/me/media"
+        f"?access_token={access_token}"
+        f"&since={since_ts}"
+        f"&until={until_ts}"
+    )
+    all_ids: list[str] = []
+    page_num = 0
+    while next_url:
+        page_num += 1
+        safe_url = re.sub(r"access_token=[^&]*", "access_token=[REDACTED]", next_url)
+        print(f"  [page {page_num}] {safe_url[:120]}...")
+        try:
+            page = fetch_media_page(next_url)
+        except requests.HTTPError as exc:
+            print(f"\nERROR: page {page_num} fetch failed — {exc}")
+            sys.exit(1)
+        except requests.RequestException as exc:
+            print(f"\nERROR: network error on page {page_num} — {exc}")
+            sys.exit(1)
+        ids = [item["id"] for item in page.get("data", [])]
+        all_ids.extend(ids)
+        print(f"  {len(ids)} posts")
+        next_url = page.get("paging", {}).get("next")
+    return all_ids
 
 
 def main() -> None:
@@ -214,65 +262,34 @@ def main() -> None:
     except (ValueError, KeyError):
         next_id = len(existing_rows) + 1
 
-    # Build initial API URL with since/until time-based params
-    next_url: str | None = (
-        f"{BASE_URL}/me/media"
-        f"?access_token={ACCESS_TOKEN}"
-        f"&since={since_ts}"
-        f"&until={until_ts}"
-    )
-
     print(f"Fetching posts since {last_timestamp_str} (unix: {since_ts})")
 
-    # Collect all new post IDs across pages (API returns newest-first)
-    all_new_ids: list[str] = []
-    page_num = 0
+    # Collect new post IDs from all accounts, paired with their token.
+    # Each account's IDs are reversed so oldest-new comes first per account.
+    all_new_posts: list[tuple[str, str]] = []  # (post_id, access_token)
+    for i, token in enumerate(TOKENS, start=1):
+        print(f"\nAccount {i}:")
+        ids = fetch_new_post_ids(token, since_ts, until_ts)
+        ids.reverse()  # oldest-new first; newest ends up last appended
+        all_new_posts.extend((pid, token) for pid in ids)
 
-    while next_url:
-        page_num += 1
-        print(f"[page {page_num}] {next_url[:80]}...")
-
-        try:
-            page = fetch_media_page(next_url)
-        except requests.HTTPError as exc:
-            print(f"\nERROR: page {page_num} fetch failed — {exc}")
-            sys.exit(1)
-        except requests.RequestException as exc:
-            print(f"\nERROR: network error on page {page_num} — {exc}")
-            sys.exit(1)
-
-        ids = [item["id"] for item in page.get("data", [])]
-        all_new_ids.extend(ids)
-        print(f"  {len(ids)} posts")
-        next_url = page.get("paging", {}).get("next")
-
-    if not all_new_ids:
+    if not all_new_posts:
         print("No new posts found.")
         return
-
-    # Reverse so we append oldest-new-post first; newest ends up as the last row
-    all_new_ids.reverse()
 
     # Seed Claude location context with the most recent existing posts
     sorted_rows = sorted(timestamped, key=lambda r: r["timestamp"], reverse=True)
     recent_locations = [r.get("location", "") for r in sorted_rows[:RECENT_LOCATION_COUNT]]
 
     with open(args.output, "a", newline="", encoding="utf-8") as out_file:
-        # Ensure the file ends with a newline before appending new rows
-        # out_file.seek(0, 2)  # seek to end
-        # if out_file.tell() > 0:
-        #     out_file.seek(out_file.tell() - 1)
-        #     if out_file.read(1) != "\n":
-        #         out_file.write("\n")
-
         writer = csv.DictWriter(out_file, fieldnames=TSV_COLUMNS, delimiter="\t")
 
         total_written = 0
-        for post_id in all_new_ids:
+        for post_id, token in all_new_posts:
             local_id = next_id
 
             try:
-                details = fetch_post_details(post_id)
+                details = fetch_post_details(post_id, token)
             except requests.RequestException as exc:
                 print(f"  ! {post_id}  detail fetch failed ({exc}) — writing partial row")
                 writer.writerow({
@@ -285,6 +302,7 @@ def main() -> None:
                     "location": "",
                     "lat": "",
                     "lng": "",
+                    "region": "",
                 })
                 out_file.flush()
                 next_id += 1
@@ -305,15 +323,21 @@ def main() -> None:
                     print(f"  ! {post_id}  media download failed ({exc})")
 
             # Ask Claude for the location, lat, and lng
-            location, lat, lng = "", "", ""
+            location, lat, lng, region = "", "", "", ""
+
+            # Include Instagram URL in the prompt so Claude can use it as a clue (e.g. for geotagged posts or if the location is mentioned in the caption). This is especially helpful for older posts that may not have media URLs that work anymore, since Claude can use the URL as a hint to look up the post's location from other sources.
+            url = ""
+            if details.get("shortcode"):
+                url = f"https://www.instagram.com/p/{details.get('shortcode', '')}/"
             try:
-                location, lat, lng = get_location_via_claude(
+                location, lat, lng, region = get_location_via_claude(
+                    url=url,
                     caption=details.get("caption", ""),
                     local_media_path=local_media_path,
                     media_type=media_type,
                     recent_locations=recent_locations,
                 )
-                print(f"  location: {location or '(undetermined)'}  lat={lat}  lng={lng}")
+                print(f"  location: {location or '(undetermined)'}  lat={lat}  lng={lng}  region: {region or '(undetermined)'}")
             except Exception as exc:
                 print(f"  ! {post_id}  Claude location lookup failed ({exc})")
 
@@ -334,6 +358,7 @@ def main() -> None:
                 "location": location,
                 "lat": lat,
                 "lng": lng,
+                "region": region,
             })
             out_file.flush()
 
@@ -350,4 +375,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    if (sys.stdout.encoding or "").lower() != "utf-8":
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
     main()

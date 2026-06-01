@@ -1,0 +1,23 @@
+[
+  {
+    "id": "miscellaneous-adventures",
+    "title": "Miscellaneous Adventures",
+    "description": "A collection of adventures across Latin America, Europe, and North America.",
+    "start_date": "2019-05-13",
+    "end_date": "2024-02-20"
+  },
+  {
+    "id": "earth-sandwich-2015",
+    "title": "Earth Sandwich 2015",
+    "description": "A round-the-world journey from Dublin to New York spanning July 2015 to August 2016.",
+    "start_date": "2015-06-21",
+    "end_date": "2016-09-15"
+  },
+  {
+    "id": "earth-club-sandwich-2027",
+    "title": "Earth Club Sandwich 2027",
+    "description": "A round-the-world journey spanning March 2027 to May 2028, with stops across Asia, the Pacific, the Americas, the Gulf, Africa, and Central Asia.",
+    "start_date": "2027-03-26",
+    "end_date": "2028-05-12"
+  }
+]

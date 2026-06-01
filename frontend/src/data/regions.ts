@@ -59,6 +59,7 @@ export const REGIONS: Region[] = [
   { code: 'ASR', name: 'Cappadocia (Kayseri)', airportName: 'Kayseri Erkilet International Airport', country: 'Turkey', coords: { lat: 38.7704, lng: 35.4954 } },
   { code: 'JTR', name: 'Santorini (Greek Islands)', airportName: 'Santorini (Thira) National Airport', country: 'Greece', coords: { lat: 36.3992, lng: 25.4793 } },
   { code: 'ATH', name: 'Athens', airportName: 'Athens International Airport Eleftherios Venizelos', country: 'Greece', coords: { lat: 37.9364, lng: 23.9445 } },
+  { code: 'KGS', name: 'Kos (Greek Islands)', airportName: 'Kos Island International Airport', country: 'Greece', coords: { lat: 36.7931, lng: 27.0914 } },
 
   // ── Balkans & Eastern Europe ──────────────────────────────
   { code: 'SOF', name: 'Sofia', airportName: 'Sofia Airport', country: 'Bulgaria', coords: { lat: 42.6952, lng: 23.4114 } },
