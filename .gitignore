@@ -25,9 +25,8 @@ venv/
 # Alembic
 backend/alembic/versions/*.pyc
 
-# instagrapi session (active + backup variants)
-instagrapi_session.json
-instagrapi_session.json.bak
+# instagrapi session (active + backup variants — .bak, .stale-<timestamp>, etc.)
+instagrapi_session.json*
 
 # Media downloads
 public/media/
