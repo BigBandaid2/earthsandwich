@@ -250,6 +250,14 @@
 
 ---
 
+## Phase 17: Drift Reconciliation (2026-06-01 weekly scan)
+
+**Status**: Backfill from the 2026-05-25 global drift baseline (`2265cf6`) through HEAD. One drift commit identified for 001 — a top-level ErrorBoundary added to harden the frontend against runtime errors now that data flows from the live API rather than hardcoded modules.
+
+- [x] T100 Add top-level `ErrorBoundary` component (`frontend/src/components/ErrorBoundary.tsx`) to gracefully surface runtime errors instead of white-screening; wire into `frontend/src/App.tsx`; clean up the now-obsolete `effectiveActiveTrip` state that became dead with API-fetched data. Commit: `ec3faf3`.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

@@ -174,6 +174,17 @@
 
 ---
 
+## Phase 27: User Story 7 — Self-healing scrapes survive mid-run failure cleanly (Priority: P1)
+
+**Goal**: Mid-scrape failures (DNS hiccup, transient network, Bloks challenge, inference exhaustion, OS-level kill) leave the pile in a consistent state via atomic snapshot/rollback. Operators can rebuild from any chosen timestamp via a single CLI invocation. Surfaced as drift in the 2026-06-01 weekly scan (baseline `2265cf6`) — emerged after Phase 21 (throttling resilience) was already deemed done, driven by real operational incidents.
+
+- [x] T254 [US7] Guard `resort_tsv_and_sweep_media` orphan sweep against interrupted scrapes — sweep only runs on the success path so a mid-flight `FetchInterruptedError` no longer misclassifies the in-flight target's unfetched media files as orphans. Driven by the 2026-05-29 DNS-hiccup incident that deleted 179 valid media files. Commit: `88f503d`.
+- [x] T255 [US7] `RunSnapshot` class in `common/pile.py` — pre-scrape TSV + media-file-set capture, `snapshot.take()` / `commit()` / `rollback()` lifecycle. `_rollback_run` helper in `instagram/pipeline.py` wraps every failure branch in `run_for_target` (`FetchInterruptedError`, `InferenceHardBlockError`, generic `Exception`). Structured JSON-Lines failure record appended to `<log_dir>/scrape-failures.jsonl`. Operator-facing failure banner printed to stdout. Commit: `3516aa9`.
+- [x] T256 [US7] Integration tests for the self-healing path — `tests/instagram/test_run_for_target_self_healing.py` mocks `iter_new_media` with each failure injection to exercise the snapshot/rollback machinery end-to-end. Two real bugs surfaced and fixed during this work. Commit: `86215ec`.
+- [x] T257 [US7] CLI flag `--newer-than <ISO>` — atomic truncate-and-rescrape from a chosen timestamp inside one snapshot-protected transaction. Replaces the manual "edit TSV, then re-run" pattern integration tests previously needed. `parse_unix_timestamp` hardened to treat naive datetimes as UTC. Mexico City smoke test (`tests/instagram/test_instagram_pull.py`) migrated to use the new flag, eliminating its test-local TSV truncation helper. 6 new unit tests in `tests/common/test_truncate_helper.py` lock the inclusive-cutoff boundary, ISO format variations, missing-file and missing-timestamp edge cases. Commit: `4c0ee6f`.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
