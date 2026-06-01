@@ -15,149 +15,128 @@
       "key": "OCS-12",
       "summary": "Phase 1: Setup (Project Initialization)",
       "url": "https://datacommlab.atlassian.net/browse/OCS-12",
-      "status": "completed",
       "tasks": []
     },
     {
       "key": "OCS-13",
       "summary": "Phase 2: Foundational (Core Data & Types)",
       "url": "https://datacommlab.atlassian.net/browse/OCS-13",
-      "status": "completed",
       "tasks": []
     },
     {
       "key": "OCS-14",
       "summary": "Phase 3: US1 - Browse trip progress on map (P1, MVP)",
       "url": "https://datacommlab.atlassian.net/browse/OCS-14",
-      "status": "completed",
       "tasks": []
     },
     {
       "key": "OCS-15",
       "summary": "Phase 4: US2 - Explore region clusters on zoomed-out map (P2)",
       "url": "https://datacommlab.atlassian.net/browse/OCS-15",
-      "status": "completed",
       "tasks": []
     },
     {
       "key": "OCS-16",
       "summary": "Phase 5: US3 - Inspect a single stop (P3)",
       "url": "https://datacommlab.atlassian.net/browse/OCS-16",
-      "status": "completed",
       "tasks": []
     },
     {
       "key": "OCS-17",
       "summary": "Phase 6: Decommission Old Features",
       "url": "https://datacommlab.atlassian.net/browse/OCS-17",
-      "status": "completed",
       "tasks": []
     },
     {
       "key": "OCS-18",
       "summary": "Phase 8: Planned Stop Type & New Trip Data",
       "url": "https://datacommlab.atlassian.net/browse/OCS-18",
-      "status": "completed",
       "tasks": []
     },
     {
       "key": "OCS-49",
       "summary": "Phase 9: Multi-Trip URL Routing",
       "url": "https://datacommlab.atlassian.net/browse/OCS-49",
-      "status": "completed",
       "tasks": []
     },
     {
       "key": "OCS-50",
       "summary": "Phase 10: Abandoned Stop Status",
       "url": "https://datacommlab.atlassian.net/browse/OCS-50",
-      "status": "completed",
       "tasks": []
     },
     {
       "key": "OCS-51",
       "summary": "Phase 11: Substack Post Integration",
       "url": "https://datacommlab.atlassian.net/browse/OCS-51",
-      "status": "completed",
       "tasks": []
     },
     {
       "key": "OCS-52",
       "summary": "Phase 12: Stop Data Backfill (Earth Sandwich 2015)",
       "url": "https://datacommlab.atlassian.net/browse/OCS-52",
-      "status": "completed",
       "tasks": []
     },
     {
       "key": "OCS-53",
       "summary": "Phase 13: Map and Sidebar UX Refinements",
       "url": "https://datacommlab.atlassian.net/browse/OCS-53",
-      "status": "completed",
       "tasks": []
     },
     {
       "key": "OCS-54",
       "summary": "Phase 14: Spec-Kit / JIRA Integration",
       "url": "https://datacommlab.atlassian.net/browse/OCS-54",
-      "status": "completed",
       "tasks": []
     },
     {
       "key": "OCS-55",
       "summary": "Phase 15: Drift Reconciliation (2026-05-04 weekly scan)",
       "url": "https://datacommlab.atlassian.net/browse/OCS-55",
-      "status": "completed",
       "tasks": []
     },
     {
       "key": "OCS-72",
       "summary": "Phase 16: Drift Reconciliation (2026-05-15 weekly scan)",
       "url": "https://datacommlab.atlassian.net/browse/OCS-72",
-      "status": "completed",
       "tasks": []
     },
     {
       "key": "OCS-107",
       "summary": "Phase 17: Drift Reconciliation (2026-06-01 weekly scan)",
       "url": "https://datacommlab.atlassian.net/browse/OCS-107",
-      "status": "completed",
       "tasks": []
     },
     {
       "key": "OCS-19",
       "summary": "Phase 7: Polish & Cross-Cutting Concerns",
       "url": "https://datacommlab.atlassian.net/browse/OCS-19",
-      "status": "pending",
       "tasks": [
-        { "key": "OCS-39", "id": "T041", "summary": "Add accessibility labels and ARIA attributes to all interactive elements", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-39" },
-        { "key": "OCS-40", "id": "T042", "summary": "Add keyboard navigation support (arrow keys, Enter, Escape)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-40" },
-        { "key": "OCS-41", "id": "T043", "summary": "Test responsive layout on mobile/tablet viewport sizes", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-41" },
-        { "key": "OCS-42", "id": "T044", "summary": "Optimize map rendering performance for 50+ markers", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-42" },
-        { "key": "OCS-43", "id": "T045", "summary": "Add visual feedback for map interactions (hover states, animations)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-43" },
-        { "key": "OCS-44", "id": "T046", "summary": "Run performance benchmark — initial page load under 3 seconds", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-44" },
-        { "key": "OCS-45", "id": "T047", "summary": "Add comprehensive inline documentation to modified components", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-45" },
-        { "key": "OCS-46", "id": "T048", "summary": "Update quickstart.md with usage examples and local dev instructions", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-46" },
-        { "key": "OCS-47", "id": "T049", "summary": "Final browser testing (map, sidebar, detail panel, region clustering)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-47" },
-        { "key": "OCS-48", "id": "T050", "summary": "Test edge cases (missing images/blogs, very long blog text, dense regions)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-48" },
-        { "key": "OCS-56", "id": "T093", "summary": "Replace continental-view map pin with country flag (fallback: smaller push-pin)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-56", "source": "stakeholder-meeting-2026-05-04" },
-        { "key": "OCS-57", "id": "T094", "summary": "Add directional arrowheads to the route polyline", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-57", "source": "stakeholder-meeting-2026-05-04" },
-        { "key": "OCS-58", "id": "T095", "summary": "Distinct Start and Finish pins for first/last trip stop", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-58", "source": "stakeholder-meeting-2026-05-04" },
-        { "key": "OCS-59", "id": "T096", "summary": "Vintage postcard map skin for continental view (no labels, no terrain)", "status": "pending", "url": "https://datacommlab.atlassian.net/browse/OCS-59", "source": "stakeholder-meeting-2026-05-04" }
+        { "key": "OCS-39", "id": "T041", "summary": "Add accessibility labels and ARIA attributes to all interactive elements", "url": "https://datacommlab.atlassian.net/browse/OCS-39" },
+        { "key": "OCS-40", "id": "T042", "summary": "Add keyboard navigation support (arrow keys, Enter, Escape)", "url": "https://datacommlab.atlassian.net/browse/OCS-40" },
+        { "key": "OCS-41", "id": "T043", "summary": "Test responsive layout on mobile/tablet viewport sizes", "url": "https://datacommlab.atlassian.net/browse/OCS-41" },
+        { "key": "OCS-42", "id": "T044", "summary": "Optimize map rendering performance for 50+ markers", "url": "https://datacommlab.atlassian.net/browse/OCS-42" },
+        { "key": "OCS-43", "id": "T045", "summary": "Add visual feedback for map interactions (hover states, animations)", "url": "https://datacommlab.atlassian.net/browse/OCS-43" },
+        { "key": "OCS-44", "id": "T046", "summary": "Run performance benchmark — initial page load under 3 seconds", "url": "https://datacommlab.atlassian.net/browse/OCS-44" },
+        { "key": "OCS-45", "id": "T047", "summary": "Add comprehensive inline documentation to modified components", "url": "https://datacommlab.atlassian.net/browse/OCS-45" },
+        { "key": "OCS-46", "id": "T048", "summary": "Update quickstart.md with usage examples and local dev instructions", "url": "https://datacommlab.atlassian.net/browse/OCS-46" },
+        { "key": "OCS-47", "id": "T049", "summary": "Final browser testing (map, sidebar, detail panel, region clustering)", "url": "https://datacommlab.atlassian.net/browse/OCS-47" },
+        { "key": "OCS-48", "id": "T050", "summary": "Test edge cases (missing images/blogs, very long blog text, dense regions)", "url": "https://datacommlab.atlassian.net/browse/OCS-48" },
+        { "key": "OCS-56", "id": "T093", "summary": "Replace continental-view map pin with country flag (fallback: smaller push-pin)", "url": "https://datacommlab.atlassian.net/browse/OCS-56", "source": "stakeholder-meeting-2026-05-04" },
+        { "key": "OCS-57", "id": "T094", "summary": "Add directional arrowheads to the route polyline", "url": "https://datacommlab.atlassian.net/browse/OCS-57", "source": "stakeholder-meeting-2026-05-04" },
+        { "key": "OCS-58", "id": "T095", "summary": "Distinct Start and Finish pins for first/last trip stop", "url": "https://datacommlab.atlassian.net/browse/OCS-58", "source": "stakeholder-meeting-2026-05-04" },
+        { "key": "OCS-59", "id": "T096", "summary": "Vintage postcard map skin for continental view (no labels, no terrain)", "url": "https://datacommlab.atlassian.net/browse/OCS-59", "source": "stakeholder-meeting-2026-05-04" }
       ]
     }
   ],
   "summary": {
     "total_stories": 17,
-    "completed_stories": 16,
-    "active_stories": 1,
-    "total_tasks": 14,
-    "pending_tasks": 14,
-    "completed_tasks": 0
+    "total_tasks": 14
   },
   "notes": [
     "All historic phases (1-6, 8, 9-15) are represented at the Story level only. Per-task records exist only for the active Phase 7 polish backlog.",
-    "Sprint assignment, owner, story points, and priority for these issues live exclusively in JIRA. Per docs/workflow.md, no sprint state is recorded in this repository.",
+    "Per Cardinal Rule #2 (no PM state in synced artifacts), sprint, owner, status, story points, priority — and derived status counters like completed_stories — are absent from this mapping. Track per-issue state in JIRA directly.",
     "Phase 15 (OCS-55) was created via the docs/workflow.md drift-scan procedure on 2026-05-04 to backfill commits c24c263..650040b that lacked task entries.",
-    "2026-06-01: Phase 17 drift recon Story OCS-107 created and transitioned to Done. Single drift task T100 (ErrorBoundary, commit ec3faf3) — stories-only per Phase 16/15/14 precedent."
+    "2026-06-01: Phase 17 drift recon Story OCS-107 created. Single drift task T100 (ErrorBoundary, commit ec3faf3) — stories-only per Phase 16/15/14 precedent."
   ]
 }
