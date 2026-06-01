@@ -71,20 +71,20 @@
       "key": "OCS-108",
       "summary": "Phase 11: US7 — Frontend API Integration (P1)",
       "url": "https://datacommlab.atlassian.net/browse/OCS-108",
-      "status": "completed",
+      "status": "pending",
       "tasks": []
     }
   ],
   "summary": {
     "total_stories": 9,
-    "completed_stories": 5,
-    "pending_stories": 4
+    "completed_stories": 4,
+    "pending_stories": 5
   },
   "notes": [
     "All Stories created 2026-05-25 after the 2026-05-22 split of 002-data-ingestion into 002-database-backend and 003-ingestion-pipeline.",
     "Phases stored at the Story level only — no Subtasks created per the team convention (stories-only sync unless there's a clear reason to break out individual tasks).",
     "Phase 5 (MOVED to 003 as Phase 1) and Phase 7 (MOVED to 003 as Phase 2) stubs in tasks.md were intentionally NOT created as Stories in JIRA — they live in tasks.md only as historical-record breadcrumbs.",
-    "2026-06-01: Phase 11 US7 Frontend API Integration added as OCS-108 (transitioned to Done). Linked as Duplicate of OCS-66 (user-created sibling ticket 'Wire frontend to backend API'); the spec-kit Story is canonical per workflow.md §JIRA sync.",
+    "2026-06-01: Phase 11 US7 Frontend API Integration added as OCS-108. Initially flipped to Done during the cadence sweep based on the [T056]–[T062] commits, but reverted to To Do same day after operator confirmation that the end-to-end FE↔BE wiring isn't actually complete. Lesson: commit messages tagged with task IDs do not automatically imply the parent Story is shippable; flip to Done only after the Independent Test in the Story description has been verified. Linked as Duplicate of OCS-66 (user-created sibling ticket 'Wire frontend to backend API'); the spec-kit Story is canonical per workflow.md §JIRA sync.",
     "Stories created in 'To Do' status. Phases 1, 2, 3, and 17 are spec-marked completed and need transitioning to 'Done' via /speckit.jira.sync-status."
   ]
 }
