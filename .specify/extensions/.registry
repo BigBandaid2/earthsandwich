@@ -18,6 +18,59 @@
       },
       "registered_skills": [],
       "installed_at": "2026-04-20T21:14:09.086321+00:00"
+    },
+    "learn": {
+      "version": "1.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:1d78c414d8e71ffa163d3b3f2a0c94a02c6418e88577e68081123ebf892e704a",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "copilot": [
+          "speckit.learn.review",
+          "speckit.learn.clarify",
+          "speckit.learn.diagrams"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-04-29T13:53:44.675546+00:00"
+    },
+    "onboard": {
+      "version": "2.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:8220058d725718da973dd45967a7403a03d0c6d815f25c2e80626b5428ae8f2f",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "copilot": [
+          "speckit.onboard.start",
+          "speckit.onboard.explain",
+          "speckit.onboard.trail",
+          "speckit.onboard.quiz",
+          "speckit.onboard.badge",
+          "speckit.onboard.mentor",
+          "speckit.onboard.team"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-04-29T16:50:56.720349+00:00"
+    },
+    "jira": {
+      "version": "2.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:5d5bdc26ee4af105f1734c29dde9fe0f432e9125a42314201ff04c75ca349bf9",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "copilot": [
+          "speckit.jira.specstoissues",
+          "speckit.specstoissues",
+          "speckit.jira.discover-fields",
+          "speckit.jira.sync-status"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-05-04T16:03:31.648876+00:00"
     }
   }
 }

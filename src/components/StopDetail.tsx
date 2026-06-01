@@ -1,62 +1,125 @@
-import { useState } from 'react';
 import type { Stop } from '../data/types';
+import type { RegionGroup } from '../utils/regionUtils';
+import { formatDate } from '../utils/regionUtils';
 
-interface StopDetailProps {
-  selectedStop: Stop | null;
+interface StopModalProps {
+  stop: Stop;
+  stopList: string[];
+  allStops: Stop[];
+  regionGroups: RegionGroup[];
+  onClose: () => void;
+  onNav: (direction: 'prev' | 'next') => void;
 }
 
-function StopDetail({ selectedStop }: StopDetailProps) {
-  const [imageOpen, setImageOpen] = useState(true);
-  const [blogOpen, setBlogOpen] = useState(true);
+function StopModal({ stop, stopList, regionGroups, onClose, onNav }: StopModalProps) {
+  const idx = stopList.indexOf(stop.id);
+  const canPrev = idx > 0;
+  const canNext = idx < stopList.length - 1;
 
-  if (!selectedStop) {
-    return (
-      <section className="stop-detail empty-state">
-        <h2>Stop details</h2>
-        <p>Select a stop from the itinerary or map to view more information here.</p>
-      </section>
-    );
-  }
+  const regionGroup = regionGroups.find((g) => g.region.code === stop.regionCode);
+
+  const igUrl =
+    stop.post.type === 'instagram'
+      ? `https://www.instagram.com/p/${stop.post.shortcode}/`
+      : null;
+
+  const breadcrumb = [
+    regionGroup?.region.name ?? stop.regionCode,
+    stop.location.split(',')[0],
+    formatDate(stop.date),
+  ];
 
   return (
-    <section className="stop-detail">
-      <div className="stop-detail-header">
-        <div>
-          <p className="stop-type">{selectedStop.type === 'city' ? 'City stop' : selectedStop.type === 'site' ? 'Site stop' : 'Major stop'}</p>
-          <h2>{selectedStop.title}</h2>
-          <p className="stop-caption">{selectedStop.caption}</p>
-          <p className="stop-date">{selectedStop.date}</p>
-        </div>
-      </div>
+    <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Stop detail">
+      <div className="modal-dim" onClick={onClose} />
 
-      {selectedStop.image ? (
-        <div className="toggle-section">
-          <button type="button" className="toggle-button" onClick={() => setImageOpen((prev) => !prev)}>
-            {imageOpen ? 'Hide image' : 'Show image'}
-          </button>
-          {imageOpen ? <img className="stop-image" src={selectedStop.image} alt={selectedStop.title} /> : null}
-        </div>
-      ) : null}
+      <button
+        type="button"
+        className="modal-nav-btn modal-nav-prev"
+        onClick={() => onNav('prev')}
+        disabled={!canPrev}
+        aria-label="Previous stop"
+      >
+        ‹
+      </button>
 
-      <div className="toggle-section">
-        <button type="button" className="toggle-button" onClick={() => setBlogOpen((prev) => !prev)}>
-          {blogOpen ? 'Hide journal entry' : 'Show journal entry'}
+      <div className="modal-content">
+        <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Close">
+          ✕
         </button>
-        {blogOpen ? (
-          <div className="blog-content">
-            <p>{selectedStop.blog ?? 'No long-form journal entry available for this stop.'}</p>
-          </div>
-        ) : null}
+
+        <nav className="modal-breadcrumb" aria-label="Breadcrumb">
+          {breadcrumb.map((crumb, i) => (
+            <span key={i}>
+              {i > 0 && <span className="breadcrumb-sep"> / </span>}
+              {i === 2 && igUrl ? (
+                <a href={igUrl} target="_blank" rel="noopener noreferrer" className="breadcrumb-ig-link">{crumb}</a>
+              ) : crumb}
+            </span>
+          ))}
+        </nav>
+
+        {stop.post.type === 'instagram' ? (
+          <InstagramPostView stop={stop} igUrl={igUrl!} />
+        ) : (
+          <SubstackPostView stop={stop} />
+        )}
       </div>
 
-      {selectedStop.details ? (
-        <div className="details-block">
-          <h3>Details</h3>
-          <p>{selectedStop.details}</p>
-        </div>
-      ) : null}
-    </section>
+      <button
+        type="button"
+        className="modal-nav-btn modal-nav-next"
+        onClick={() => onNav('next')}
+        disabled={!canNext}
+        aria-label="Next stop"
+      >
+        ›
+      </button>
+    </div>
   );
 }
 
-export default StopDetail;
+function InstagramPostView({ stop, igUrl }: { stop: Stop; igUrl: string }) {
+  if (stop.post.type !== 'instagram') return null;
+  const post = stop.post;
+
+  return (
+    <article className="post-instagram">
+      <h1 className="post-heading">{stop.location}</h1>
+      <p className="post-subheading">{post.caption}</p>
+      <a href={igUrl} target="_blank" rel="noopener noreferrer" className="post-hero-link">
+        <img
+          src={post.image}
+          alt={post.caption.slice(0, 80)}
+          className="post-hero-image"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).parentElement!.parentElement!.insertAdjacentHTML(
+              'beforeend',
+              '<p class="image-unavailable">Image no longer available</p>'
+            );
+            (e.currentTarget as HTMLImageElement).parentElement!.style.display = 'none';
+          }}
+        />
+      </a>
+    </article>
+  );
+}
+
+function SubstackPostView({ stop }: { stop: Stop }) {
+  if (stop.post.type !== 'substack') return null;
+  const post = stop.post;
+
+  return (
+    <article className="post-substack">
+      <h1 className="post-heading">{post.title}</h1>
+      {post.subtitle && <p className="post-subheading">{post.subtitle}</p>}
+      <div className="post-body">
+        {post.body.split('\n\n').map((para, i) => (
+          <p key={i}>{para}</p>
+        ))}
+      </div>
+    </article>
+  );
+}
+
+export default StopModal;

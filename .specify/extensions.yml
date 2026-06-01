@@ -50,6 +50,13 @@ hooks:
     prompt: Commit outstanding changes before implementation?
     description: Auto-commit before implementation
     condition: null
+  - extension: onboard
+    command: speckit.onboard.before-implement
+    enabled: true
+    optional: true
+    prompt: Skim recent project changes before implementing?
+    description: Show a digest of new/changed files since last implement so you can refresh your mental model before touching code.
+    condition: null
   before_checklist:
   - extension: git
     command: speckit.git.commit
@@ -114,6 +121,13 @@ hooks:
     prompt: Commit task changes?
     description: Auto-commit after task generation
     condition: null
+  - extension: jira
+    command: speckit.jira.specstoissues
+    enabled: true
+    optional: true
+    prompt: Create Jira issues from tasks?
+    description: Automatically create Jira hierarchy after task generation
+    condition: null
   after_implement:
   - extension: git
     command: speckit.git.commit
@@ -121,6 +135,20 @@ hooks:
     optional: true
     prompt: Commit implementation changes?
     description: Auto-commit after implementation
+    condition: null
+  - extension: learn
+    command: speckit.learn.review
+    enabled: true
+    optional: true
+    prompt: Generate a learning guide from this implementation?
+    description: ''
+    condition: null
+  - extension: onboard
+    command: speckit.onboard.after-implement
+    enabled: true
+    optional: true
+    prompt: Execute speckit.onboard.after-implement?
+    description: ''
     condition: null
   after_checklist:
   - extension: git
@@ -145,4 +173,12 @@ hooks:
     optional: true
     prompt: Commit after syncing issues?
     description: Auto-commit after tasks-to-issues conversion
+    condition: null
+  after_explain:
+  - extension: onboard
+    command: speckit.onboard.after-explain
+    enabled: true
+    optional: true
+    prompt: Execute speckit.onboard.after-explain?
+    description: ''
     condition: null
