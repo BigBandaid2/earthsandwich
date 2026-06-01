@@ -1,0 +1,212 @@
+old TSV rows: 322   new TSV rows: 323
+shared: 322   only-old: 0   only-new: 1
+
+Among 322 shared shortcodes:
+  exact match: 17 (5.3%)
+  differ:      305 (94.7%)
+
+Diff buckets:
+  old_undetermined              : 35
+  new_undetermined              : 0
+  new_with_fallback_note        : 7
+  old_appends_country           : 196
+  truly_different               : 67
+
+========================================================================
+BUCKET: old_undetermined  (35)
+========================================================================
+  shortcode=4MgtN7FnOe  old_id=322  new_id=1
+    OLD: 
+    NEW: Hudson River, New York Harbor, New York, USA
+  shortcode=4WuYp6lnF0  old_id=321  new_id=2
+    OLD: 
+    NEW: Hudson River, New York Harbor, New York, USA
+    R:   fallback: no observable evidence in image/caption; location copied from prior post (Hudson...
+  shortcode=4XH8OvFnGe  old_id=320  new_id=3
+    OLD: 
+    NEW: Upper West Side, New York, USA
+  shortcode=4YTqPjlnFf  old_id=319  new_id=4
+    OLD: 
+    NEW: Upper West Side, New York, USA
+    R:   fallback: no observable evidence in image/caption; location copied from prior post (Upper ...
+  shortcode=4ZTJ3DFnDY  old_id=318  new_id=5
+    OLD: 
+    NEW: John F. Kennedy International Airport, Queens, New York, USA
+    R:   Looking at the boarding pass, I can see:
+- Virgin America flight VX 23
+- Departure: New Yo...
+  shortcode=4aCGbhlnDv  old_id=317  new_id=6
+    OLD: 
+    NEW: San Francisco International Airport approach, San Francisco Bay, California, USA
+    R:   Looking at the evidence:
+
+1. Caption mentions "SFO" explicitly - San Francisco Internation...
+  shortcode=4cKiSglnJf  old_id=316  new_id=7
+    OLD: 
+    NEW: Las Vegas, Nevada, USA
+  shortcode=4gN0y0lnII  old_id=315  new_id=8
+    OLD: 
+    NEW: Bellagio Hotel & Casino, Las Vegas, Nevada, USA
+    R:   The caption mentions "the wine cellars at the Bellagio" and "#vegas" — the Bellagio is a s...
+  shortcode=4pjpz6lnAR  old_id=314  new_id=9
+    OLD: 
+    NEW: Bellagio Hotel & Casino, Las Vegas, Nevada, USA
+    R:   fallback: no observable evidence in image/caption; location copied from prior post (Bellag...
+  shortcode=4sf-_dlnMv  old_id=313  new_id=10
+    OLD: 
+    NEW: Canada (McDonald's restaurant)
+  shortcode=42c_5ClnEN  old_id=312  new_id=11
+    OLD: 
+    NEW: Canada (McDonald's restaurant)
+    R:   fallback: no observable evidence in image/caption; location copied from prior post (Canada...
+  shortcode=45EA90FnDO  old_id=311  new_id=12
+    OLD: 
+    NEW: Costco
+  shortcode=4-vKLiFnHN  old_id=310  new_id=13
+    OLD: 
+    NEW: Costco
+    R:   fallback: no observable evidence in image/caption; location copied from prior post (Costco...
+  shortcode=5A0VYXlnIW  old_id=309  new_id=14
+    OLD: 
+    NEW: Costco
+    R:   fallback: no observable evidence in image/caption; location copied from prior post (Costco...
+  shortcode=5IzQD2FnNR  old_id=308  new_id=15
+    OLD: 
+    NEW: Vancouver International Airport, Richmond, British Columbia, Canada
+    R:   I can see a small turboprop aircraft (appears to be a Dash 8/De Havilland Canada DHC-8) wi...
+  ... (+20 more)
+
+========================================================================
+BUCKET: new_with_fallback_note  (7)
+========================================================================
+  shortcode=BCIK3K9FnG5  old_id=153  new_id=170
+    OLD: Buenos Aires, Argentina
+    NEW: Palacio de Aguas Corrientes, Buenos Aires, Argentina
+    R:   fallback: no observable evidence in image/caption; location copied from prior post (Palaci...
+  shortcode=BGRhG3AlnEe  old_id=80  new_id=243
+    OLD: Military Museum, Kalemegdan, Belgrade
+    NEW: Latin Bridge, Sarajevo, Bosnia and Herzegovina
+    R:   I can see military vehicles/tanks on display outdoors, with a small information placard vi...
+  shortcode=BJGdT9-BYeE  old_id=65  new_id=258
+    OLD: Seattle, Washington
+    NEW: South Lake Union, Seattle, United States
+    R:   fallback: no observable evidence in image/caption; location copied from prior post (South ...
+  shortcode=BMFsW9thGGT  old_id=60  new_id=263
+    OLD: Seattle, Washington
+    NEW: Seattle-Tacoma International Airport, Seattle, United States
+    R:   fallback: no observable evidence in image/caption; location copied from prior post (Seattl...
+  shortcode=BMZgSVmhTmR  old_id=59  new_id=264
+    OLD: Seattle, Washington
+    NEW: Freetown Christiania, Copenhagen, Denmark
+    R:   fallback: no observable evidence in image/caption; location copied from prior post (Freeto...
+  shortcode=Bd8J9ZrgftF  old_id=49  new_id=274
+    OLD: New York, New York
+    NEW: Matagorda Bay, Matagorda, United States
+    R:   fallback: no observable evidence in image/caption; location copied from prior post (Matago...
+  shortcode=BjxaZmbBaPU  old_id=41  new_id=282
+    OLD: New York, New York
+    NEW: New York City, New York, United States
+    R:   fallback: no observable evidence in image/caption; location copied from prior post (New Yo...
+
+========================================================================
+BUCKET: old_appends_country  (196)
+========================================================================
+  shortcode=5OtGZYlnLm  old_id=306  new_id=17
+    OLD: Alki Beach Park, Seattle
+    NEW: Alki Beach Park, Seattle, United States
+  shortcode=5OtXvIFnME  old_id=305  new_id=18
+    OLD: Alki Beach Park, Seattle
+    NEW: Alki Beach Park, Seattle, United States
+  shortcode=5Ot-OTFnMy  old_id=304  new_id=19
+    OLD: Seattle Aquarium
+    NEW: Seattle Aquarium, Seattle, United States
+  shortcode=5mctThFnIX  old_id=302  new_id=21
+    OLD: Compass Point Beach Resort, Bahamas
+    NEW: Compass Point Beach Resort, Nassau, Bahamas
+  shortcode=5nM0rkFnGg  old_id=301  new_id=22
+    OLD: Compass Point Beach Resort, Bahamas
+    NEW: Compass Point Beach Resort, Nassau, Bahamas
+  shortcode=5osaSrFnA5  old_id=300  new_id=23
+    OLD: Toronto, Ontario
+    NEW: Toronto, Ontario, Canada
+  shortcode=5tuSCulnGh  old_id=299  new_id=24
+    OLD: Dublin, Ireland
+    NEW: Dublin, Dublin, Ireland
+  shortcode=5tu_ZOlnHf  old_id=298  new_id=25
+    OLD: Dublin, Ireland
+    NEW: Dublin, Dublin, Ireland
+  shortcode=5tvsUJlnIg  old_id=297  new_id=26
+    OLD: Saint Patrick's Cathedral, Dublin
+    NEW: Saint Patrick's Cathedral, Dublin, Ireland
+  shortcode=5xbqoxlnOJ  old_id=295  new_id=28
+    OLD: Dublin, Ireland
+    NEW: Dublin, Dublin, Ireland
+  shortcode=5xcgVKFnP9  old_id=294  new_id=29
+    OLD: Galway, Ireland
+    NEW: Galway, Galway, Ireland
+  shortcode=5x58KzlnLa  old_id=293  new_id=30
+    OLD: The Cobblestone, Dublin
+    NEW: The Cobblestone, Dublin, Ireland
+  shortcode=50acq0lnDR  old_id=292  new_id=31
+    OLD: Long Room Library, Trinity College, Dublin
+    NEW: The Long Room Library, Trinity College, Dublin, Ireland
+  shortcode=50dqxiFnIq  old_id=291  new_id=32
+    OLD: Dublin, Ireland
+    NEW: Dublin, Dublin, Ireland
+  shortcode=6AvJSglnEB  old_id=283  new_id=40
+    OLD: Monserrate Palace, Sintra
+    NEW: Monserrate Palace, Sintra, Portugal
+  ... (+181 more)
+
+========================================================================
+BUCKET: truly_different  (67)
+========================================================================
+  shortcode=58Dx3vlnHK  old_id=287  new_id=36
+    OLD: Ruínas do Convento do Carmo, Lisbon
+    NEW: Ruins of the Carmo Convent, Lisbon, Portugal
+  shortcode=5-qW_7lnEh  old_id=286  new_id=37
+    OLD: Rua da Bica de Duarte Belo, Lisbon
+    NEW: Bica Funicular Street, Lisbon, Portugal
+  shortcode=6BBVdKlnIh  old_id=281  new_id=42
+    OLD: Palácio da Pena, Sintra
+    NEW: Palace of Pena, Sintra, Portugal
+  shortcode=6fSguQlnAl  old_id=265  new_id=58
+    OLD: Palacios Nazaríes, Alhambra, Granada
+    NEW: Nasrid Palaces, Granada, Spain
+  shortcode=6iorSelnON  old_id=263  new_id=60
+    OLD: Medina of Tetouan, Morocco
+    NEW: Khassa Medina, Tetouan, Morocco
+  shortcode=6io-7FFnOi  old_id=262  new_id=61
+    OLD: Medina of Tetouan, Morocco
+    NEW: Khassa Medina, Tetouan, Morocco
+  shortcode=6nubLTlnAf  old_id=260  new_id=63
+    OLD: Medina of Tetouan, Morocco
+    NEW: Khasa Medina, Tetouan, Morocco
+  shortcode=62g1tGFnJG  old_id=255  new_id=68
+    OLD: Place Jemâa el-Fna, Marrakech
+    NEW: Jemaa el-Fnaa Square, Marrakech, Morocco
+  shortcode=7SdN4UFnLk  old_id=249  new_id=74
+    OLD: Luxembourg City Park
+    NEW: Municipal Park, Luxembourg City, Luxembourg
+  shortcode=7ShPyYFnD2  old_id=247  new_id=76
+    OLD: Grand Place, Brussels
+    NEW: Grand Market Hall, Brussels, Belgium
+  shortcode=7cO6OIFnNy  old_id=246  new_id=77
+    OLD: Englischer Garten, Munich
+    NEW: English Garden - By the Surfers, Munich, Germany
+  shortcode=7i5Kr6lnIp  old_id=243  new_id=80
+    OLD: Mirabellgarten, Salzburg
+    NEW: Mirabell Gardens, Salzburg, Austria
+  shortcode=7p03X2lnIW  old_id=239  new_id=84
+    OLD: Torre degli Asinelli, Bologna
+    NEW: Tower of the Asinelli, Bologna, Italy
+  shortcode=70hwVvlnHL  old_id=237  new_id=86
+    OLD: San Petronio Basilica, Bologna
+    NEW: Basilica of San Petronio, Bologna, Italy
+  shortcode=73Zpu-lnLq  old_id=234  new_id=89
+    OLD: Leonardo da Vinci Museum, Florence
+    NEW: Museo Nazionale della Scienza e della Tecnologia Leonardo da Vinci, Milan, Italy
+  ... (+52 more)
+
+Only in NEW (1):
+  DYFNMcHxKDv  ts=2026-05-08T14:39:41+0000  loc='Mexico City, Mexico City, Mexico'

@@ -9,6 +9,30 @@
     "chat.tools.terminal.autoApprove": {
         ".specify/scripts/bash/": true,
         ".specify/scripts/powershell/": true
-    }
+    },
+    "dbcode.connections": [
+        {
+            "connectionId": "2v90OFlQhfFh2T0GebnHy",
+            "name": "clubsandwich-db",
+            "driver": "postgres",
+            "connectionType": "host",
+            "host": "localhost",
+            "port": 5432,
+            "ssl": false,
+            "authMethod": "password",
+            "username": "earthsandwich",
+            "password": "",
+            "savePassword": "secretStorage",
+            "database": "earthsandwich",
+            "readOnly": false,
+            "role": "development",
+            "postConnectionSqlType": "inline",
+            "connectionTimeout": 30,
+            "pinnedConnectionTimeout": "0",
+            "introspection": {
+                "progressive": false
+            }
+        }
+    ]
 }
 

@@ -1,6 +1,6 @@
 {
   "created_at": "2026-05-04T00:00:00Z",
-  "updated_at": "2026-05-04T00:00:00Z",
+  "updated_at": "2026-05-25T00:00:00Z",
   "spec": "001-world-travelogue",
   "project": "OCS",
   "jira_base_url": "https://datacommlab.atlassian.net",
@@ -110,6 +110,13 @@
       "tasks": []
     },
     {
+      "key": "OCS-72",
+      "summary": "Phase 16: Drift Reconciliation (2026-05-15 weekly scan)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-72",
+      "status": "completed",
+      "tasks": []
+    },
+    {
       "key": "OCS-19",
       "summary": "Phase 7: Polish & Cross-Cutting Concerns",
       "url": "https://datacommlab.atlassian.net/browse/OCS-19",
@@ -133,8 +140,8 @@
     }
   ],
   "summary": {
-    "total_stories": 15,
-    "completed_stories": 14,
+    "total_stories": 16,
+    "completed_stories": 15,
     "active_stories": 1,
     "total_tasks": 14,
     "pending_tasks": 14,

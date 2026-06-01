@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-"""Export posts.local.tsv to public/posts.json as a list of Stop objects.
+"""Export the hand-curated truth-baseline TSV to public/posts.json as a list of Stop objects.
+
+LEGACY: this script bridges the truth file (`pile-app/instagram/validation/posts.local.tsv`)
+to the frontend's static data layer (`public/posts.json`). It exists because the
+production data path through the bridge-app + 002 backend isn't built yet — when
+the bridge-app lands, this script is retired.
 
 Each TSV row becomes a Stop with status "visited" and an InstagramPost,
 matching the shape defined in src/data/types.ts. Rows with missing
 coordinates are skipped since they cannot be placed on the map.
 
 Usage:
-    python export_posts_json.py
-    python export_posts_json.py --input posts.local.tsv --output public/posts.json
+    python scripts/export_posts_json.py
+    python scripts/export_posts_json.py --input <tsv> --output <json>
 """
 
 import argparse
@@ -15,8 +20,8 @@ import csv
 import json
 import os
 
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-DEFAULT_INPUT = os.path.join(PROJECT_ROOT, "posts.local.tsv")
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+DEFAULT_INPUT = os.path.join(PROJECT_ROOT, "pile-app", "instagram", "validation", "posts.local.tsv")
 DEFAULT_OUTPUT = os.path.join(PROJECT_ROOT, "public", "posts.json")
 
 
@@ -38,18 +43,18 @@ def tsv_row_to_stop(row: dict) -> dict | None:
         return None
 
     timestamp = col("timestamp")
-    # Both "2024-02-20T02:27:16+0000" and "2024-02-20 02:27:16+00" → "2024-02-20"
     date = timestamp[:10] if timestamp else ""
 
     media_url = col("media_url")
-    # Vite serves public/ as the web root, so strip that prefix
+    # Vite serves public/ as the web root; strip the leading "public/" so the
+    # served URL ends up rooted at "/".
     if media_url.startswith("public/"):
-        media_url = media_url[len("public"):]  # "public/media/1.jpg" → "/media/1.jpg"
+        media_url = media_url[len("public"):]
 
     location = col("location") or col("region")
 
     return {
-        "id": f"ig-{instagram_id}",  # deterministic — stable across re-runs
+        "id": f"ig-{instagram_id}",
         "date": date,
         "location": location,
         "coords": {"lat": lat, "lng": lng},

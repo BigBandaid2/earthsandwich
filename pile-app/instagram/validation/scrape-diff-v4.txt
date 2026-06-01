@@ -1,0 +1,74 @@
+old TSV rows: 322   new TSV rows: 323
+shared shortcodes: 322   only-old: 0   only-new: 1
+
+Among 322 shared shortcodes:
+  exact match: 18 (5.6%)
+  differ:      304 (94.4%)
+
+Diff buckets:
+  old_undetermined              : 35
+  new_undetermined              : 0
+  new_with_fallback_note        : 7
+  old_appends_country           : 197
+  truly_different               : 65
+
+--- v3 had: 17 exact, 305 differ; old_undetermined=35, new_undetermined=0, fallback=7, country=196, truly_diff=67, only_old=0, only_new=1 ---
+
+========================================================================
+BUCKET: new_with_fallback_note  (7)
+========================================================================
+  sc=BCIK3K9FnG5  old_id=153  new_id=170
+    OLD: Buenos Aires, Argentina
+    NEW: Buenos Aires
+  sc=BGRhG3AlnEe  old_id=80  new_id=243
+    OLD: Military Museum, Kalemegdan, Belgrade
+    NEW: Sarajevo
+  sc=BJGdT9-BYeE  old_id=65  new_id=258
+    OLD: Seattle, Washington
+    NEW: Seattle
+  sc=BMFsW9thGGT  old_id=60  new_id=263
+    OLD: Seattle, Washington
+    NEW: Seattle
+  sc=BMZgSVmhTmR  old_id=59  new_id=264
+    OLD: Seattle, Washington
+    NEW: Copenhagen
+  sc=Bd8J9ZrgftF  old_id=49  new_id=274
+    OLD: New York, New York
+    NEW: Matagorda
+  sc=BjxaZmbBaPU  old_id=41  new_id=282
+    OLD: New York, New York
+    NEW: New York
+========================================================================
+BUCKET: truly_different  (65)
+========================================================================
+  sc=58Dx3vlnHK  old_id=287  new_id=36
+    OLD: Ruínas do Convento do Carmo, Lisbon
+    NEW: Ruins of the Carmo Convent, Lisbon, Portugal
+  sc=5-qW_7lnEh  old_id=286  new_id=37
+    OLD: Rua da Bica de Duarte Belo, Lisbon
+    NEW: Bica Funicular Street, Lisbon, Portugal
+  sc=6BBVdKlnIh  old_id=281  new_id=42
+    OLD: Palácio da Pena, Sintra
+    NEW: Palace of Pena, Sintra, Portugal
+  sc=6fSguQlnAl  old_id=265  new_id=58
+    OLD: Palacios Nazaríes, Alhambra, Granada
+    NEW: Nasrid Palaces, Granada, Spain
+  sc=6iorSelnON  old_id=263  new_id=60
+    OLD: Medina of Tetouan, Morocco
+    NEW: Khasa Medina, Tetouan, Morocco
+  sc=6io-7FFnOi  old_id=262  new_id=61
+    OLD: Medina of Tetouan, Morocco
+    NEW: Khasa Medina, Tetouan, Morocco
+  sc=6nubLTlnAf  old_id=260  new_id=63
+    OLD: Medina of Tetouan, Morocco
+    NEW: Khassa Medina, Tetouan, Morocco
+  sc=62g1tGFnJG  old_id=255  new_id=68
+    OLD: Place Jemâa el-Fna, Marrakech
+    NEW: Jemaa el-Fna Square, Marrakech, Morocco
+  sc=7cO6OIFnNy  old_id=246  new_id=77
+    OLD: Englischer Garten, Munich
+    NEW: English Garden - By the Surfers, Munich, Germany
+  sc=7i5Kr6lnIp  old_id=243  new_id=80
+    OLD: Mirabellgarten, Salzburg
+    NEW: Mirabell Gardens, Salzburg, Austria
+  ... (+55 more)
