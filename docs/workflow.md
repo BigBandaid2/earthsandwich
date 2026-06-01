@@ -16,21 +16,22 @@ Roughly once per week, the Team Lead is responsible for grasping the current sta
 2. **Reconcile Code to Tasks** — drift scan against previous drift reconciliation → HEAD (see [§Reconciliation](#reconciliation-claudespec-drift-scan)).
 3. **New Phase/Story for Code Drift** — bundle detected changes as a new Phase appended to the relevant `tasks.md`.
 4. **Sync Spec State to JIRA** — push new phases as Stories and flip completion statuses so the planning meeting reads off current JIRA state (see [§JIRA sync](#jira-sync)).
-5. **Log estimated hours** — append daily rows to `docs/planning/time-log.tsv` and add a person/story hours summary to the current sprint plan (see [§Time logging](#time-logging)).
-6. **Check Progress Against Previous Sprint Plan** — append sprint review notes.
+5. **Backfill sprint on Done items** — any Done Story missing a sprint goes into the currently-open sprint (see [§Sprint membership rule](#sprint-membership-rule)).
+6. **Log estimated hours** — append daily rows to `docs/planning/time-log.tsv` and add a person/story hours summary to the current sprint plan (see [§Time logging](#time-logging)).
+7. **Check Progress Against Previous Sprint Plan** — append sprint review notes.
 
 ### During Weekly Team Meeting
 
-7. **Attest hours** — each team member confirms their estimated hours, adds meeting time, fills the `Hours Attested` column (see [§Time logging](#time-logging)).
-8. **Plan the week in JIRA's UI** — drag stories into the sprint, assign owners, set story points, write the Sprint goal.
+8. **Attest hours** — each team member confirms their estimated hours, adds meeting time, fills the `Hours Attested` column (see [§Time logging](#time-logging)).
+9. **Plan the week in JIRA's UI** — drag stories into the sprint, assign owners, set story points, write the Sprint goal.
 
 ### After Weekly Team Meeting
 
-9. **Link related tickets** — `Duplicate` for 1-to-1 parallels with a spec-kit Story, `Blocks` for prerequisite dependencies between tickets, `Relates` for everything else (see [§JIRA sync](#jira-sync)).
-10. **Create New Sprint Plan** — via JIRA tickets or directly.
-11. **Push to JIRA** — any phases newly decided in the meeting become new Stories in OCS, placed in the current sprint for velocity attribution. (Drift-discovered phases were already synced in step 4.)
-12. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
-13. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
+10. **Link related tickets** — `Duplicate` for 1-to-1 parallels with a spec-kit Story, `Blocks` for prerequisite dependencies between tickets, `Relates` for everything else (see [§JIRA sync](#jira-sync)).
+11. **Create New Sprint Plan** — via JIRA tickets or directly.
+12. **Push to JIRA** — any phases newly decided in the meeting become new Stories in OCS, placed in the current sprint for velocity attribution. (Drift-discovered phases were already synced + sprint-attributed in steps 4–5.)
+13. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
+14. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
 
 The weekly cadence is the contract. The per-feature ceremony (below) is the optional discipline for serious architectural work.
 
@@ -144,6 +145,12 @@ Two commands keep JIRA aligned with the spec state:
 ### Sprint membership rule
 
 Any Story flipped to **Done** must belong to a sprint — default to the currently-open sprint unless the work demonstrably happened in a different one (in which case set that sprint explicitly). This keeps velocity attribution accurate at sprint-review time.
+
+**Operationalised as step 5 of the weekly cadence.** After step 4's status-flip pass, query JIRA for Done-without-sprint Stories and assign each to the open sprint:
+
+- JQL: `project = OCS AND status = Done AND sprint is EMPTY AND issuetype not in (Subtask, Epic)` — Subtasks inherit their parent's sprint and can't be set directly; Epics never belong to a sprint in JIRA Cloud's next-gen projects. The filter keeps the result list to items the rule can actually act on.
+- For each result: set the `sprint` field to the currently-open sprint ID (via JIRA UI drag-into-sprint, or the MCP `editJiraIssue` with `customfield_10020` = sprint ID).
+- Override the default only when the work demonstrably shipped in a prior sprint — e.g. a Story flipped Done late but the commits land in last sprint's window. In that case set the historical sprint explicitly.
 
 In-progress stories are *not* automatically added to the current sprint. Add one case-by-case when partial work has shipped this sprint and the team wants velocity credit for it.
 
