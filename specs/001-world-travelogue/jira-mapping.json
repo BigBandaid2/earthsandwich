@@ -1,6 +1,6 @@
 {
   "created_at": "2026-05-04T00:00:00Z",
-  "updated_at": "2026-05-25T00:00:00Z",
+  "updated_at": "2026-06-01T00:00:00Z",
   "spec": "001-world-travelogue",
   "project": "OCS",
   "jira_base_url": "https://datacommlab.atlassian.net",
@@ -117,6 +117,13 @@
       "tasks": []
     },
     {
+      "key": "OCS-107",
+      "summary": "Phase 17: Drift Reconciliation (2026-06-01 weekly scan)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-107",
+      "status": "completed",
+      "tasks": []
+    },
+    {
       "key": "OCS-19",
       "summary": "Phase 7: Polish & Cross-Cutting Concerns",
       "url": "https://datacommlab.atlassian.net/browse/OCS-19",
@@ -140,8 +147,8 @@
     }
   ],
   "summary": {
-    "total_stories": 16,
-    "completed_stories": 15,
+    "total_stories": 17,
+    "completed_stories": 16,
     "active_stories": 1,
     "total_tasks": 14,
     "pending_tasks": 14,
@@ -150,6 +157,7 @@
   "notes": [
     "All historic phases (1-6, 8, 9-15) are represented at the Story level only. Per-task records exist only for the active Phase 7 polish backlog.",
     "Sprint assignment, owner, story points, and priority for these issues live exclusively in JIRA. Per docs/workflow.md, no sprint state is recorded in this repository.",
-    "Phase 15 (OCS-55) was created via the docs/workflow.md drift-scan procedure on 2026-05-04 to backfill commits c24c263..650040b that lacked task entries."
+    "Phase 15 (OCS-55) was created via the docs/workflow.md drift-scan procedure on 2026-05-04 to backfill commits c24c263..650040b that lacked task entries.",
+    "2026-06-01: Phase 17 drift recon Story OCS-107 created and transitioned to Done. Single drift task T100 (ErrorBoundary, commit ec3faf3) — stories-only per Phase 16/15/14 precedent."
   ]
 }

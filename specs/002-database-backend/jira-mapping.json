@@ -1,6 +1,6 @@
 {
   "created_at": "2026-05-25T00:00:00Z",
-  "updated_at": "2026-05-25T00:00:00Z",
+  "updated_at": "2026-06-01T00:00:00Z",
   "spec": "002-database-backend",
   "project": "OCS",
   "jira_base_url": "https://datacommlab.atlassian.net",
@@ -66,11 +66,18 @@
       "url": "https://datacommlab.atlassian.net/browse/OCS-82",
       "status": "completed",
       "tasks": []
+    },
+    {
+      "key": "OCS-108",
+      "summary": "Phase 11: US7 — Frontend API Integration (P1)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-108",
+      "status": "completed",
+      "tasks": []
     }
   ],
   "summary": {
-    "total_stories": 8,
-    "completed_stories": 4,
+    "total_stories": 9,
+    "completed_stories": 5,
     "pending_stories": 4
   },
   "notes": [
