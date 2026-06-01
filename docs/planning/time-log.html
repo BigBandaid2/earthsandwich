@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Time Log Explorer</title>
+<style>
+  :root {
+    --bg: #0f0f10;
+    --panel: #1a1a1c;
+    --panel2: #232326;
+    --border: #2a2a2e;
+    --text: #e5e5e7;
+    --muted: #8e8e93;
+    --accent: #5b8fff;
+    --ethan: #5b8fff;
+    --elena: #f472b6;
+    --wela: #34d399;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 13px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+  }
+  header {
+    padding: 12px 20px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+  }
+  header h1 {
+    font-size: 14px;
+    margin: 0;
+    font-weight: 500;
+  }
+  header .subtitle {
+    color: var(--muted);
+    font-size: 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  main {
+    display: grid;
+    grid-template-columns: 220px 1fr 340px;
+    overflow: hidden;
+    min-height: 0;
+  }
+  aside.controls, aside.details {
+    background: var(--panel);
+    padding: 16px;
+    overflow-y: auto;
+  }
+  aside.controls { border-right: 1px solid var(--border); }
+  aside.details { border-left: 1px solid var(--border); }
+  .section {
+    margin-bottom: 20px;
+  }
+  .section h3 {
+    margin: 0 0 8px 0;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+  }
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 0;
+    cursor: pointer;
+    font-size: 12.5px;
+  }
+  input[type=checkbox], input[type=radio] {
+    accent-color: var(--accent);
+  }
+  .preset-btn, .toggle-btn {
+    display: block;
+    width: 100%;
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 10px;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+    font-size: 12.5px;
+  }
+  .preset-btn:hover, .toggle-btn:hover { background: #2d2d31; }
+  .toggle-btn[aria-pressed="true"] { background: #2c4368; border-color: var(--accent); }
+  #chart-pane {
+    overflow: auto;
+    padding: 16px;
+    background: var(--bg);
+  }
+  svg { display: block; }
+  .bar-segment {
+    cursor: pointer;
+    stroke: var(--panel);
+    stroke-width: 1;
+    transition: opacity 0.1s, stroke 0.1s, stroke-width 0.1s;
+  }
+  .bar-segment:hover { opacity: 0.75; }
+  .bar-segment.selected {
+    stroke: #fff;
+    stroke-width: 2;
+  }
+  .axis text { fill: var(--muted); font-size: 11px; }
+  .axis-tick line { stroke: #2a2a2e; }
+  .grid-line { stroke: #1f1f22; stroke-dasharray: 2 4; }
+  .details-empty { color: var(--muted); font-style: italic; }
+  .detail-row { margin-bottom: 10px; }
+  .detail-row .lbl {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .detail-row .val {
+    margin-top: 2px;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+  }
+  .detail-row .val.mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px;
+    color: #cfcfd3;
+  }
+  .badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    background: var(--panel2);
+    color: var(--text);
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 4px;
+    font-size: 11px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-swatch { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+  footer {
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    padding: 12px 20px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: stretch;
+  }
+  #prompt-wrap { display: flex; flex-direction: column; gap: 4px; }
+  #prompt-wrap .lbl {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  #prompt {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 100px;
+    overflow-y: auto;
+  }
+  #copy {
+    background: var(--accent);
+    color: #fff;
+    border: 0;
+    padding: 10px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 500;
+    align-self: end;
+  }
+  #copy:hover { background: #4a7be8; }
+  .summary {
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 4px;
+  }
+  .day-entry-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .day-entry {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+  }
+  .day-entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    font-size: 12px;
+  }
+  .day-entry-person {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+  }
+  .day-entry-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 11.5px;
+  }
+  .day-entry-meta b { color: var(--text); font-weight: 600; }
+  .day-entry-commits {
+    color: #cfcfd3;
+    font-size: 12px;
+    line-height: 1.45;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Time Log Explorer</h1>
+  <span class="subtitle">docs/planning/time-log.tsv · stacked bars by day</span>
+</header>
+<main>
+  <aside class="controls">
+    <div class="section">
+      <h3>Person</h3>
+      <fieldset id="person-filter"></fieldset>
+    </div>
+    <div class="section">
+      <h3>Sprint</h3>
+      <fieldset id="sprint-filter"></fieldset>
+    </div>
+    <div class="section">
+      <h3>Hours source</h3>
+      <fieldset id="hsrc-filter">
+        <label><input type="radio" name="hsrc" value="prefer-attested" checked /> Attested when available</label>
+        <label><input type="radio" name="hsrc" value="estimated-only" /> Estimated only</label>
+      </fieldset>
+    </div>
+    <div class="section">
+      <h3>Filter</h3>
+      <button class="toggle-btn" id="toggle-overhead" aria-pressed="false">Exclude Overhead</button>
+    </div>
+    <div class="section">
+      <h3>Presets</h3>
+      <button class="preset-btn" data-preset="all">All work</button>
+      <button class="preset-btn" data-preset="ethan">Ethan only</button>
+      <button class="preset-btn" data-preset="elena">Elena only</button>
+      <button class="preset-btn" data-preset="sprint3">Sprint 3 only</button>
+      <button class="preset-btn" data-preset="story-only">Hide Overhead</button>
+    </div>
+    <div class="section">
+      <h3>Legend</h3>
+      <div class="legend" id="legend"></div>
+    </div>
+  </aside>
+  <section id="chart-pane">
+    <svg id="chart"></svg>
+    <div class="summary" id="summary"></div>
+  </section>
+  <aside class="details">
+    <div class="section">
+      <h3>Selected entry</h3>
+      <div id="details">
+        <p class="details-empty">Click a segment in the chart to see its details here.</p>
+      </div>
+    </div>
+  </aside>
+</main>
+<footer>
+  <div id="prompt-wrap">
+    <span class="lbl">Prompt</span>
+    <pre id="prompt">Default view loaded.</pre>
+  </div>
+  <button id="copy">Copy prompt</button>
+</footer>
+
+<script>
+// Time-log data embedded inline. Source: docs/planning/time-log.tsv as of 2026-06-01 (post-attestation refresh).
+const TSV_TEXT = String.raw`Date	DOW	Sprint	Story	Person	Commits	Time Span	Hours Estimated	Hours Attested
+2026-05-05	Tue	Sprint 1	OCS-72	Elena Shen	0a689de (T097 update 2015 trip image routes — small targeted change)	17:00	0.25	0.275
+2026-05-06	Wed	Sprint 1	Overhead	Ethan Shen	6fd2327 (clean up workflow.md after W19 sprint plan landed)	16:02	1.0	1.0
+2026-05-07	Thu	Sprint 1	OCS-72	Elena Shen	9f800f2 (add region column to posts.tsv + load_posts_tsv script); 57aeb53 (T098 first-pass IG ingestion — public/posts.json + usePosts.ts + App.tsx wiring)	22:07-23:21	1.5	1.65
+2026-05-08	Fri	Sprint 1	OCS-72	Elena Shen	85348c4 (add second test account scaffolding); 17b532f (T099 add Kos region)	00:16-01:22	1.0	1.1
+2026-05-08	Fri	Sprint 1	OCS-73	Elena Shen	a093cd0 (define new spec 002-data-ingestion — /speckit.specify per-feature ceremony)	20:33	1.5	1.65
+2026-05-08	Fri	Sprint 1	Overhead	Ethan Shen	Weekly team meeting (discussion, no commits)	—	1.5	1.5
+2026-05-08	Fri	Sprint 1	Overhead	Elena Shen	Weekly team meeting (discussion, no commits)	—	1.5	1.5
+2026-05-12	Tue	(inter-sprint)	OCS-73	Elena Shen	6faeb11 (/speckit.plan for 002 — per-feature ceremony)	20:34	1.5	1.65
+2026-05-15	Fri	Sprint 2	OCS-72	Ethan Shen	650a222 portion (Phase 16 drift-recon authoring; commit was bundled with sprint planning + workflow.md updates — those split into Overhead row)	17:52	0.5	0.5
+2026-05-15	Fri	Sprint 2	Overhead	Ethan Shen	650a222 portion (sprint planning + workflow.md tweaks); f5b8233 (W20 sprint plan creation)	17:52-17:53	1.0	1.0
+2026-05-15	Fri	Sprint 2	Overhead	Ethan Shen	Weekly team meeting (discussion, no commits)	—	1.5	1.5
+2026-05-15	Fri	Sprint 2	Overhead	Elena Shen	Weekly team meeting (discussion, no commits)	—	1.5	1.5
+2026-05-17	Sun	Sprint 2	OCS-73	Elena Shen	7538aee (spec amendment — LLM-only location, region end-date endpoint); 7695685 (tasks.md initial author)	17:10-17:23	0.5	0.55
+2026-05-17	Sun	Sprint 2	OCS-75	Elena Shen	8ec0b68 (T001 backend dir scaffold); ce22f8e (T002 migrate frontend/ — large rename diff)	17:32-17:41	1.0	1.1
+2026-05-18	Mon	Sprint 2	OCS-75	Elena Shen	952ffad (T003-T005 reqs + tsx + backend/.env.example — late-night session)	02:47	1.0	1.1
+2026-05-18	Mon	Sprint 2	OCS-77	Elena Shen	729b94a (T019 export-seed-data.ts — early-morning standalone session)	03:25	0.75	0.825
+2026-05-18	Mon	Sprint 2	OCS-76	Elena Shen	236956c (T006 config); cc22fe6 (T007 database); 5219ac0 (T008 main.py with lifespan hook)	20:35-20:57	0.75	0.825
+2026-05-19	Tue	Sprint 2	OCS-76	Elena Shen	8 commits in 24 min — AI-assisted burst: 4394695 T009 trip, b4b4fb8 T010 stop, 89380b3 T011 instagram_post, 5be4594 T012 substack_post, 63eb2e4 T013-T014 alembic init, 373700f T015 initial migration, 592cc54 T016 trip schema, 4b27396 T017-T018 stop+post schemas	18:53-19:17	0.5	0.55
+2026-05-19	Tue	Sprint 2	OCS-77	Elena Shen	401c2aa (T020 seed.py); a65c23b (T021 remove sequence_order — models + schemas + export + seed); 3775ea1 (T022 pg_dump invocation)	19:39-20:14	0.75	0.825
+2026-05-19	Tue	Sprint 2	OCS-82	Elena Shen	ce55532 (T052 temp docker-compose.db.yml + backend/session.json dev setup)	21:14	0.5	0.55
+2026-05-20	Wed	Sprint 2	Overhead	Ethan Shen	Weekly team meeting (discussion, no commits)	—	1.5	1.5
+2026-05-20	Wed	Sprint 2	Overhead	Elena Shen	Weekly team meeting (discussion, no commits)	—	1.5	1.5
+2026-05-22	Fri	Sprint 2	OCS-77	Elena Shen	085b95c (fix seed.py + alembic upgrade head — post-T020/T022 cleanup)	16:21	0.5	0.55
+2026-05-22	Fri	Sprint 2	OCS-86	Ethan Shen	504c617 (T100 standalone-execution prep — UTF-8, token redact, fence-strip, env rename)	16:12	1.5	1.5
+2026-05-22	Fri	Sprint 2	Overhead	Ethan Shen	f767e33 (spec restructure — split 002-data-ingestion into 002-database-backend + 003-ingestion-pipeline)	16:13	1.5	1.5
+2026-05-22	Fri	Sprint 2	Overhead	Ethan Shen	Weekly team meeting (discussion, no commits)	—	1.5	1.5
+2026-05-22	Fri	Sprint 2	Overhead	Elena Shen	Weekly team meeting (discussion, no commits)	—	1.5	1.5
+2026-05-25	Mon	Sprint 2	OCS-86	Ethan Shen	5 commits prototyping OCS-83 subtasks: a5f5d9f (T101 instagrapi pivot + dual-path location); 2629535 (T102 integration test + tests/ scaffold); 8feb24e (T103 21 unit tests for location helpers); df40169 (T104 extract process_media + 22 unit tests); 2265cf6 (T105 retire FR-043 + Phase 17 author)	10:58-12:16	3.0	3.0
+2026-05-25	Mon	Sprint 2	Overhead	Ethan Shen	53c3e8f (JIRA sync push for 002+003 specs + workflow.md step 3); e36e648 (workflow.md JIRA-sync detail section + sprint membership rule)	13:02-13:24	1.5	1.5
+2026-05-25	Mon	Sprint 2	Overhead	Ethan Shen	Weekly team meeting (discussion, no commits)	—	1.5	1.5
+2026-05-25	Mon	Sprint 2	Overhead	Elena Shen	Weekly team meeting (discussion, no commits)	—	1.5	1.5
+2026-05-26	Tue	Sprint 3	OCS-78	Elena Shen	5 commits on Phase 4 US2 Read API endpoints: 104a307 (T023 GET /trips), b398a77 (T024 GET /stops), 4e48949 (T025 GET /posts), 3b2a274 (T026 register routers), 27fd43f (T027 error handlers)	19:01-19:29	2.0	2.0
+2026-05-26	Tue	Sprint 3	Overhead	Ethan Shen	a3dd4fb (gitignore roadmap), 46dc10a (publish roadmap + DU outline image), 0dd7d05 (roadmap.md trim spec list + broaden MCP), 2a08f38 (roadmap.md MCP → Purpose 1), eee1fd4 (W22 sprint plan + Blocks link convention)	03:18-07:03	2.0	2.0
+2026-05-27	Wed	Sprint 3	OCS-78	Elena Shen	5 commits on Phase 4 US2 backend tests: ff07117 (T052 conftest + factories), 2a810bb (T053 trips tests), 26e404a (T054 stops tests), 9e893f0 (T055 posts tests), 581b50c (fix unit test mock)	12:53-14:49	2.5	2.5
+2026-05-27	Wed	Sprint 3	OCS-80	Elena Shen	2 commits on Phase 8 US6 Containerization: 9b8640e (fix to run backend app), 0a983f5 (T044+T047 Dockerize backend)	16:23-16:48	1.0	1.0
+2026-05-27	Wed	Sprint 3	OCS-83	Ethan Shen	2 commits on pre-overhaul ingestion: 7161311 (location-pipeline bug fixes + streaming + anti-throttle), 31c41cd (city-level fallback + prose handling + log sweep + @welawen onboarded)	14:57-17:57	3.0	3.0
+2026-05-27	Wed	Sprint 3	Overhead	Ethan Shen	003 spec restructure: e31a233 (003 spec re-author + FR-019 inversion), 27a35dd (003 spec mandate App-level segregation + DU ETL handoff)	23:19-23:49	1.5	1.5
+2026-05-27	Wed	Sprint 3	Overhead	Ethan Shen	Weekly team meeting (discussion, no commits)	—	1.0	1.0
+2026-05-27	Wed	Sprint 3	Overhead	Elena Shen	Weekly team meeting (discussion, no commits)	—	1.0	1.0
+2026-05-28	Thu	Sprint 3	OCS-66	Elena Shen	8 commits on Phase 11 US7 Frontend API Integration: 36db372 (new tasks for frontend API switch), afb24d6 (T056 VITE_API_BASE_URL), df310e0 (T057 API client), 57eeda1 (T058 adapters), 0b0bf7e (T059 useTrips), b6e38bb (T060 useTrip), 704c850 (T061 App.tsx), fd37285 (T062 remove usePosts), a74c0fb (gitattributes LF)	20:53-22:10	3.5	3.5
+2026-05-28	Thu	Sprint 3	Overhead	Ethan Shen	223d59f (rebuild project-level docs around App stubs + bridge/bridge-builder split), 8b6349d (roadmap tighten Vision business case)	03:03-03:49	1.5	1.5
+2026-05-29	Fri	Sprint 3	Overhead	Ethan Shen	Workflow + roadmap + spec restructure prep — 11 commits: aef816c (workflow drops), 8da2963 (workflow tighten New Specs), f6c2bd4 (roadmap DU outline beyond clean data), a191185 (Cardinal Rule #1 nuance), d516a5d (roadmap Vision Para 1), 9fa2ce8 (sync 003+002 to bridge-app split), 78896a3 (workflow Sprint goals), aa186d6 (drop W22 template link), 978d50b (003 /speckit.clarify session), fc52600 (003 /speckit.plan output), 477a193 (003 plan validation scaffolding)	02:22-05:25	4.0	4.0
+2026-05-29	Fri	Sprint 3	OCS-96	Ethan Shen	ffc8bfc (003 Phase 18 stand up pile-app/ skeleton T200-T205)	11:08	0.75	0.75
+2026-05-29	Fri	Sprint 3	OCS-97	Ethan Shen	003 Phase 19 migrate Instagram service to pile-app/ — 3 commits: 6d77008 (T206-T220 main migration), bc16d07 (T206-T220 followup: load .env in conftest), 3df401a (T206 followup: no-geotag extension note)	11:35-12:02	2.0	2.0
+2026-05-29	Fri	Sprint 3	OCS-103	Ethan Shen	c336d1e (003 Phase 20 widen Instagram TSV to 16 cols + shortcode dedup + FR-106 tombstones T221-T228)	12:23	1.5	1.5
+2026-05-29	Fri	Sprint 3	OCS-98	Ethan Shen	777255b (003 Phase 21 throttling resilience — inference hard-block + login_required + ETA setup overhead T229-T231)	12:35	1.5	1.5
+2026-05-29	Fri	Sprint 3	Overhead	Ethan Shen	JIRA sync admin: b319701 (003 jira sync mapping post-overhaul + create Phases 18-26 Stories), b22d72d (003 jira complete sync — create 3 previously-WAF-blocked Stories), 0949fbc (003 tasks /speckit.tasks output drop dropped-scope phases)	10:31-12:40	1.0	1.0
+2026-05-29	Fri	Sprint 3	OCS-106	Ethan Shen	Self-healing scrapes work (drift-detected; new Phase 27 / US7 in 2026-06-01 drift recon) — 3 commits: 88f503d (T254 guard orphan-sweep against interrupted scrapes), 3516aa9 (T255 RunSnapshot atomic snapshot/rollback + structured failure log), 86215ec (T256 integration test coverage + 2 real bugs surfaced)	15:07-16:47	3.0	3.0
+2026-05-29	Fri	Sprint 3	OCS-107	Elena Shen	ec3faf3 (ErrorBoundary component added; effectiveActiveTrip state cleanup) — drift-detected; new T100 in 001 Phase 17 in 2026-06-01 drift recon	15:02	1.0	1.0
+2026-05-29	Fri	Sprint 3	Overhead	Ethan Shen	Weekly team meeting (discussion, no commits)	—	1.0	1.0
+2026-05-29	Fri	Sprint 3	Overhead	Elena Shen	Weekly team meeting (discussion, no commits)	—	1.0	1.0
+2026-05-30	Sat	Sprint 3	OCS-106	Ethan Shen	4c0ee6f (T257 CLI --newer-than flag for atomic truncate + re-scrape; migrate Mexico City smoke test; 6 unit tests in test_truncate_helper.py; parse_unix_timestamp hardened for naive datetimes)	12:54	2.5	2.5
+2026-05-30	Sat	Sprint 3	Overhead	Ethan Shen	d1a84ec (004 spec draft: bridge-builder-toolkit specify-prompt — context + vision + in-scope/out-of-scope + prior-art-and-novelty + Key Vision Points)	13:44	2.0	2.0
+2026-06-01	Mon	Sprint 3	Overhead	Ethan Shen	46515a2 (004 /speckit.specify formal authoring — 5-story spec with project lifecycle + profile analysis + bridge synthesis + auto-oracle loop + manual refinement; 18 SCs; quality checklist passed first iteration)	11:05	1.5	1.5
+2026-06-01	Mon	Sprint 3	Overhead	Ethan Shen	Weekly cadence pre-meeting prep — 13f9184 (drift recon 2026-06-01: 001 Phase 17 + 003 Phase 27); merge sequence 7fb41ae+a8cced5+f28f42b+5a4c96e (001+002+003+004 → master with --no-ff per workflow.md); branch syncs (push 003+004 to origin); time-log composition	ongoing	2.5	2.5
+2026-06-01	Mon	Sprint 3	Overhead	Ethan Shen	Weekly team meeting (discussion, no commits)	—	1.0	1.0
+2026-06-01	Mon	Sprint 3	Overhead	Elena Shen	Weekly team meeting (discussion, no commits)	—	1.0	1.0`;
+
+const PERSON_COLORS = {
+  'Ethan Shen': '#5b8fff',
+  'Elena Shen': '#f472b6',
+  'Wela Quan': '#34d399',
+};
+const DEFAULT_COLOR = '#94a3b8';
+
+function parseTSV(text) {
+  const lines = text.split('\n');
+  const headers = lines[0].split('\t');
+  return lines.slice(1).filter(l => l.length).map(line => {
+    const cells = line.split('\t');
+    const row = Object.fromEntries(headers.map((h, i) => [h, cells[i] !== undefined ? cells[i] : '']));
+    row.HoursEstimatedNum = parseFloat(row['Hours Estimated']) || 0;
+    const att = (row['Hours Attested'] || '').trim();
+    row.HoursAttestedNum = att.length ? parseFloat(att) : null;
+    return row;
+  });
+}
+
+const ALL_DATA = parseTSV(TSV_TEXT);
+const ALL_PEOPLE = [...new Set(ALL_DATA.map(r => r.Person))].sort();
+const ALL_SPRINTS = (() => {
+  const s = [...new Set(ALL_DATA.map(r => r.Sprint))];
+  s.sort((a, b) => {
+    const na = parseInt((a.match(/(\d+)/) || ['', '999'])[1]);
+    const nb = parseInt((b.match(/(\d+)/) || ['', '999'])[1]);
+    if (na !== nb) return na - nb;
+    return a.localeCompare(b);
+  });
+  return s;
+})();
+
+const state = {
+  people: new Set(ALL_PEOPLE),
+  sprints: new Set(ALL_SPRINTS),
+  hoursSource: 'prefer-attested',
+  excludeOverhead: false,
+  selectedEntry: null,   // single row from a clicked segment
+  selectedDate: null,    // ISO date string from a clicked Y-axis label
+};
+
+function getHours(row) {
+  if (state.hoursSource === 'prefer-attested' && row.HoursAttestedNum !== null) {
+    return row.HoursAttestedNum;
+  }
+  return row.HoursEstimatedNum;
+}
+function getColor(row) {
+  return PERSON_COLORS[row.Person] || DEFAULT_COLOR;
+}
+function filteredData() {
+  return ALL_DATA.filter(r =>
+    state.people.has(r.Person) &&
+    state.sprints.has(r.Sprint) &&
+    (!state.excludeOverhead || r.Story !== 'Overhead')
+  );
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+
+const ns = 'http://www.w3.org/2000/svg';
+
+const DOW_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+function dowOf(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00Z');
+  return DOW_NAMES[d.getUTCDay()];
+}
+
+function dateRange(start, end) {
+  const dates = [];
+  const d = new Date(start + 'T12:00:00Z');
+  const last = new Date(end + 'T12:00:00Z');
+  while (d <= last) {
+    dates.push(d.toISOString().slice(0, 10));
+    d.setUTCDate(d.getUTCDate() + 1);
+  }
+  return dates;
+}
+
+function renderChart() {
+  const svg = document.getElementById('chart');
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+  const data = filteredData();
+  if (data.length === 0) {
+    svg.setAttribute('width', 600);
+    svg.setAttribute('height', 100);
+    const t = document.createElementNS(ns, 'text');
+    t.textContent = 'No data matches current filters.';
+    t.setAttribute('x', 300); t.setAttribute('y', 50);
+    t.setAttribute('text-anchor', 'middle'); t.setAttribute('fill', '#8e8e93');
+    svg.appendChild(t);
+    document.getElementById('summary').textContent = '';
+    return;
+  }
+
+  // Full date range (inclusive), so zero-hour days show as empty rows.
+  // Reversed so the newest row sits at the top of the chart (no scroll needed
+  // to see most-recent activity).
+  const sortedDates = [...new Set(data.map(r => r.Date))].sort();
+  const firstDate = sortedDates[0];
+  const lastDate = sortedDates[sortedDates.length - 1];
+  const allDates = dateRange(firstDate, lastDate).reverse();
+
+  // Horizontal stacked bars: rows = days, bar grows left→right by hours.
+  const margin = { top: 30, right: 30, bottom: 50, left: 100 };
+  const barHeight = 18;
+  const rowGap = 6;
+  const rowHeight = barHeight + rowGap;
+  const chartHeight = allDates.length * rowHeight;
+  const chartWidth = 720;
+  const totalWidth = chartWidth + margin.left + margin.right;
+  const totalHeight = chartHeight + margin.top + margin.bottom;
+
+  const dayTotals = allDates.map(d => data.filter(r => r.Date === d).reduce((s, r) => s + getHours(r), 0));
+  const maxHours = Math.max(...dayTotals, 2);
+  const xMax = Math.ceil(maxHours / 2) * 2;
+
+  svg.setAttribute('width', totalWidth);
+  svg.setAttribute('height', totalHeight);
+
+  const xScale = h => margin.left + (h / xMax) * chartWidth;
+
+  // Vertical grid lines + X-axis labels (top + bottom)
+  for (let h = 0; h <= xMax; h += 2) {
+    const x = xScale(h);
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('class', 'grid-line');
+    line.setAttribute('x1', x); line.setAttribute('x2', x);
+    line.setAttribute('y1', margin.top); line.setAttribute('y2', margin.top + chartHeight);
+    svg.appendChild(line);
+    const txtTop = document.createElementNS(ns, 'text');
+    txtTop.textContent = h + 'h';
+    txtTop.setAttribute('x', x);
+    txtTop.setAttribute('y', margin.top - 10);
+    txtTop.setAttribute('text-anchor', 'middle');
+    txtTop.setAttribute('fill', '#8e8e93');
+    txtTop.setAttribute('font-size', '11');
+    svg.appendChild(txtTop);
+    const txtBot = document.createElementNS(ns, 'text');
+    txtBot.textContent = h + 'h';
+    txtBot.setAttribute('x', x);
+    txtBot.setAttribute('y', margin.top + chartHeight + 20);
+    txtBot.setAttribute('text-anchor', 'middle');
+    txtBot.setAttribute('fill', '#8e8e93');
+    txtBot.setAttribute('font-size', '11');
+    svg.appendChild(txtBot);
+  }
+
+  // Y-axis spine (vertical line at x=0)
+  const ySpine = document.createElementNS(ns, 'line');
+  ySpine.setAttribute('x1', margin.left); ySpine.setAttribute('x2', margin.left);
+  ySpine.setAttribute('y1', margin.top); ySpine.setAttribute('y2', margin.top + chartHeight);
+  ySpine.setAttribute('stroke', '#2a2a2e'); ySpine.setAttribute('stroke-width', '1');
+  svg.appendChild(ySpine);
+
+  // Rows (one per date)
+  allDates.forEach((date, i) => {
+    const rowY = margin.top + i * rowHeight + (rowGap / 2);
+    const dayEntries = data.filter(r => r.Date === date);
+    dayEntries.sort((a, b) => {
+      if (a.Person !== b.Person) return a.Person.localeCompare(b.Person);
+      if (a.Story !== b.Story) return a.Story.localeCompare(b.Story);
+      return 0;
+    });
+
+    // Row backgrounds:
+    //   - zero-hour rows get a subtle dark strip so the gap reads as intentional
+    //   - the date-selected row (Y-axis label clicked) gets a brighter highlight
+    const isZero = dayEntries.length === 0;
+    const isDateSelected = state.selectedDate === date;
+    if (isDateSelected) {
+      const bg = document.createElementNS(ns, 'rect');
+      bg.setAttribute('x', margin.left);
+      bg.setAttribute('y', rowY - 2);
+      bg.setAttribute('width', chartWidth);
+      bg.setAttribute('height', barHeight + 4);
+      bg.setAttribute('fill', 'rgba(91, 143, 255, 0.12)');
+      bg.setAttribute('stroke', 'rgba(91, 143, 255, 0.4)');
+      svg.appendChild(bg);
+    } else if (isZero) {
+      const bg = document.createElementNS(ns, 'rect');
+      bg.setAttribute('x', margin.left);
+      bg.setAttribute('y', rowY);
+      bg.setAttribute('width', chartWidth);
+      bg.setAttribute('height', barHeight);
+      bg.setAttribute('fill', '#161618');
+      svg.appendChild(bg);
+    }
+
+    let cumulative = 0;
+    dayEntries.forEach(entry => {
+      const h = getHours(entry);
+      if (h <= 0) return;
+      const segX = xScale(cumulative);
+      const segW = xScale(cumulative + h) - segX;
+      const rect = document.createElementNS(ns, 'rect');
+      rect.setAttribute('x', segX);
+      rect.setAttribute('y', rowY);
+      rect.setAttribute('width', Math.max(1, segW));
+      rect.setAttribute('height', barHeight);
+      rect.setAttribute('fill', getColor(entry));
+      rect.setAttribute('class', 'bar-segment' + (state.selectedEntry === entry ? ' selected' : ''));
+      const title = document.createElementNS(ns, 'title');
+      const commitsTrim = entry.Commits.length > 100 ? entry.Commits.slice(0, 97) + '...' : entry.Commits;
+      title.textContent = `${entry.Date} · ${entry.Person} · ${entry.Story} · ${h}h\n${commitsTrim}`;
+      rect.appendChild(title);
+      rect.addEventListener('click', () => selectEntry(entry));
+      svg.appendChild(rect);
+      cumulative += h;
+    });
+
+    // Y-axis label: MM-DD + DOW. Clickable → opens a day-summary view in
+    // the right panel listing all entries for that day.
+    const dow = dayEntries[0]?.DOW || dowOf(date);
+    const lbl = document.createElementNS(ns, 'text');
+    lbl.textContent = `${date.slice(5)} ${dow}`;
+    lbl.setAttribute('x', margin.left - 10);
+    lbl.setAttribute('y', rowY + barHeight / 2 + 4);
+    lbl.setAttribute('text-anchor', 'end');
+    lbl.setAttribute('font-size', '10');
+    lbl.setAttribute('font-family', 'ui-monospace, monospace');
+    let labelFill = isZero ? '#5a5a5e' : '#8e8e93';
+    if (isDateSelected) labelFill = '#cfcfd3';
+    lbl.setAttribute('fill', labelFill);
+    lbl.setAttribute('font-weight', isDateSelected ? '600' : '400');
+    lbl.setAttribute('style', 'cursor: pointer');
+    const labelTitle = document.createElementNS(ns, 'title');
+    labelTitle.textContent = `Click to see all entries on ${date}`;
+    lbl.appendChild(labelTitle);
+    lbl.addEventListener('click', () => selectDate(date));
+    svg.appendChild(lbl);
+  });
+
+  // Summary
+  const totalH = dayTotals.reduce((a, b) => a + b, 0);
+  const zeroDayCount = dayTotals.filter(d => d === 0).length;
+  const peakIdx = dayTotals.indexOf(Math.max(...dayTotals));
+  document.getElementById('summary').textContent =
+    `${data.length} entries · ${allDates.length} days in range (${zeroDayCount} zero-hour) · ${totalH.toFixed(2)}h total · peak ${allDates[peakIdx]} (${dayTotals[peakIdx].toFixed(2)}h)`;
+}
+
+function selectEntry(entry) {
+  state.selectedEntry = entry;
+  state.selectedDate = null;
+  renderChart();
+  renderDetails();
+  updatePrompt();
+}
+
+function selectDate(date) {
+  // Toggle off if the same date is clicked again
+  state.selectedDate = (state.selectedDate === date) ? null : date;
+  state.selectedEntry = null;
+  renderChart();
+  renderDetails();
+  updatePrompt();
+}
+
+function renderDateSummary(date) {
+  const data = filteredData();
+  const dayEntries = data.filter(r => r.Date === date);
+  dayEntries.sort((a, b) => {
+    if (a.Person !== b.Person) return a.Person.localeCompare(b.Person);
+    return a.Story.localeCompare(b.Story);
+  });
+  const dow = dayEntries[0]?.DOW || dowOf(date);
+  const total = dayEntries.reduce((s, r) => s + getHours(r), 0);
+  const sprintLabel = dayEntries[0]?.Sprint ? `<span class="badge">${escapeHtml(dayEntries[0].Sprint)}</span>` : '';
+
+  if (dayEntries.length === 0) {
+    return `
+      <div class="detail-row"><div class="lbl">Date</div><div class="val">${escapeHtml(date)} <span class="badge">${escapeHtml(dow)}</span></div></div>
+      <div class="detail-row"><div class="lbl">Total hours</div><div class="val"><b>0h</b></div></div>
+      <p class="details-empty" style="margin-top: 12px">No entries on this day (with current filters).</p>
+    `;
+  }
+
+  const rows = dayEntries.map(r => {
+    const h = getHours(r);
+    return `
+      <div class="day-entry" data-key="${escapeHtml(r.Date + '|' + r.Person + '|' + r.Story + '|' + r.Commits.slice(0, 30))}">
+        <div class="day-entry-head">
+          <span class="day-entry-person"><span class="legend-swatch" style="background:${getColor(r)}"></span>${escapeHtml(r.Person)}</span>
+          <span class="day-entry-meta"><span class="badge">${escapeHtml(r.Story)}</span> <b>${h}h</b></span>
+        </div>
+        <div class="day-entry-commits mono">${escapeHtml(r.Commits)}</div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="detail-row"><div class="lbl">Date</div><div class="val">${escapeHtml(date)} <span class="badge">${escapeHtml(dow)}</span> ${sprintLabel}</div></div>
+    <div class="detail-row"><div class="lbl">Total hours</div><div class="val"><b>${total.toFixed(2)}h</b> across ${dayEntries.length} entr${dayEntries.length === 1 ? 'y' : 'ies'}</div></div>
+    <div class="day-entry-list">${rows}</div>
+  `;
+}
+
+function renderDetails() {
+  const el = document.getElementById('details');
+  if (state.selectedDate) {
+    el.innerHTML = renderDateSummary(state.selectedDate);
+    return;
+  }
+  if (!state.selectedEntry) {
+    el.innerHTML = '<p class="details-empty">Click a segment in the chart for entry details, or click a date label on the Y-axis for a day summary.</p>';
+    return;
+  }
+  const r = state.selectedEntry;
+  const usedHours = getHours(r);
+  const source = (state.hoursSource === 'prefer-attested' && r.HoursAttestedNum !== null) ? 'attested' : 'estimated';
+  el.innerHTML = `
+    <div class="detail-row"><div class="lbl">Date</div><div class="val">${escapeHtml(r.Date)} <span class="badge">${escapeHtml(r.DOW)}</span></div></div>
+    <div class="detail-row"><div class="lbl">Sprint</div><div class="val">${escapeHtml(r.Sprint)}</div></div>
+    <div class="detail-row"><div class="lbl">Story</div><div class="val">${escapeHtml(r.Story)}</div></div>
+    <div class="detail-row"><div class="lbl">Person</div><div class="val"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${getColor(r)};margin-right:6px;vertical-align:middle"></span>${escapeHtml(r.Person)}</div></div>
+    <div class="detail-row"><div class="lbl">Hours in chart</div><div class="val"><b>${usedHours}h</b> <span class="badge">${source}</span></div></div>
+    <div class="detail-row"><div class="lbl">Hours estimated</div><div class="val">${escapeHtml(r['Hours Estimated'] || '(empty)')}</div></div>
+    <div class="detail-row"><div class="lbl">Hours attested</div><div class="val">${escapeHtml(r['Hours Attested'] || '(empty — not yet attested)')}</div></div>
+    <div class="detail-row"><div class="lbl">Time span</div><div class="val mono">${escapeHtml(r['Time Span'] || '—')}</div></div>
+    <div class="detail-row"><div class="lbl">Commits</div><div class="val mono">${escapeHtml(r.Commits)}</div></div>
+  `;
+}
+
+function renderLegend() {
+  const el = document.getElementById('legend');
+  el.innerHTML = ALL_PEOPLE.filter(p => state.people.has(p)).map(p =>
+    `<div class="legend-item"><div class="legend-swatch" style="background:${PERSON_COLORS[p] || DEFAULT_COLOR}"></div>${escapeHtml(p)}</div>`
+  ).join('');
+}
+
+function updatePrompt() {
+  const data = filteredData();
+  const days = new Set(data.map(r => r.Date)).size;
+  const totalH = data.reduce((s, r) => s + getHours(r), 0);
+  const parts = [];
+  parts.push('Render docs/planning/time-log.tsv as a horizontal stacked bar chart (one row per day, oldest at top → newest at bottom, bars grow left-to-right, segments = entries, colors = person, zero-hour days shown as empty rows).');
+  if (state.people.size < ALL_PEOPLE.length) {
+    parts.push(`Filter to ${[...state.people].join(', ')}.`);
+  }
+  if (state.sprints.size < ALL_SPRINTS.length) {
+    parts.push(`Restrict to sprints: ${[...state.sprints].join(', ')}.`);
+  }
+  if (state.excludeOverhead) {
+    parts.push('Exclude Overhead entries — story-attributable work only.');
+  }
+  if (state.hoursSource === 'estimated-only') {
+    parts.push('Use the Hours Estimated column for every entry, regardless of attestation.');
+  } else {
+    parts.push('Use Hours Attested when populated, otherwise fall back to Hours Estimated.');
+  }
+  parts.push(`Result: ${data.length} entries / ${days} days / ${totalH.toFixed(2)}h shown.`);
+  if (state.selectedDate) {
+    const dayEntries = data.filter(r => r.Date === state.selectedDate);
+    const dayTotal = dayEntries.reduce((s, r) => s + getHours(r), 0);
+    parts.push(`Focus on ${state.selectedDate} (${dayEntries.length} entr${dayEntries.length === 1 ? 'y' : 'ies'}, ${dayTotal.toFixed(2)}h).`);
+  } else if (state.selectedEntry) {
+    const r = state.selectedEntry;
+    parts.push(`Highlight ${r.Date} · ${r.Person} · ${r.Story} (${getHours(r)}h).`);
+  }
+  document.getElementById('prompt').textContent = parts.join(' ');
+}
+
+function rerender() {
+  renderChart();
+  renderDetails();
+  renderLegend();
+  updatePrompt();
+}
+
+// Keyboard navigation: arrow keys step the current selection forward (right)
+// or backward (left). Direction is chronological — right = newer, left = older.
+// Entry navigation iterates across all visible entries, day by day; date
+// navigation iterates across the full date range (including zero-hour days,
+// matching what the chart renders).
+function navigateDate(direction) {
+  if (!state.selectedDate) return false;
+  const data = filteredData();
+  if (data.length === 0) return false;
+  const sortedDates = [...new Set(data.map(r => r.Date))].sort();
+  const allDates = dateRange(sortedDates[0], sortedDates[sortedDates.length - 1]);
+  const idx = allDates.indexOf(state.selectedDate);
+  if (idx === -1) return false;
+  const newIdx = idx + direction;
+  if (newIdx < 0 || newIdx >= allDates.length) return false;
+  state.selectedDate = allDates[newIdx];
+  state.selectedEntry = null;
+  rerender();
+  scrollSelectionIntoView();
+  return true;
+}
+
+function navigateEntry(direction) {
+  if (!state.selectedEntry) return false;
+  const data = filteredData();
+  if (data.length === 0) return false;
+  const sortedDates = [...new Set(data.map(r => r.Date))].sort();
+  const ordered = [];
+  sortedDates.forEach(date => {
+    const dayEntries = data.filter(r => r.Date === date);
+    dayEntries.sort((a, b) => {
+      if (a.Person !== b.Person) return a.Person.localeCompare(b.Person);
+      return a.Story.localeCompare(b.Story);
+    });
+    ordered.push(...dayEntries);
+  });
+  const idx = ordered.indexOf(state.selectedEntry);
+  if (idx === -1) return false;
+  const newIdx = idx + direction;
+  if (newIdx < 0 || newIdx >= ordered.length) return false;
+  state.selectedEntry = ordered[newIdx];
+  state.selectedDate = null;
+  rerender();
+  scrollSelectionIntoView();
+  return true;
+}
+
+function scrollSelectionIntoView() {
+  // After re-render, find the highlighted DOM node and ask the browser to
+  // bring it into view inside the scrollable chart-pane. block:'nearest'
+  // means we only scroll when the selection is actually off-screen.
+  const el = document.querySelector('.bar-segment.selected') ||
+             (state.selectedDate ? findDateLabel(state.selectedDate) : null);
+  if (el && typeof el.scrollIntoView === 'function') {
+    el.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+  }
+}
+
+function findDateLabel(date) {
+  // The label is a <text> whose textContent starts with the MM-DD slice.
+  const prefix = date.slice(5);
+  const labels = document.querySelectorAll('#chart text');
+  for (const t of labels) {
+    if (t.textContent && t.textContent.startsWith(prefix + ' ')) return t;
+  }
+  return null;
+}
+
+function initKeyboard() {
+  document.addEventListener('keydown', (e) => {
+    // Don't intercept when typing into a form control.
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if (e.key === 'ArrowRight') {
+      const handled = state.selectedDate ? navigateDate(+1) :
+                      state.selectedEntry ? navigateEntry(+1) : false;
+      if (handled) e.preventDefault();
+    } else if (e.key === 'ArrowLeft') {
+      const handled = state.selectedDate ? navigateDate(-1) :
+                      state.selectedEntry ? navigateEntry(-1) : false;
+      if (handled) e.preventDefault();
+    } else if (e.key === 'Escape') {
+      if (state.selectedDate || state.selectedEntry) {
+        state.selectedDate = null;
+        state.selectedEntry = null;
+        rerender();
+        e.preventDefault();
+      }
+    }
+  });
+}
+
+// Wire controls
+function initPersonFilter() {
+  const c = document.getElementById('person-filter');
+  c.innerHTML = ALL_PEOPLE.map(p =>
+    `<label><input type="checkbox" data-person="${escapeHtml(p)}" checked /> <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${PERSON_COLORS[p] || DEFAULT_COLOR};flex-shrink:0"></span>${escapeHtml(p)}</label>`
+  ).join('');
+  c.addEventListener('change', e => {
+    const p = e.target.dataset.person;
+    if (!p) return;
+    if (e.target.checked) state.people.add(p); else state.people.delete(p);
+    state.selectedEntry = null;
+    state.selectedDate = null;
+    rerender();
+  });
+}
+function initSprintFilter() {
+  const c = document.getElementById('sprint-filter');
+  c.innerHTML = ALL_SPRINTS.map(s =>
+    `<label><input type="checkbox" data-sprint="${escapeHtml(s)}" checked /> ${escapeHtml(s)}</label>`
+  ).join('');
+  c.addEventListener('change', e => {
+    const s = e.target.dataset.sprint;
+    if (!s) return;
+    if (e.target.checked) state.sprints.add(s); else state.sprints.delete(s);
+    state.selectedEntry = null;
+    state.selectedDate = null;
+    rerender();
+  });
+}
+function initHoursSource() {
+  document.getElementById('hsrc-filter').addEventListener('change', e => {
+    state.hoursSource = e.target.value;
+    rerender();
+  });
+}
+function initToggleOverhead() {
+  const btn = document.getElementById('toggle-overhead');
+  btn.addEventListener('click', () => {
+    state.excludeOverhead = !state.excludeOverhead;
+    btn.setAttribute('aria-pressed', state.excludeOverhead);
+    btn.textContent = state.excludeOverhead ? 'Show Overhead' : 'Exclude Overhead';
+    rerender();
+  });
+}
+function initPresets() {
+  const checkAll = (sel, on) => document.querySelectorAll(sel).forEach(cb => cb.checked = on);
+  const checkOnly = (sel, attr, value) => document.querySelectorAll(sel).forEach(cb => cb.checked = cb.dataset[attr] === value);
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const preset = btn.dataset.preset;
+      state.selectedEntry = null;
+    state.selectedDate = null;
+      switch (preset) {
+        case 'all':
+          state.people = new Set(ALL_PEOPLE);
+          state.sprints = new Set(ALL_SPRINTS);
+          state.excludeOverhead = false;
+          checkAll('#person-filter input[type=checkbox]', true);
+          checkAll('#sprint-filter input[type=checkbox]', true);
+          break;
+        case 'ethan':
+          state.people = new Set(['Ethan Shen']);
+          state.sprints = new Set(ALL_SPRINTS);
+          state.excludeOverhead = false;
+          checkOnly('#person-filter input', 'person', 'Ethan Shen');
+          checkAll('#sprint-filter input[type=checkbox]', true);
+          break;
+        case 'elena':
+          state.people = new Set(['Elena Shen']);
+          state.sprints = new Set(ALL_SPRINTS);
+          state.excludeOverhead = false;
+          checkOnly('#person-filter input', 'person', 'Elena Shen');
+          checkAll('#sprint-filter input[type=checkbox]', true);
+          break;
+        case 'sprint3':
+          state.people = new Set(ALL_PEOPLE);
+          state.sprints = new Set(['Sprint 3']);
+          state.excludeOverhead = false;
+          checkAll('#person-filter input[type=checkbox]', true);
+          checkOnly('#sprint-filter input', 'sprint', 'Sprint 3');
+          break;
+        case 'story-only':
+          state.excludeOverhead = true;
+          break;
+      }
+      const tb = document.getElementById('toggle-overhead');
+      tb.setAttribute('aria-pressed', state.excludeOverhead);
+      tb.textContent = state.excludeOverhead ? 'Show Overhead' : 'Exclude Overhead';
+      rerender();
+    });
+  });
+}
+function initCopy() {
+  document.getElementById('copy').addEventListener('click', async () => {
+    const text = document.getElementById('prompt').textContent;
+    const btn = document.getElementById('copy');
+    try {
+      await navigator.clipboard.writeText(text);
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = orig, 1500);
+    } catch (e) {
+      // Fallback: select the prompt text for manual copy
+      const range = document.createRange();
+      range.selectNodeContents(document.getElementById('prompt'));
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      btn.textContent = 'Selected — Ctrl+C';
+      setTimeout(() => btn.textContent = 'Copy prompt', 2000);
+    }
+  });
+}
+
+initPersonFilter();
+initSprintFilter();
+initHoursSource();
+initToggleOverhead();
+initPresets();
+initCopy();
+initKeyboard();
+rerender();
+</script>
+</body>
+</html>
