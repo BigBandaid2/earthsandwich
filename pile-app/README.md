@@ -16,6 +16,20 @@ Per FR-110 / FR-111 / SC-010 / SC-011 in the spec, this directory (`pile-app/`) 
 
 Speckit working-process artifacts (spec, plan, tasks, JIRA mapping) live at the parent project's root (`../specs/003-ingestion-pipeline/`) and are NOT part of the App — see the spec at [`../specs/003-ingestion-pipeline/spec.md`](../specs/003-ingestion-pipeline/spec.md).
 
+### Contract with bridge-app (the App's sole consumer)
+
+The **pile** is this App's only downstream surface. Other Apps — the Travelogue backend, the React front-end, future MCP / user-input tools — do **not** read the pile directly. The future **bridge-app** is the one and only intermediary: it reads pile artefacts (TSVs + media files) and writes into the production Travelogue schema via the backend's write paths. This isolation is what lets the pile evolve without breaking downstream consumers, and what lets downstream schemas evolve without forcing scrape replays.
+
+The pile's on-disk shape is fixed by per-source contracts that bridge-app is expected to honour. Authors building or modifying a pipeline service MUST keep their output conformant with the corresponding contract:
+
+- Instagram: [`../specs/003-ingestion-pipeline/contracts/pile-artifact-instagram.md`](../specs/003-ingestion-pipeline/contracts/pile-artifact-instagram.md) — TSV column ordering, media filename convention, tombstone semantics.
+- Substack: [`../specs/003-ingestion-pipeline/contracts/pile-artifact-substack.md`](../specs/003-ingestion-pipeline/contracts/pile-artifact-substack.md) — RSS-derived columns + idempotency rules.
+
+Guardrails enforcing the boundary:
+
+- `tests/integration/test_self_containment.py` (runs in default suite) — fails if any `pile-app/` Python source references sibling Apps' directories (`scripts/`, `backend/`, `frontend/`, `public/`), workspace-absolute paths, or `../` parent-traversals.
+- `tests/integration/test_portability.py` (gated by `PILE_APP_PORTABILITY_TEST=1`) — copies the App to a tempdir, builds a fresh venv there, and runs the test suite to prove the directory really is movable.
+
 ## Quickstart
 
 Full operator guide at [`../specs/003-ingestion-pipeline/quickstart.md`](../specs/003-ingestion-pipeline/quickstart.md). The short version:
