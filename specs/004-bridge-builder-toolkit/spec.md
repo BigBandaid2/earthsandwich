@@ -251,6 +251,11 @@ The baseline is **deliberately editable**, not frozen, for two reasons: (a) the 
 
 - **FR-090**: The final accepted bundle MUST be a directory of files inside the project — all iteration artifacts (raw ydata + raw ER + raw dbt + enhanced playgrounds), the final mappings, sample-record validation results, full iteration history (automatic and manual), and captured prompt payloads — suitable for direct use as input to `/speckit.specify` (or equivalent spec-authoring step).
 - **FR-091**: The toolkit's first concrete execution MUST run as a project named for the IG→Travelogue case, against the 003 IG pile + 002 Travelogue schema, and MUST produce a bundle usable as input for the bridge-app spec without further hand-editing of the bundle's structure.
+- **FR-092**: For the IG→Travelogue first-run case (per FR-091), the Final Bundle MUST include the following two items, verbatim, so the bridge-app spec the bundle seeds carries them forward where they can finally be tested by the consuming App:
+  - `003 US3 AS#1` — "bridge-app reads pile via file-level conventions, no service-internal names"
+  - `003 US3 AS#2` — "swapping a pipeline-service implementation is invisible to bridge-app (same pile output contract)"
+
+  This is an editorial inclusion specific to the 003→bridge-app handoff — captured here on 2026-06-03 during the Phase 22 DoD peer-review of OCS-99 — NOT a systemic mechanism for cross-spec inheritance. Pile-app exposes only the pile to other Apps; spec 004 simply remembers these two bridge-app-side constraints from spec 003 so the toolkit doesn't drop them when producing the bundle. Future bridge cases would establish their own such items independently if relevant.
 
 **Standing on existing shoulders**
 
