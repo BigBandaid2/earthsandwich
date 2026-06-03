@@ -417,6 +417,59 @@ function getHours(row) {
 function getColor(row) {
   return PERSON_COLORS[row.Person] || DEFAULT_COLOR;
 }
+// Three time categories drive a texture overlay on top of the person color:
+//   story    — solid fill (no pattern)
+//   overhead — 45° diagonal hatching
+//   meeting  — dot grid
+function categorizeRow(row) {
+  const story = (row.Story || '').trim();
+  if (/^OCS-\d+/i.test(story)) return 'story';
+  if (/Weekly team meeting/i.test(row.Commits || '')) return 'meeting';
+  return 'overhead';
+}
+function patternId(person, category) {
+  return `pat-${category}-${person.replace(/\s+/g, '-')}`;
+}
+function getFill(row) {
+  const cat = categorizeRow(row);
+  if (cat === 'story') return getColor(row);
+  return `url(#${patternId(row.Person, cat)})`;
+}
+function ensurePatterns(svg, ns) {
+  const defs = document.createElementNS(ns, 'defs');
+  ALL_PEOPLE.forEach(person => {
+    const color = PERSON_COLORS[person] || DEFAULT_COLOR;
+    // Overhead: 45° diagonal stripes (dark ink overlay)
+    const oh = document.createElementNS(ns, 'pattern');
+    oh.setAttribute('id', patternId(person, 'overhead'));
+    oh.setAttribute('patternUnits', 'userSpaceOnUse');
+    oh.setAttribute('width', '6'); oh.setAttribute('height', '6');
+    oh.setAttribute('patternTransform', 'rotate(45)');
+    const ohBase = document.createElementNS(ns, 'rect');
+    ohBase.setAttribute('width', '6'); ohBase.setAttribute('height', '6'); ohBase.setAttribute('fill', color);
+    const ohLine = document.createElementNS(ns, 'line');
+    ohLine.setAttribute('x1', '0'); ohLine.setAttribute('y1', '0');
+    ohLine.setAttribute('x2', '0'); ohLine.setAttribute('y2', '6');
+    ohLine.setAttribute('stroke', 'rgba(0,0,0,0.5)');
+    ohLine.setAttribute('stroke-width', '2');
+    oh.appendChild(ohBase); oh.appendChild(ohLine);
+    defs.appendChild(oh);
+    // Meeting: white dot grid (lighter accent reads as "scheduled")
+    const mt = document.createElementNS(ns, 'pattern');
+    mt.setAttribute('id', patternId(person, 'meeting'));
+    mt.setAttribute('patternUnits', 'userSpaceOnUse');
+    mt.setAttribute('width', '5'); mt.setAttribute('height', '5');
+    const mtBase = document.createElementNS(ns, 'rect');
+    mtBase.setAttribute('width', '5'); mtBase.setAttribute('height', '5'); mtBase.setAttribute('fill', color);
+    const mtDot = document.createElementNS(ns, 'circle');
+    mtDot.setAttribute('cx', '2.5'); mtDot.setAttribute('cy', '2.5');
+    mtDot.setAttribute('r', '1.1');
+    mtDot.setAttribute('fill', 'rgba(255,255,255,0.75)');
+    mt.appendChild(mtBase); mt.appendChild(mtDot);
+    defs.appendChild(mt);
+  });
+  svg.appendChild(defs);
+}
 function filteredData() {
   return ALL_DATA.filter(r =>
     state.people.has(r.Person) &&
@@ -452,6 +505,7 @@ function dateRange(start, end) {
 function renderChart() {
   const svg = document.getElementById('chart');
   while (svg.firstChild) svg.removeChild(svg.firstChild);
+  ensurePatterns(svg, ns);
 
   const data = filteredData();
   if (data.length === 0) {
@@ -571,11 +625,11 @@ function renderChart() {
       rect.setAttribute('y', rowY);
       rect.setAttribute('width', Math.max(1, segW));
       rect.setAttribute('height', barHeight);
-      rect.setAttribute('fill', getColor(entry));
+      rect.setAttribute('fill', getFill(entry));
       rect.setAttribute('class', 'bar-segment' + (state.selectedEntry === entry ? ' selected' : ''));
       const title = document.createElementNS(ns, 'title');
       const commitsTrim = entry.Commits.length > 100 ? entry.Commits.slice(0, 97) + '...' : entry.Commits;
-      title.textContent = `${entry.Date} · ${entry.Person} · ${entry.Story} · ${h}h\n${commitsTrim}`;
+      title.textContent = `${entry.Date} · ${entry.Person} · ${entry.Story} · ${categorizeRow(entry)} · ${h}h\n${commitsTrim}`;
       rect.appendChild(title);
       rect.addEventListener('click', () => selectEntry(entry));
       svg.appendChild(rect);
@@ -695,9 +749,18 @@ function renderDetails() {
 
 function renderLegend() {
   const el = document.getElementById('legend');
-  el.innerHTML = ALL_PEOPLE.filter(p => state.people.has(p)).map(p =>
+  const people = ALL_PEOPLE.filter(p => state.people.has(p)).map(p =>
     `<div class="legend-item"><div class="legend-swatch" style="background:${PERSON_COLORS[p] || DEFAULT_COLOR}"></div>${escapeHtml(p)}</div>`
   ).join('');
+  // Category swatches use a neutral gray so the texture (not the color) reads
+  // as the encoding axis. People → color; category → texture.
+  const swatch = (innerSvg, label) => `<div class="legend-item"><div class="legend-swatch" style="background:transparent;padding:0;overflow:hidden">${innerSvg}</div>${label}</div>`;
+  const gray = '#6b7280';
+  const storyS  = `<svg width="12" height="12" xmlns="http://www.w3.org/2000/svg"><rect width="12" height="12" fill="${gray}"/></svg>`;
+  const ohS     = `<svg width="12" height="12" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="lg-oh" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)"><rect width="6" height="6" fill="${gray}"/><line x1="0" y1="0" x2="0" y2="6" stroke="rgba(0,0,0,0.55)" stroke-width="2"/></pattern></defs><rect width="12" height="12" fill="url(#lg-oh)"/></svg>`;
+  const mtgS    = `<svg width="12" height="12" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="lg-mt" patternUnits="userSpaceOnUse" width="5" height="5"><rect width="5" height="5" fill="${gray}"/><circle cx="2.5" cy="2.5" r="1.1" fill="rgba(255,255,255,0.85)"/></pattern></defs><rect width="12" height="12" fill="url(#lg-mt)"/></svg>`;
+  const cats = swatch(storyS, 'Story work') + swatch(ohS, 'Overhead') + swatch(mtgS, 'Meeting');
+  el.innerHTML = people + '<div style="width:1px;background:#2a2a2e;margin:0 8px;align-self:stretch"></div>' + cats;
 }
 
 function updatePrompt() {
@@ -705,7 +768,7 @@ function updatePrompt() {
   const days = new Set(data.map(r => r.Date)).size;
   const totalH = data.reduce((s, r) => s + getHours(r), 0);
   const parts = [];
-  parts.push('Render docs/planning/time-log.tsv as a horizontal stacked bar chart (one row per day, oldest at top → newest at bottom, bars grow left-to-right, segments = entries, colors = person, zero-hour days shown as empty rows).');
+  parts.push('Render docs/planning/time-log.tsv as a horizontal stacked bar chart (one row per day, oldest at top → newest at bottom, bars grow left-to-right, segments = entries, colors = person, textures = category (solid = story work, diagonal hatching = overhead, dot grid = weekly-team-meeting time), zero-hour days shown as empty rows).');
   if (state.people.size < ALL_PEOPLE.length) {
     parts.push(`Filter to ${[...state.people].join(', ')}.`);
   }
