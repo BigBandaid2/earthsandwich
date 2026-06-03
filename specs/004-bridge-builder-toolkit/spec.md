@@ -119,10 +119,36 @@ After bridge synthesis (and the automatic oracle loop, if applicable) terminates
 
 ---
 
+### User Story 6 — Truth-baseline review of bridge output (Priority: P6)
+
+After one or more iterations have produced transformed records, the operator wants to evaluate output quality — particularly the AI-inferred columns whose value depends on the model's judgment rather than a deterministic rule. They open a review playground that joins each bridge output row against a hand-curated **truth baseline** for the same record (via a stable identifier like `shortcode`), focuses visually on the AI-inferred columns, and walks them pair by pair. For each pair they tag a verdict: `exact-match` / `bridge-improved` / `bridge-regressed` / `truly-different`. Pairs tagged `bridge-improved` immediately update the truth-baseline file (with the prior value preserved in a timestamped edit history); other tags are recorded in the session summary without touching the baseline. The summary lists per-bucket counts, per-pair verdicts, and which AI-inferred columns drove the disagreements — and can be fed back as a payload to the `iterate` CLI (User Story 5) to drive a fresh bridge iteration informed by the inference-quality observations.
+
+The baseline is **deliberately editable**, not frozen, for two reasons: (a) the baseline itself may be stale or wrong, and discovering this through review is part of how the baseline matures; (b) different AI-inference iterations of the same bridge produce different outputs against the same baseline — the baseline must record *what the operator currently believes is correct*, learning over time. Three-way mode lets the operator compare two bridge iterations against the same baseline simultaneously, scoped to AI-inferred columns, to see which iteration's inference improved.
+
+**Why this priority**: The auto oracle (Story 4) catches schema-level wiring problems; manual refinement (Story 5) catches semantic mapping errors at the proposal level. Neither catches the case where a mapping is correctly wired and the proposal is semantically sound but the AI inference inside the bridge produced the wrong value. Truth-baseline review is the operator's tool for measuring AI-inference quality across iterations and converging it toward correctness. P6 because it depends on the bridge having produced output (Stories 3–5) — it's a post-hoc quality control overlay, not part of the build-the-bridge sequence.
+
+**Independent Test**: Operator has run the bridge for the IG→Travelogue project at least once and has transformed records in the target. They invoke the review CLI with a truth-baseline path (e.g. a TSV of hand-curated locations keyed by `shortcode`) and the join key. The toolkit opens a review playground with paired rows, AI-inferred columns visually emphasized; the operator works through pairs tagging verdicts and confirming baseline edits. On session save: (a) `bridge-improved` tags overwrite the corresponding baseline values, with prior-value + timestamp + rationale captured in a sidecar edit history; (b) a session summary report is persisted in the iteration folder; (c) the summary can be passed as a payload to the `iterate` CLI to drive a new iteration.
+
+**Acceptance Scenarios**:
+
+1. **Given** a bridge has produced N output records and a truth-baseline file exists for the same domain, **When** the operator invokes the review CLI with the truth-baseline path and a stable join key, **Then** the toolkit produces a review playground showing paired rows joined on that key, surfaces unmatched-on-either-side cases as separate buckets (`only-truth` / `only-bridge`), and visually emphasizes the AI-inferred columns of the target schema.
+2. **Given** the operator is inspecting a pair in the playground, **When** they tag it `bridge-improved`, **Then** the toolkit captures the edit; on session save the truth-baseline file on disk is updated to the bridge's value, with the prior value, the editor identity, a timestamp, and the (optional) operator rationale preserved in a baseline edit-history sidecar.
+3. **Given** the operator tags a pair `bridge-regressed` or `truly-different`, **When** they save the session, **Then** the verdict is recorded in the session summary, the pair is included in the follow-up list, and the baseline is NOT modified.
+4. **Given** the operator tags a pair `exact-match`, **When** they save the session, **Then** the verdict is recorded in the per-bucket count; the baseline is not modified.
+5. **Given** any review session has completed, **When** the operator inspects the iteration folder, **Then** the session summary (per-bucket counts, per-pair verdicts, baseline edits made, AI-inferred-column focus list, session timestamp) is persisted alongside the iteration's other artifacts.
+6. **Given** a review session summary exists, **When** the operator decides to act on it, **Then** they can pass the summary as a feedback payload to the `iterate` CLI (User Story 5) to drive a new bridge iteration informed by the inference-quality observations.
+7. **Given** the bridge mapping designates certain target columns as AI-inferred and others as direct copies or deterministic transforms, **When** the review playground renders, **Then** AI-inferred columns are visually distinguished (texture or border emphasis) and the operator can filter the pair list to "AI-inferred only" / "direct-copy only" / "all."
+8. **Given** the operator wants to compare two different bridge iterations against the same truth baseline, **When** they invoke the review CLI naming both iterations, **Then** the playground shows a three-way comparison (truth + iteration N + iteration M) scoped to AI-inferred columns, with per-iteration verdict columns so the operator can capture independent judgments per iteration.
+
+---
+
 ### Edge Cases
 
 - **Empty or malformed pile**: The toolkit must produce a meaningful Stage 1 report even with zero rows or some malformed rows. ydata-profiling has its own degraded-mode output for these; the enhanced playground must surface them readably rather than crash.
 - **No plausible mapping candidates**: Stage 2's candidate-table reasoning may conclude no target tables can be populated from the pile. Stage 3 must handle "zero proposed mappings" gracefully. The dbt project artifact for this case still exists but contains zero models; the oracle loop has nothing to validate and is skipped with a "no mappings" reason recorded.
+- **Empty truth baseline at first review**: A brand-new domain may have no truth baseline yet. The toolkit MUST allow bootstrapping: the first review session starts with an empty baseline, every pair is treated as `only-bridge`, and the operator's `bridge-improved` tags become the seed entries of the baseline. Subsequent sessions compare against the growing baseline normally.
+- **Join key absent from one side**: If the supplied join key is missing from the bridge output schema or the truth-baseline schema, the review CLI MUST refuse to run with a clear error naming the missing side.
+- **Bridge produces surrogate keys not present in the baseline**: The operator can supply a deterministic key-translation function or a join-key lookup table; the toolkit applies it before pairing.
 - **Insertion validation succeeds for the wrong reason**: A mapping that inserts NULLs into nullable columns may "succeed" without being semantically correct. The oracle is necessary but not sufficient; that's why User Story 5 exists.
 - **Playground embedded-data limits**: If the pile is large enough that a fair sample plus per-column statistics push the playground HTML past ~5 MB, the orchestrator must sample more aggressively or summarize further. The raw ydata/ER/dbt artifacts are unaffected — they're separate files with their own size profiles.
 - **Non-relational pile**: ER-diagram generation is skipped on the pile side; the pile-analysis playground gets only the ydata baseline as prior art. The enhanced playground's per-section labels MUST still distinguish "ydata baseline" vs. "LLM-extended" vs. "toolkit-novel"; "ER-diagram baseline" is absent rather than fabricated.
@@ -206,6 +232,21 @@ After bridge synthesis (and the automatic oracle loop, if applicable) terminates
 - **FR-082**: Every manual iteration MUST be persisted on disk inside the project folder alongside automatic iterations. The on-disk layout MUST allow an operator to inspect any prior iteration without re-running the toolkit.
 - **FR-083**: The operator MUST be able to mark the current bridge as final via an `accept-bundle` CLI command, which materializes a final-bundle directory inside the project — suitable as input to `/speckit.specify` for authoring the downstream bridge spec.
 
+**Truth-baseline review (User Story 6)**
+
+- **FR-150**: Toolkit MUST provide a `review` CLI subcommand accepting: one or more iteration identifiers, a truth-baseline file path, a join-key column name, and (optionally) an explicit list of AI-inferred columns when the bridge mapping does not already mark them.
+- **FR-151**: The review playground MUST present pairs joined on the supplied key, partitioned into buckets: `shared` (present on both sides), `only-truth` (in baseline, not in bridge output), `only-bridge` (in bridge output, not in baseline).
+- **FR-152**: For shared pairs, the review playground MUST default-focus on the AI-inferred columns (per FR-153) and visually distinguish them from direct-copy / deterministic-transform columns (texture, shading, or border accent).
+- **FR-153**: The bridge mapping (the dbt project's `schema.yml` column metadata or an equivalent toolkit-side metadata layer) MUST mark which target columns are AI-inferred. The review playground reads this designation and renders the inferred-column emphasis automatically.
+- **FR-154**: The playground MUST let the operator tag each pair with one of: `exact-match`, `bridge-improved` (truth should be updated to the bridge's value), `bridge-regressed` (truth is right, bridge is wrong), `truly-different` (independent semantic disagreement — flag for follow-up research). Tags are operator-driven and per-pair.
+- **FR-155**: When the operator tags a pair `bridge-improved` and saves the session, the toolkit MUST write the bridge value back to the on-disk truth-baseline file AND append an entry to a baseline edit-history sidecar capturing: prior value, new value, session id, timestamp, optional operator rationale.
+- **FR-156**: When the operator tags a pair `bridge-regressed`, `truly-different`, or `exact-match`, the truth-baseline file MUST NOT be modified.
+- **FR-157**: The truth-baseline file MUST be a human-readable text format (TSV, CSV, or JSON) so it can be hand-edited outside the toolkit. The baseline edit-history sidecar MUST live alongside the baseline file and MUST itself be human-readable.
+- **FR-158**: The review playground MUST support a three-way comparison mode showing one truth baseline against two (or more) bridge iterations side-by-side, scoped to the AI-inferred columns. The operator MUST be able to capture independent per-iteration verdicts in the three-way mode.
+- **FR-159**: Each review session MUST produce a persisted session summary inside the iteration folder containing: per-bucket counts (`exact-match` / `bridge-improved` / `bridge-regressed` / `truly-different` / `only-truth` / `only-bridge`), per-pair verdicts, baseline edits captured, AI-inferred-column focus list, and session timestamp.
+- **FR-160**: A review-session summary MUST be acceptable as a feedback payload to the `iterate` CLI (FR-080), so the operator can drive a fresh bridge iteration informed by the review's findings.
+- **FR-161**: A brand-new domain MUST be allowed to start with an empty truth baseline. The first review session bootstraps the baseline: every pair appears as `only-bridge`; `bridge-improved` tags become the baseline's seed entries.
+
 **Outputs**
 
 - **FR-090**: The final accepted bundle MUST be a directory of files inside the project — all iteration artifacts (raw ydata + raw ER + raw dbt + enhanced playgrounds), the final mappings, sample-record validation results, full iteration history (automatic and manual), and captured prompt payloads — suitable for direct use as input to `/speckit.specify` (or equivalent spec-authoring step).
@@ -240,6 +281,10 @@ After bridge synthesis (and the automatic oracle loop, if applicable) terminates
 - **Validation Result**: The outcome of one insert+delete round trip against the target during an iteration — success, schema-violation failure, transient failure (retried), or "skipped" — with the transformed dummy record and any error message.
 - **Synthesized Feedback Prompt**: A natural-language payload generated automatically from an oracle failure, used to seed the next automatic iteration's bridge synthesis. Distinct from operator-generated feedback in that it requires no user intervention.
 - **Final Bundle**: The directory of files produced when the operator runs `accept-bundle` on a project. Suitable as direct input to `/speckit.specify`.
+- **Truth Baseline**: A hand-curated reference dataset for a bridge domain — the operator-believed-correct values for each record. Stored as a human-readable TSV/CSV/JSON file inside the project folder. Editable through review sessions; deliberately NOT frozen. Every edit preserved with prior value, timestamp, and rationale in an edit-history sidecar. Refines over time as the operator's understanding sharpens or the bridge surfaces baseline errors.
+- **AI-Inferred-Field Designation**: Metadata on the bridge mapping naming which target columns are produced by AI inference (as opposed to direct copies or deterministic transforms). Drives review-playground emphasis and the three-way comparison's scope.
+- **Review Session**: One operator pass through paired (truth, bridge) records for one or more iterations. Owns: the iteration(s) under review, the truth-baseline snapshot at session start, per-pair verdicts, baseline edits captured, persisted session summary. Lives in the iteration folder.
+- **Verdict**: The operator's per-pair tag from a review session — one of `exact-match`, `bridge-improved`, `bridge-regressed`, `truly-different`. The mechanism by which operator judgment enters the iteration record.
 
 ## Success Criteria *(mandatory)*
 
@@ -263,6 +308,11 @@ After bridge synthesis (and the automatic oracle loop, if applicable) terminates
 - **SC-016**: Multiple bridge projects coexist in one installation **without state corruption** across **at least 5 concurrent projects**.
 - **SC-017**: Connection-validation at project creation correctly **identifies a misconfigured endpoint** (wrong path, wrong credentials, unreachable host) in **100%** of test cases.
 - **SC-018**: If any pinned prior-art tool (`ydata-profiling`, ER tool, `dbt`) fails at runtime, the toolkit **never** produces an enhanced playground that fabricates the affected baseline — the failure surfaces to the operator in **100%** of test cases (FR-105 honored).
+- **SC-019**: For a 300-row bridge output reviewed against an existing truth baseline (the calibration anchor here is the IG→Travelogue 2026-06-03 manual walkthrough of 322 shared shortcodes), an operator can complete one review pass — including baseline edits — in **under 90 minutes**.
+- **SC-020**: Every truth-baseline edit made through a review session is retrievable from the edit-history sidecar with its prior value, new value, session id, timestamp, and (when supplied) rationale in **100%** of cases — no edit loss, no edit untraceability.
+- **SC-021**: The review playground correctly identifies AI-inferred columns vs direct-copy / deterministic-transform columns from the bridge mapping in **100%** of test cases (FR-153 honored).
+- **SC-022**: In three-way mode (truth + iteration N + iteration M), an operator can identify which iteration's AI inference improved overall (more `bridge-improved` tags, fewer `bridge-regressed`) for the AI-inferred column subset in **under 5 minutes** for representative test cases.
+- **SC-023**: A review-session summary, passed as a feedback payload to the `iterate` CLI (FR-160), drives a new bridge iteration whose AI-inference outputs measurably improve on the prior iteration's `bridge-regressed` tags in at least **70%** of test cases (early-loop refinement metric).
 
 ## Assumptions
 
