@@ -210,14 +210,14 @@ Each row carries: builder's pre-review AI assessment (`satisfied` / `partial` / 
 
 ### Carry-forward items
 
-Items that can only be tested in another App (typical case: contracts the consuming App must honour but which the producing App cannot self-verify) get a `forward` assessment in the playground. The peer-review walkthrough is responsible for **routing the forward item to the spec that will test it** — leaving forward items in the playground alone is not enough.
+Items that can only be tested in another App (typical case: a constraint the consuming App must honour but which the producing App cannot self-verify) get a `forward` assessment in the playground. The peer-review walkthrough is responsible for **routing the forward item to the spec that will eventually test it** — leaving forward items in the playground alone is not enough.
 
 Two-step protocol per forward item:
 
 1. **Mark the playground row's evidence** with `carried forward to specs/<spec>/...` so the trail is visible at review time.
-2. **Open the receiving spec and capture the constraint there.** Bridge-app-side contracts go into spec 004 (`bridge-builder-toolkit`), which relays them into the bridge-app spec via its Final Bundle. Other downstream destinations work the same way: file the constraint in the spec that owns the verification, and reference the originating Story.
+2. **Open the receiving spec and capture the constraint there as an editorial pickup** — naming the originating spec + Story, recording the verbatim constraint text, and letting the receiving spec's authors decide where it best lands (a new FR, an Edge Case, a Key Entity note). Each such pickup is a one-off — not a systemic relay between specs.
 
-Worked example: 003 Phase 22 / US3 has two bridge-app-side Acceptance Scenarios (AS#1, AS#2) that can't be verified until bridge-app exists. They live as `forward` in `specs/003-ingestion-pipeline/reviews/phase-22-us3.html` and as relayed constraints in `specs/004-bridge-builder-toolkit/spec.md`'s carry-forward block (FR-092).
+Worked example: 003 Phase 22 / US3 has two bridge-app-side Acceptance Scenarios (AS#1, AS#2) that can't be verified until bridge-app exists. They live as `forward` in `specs/003-ingestion-pipeline/reviews/phase-22-us3.html` and as a one-time editorial pickup at FR-092 in `specs/004-bridge-builder-toolkit/spec.md`, so the bundle that toolkit eventually produces seeds the bridge-app spec with them intact.
 
 ### Disposition + prompt
 
