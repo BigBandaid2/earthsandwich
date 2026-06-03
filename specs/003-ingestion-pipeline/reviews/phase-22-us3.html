@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Phase 22 / US3 — DoD peer-review playground</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; padding: 0; background: #0f0f12; color: #d4d4d8; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; font-size: 13.5px; line-height: 1.5; }
+  body { padding: 18px 24px 80px; max-width: 1320px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 4px; color: #f4f4f5; }
+  h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.04em; color: #a1a1aa; margin: 22px 0 8px; }
+  .meta { color: #8e8e93; font-size: 12.5px; margin-bottom: 6px; }
+  .meta code, code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: #c4d2ff; background: #1a1a1f; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+  th { text-align: left; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #8e8e93; padding: 8px 8px 6px; border-bottom: 1px solid #2a2a2e; vertical-align: bottom; }
+  td { padding: 10px 8px; border-bottom: 1px solid #1f1f23; vertical-align: top; font-size: 13px; }
+  tr:hover { background: #14141a; }
+  td.type { font-family: ui-monospace, monospace; font-size: 11.5px; color: #8e8e93; white-space: nowrap; }
+  td.item { color: #e4e4e7; }
+  td.evidence { color: #a1a1aa; font-size: 12.5px; }
+  td.assessment { white-space: nowrap; text-align: center; }
+  td.satisfied { text-align: center; }
+  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; letter-spacing: 0.02em; }
+  .b-full { background: #14532d; color: #bbf7d0; }
+  .b-partial { background: #422006; color: #fdba74; }
+  .b-forward { background: #1e1b4b; color: #c7d2fe; }
+  .b-unclear { background: #3f1f1f; color: #fca5a5; }
+  textarea { width: 100%; background: #1a1a1f; color: #e4e4e7; border: 1px solid #2a2a2e; border-radius: 4px; padding: 6px 8px; font-family: -apple-system, system-ui, sans-serif; font-size: 12.5px; resize: vertical; line-height: 1.4; min-height: 28px; }
+  textarea:focus { outline: none; border-color: #5b8fff; }
+  input[type="text"] { background: #1a1a1f; color: #e4e4e7; border: 1px solid #2a2a2e; border-radius: 4px; padding: 6px 8px; font-size: 12.5px; min-width: 200px; }
+  input[type="text"]:focus { outline: none; border-color: #5b8fff; }
+  input[type="checkbox"] { transform: scale(1.3); accent-color: #5b8fff; cursor: pointer; }
+  button { background: #1f2937; color: #e4e4e7; border: 1px solid #2a2a2e; border-radius: 4px; padding: 5px 10px; font-size: 12px; cursor: pointer; font-family: inherit; }
+  button:hover { background: #2a2a2e; }
+  button.primary { background: #1e40af; color: #fff; border-color: #1e40af; }
+  button.primary:hover { background: #2563eb; }
+  button.danger { background: #3f1f1f; color: #fca5a5; border-color: #5a2828; }
+  button.danger:hover { background: #5a2828; }
+  .row-controls { display: flex; gap: 6px; align-items: center; justify-content: flex-end; }
+  .legend { color: #71717a; font-size: 11.5px; margin: 6px 0 4px; }
+  .story-meta { display: grid; grid-template-columns: 160px 1fr; gap: 8px 14px; margin-top: 8px; align-items: center; }
+  .story-meta label { font-size: 12px; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.03em; }
+  .radio-group { display: flex; gap: 14px; }
+  .radio-group label { display: flex; gap: 6px; align-items: center; color: #e4e4e7; text-transform: none; letter-spacing: 0; font-size: 13px; cursor: pointer; }
+  #prompt { background: #14141a; border: 1px solid #2a2a2e; border-radius: 4px; padding: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: #d4d4d8; white-space: pre-wrap; word-wrap: break-word; min-height: 140px; max-height: 460px; overflow-y: auto; }
+  #copy-feedback { color: #4ade80; font-size: 11.5px; margin-left: 10px; opacity: 0; transition: opacity 0.2s; }
+  #copy-feedback.show { opacity: 1; }
+  .col-num { width: 28px; color: #71717a; font-family: ui-monospace, monospace; font-size: 11.5px; }
+  .col-type { width: 110px; }
+  .col-assess { width: 100px; }
+  .col-evidence { width: 22%; }
+  .col-peer { width: 26%; }
+  .col-sat { width: 52px; }
+  .col-act { width: 60px; }
+  .footer-controls { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<h1>Definition-of-Done peer review — Phase 22 / User Story 3</h1>
+<div class="meta">
+  <strong>Story:</strong> US3 — The pile is consumed only via a bridge-app, never directly &middot;
+  <strong>JIRA:</strong> <code>OCS-99</code> &middot;
+  <strong>Spec:</strong> <code>specs/003-ingestion-pipeline/</code> &middot;
+  <strong>Branch:</strong> <code>003-ingestion-pipeline</code>
+</div>
+<div class="meta">
+  Builder walks the table with a peer reviewer. Each row carries the AI's pre-review assessment, the supporting evidence, and an editable peer comment + satisfaction checkbox. Story-level fields (reviewer name, overall comment, DONE / Needs Work) and any add/delete/edit of DoD items feed the copy-out prompt at the bottom.
+</div>
+
+<h2>Definition of Done — checklist</h2>
+<div class="legend">
+  Assessment badges: <span class="badge b-full">satisfied</span> <span class="badge b-partial">partial</span> <span class="badge b-forward">forward</span> <span class="badge b-unclear">needs review</span>
+</div>
+
+<table id="dod-table">
+  <thead>
+    <tr>
+      <th class="col-num">#</th>
+      <th class="col-type">Type</th>
+      <th>Item</th>
+      <th class="col-assess">AI assess</th>
+      <th class="col-evidence">Evidence</th>
+      <th class="col-peer">Peer comment</th>
+      <th class="col-sat">✓</th>
+      <th class="col-act"></th>
+    </tr>
+  </thead>
+  <tbody id="rows"></tbody>
+</table>
+
+<div class="footer-controls">
+  <button id="add-row">+ Add DoD item</button>
+  <span class="legend">use for criteria the spec missed; the prompt will record them as an amendment</span>
+</div>
+
+<h2>Story-level disposition</h2>
+<div class="story-meta">
+  <label for="reviewer-name">Reviewer name</label>
+  <input type="text" id="reviewer-name" placeholder="e.g., Elena Shen" />
+
+  <label for="reviewer-comment">General comment</label>
+  <textarea id="reviewer-comment" rows="3" placeholder="Knowledge-share notes, deferred items, concerns surfaced during the walkthrough..."></textarea>
+
+  <label>Disposition</label>
+  <div class="radio-group">
+    <label><input type="radio" name="status" value="DONE" /> DONE</label>
+    <label><input type="radio" name="status" value="Needs work" checked /> Needs work</label>
+  </div>
+</div>
+
+<h2>Generated prompt</h2>
+<div class="meta">
+  Paste this into Claude to record the peer-review outcome in <code>tasks.md</code>, amend the spec if needed, and flip the JIRA Story when the disposition is DONE.
+</div>
+<div id="prompt"></div>
+<div class="footer-controls">
+  <button id="copy-btn" class="primary">Copy prompt</button>
+  <button id="reset-btn">Reset peer fields</button>
+  <span id="copy-feedback">Copied.</span>
+</div>
+
+<script>
+// ---------- Phase 22 / US3 DoD source ----------
+// Sourced once from specs/003-ingestion-pipeline/spec.md (L64-79, L243-244) and
+// tasks.md Phase 22 on 2026-06-03. Update inline if the spec changes.
+const INITIAL_ITEMS = [
+  {
+    type: "Independent Test",
+    item: "(a) outside-in: grep parent project for paths reaching INTO pile-app's pile returns zero hits in non-spec code",
+    assessment: "full",
+    evidence: "T258 — tests/test_pile_app_segregation.py passes (0.87s); scans every non-excluded file under repo root for pile-app/pile/, pile-app/logs/, pile-app/instagrapi_session.json, pile-app/.env"
+  },
+  {
+    type: "Independent Test",
+    item: "(b) copy App root to empty fresh project; tests pass + Instagram scrape runs end-to-end",
+    assessment: "partial",
+    evidence: "T232 covers the test-pass half via PILE_APP_PORTABILITY_TEST=1 gated pytest run in a fresh-venv tempdir. The 'scrape runs against a public target' half is NOT exercised by T232 (would require live IG creds in the temp env); manual verification needed at close-out"
+  },
+  {
+    type: "Acceptance Sc.",
+    item: "AS#1 — bridge-app reads pile via file-level conventions, no service-internal names",
+    assessment: "forward",
+    evidence: "Forward contract — bridge-app doesn't exist yet (planned spec). Pile-artifact-instagram.md + pile-artifact-substack.md capture the file-level conventions bridge-app must consume. Verifiable only when bridge-app is built"
+  },
+  {
+    type: "Acceptance Sc.",
+    item: "AS#2 — swapping a pipeline-service implementation is invisible to bridge-app (same pile contract)",
+    assessment: "forward",
+    evidence: "Same forward-contract caveat. The contracts/ files pin the on-disk shape; service-internal swaps that preserve the contract should be invisible by construction"
+  },
+  {
+    type: "Acceptance Sc.",
+    item: "AS#3 — copied App root, tests pass inside the copy",
+    assessment: "partial",
+    evidence: "T232 implements this; gated by PILE_APP_PORTABILITY_TEST=1 (3-5 min) — not run by default. Close-out should include one explicit invocation"
+  },
+  {
+    type: "Acceptance Sc.",
+    item: "AS#4 — grep parent project for refs INTO App's pile returns zero hits",
+    assessment: "full",
+    evidence: "T258 covers this directly; currently passing"
+  },
+  {
+    type: "Checkpoint",
+    item: "Segregation properties verified by the test suite and explicit to readers",
+    assessment: "full",
+    evidence: "Inside-out (T233, default suite), outside-in (T258, default suite), human-readable docs (T234 — pile-app/README.md 'App boundary' + 'Contract with bridge-app' sub-section linking both pile-artifact contracts)"
+  },
+  {
+    type: "SC-010",
+    item: "Copying App root to fresh empty project produces a working, runnable codebase; all tests pass + Instagram scrape against a public target completes",
+    assessment: "partial",
+    evidence: "Test-pass half wired (T232, gated). Scrape-runs-against-public-target half is NOT in T232 — requires live IG creds. Either accept as 'verifiable by operator at close-out' or amend T232 to take optional creds via env-var and exercise a 1-page scrape"
+  },
+  {
+    type: "SC-011",
+    item: "Grep across App root finds zero file-system refs outside the App (excl. /tmp, os.path.expanduser, URLs)",
+    assessment: "full",
+    evidence: "T233 implements this in the default suite, currently passing (0.21s). Allow-list matches the SC wording (URLs via per-line URL-strip; /tmp + os.path.expanduser are not currently used in pile-app code but would be exempt)"
+  }
+];
+
+// ---------- State ----------
+const state = {
+  items: INITIAL_ITEMS.map(it => ({ ...it, peerComment: "", satisfied: false, custom: false })),
+  reviewerName: "",
+  reviewerComment: "",
+  status: "Needs work"
+};
+
+const BADGE = {
+  full: { cls: "b-full", label: "satisfied" },
+  partial: { cls: "b-partial", label: "partial" },
+  forward: { cls: "b-forward", label: "forward" },
+  unclear: { cls: "b-unclear", label: "needs review" }
+};
+
+// ---------- Render ----------
+function renderRows() {
+  const tbody = document.getElementById("rows");
+  tbody.innerHTML = "";
+  state.items.forEach((it, idx) => {
+    const tr = document.createElement("tr");
+    const badge = BADGE[it.assessment] || BADGE.unclear;
+    tr.innerHTML = `
+      <td class="col-num">${idx + 1}</td>
+      <td class="type">${escapeHtml(it.type)}${it.custom ? " <span style='color:#fca5a5'>★</span>" : ""}</td>
+      <td class="item"><div contenteditable="true" data-field="item" data-idx="${idx}" style="outline:none">${escapeHtml(it.item)}</div></td>
+      <td class="assessment">
+        <select data-field="assessment" data-idx="${idx}" style="background:#1a1a1f;color:#e4e4e7;border:1px solid #2a2a2e;border-radius:3px;font-size:11px;padding:2px 4px">
+          <option value="full" ${it.assessment === "full" ? "selected" : ""}>satisfied</option>
+          <option value="partial" ${it.assessment === "partial" ? "selected" : ""}>partial</option>
+          <option value="forward" ${it.assessment === "forward" ? "selected" : ""}>forward</option>
+          <option value="unclear" ${it.assessment === "unclear" ? "selected" : ""}>needs review</option>
+        </select>
+      </td>
+      <td class="evidence"><div contenteditable="true" data-field="evidence" data-idx="${idx}" style="outline:none">${escapeHtml(it.evidence)}</div></td>
+      <td><textarea data-field="peerComment" data-idx="${idx}" rows="2" placeholder="Peer comment...">${escapeHtml(it.peerComment)}</textarea></td>
+      <td class="satisfied"><input type="checkbox" data-field="satisfied" data-idx="${idx}" ${it.satisfied ? "checked" : ""} /></td>
+      <td><div class="row-controls"><button class="danger" data-action="delete" data-idx="${idx}" title="Remove this DoD item — flagged in the prompt">−</button></div></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+// ---------- Prompt synthesis ----------
+function updatePrompt() {
+  const lines = [];
+  const reviewer = state.reviewerName.trim() || "[reviewer name not supplied]";
+  const todayISO = new Date().toISOString().slice(0, 10);
+
+  lines.push(`Record the Phase 22 / US3 DoD peer-review outcome for OCS-99 in the repo.`);
+  lines.push("");
+  lines.push(`Spec: specs/003-ingestion-pipeline/spec.md (User Story 3, L64-79; SC-010 + SC-011 at L243-244).`);
+  lines.push(`Tasks: specs/003-ingestion-pipeline/tasks.md (Phase 22).`);
+  lines.push(`Reviewer: ${reviewer}`);
+  lines.push(`Date: ${todayISO}`);
+  lines.push(`Disposition: ${state.status}`);
+  lines.push("");
+
+  if (state.reviewerComment.trim()) {
+    lines.push("Reviewer's general comment:");
+    state.reviewerComment.trim().split("\n").forEach(l => lines.push(`  ${l}`));
+    lines.push("");
+  }
+
+  const satisfied = state.items.filter(i => i.satisfied);
+  const unsatisfied = state.items.filter(i => !i.satisfied);
+  const withComments = state.items.filter(i => i.peerComment.trim());
+  const customAmend = state.items.filter(i => i.custom);
+
+  lines.push(`Peer marked ${satisfied.length} / ${state.items.length} DoD items satisfied.`);
+  if (unsatisfied.length) {
+    lines.push("");
+    lines.push("Unsatisfied items (carry forward or amend spec):");
+    unsatisfied.forEach(it => {
+      lines.push(`  - [${it.type}] ${it.item}`);
+      if (it.peerComment.trim()) lines.push(`    peer note: ${it.peerComment.trim()}`);
+    });
+  }
+  if (withComments.length) {
+    lines.push("");
+    lines.push("Per-item peer comments (record alongside the item in the spec / tasks where useful):");
+    withComments.forEach(it => {
+      lines.push(`  - [${it.type}] ${it.item.slice(0, 80)}${it.item.length > 80 ? "..." : ""}`);
+      lines.push(`    ${it.peerComment.trim()}`);
+    });
+  }
+  if (customAmend.length) {
+    lines.push("");
+    lines.push("Peer-added DoD items (NOT in current spec/tasks — amend spec.md or tasks.md to capture):");
+    customAmend.forEach(it => {
+      lines.push(`  - NEW [${it.type}] ${it.item}`);
+      if (it.peerComment.trim()) lines.push(`    rationale: ${it.peerComment.trim()}`);
+    });
+  }
+
+  lines.push("");
+  if (state.status === "DONE") {
+    lines.push("Actions to take:");
+    lines.push("  1. Update tasks.md Phase 22 Checkpoint with a peer-review attestation line:");
+    lines.push(`     \"Peer-reviewed by ${reviewer} on ${todayISO}: DONE.\"`);
+    lines.push("  2. If any 'forward' items remain (bridge-app-side ASs typically), record them as deferred under a 'Carry-forward' bullet under Phase 22, OR open a new follow-on task at the bottom of Phase 22 referencing the bridge-app spec.");
+    lines.push("  3. If peer added new DoD items above, amend specs/003-ingestion-pipeline/spec.md (User Story 3 Acceptance Scenarios OR Success Criteria block) to include them; commit on 003-ingestion-pipeline.");
+    lines.push("  4. Transition OCS-99 from In Progress to Done in JIRA (manual flip, per the workflow rule that sync never auto-Done's Stories).");
+    lines.push("  5. Commit + push the tasks.md / spec.md changes on 003-ingestion-pipeline.");
+  } else {
+    lines.push("Actions to take:");
+    lines.push("  1. Address the unsatisfied items above before re-review. OCS-99 stays In Progress.");
+    lines.push("  2. If peer added new DoD items, amend specs/003-ingestion-pipeline/spec.md or tasks.md to capture them.");
+    lines.push("  3. Schedule a second pass once the unsatisfied items are closed.");
+    lines.push("  4. Commit + push any tasks.md / spec.md changes on 003-ingestion-pipeline.");
+  }
+  document.getElementById("prompt").textContent = lines.join("\n");
+}
+
+// ---------- Event wiring ----------
+function rerender() { renderRows(); updatePrompt(); }
+
+document.getElementById("rows").addEventListener("input", e => {
+  const t = e.target;
+  const idx = parseInt(t.dataset.idx, 10);
+  const field = t.dataset.field;
+  if (isNaN(idx) || !field) return;
+  if (t.tagName === "DIV") {
+    state.items[idx][field] = t.innerText;
+  } else if (t.tagName === "TEXTAREA") {
+    state.items[idx][field] = t.value;
+  } else if (t.tagName === "SELECT") {
+    state.items[idx][field] = t.value;
+  }
+  updatePrompt();
+});
+
+document.getElementById("rows").addEventListener("change", e => {
+  const t = e.target;
+  const idx = parseInt(t.dataset.idx, 10);
+  if (isNaN(idx)) return;
+  if (t.type === "checkbox") {
+    state.items[idx].satisfied = t.checked;
+    updatePrompt();
+  }
+});
+
+document.getElementById("rows").addEventListener("click", e => {
+  const t = e.target;
+  if (t.dataset.action === "delete") {
+    const idx = parseInt(t.dataset.idx, 10);
+    if (confirm("Remove this DoD item? The prompt will reflect it as a peer-driven deletion.")) {
+      state.items.splice(idx, 1);
+      rerender();
+    }
+  }
+});
+
+document.getElementById("add-row").addEventListener("click", () => {
+  state.items.push({
+    type: "Custom (peer-added)",
+    item: "New DoD item — edit me",
+    assessment: "unclear",
+    evidence: "(peer-driven amendment, not in current spec)",
+    peerComment: "",
+    satisfied: false,
+    custom: true
+  });
+  rerender();
+});
+
+document.getElementById("reviewer-name").addEventListener("input", e => {
+  state.reviewerName = e.target.value;
+  updatePrompt();
+});
+
+document.getElementById("reviewer-comment").addEventListener("input", e => {
+  state.reviewerComment = e.target.value;
+  updatePrompt();
+});
+
+document.querySelectorAll('input[name="status"]').forEach(r => {
+  r.addEventListener("change", e => {
+    state.status = e.target.value;
+    updatePrompt();
+  });
+});
+
+document.getElementById("copy-btn").addEventListener("click", async () => {
+  const txt = document.getElementById("prompt").textContent;
+  try {
+    await navigator.clipboard.writeText(txt);
+  } catch (e) {
+    // Fallback for restricted clipboard contexts
+    const ta = document.createElement("textarea");
+    ta.value = txt;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+  }
+  const fb = document.getElementById("copy-feedback");
+  fb.classList.add("show");
+  setTimeout(() => fb.classList.remove("show"), 1500);
+});
+
+document.getElementById("reset-btn").addEventListener("click", () => {
+  if (!confirm("Clear all peer fields (comments + checkboxes + reviewer name + general comment)? Custom-added rows are kept.")) return;
+  state.items.forEach(it => { it.peerComment = ""; it.satisfied = false; });
+  state.reviewerName = "";
+  state.reviewerComment = "";
+  state.status = "Needs work";
+  document.getElementById("reviewer-name").value = "";
+  document.getElementById("reviewer-comment").value = "";
+  document.querySelector('input[name="status"][value="Needs work"]').checked = true;
+  rerender();
+});
+
+// ---------- Render-on-load ----------
+rerender();
+</script>
+</body>
+</html>
