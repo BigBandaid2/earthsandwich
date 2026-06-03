@@ -8,7 +8,16 @@
 
 ## Weekly Cadence
 
-Roughly once per week, the Team Lead is responsible for grasping the current state of the project, capturing all progress since the last sprint review, planning objectives for the sprint to come, and keeping the core spec readable and coherent. 
+Two rhythms operate here. **Per User Story** (the "After Each User Story" sub-section below) fires whenever a Story finishes — could happen twice in a week, or zero times — and is the gate between "operator marked all tasks done" and the manual JIRA Done flip. **Weekly** (the three meeting-anchored sub-sections after it) is the team-meeting rhythm: drift scan, sync, attest, plan.
+
+### After Each User Story
+
+Triggered when an operator believes a User Story is complete (all its tasks `[x]`-marked). Required gate before flipping the JIRA Story to Done.
+
+1. **Build the DoD review playground** at `specs/<spec>/reviews/phase-NN-usN.html` (see [§Definition of Done Review](#definition-of-done-review) for table contents, carry-forward handling, and the prompt-back convention).
+2. **Schedule a peer-review walkthrough** with at least one other team member — never the builder alone. Peer is the knowledge-share + accountability check, not a rubber stamp.
+3. **Reviewer fills disposition fields** in the playground: name, general comment, `DONE` / `Needs work`.
+4. **Paste the playground's copy-out prompt into Claude.** Records the outcome: peer-review attestation in `tasks.md`, any peer-driven spec amendments, and (DONE only) the manual JIRA Story flip from In Progress → Done.
 
 ### Before Weekly Team Meeting
 
@@ -177,6 +186,44 @@ Don't touch the Subtasks under spec-kit Stories — those are managed by the spe
 ### What never goes into the sync
 
 Per [Cardinal Rule #2](../.specify/memory/constitution.md#cardinal-rules), `specs/<spec>/jira-mapping.json` must not record sprint, owner, status, story points, or priority — **including derived counters like `completed_stories` / `pending_stories` / `completed_tasks`** that summarize status. Those PM fields live in JIRA's UI; the mapping file carries only identity (key, summary, URL, parent/child structure) plus a `total_stories` / `total_tasks` count. Two writers (this file + JIRA's UI) on the same field guarantees drift. Narrative artefacts that humans read but tools don't sync (`docs/planning/YYYY-WW.md`, this guide) are exempt.
+
+---
+
+## Definition of Done Review
+
+Each User Story closes with a peer-reviewed Definition-of-Done walkthrough — the [§After Each User Story](#after-each-user-story) gate referenced in the weekly cadence. Purpose: knowledge-share, sanity-check, gap-finding, capturing criteria that can't be fully satisfied, and accountability (the builder is not also their sole tester and judge).
+
+### The playground
+
+Each Story gets a single-file HTML playground at `specs/<spec>/reviews/phase-NN-usN.html`. Hand-curated for now; the template will likely evolve before it's worth scripting. Layout follows the `playground:playground` conventions: single file, vanilla HTML/CSS/JS, no external deps, dark theme, live state, copy-out-a-prompt.
+
+The playground's table aggregates the Story's Definition of Done from `spec.md` and `tasks.md`:
+
+| Source | Rows |
+|---|---|
+| spec.md User Story `Independent Test` | one per sub-clause (a, b, ...) |
+| spec.md User Story `Acceptance Scenarios` | one per AS |
+| tasks.md phase `Checkpoint` | one row |
+| spec.md `Success Criteria` tied to the Story | one per SC |
+
+Each row carries: builder's pre-review AI assessment (`satisfied` / `partial` / `forward` / `needs review`), supporting evidence (commits, test names, file paths), an editable peer-comment textarea, and a satisfied checkbox. The reviewer can add new rows for criteria the spec missed, delete rows for criteria deemed irrelevant, and edit existing item text — all of which the prompt records as spec amendments.
+
+### Carry-forward items
+
+Items that can only be tested in another App (typical case: contracts the consuming App must honour but which the producing App cannot self-verify) get a `forward` assessment in the playground. The peer-review walkthrough is responsible for **routing the forward item to the spec that will test it** — leaving forward items in the playground alone is not enough.
+
+Two-step protocol per forward item:
+
+1. **Mark the playground row's evidence** with `carried forward to specs/<spec>/...` so the trail is visible at review time.
+2. **Open the receiving spec and capture the constraint there.** Bridge-app-side contracts go into spec 004 (`bridge-builder-toolkit`), which relays them into the bridge-app spec via its Final Bundle. Other downstream destinations work the same way: file the constraint in the spec that owns the verification, and reference the originating Story.
+
+Worked example: 003 Phase 22 / US3 has two bridge-app-side Acceptance Scenarios (AS#1, AS#2) that can't be verified until bridge-app exists. They live as `forward` in `specs/003-ingestion-pipeline/reviews/phase-22-us3.html` and as relayed constraints in `specs/004-bridge-builder-toolkit/spec.md`'s carry-forward block (FR-092).
+
+### Disposition + prompt
+
+The reviewer's binary `DONE` / `Needs work` disposition drives the copy-out prompt's tail. DONE-path lists 5 follow-up actions (Checkpoint attestation in `tasks.md`, spec amendments if any, JIRA Story flip In Progress → Done, commit + push). Needs-work-path lists 4 different ones (address unsatisfied items, amend spec if any, schedule second pass, Story stays In Progress).
+
+Without the peer-review prompt being executed, no Story → Done. The In-Progress-only sync rule (see [§JIRA sync](#jira-sync)) presumes peer review is the final hop.
 
 ---
 
