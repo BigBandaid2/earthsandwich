@@ -104,7 +104,8 @@ def session_sanity(target: str) -> None:
     )
     proc = subprocess.run(
         [_python_bin(), "-c", snippet],
-        cwd=APP_ROOT, capture_output=True, text=True,
+        cwd=APP_ROOT, capture_output=True,
+        text=True, encoding="utf-8", errors="replace",
     )
     sys.stdout.write(proc.stdout)
     sys.stderr.write(proc.stderr)
@@ -128,7 +129,8 @@ def smoke_test(target: str) -> None:
     print("\n=== Step 1: pytest smoke test (1 post, normal rate) ===", flush=True)
     proc = subprocess.run(
         [_python_bin(), "-m", "pytest", "tests/instagram/test_instagram_pull.py", "-q"],
-        cwd=APP_ROOT, capture_output=True, text=True,
+        cwd=APP_ROOT, capture_output=True,
+        text=True, encoding="utf-8", errors="replace",
     )
     sys.stdout.write(proc.stdout)
     sys.stderr.write(proc.stderr)
@@ -185,7 +187,7 @@ def run_scrape(target: str, newer_than: str, rate: str, step_label: str) -> None
         proc = subprocess.Popen(
             cmd, cwd=APP_ROOT,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-            text=True, bufsize=1,
+            text=True, encoding="utf-8", errors="replace", bufsize=1,
         )
         assert proc.stdout is not None
         for line in proc.stdout:
