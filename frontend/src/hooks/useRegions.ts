@@ -1,34 +1,34 @@
 import { useEffect, useState } from 'react';
-import type { Trip } from '../data/types';
-import { getTrips } from '../api/client';
-import { adaptTripSummary } from '../api/adapters';
+import type { Region } from '../data/types';
+import { getRegions } from '../api/client';
+import { adaptRegion } from '../api/adapters';
 import { withRetry } from '../utils/retry';
 
-interface UseTripsResult {
-  trips: Trip[];
+interface UseRegionsResult {
+  regions: Region[];
   loading: boolean;
   error: string | null;
 }
 
-export function useTrips(): UseTripsResult {
-  const [trips, setTrips] = useState<Trip[]>([]);
+export function useRegions(): UseRegionsResult {
+  const [regions, setRegions] = useState<Region[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    withRetry(() => getTrips())
+    withRetry(() => getRegions())
       .then((data) => {
         if (!cancelled) {
-          setTrips(data.map(adaptTripSummary));
+          setRegions(data.map(adaptRegion));
           setError(null);
         }
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to load trips.');
-          setTrips([]);
+          setError(err instanceof Error ? err.message : 'Failed to load regions.');
+          setRegions([]);
         }
       })
       .finally(() => {
@@ -39,5 +39,5 @@ export function useTrips(): UseTripsResult {
     };
   }, []);
 
-  return { trips, loading, error };
+  return { regions, loading, error };
 }

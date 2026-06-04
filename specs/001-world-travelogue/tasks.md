@@ -378,9 +378,9 @@ With multiple developers:
 - [x] T108 [P] [US6] Write `useTrip` hook tests in `frontend/tests/unit/hooks/useTrip.test.ts`: (a) does nothing when `tripId` is null; (b) sets `loading=true` on `tripId` change; (c) successful fetch populates `trip`; (d) after retry exhaustion `error` is set and `trip` is null
 - [x] T109 [P] [US6] Write `useRegions` hook tests in `frontend/tests/unit/hooks/useRegions.test.ts`: (a) `loading=true` initially; (b) success yields `regions: Region[]` array; (c) retry exhaustion yields `error` string
 - [x] T110 [US6] Write `App` integration tests in `frontend/tests/unit/components/App.test.tsx` — mock `useTrips`, `useTrip`, `useRegions` via `vi.mock`: (a) loading indicator visible while any hook reports `loading=true`; (b) error panel visible when `useTrips` yields an error; (c) "No trips are currently available." rendered when `useTrips` yields empty list; (d) trip switch triggers `useTrip` with the new trip id
-- [ ] T111 [P] [US6] Update `useTrips` to wrap `getTrips()` in `withRetry` from `frontend/src/utils/retry.ts` in `frontend/src/hooks/useTrips.ts`
-- [ ] T112 [P] [US6] Update `useTrip` to wrap `getTripDetail()` in `withRetry` in `frontend/src/hooks/useTrip.ts`
-- [ ] T113 [P] [US6] Create `useRegions` hook in `frontend/src/hooks/useRegions.ts`: on mount calls `getRegions()` wrapped in `withRetry`; returns `{ regions: Region[], loading: boolean, error: string | null }`; cancels on unmount
+- [x] T111 [P] [US6] Update `useTrips` to wrap `getTrips()` in `withRetry` from `frontend/src/utils/retry.ts` in `frontend/src/hooks/useTrips.ts`
+- [x] T112 [P] [US6] Update `useTrip` to wrap `getTripDetail()` in `withRetry` in `frontend/src/hooks/useTrip.ts`
+- [x] T113 [P] [US6] Create `useRegions` hook in `frontend/src/hooks/useRegions.ts`: on mount calls `getRegions()` wrapped in `withRetry`; returns `{ regions: Region[], loading: boolean, error: string | null }`; cancels on unmount
 - [ ] T114 [US6] Update `groupStopsByRegion` in `frontend/src/utils/regionUtils.ts` to accept `regions: Region[]` as a second parameter instead of importing from the module-level `REGIONS` constant; remove the `REGIONS` import from this file
 - [ ] T115 [US6] Update `frontend/src/App.tsx`: call `useRegions()`; extend the loading gate to include `regionsLoading`; extend the error gate to include `regionsError`; render "No trips are currently available." when `trips.length === 0` after load; pass the fetched `regions` array to `groupStopsByRegion`
 
