@@ -5,7 +5,7 @@ Usage (from project root):
     python scripts/seed.py
 
 Reads DATABASE_URL from the environment (or backend/.env).
-Inserts in FK order: trips → stops → instagram_posts → substack_posts.
+Inserts in FK order: regions → trips → stops → instagram_posts → substack_posts.
 All inserts use ON CONFLICT DO NOTHING so the script is safe to re-run.
 """
 
@@ -44,10 +44,30 @@ def _pg_url(database_url: str) -> str:
 
 
 async def seed(conn: asyncpg.Connection) -> None:
+    regions = _load_json("regions")
     trips = _load_json("trips")
     stops = _load_json("stops")
     instagram_posts = _load_json("instagram_posts")
     substack_posts = _load_json("substack_posts")
+
+    # ── regions ───────────────────────────────────────────────────────────────
+    result = await conn.executemany(
+        """
+        INSERT INTO regions (iata_code, name, airport_name, country, lat, lng)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        ON CONFLICT DO NOTHING
+        """,
+        [
+            (r["iata_code"], r["name"], r["airport_name"], r["country"], r["lat"], r["lng"])
+            for r in regions
+        ],
+    )
+    print(f"regions:         {len(regions)} records processed  ({result})")
+
+    # Validate the NOT VALID FK constraint now that regions are populated
+    await conn.execute(
+        "ALTER TABLE stops VALIDATE CONSTRAINT fk_stops_region_code"
+    )
 
     # ── trips ─────────────────────────────────────────────────────────────────
     result = await conn.executemany(
