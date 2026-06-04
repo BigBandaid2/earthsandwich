@@ -7,7 +7,7 @@
 Five tables mirror the existing `src/data/types.ts` interfaces and extend them with persistence metadata. Planned stops have no separate table — they are represented by `post_type = 'planned'` and an optional `caption` on the `stops` row. The `regions` table is a reference/lookup table; its `iata_code` values are the only valid values for `stops.region_code`.
 
 ```
-regions  ←─────────────────────────────────────────────────────────┐
+regions  ←──────────────────────────────────────────────────────────┐
                                                                     │ (region_code FK)
 trips                                                               │
   └── stops (FK: trip_id) ──────────────────────────────────────────┘

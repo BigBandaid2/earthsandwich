@@ -101,10 +101,10 @@
 
 **Independent Test**: Use curl with `Authorization: Bearer <API_SECRET_KEY>` to POST /trips (201 response), PUT /trips/:id (200 response with updated fields), and POST /regions/end-date (200 response). Verify 401 for all three without a token. Verify 409 on duplicate trip id. Verify 422 on bad date format.
 
-- [ ] T037 [P] [US4] Define POST /regions/end-date contract in specs/002-database-backend/contracts/api.md: request body (optional trip string, optional region string, optional date ISO 8601), response shape, storage strategy (e.g. new region_end_dates table or existing schema extension), and any new migration required — this task MUST be completed before T040
-- [ ] T038 [P] [US4] Add POST /trips handler to backend/app/api/trips.py: validate body via TripCreate schema; insert trip; return 201 TripResponse; return 401 on missing/invalid bearer token; return 409 if trip id already exists; return 422 on invalid date format (FR-013, FR-029)
-- [ ] T039 [P] [US4] Add PUT /trips/:id handler to backend/app/api/trips.py: validate body via TripUpdate (all fields optional); apply partial update; update updated_at; return 200 TripResponse; return 401/404/422 as appropriate
-- [ ] T040 [US4] Create backend/app/api/regions.py with POST /regions/end-date handler per contract defined in T037: resolve defaults (most recent trip by created_at if trip omitted; most recent region_code seen in that trip's stops if region omitted; current date if date omitted); require bearer auth (FR-045) — depends on T037
+- [ ] T037 [P] [US4] Define POST /regions/end-date contract in specs/002-database-backend/contracts/api.md: request body (optional trip string, optional region string, optional date ISO 8601), response shape, storage strategy (decided in a design meeting — do NOT begin this task until that meeting has been held and a storage model chosen; see Clarifications in spec.md), and any required migration — this task MUST be completed before T040
+- [ ] T038 [P] [US4] Add POST /trips handler to backend/app/api/trips.py: validate body (title, description, start_date, end_date — no id field); auto-generate id by slugifying title (lowercase, hyphens); if a trip with the same title already exists return 409; if the generated slug collides with an existing id, append an incrementing counter (e.g. `my-trip-2`); on success return 201 with the generated id; return 401 on missing/invalid bearer token; return 422 on invalid date format (FR-017, FR-026) — TDD: T072 test must exist and fail before this task begins
+- [ ] T039 [P] [US4] Add PUT /trips/:id handler to backend/app/api/trips.py: validate body via TripUpdate (all fields optional); apply partial update (last-write-wins, no optimistic locking); update updated_at; return 200 TripResponse; return 401/404/422 as appropriate (FR-018, FR-026) — TDD: T072 test must exist and fail before this task begins
+- [ ] T040 [US4] Add POST /regions/end-date handler to backend/app/api/regions.py per contract defined in T037: resolve defaults (most recent trip by created_at if trip omitted; most recent region_code seen in that trip's stops if region omitted; current date if date omitted); require bearer auth (FR-026) — depends on T037
 - [ ] T041 [US4] Register POST /trips, PUT /trips/:id write handlers and POST /regions/end-date router in backend/app/main.py; add shared bearer token auth dependency enforcing FR-029 across all write endpoints
 
 **Checkpoint**: US4 complete — operators can manage trips and record region transitions without code changes.
@@ -167,6 +167,57 @@
 
 ---
 
+## Phase 12: Regions Reference Table (FR-040, FR-041)
+
+**Purpose**: Implement the `regions` reference table added in the spec overhaul. Blocks the FK constraint on `stops.region_code` and the `GET /regions` read endpoint.
+
+**Independent Test**: Run `npx tsx scripts/export-seed-data.ts` → confirm `scripts/seed-data/regions.json` is produced. Run `python scripts/seed.py` against a fresh DB → confirm `regions` rows are present and `stops.region_code` FK is enforced. Call `GET /regions` → verify all regions returned with correct shape. Call `GET /regions?country=Colombia` → verify filtered results.
+
+- [ ] T063 Create `backend/app/models/region.py` with Region SQLAlchemy ORM model: `iata_code VARCHAR(10) PK`, `name VARCHAR(255) NOT NULL`, `airport_name VARCHAR(500) NOT NULL`, `country VARCHAR(255) NOT NULL`, `lat DECIMAL(10,7) NOT NULL`, `lng DECIMAL(10,7) NOT NULL`; no indexes beyond PK (reference table, full-table scans acceptable)
+- [ ] T064 [P] Update `backend/app/models/__init__.py` to import Region so Alembic autogenerate detects the new table
+- [ ] T065 [P] Create `backend/app/schemas/region.py` with RegionResponse Pydantic v2 model: all six fields matching the `regions` table; shape must match contracts/api.md GET /regions response
+- [ ] T066 Generate Alembic migration (`alembic revision --autogenerate -m "add regions table and stops region_code fk"`): creates `regions` table with all columns; adds FK constraint `stops.region_code → regions.iata_code` (NULLABLE, ON DELETE SET NULL); apply with `alembic upgrade head` — depends on T063 and T064
+- [ ] T067 Update `scripts/export-seed-data.ts` to import `frontend/src/data/regions.ts` and serialize to `scripts/seed-data/regions.json`
+- [ ] T068 Update `scripts/seed.py` to read `scripts/seed-data/regions.json` and insert all region records using `INSERT ... ON CONFLICT DO NOTHING` on `iata_code` BEFORE inserting stops (FK order); re-run seed against a fresh DB and regenerate `scripts/seed-dump.sql` — depends on T066
+- [ ] T069 [P] [US2] Write `backend/tests/unit/api/test_regions.py` (TDD — must precede T070): test GET /regions returns 200 with a list of RegionResponse objects; test `country=Colombia` filter returns only regions where country matches; test GET /regions with no filter returns all regions; verify response shape matches contracts/api.md
+- [ ] T070 [US2] Add GET /regions handler to `backend/app/api/regions.py`: query all `regions` rows; apply optional `country` query param filter (exact match); return list of RegionResponse; no authentication required (FR-041) — depends on T069 TDD test existing and failing
+- [ ] T071 Register GET /regions router in `backend/app/main.py`
+
+**Checkpoint**: Phase 12 complete — `regions` table seeded, FK constraint on stops enforced, GET /regions endpoint live. Validate by running the updated seed pipeline and calling the endpoint.
+
+---
+
+## Phase 13: TDD Tests — Write API & Health Endpoint; Security Fix (US3, P1)
+
+**Purpose**: Write failing unit tests for all write endpoints and the health endpoint (TDD prerequisite for Phase 6 and Phase 9 implementation tasks); remove the accidentally committed `backend/session.json` from the git index (FR-032).
+
+> **Execution note**: T072 MUST be completed before Phase 6 tasks T038 and T039 begin. T073 MUST be completed before Phase 9 task T050 begins. T074 is independent and can run at any time.
+
+**Independent Test**: Run `pytest backend/tests/unit/api/test_write_trips.py` — all tests must FAIL before T038/T039 are implemented. Run `pytest backend/tests/unit/api/test_health.py` — must FAIL before T050. Run `git status backend/session.json` — file must be untracked (removed from index).
+
+- [ ] T072 [P] [US3] Write `backend/tests/unit/api/test_write_trips.py` (TDD — must precede Phase 6 T038/T039): test POST /trips with valid body returns 201 with auto-generated slug id derived from title (e.g. `"New Adventure 2029"` → `"new-adventure-2029"`); test POST /trips with duplicate title returns 409; test POST /trips whose title slug collides with existing id returns 201 with counter-suffixed id (e.g. `"my-trip-2"`); test POST /trips without auth header returns 401; test POST /trips with invalid date format returns 422; test PUT /trips/:id with partial body returns 200 with supplied fields updated and omitted fields preserved; test PUT /trips/:id without auth returns 401; test PUT /trips/:id with unknown id returns 404; test PUT /trips/:id with invalid date returns 422
+- [ ] T073 [P] [US3] Write `backend/tests/unit/api/test_health.py` (TDD — must precede Phase 9 T050): test GET /health returns 200 with body `{"status": "ok"}`; test GET /health returns 200 with no Authorization header (authentication not required)
+- [ ] T074 [P] Fix security issue per FR-032: add `backend/session.json` to `.gitignore`; run `git rm --cached backend/session.json` to remove the file from the git index without deleting the local file; commit the `.gitignore` change
+
+**Checkpoint**: Phase 13 complete — TDD tests written and failing (confirming tests are real), session.json removed from git tracking.
+
+---
+
+## Phase 14: MCP Trip Intelligence — Research & Contract (US5, P2)
+
+**Purpose**: Complete the research and contract prerequisites for the MCP trip-intelligence interface. No implementation tasks are included — those will be added in a future phase once the contract is reviewed.
+
+> **Gate**: Implementation of US5 (FR-020–FR-023) MUST NOT begin until T075 (research) and T076 (contract) are both complete and reviewed. See FR-023 in spec.md.
+
+**Independent Test**: Confirm `specs/002-database-backend/research.md` contains Decision 7+ documenting at least two evaluated event data sources (coverage, rate limits, format, chosen approach). Confirm `specs/002-database-backend/contracts/mcp.md` exists with: tool names and descriptions, input/output schemas, authentication model (API_SECRET_KEY bearer token), external data source integration pattern, and error responses.
+
+- [ ] T075 [US5] Research MCP event data sources: evaluate at least two public holiday / festival APIs (e.g. Calendarific, Nager.Date, OpenHolidays, or others); assess free tier request limits, regional coverage for planned trip destinations (Colombia, Mexico, New Zealand, …), response format, and date-range query support; document findings in `specs/002-database-backend/research.md` as Decision 7 using the existing decision format (Decision / Rationale / Alternatives considered)
+- [ ] T076 [US5] Define MCP contract in `specs/002-database-backend/contracts/mcp.md` (depends on T075): specify MCP tool names and descriptions; input schemas (trip_id, proximity_window in days); output schemas (stop id, event_name, event_date, suggested_date_shift_range); authentication model (same API_SECRET_KEY bearer token as write endpoints); external data source integration pattern (which API, request shape, response mapping); error responses; contract must be reviewed before any implementation begins (FR-023)
+
+**Checkpoint**: Phase 14 complete — research documented, MCP contract file exists and reviewed. Ready to add US5 implementation tasks in a subsequent tasks phase.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -175,10 +226,13 @@
 - **Foundational (Phase 2)**: Depends on Phase 1 completion — **BLOCKS all user stories**
 - **US1 (Phase 3)**: Depends on Phase 2; T019 should run after T002 (frontend move may shift TS data import paths)
 - **US2 (Phase 4)**: Depends on Phase 2; no dependency on US1 (but seeded data needed for manual testing)
-- **US4 (Phase 6)**: Depends on Phase 2; T040 depends on T037 (contract must be defined first)
+- **US4 (Phase 6)**: Depends on Phase 2; T040 depends on T037 (contract must be defined first; T037 itself cannot begin until the design meeting for the storage model is held); T038 and T039 each require T072 (TDD test) to exist and fail before implementation begins
 - **US6 (Phase 8)**: Depends on Phase 2; practically benefits from US1 (seed-dump.sql) existing; T045 Dockerfile.frontend COPY paths must reflect T002 frontend/ move
-- **Polish (Phase 9)**: Depends on all user story phases in this spec
+- **Polish (Phase 9)**: T050 requires T073 (TDD test) to exist and fail before implementation begins; T051 depends on all user story phases
 - **US7 (Phase 11)**: Depends on US2 (Phase 4) completion — API endpoints must exist before frontend consumes them; T061 depends on T056–T060 all completing first; T062 can run after T061
+- **Regions (Phase 12)**: Depends on Phase 2; T066 depends on T063 + T064; T068 depends on T066; T070 depends on T069 (TDD); T071 depends on T070
+- **TDD Tests + Security (Phase 13)**: T072 must precede Phase 6 T038/T039; T073 must precede Phase 9 T050; T074 is independent
+- **MCP Research (Phase 14)**: T076 depends on T075; no further implementation tasks until contract is reviewed
 
 ### Parallel Opportunities
 
@@ -241,6 +295,39 @@ Task T061: Update frontend/src/App.tsx  ← after all five above
 Task T062: Delete frontend/src/hooks/usePosts.ts  ← after T061
 ```
 
+### Phase 12 Regions (T063–T065 parallel, then T066, then T067+T069 parallel, then T068+T070 parallel, then T071):
+```
+In parallel:
+Task T063: Create backend/app/models/region.py
+Task T064: Update backend/app/models/__init__.py
+Task T065: Create backend/app/schemas/region.py
+Then sequentially:
+Task T066: Generate and apply Alembic migration  ← after T063 + T064
+In parallel (after T066):
+Task T067: Update scripts/export-seed-data.ts
+Task T069: Write backend/tests/unit/api/test_regions.py (TDD)
+Then in parallel:
+Task T068: Update scripts/seed.py + regenerate seed-dump.sql  ← after T066
+Task T070: Add GET /regions handler  ← after T069 (TDD test must fail first)
+Then sequentially:
+Task T071: Register GET /regions router in main.py  ← after T070
+```
+
+### Phase 13 TDD Tests (T072, T073, T074 all parallel):
+```
+In parallel (all independent):
+Task T072: Write backend/tests/unit/api/test_write_trips.py
+Task T073: Write backend/tests/unit/api/test_health.py
+Task T074: Fix backend/session.json security issue
+```
+
+### Phase 14 MCP Research (T075 then T076):
+```
+Sequentially:
+Task T075: Research MCP event data sources → document in research.md
+Task T076: Define MCP contract in contracts/mcp.md  ← after T075
+```
+
 ---
 
 ## Implementation Strategy
@@ -261,10 +348,13 @@ Task T062: Delete frontend/src/hooks/usePosts.ts  ← after T061
 1. Setup + Foundational → skeleton ready
 2. US1 → database seeded, SQL dump committed → **demo: data in DB**
 3. US2 → read API live → **demo: API returns trips/stops/posts**
-4. US7 → frontend calls API → **demo: browser renders live data from DB** (MVP!)
-5. US4 → trip management + region end dates → **demo: operator can create trips via API**
-6. US6 → containerized → **demo: `docker compose up` works from scratch**
-7. Polish → health endpoint, E2E validation
+4. US7 → frontend calls API → **demo: browser renders live data from DB** (MVP! — recorded in spec 001)
+5. Phase 12 → regions table seeded, FK constraint enforced, GET /regions live → **demo: regions endpoint works**
+6. Phase 13 → TDD test tasks written (failing), security fix committed → **demo: tests fail as expected; session.json untracked**
+7. US4 → trip management (write tests T072 pass) → **demo: operator can create/update trips via API**
+8. US6 → containerized → **demo: `docker compose up` works from scratch**
+9. Polish (T050 after T073 passes, T051) → **demo: GET /health works, E2E validated**
+10. Phase 14 → MCP research + contract reviewed → **gate open for US5 implementation tasks**
 
 ---
 
@@ -274,6 +364,10 @@ Task T062: Delete frontend/src/hooks/usePosts.ts  ← after T061
 - **[Story]** label maps each task to a specific user story for traceability
 - Each user story is independently completable and testable via its Independent Test
 - **T002** (frontend/ move) is a Setup task that affects T019 (TS data import paths) and T045 (Dockerfile.frontend COPY paths) — complete T002 before those tasks
-- **T037** (contract) is a blocking dependency for T040 — do not implement the region end-date handler before the contract is defined
-- Phase 5 (US3) and Phase 7 (US5) stubs preserve the original phase numbering after the 2026-05-22 split — the actual tasks live in `003-ingestion-pipeline/tasks.md`
+- **T037** (contract) is a blocking dependency for T040 — do not implement the region end-date handler before the contract is defined; T037 itself cannot begin until a design meeting settles the storage model
+- **T072** (write API TDD tests) must exist and fail before Phase 6 T038/T039 begin — TDD mandate (FR-015)
+- **T073** (health endpoint TDD test) must exist and fail before Phase 9 T050 begins — TDD mandate (FR-015)
+- Phase 5 (US3 Instagram) and Phase 7 (US5 Substack) stubs preserve the original phase numbering after the 2026-05-22 split — the actual tasks live in `003-ingestion-pipeline/tasks.md`
+- Phase 12 adds the `regions` table (FR-040) which was introduced in the spec overhaul (2026-06-01); T066 migration must precede any seed pipeline re-run
+- Phase 14 (MCP research + contract) gates all US5 implementation; no implementation tasks exist until T076 is reviewed
 - Commit after each task or logical group; stop at any checkpoint to validate the story independently
