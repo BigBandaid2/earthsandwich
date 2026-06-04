@@ -395,7 +395,7 @@ With multiple developers:
 **Independent Test**: Pass fixture `RegionGroup[]` and `Trip` to `TripFeed`; assert Visited / Planned / Abandoned sections render in order with the correct region tiles.
 
 - [x] T116 [P] [US1] Write `regionUtils` unit tests in `frontend/tests/unit/utils/regionUtils.test.ts`: `groupStopsByRegion` groups stops by `region_code`; derives `startDate`/`endDate` per FR-014 (skips abandoned for next-region anchor); excludes Substack dates when non-Substack stops exist (FR-033); rolls up `overallStatus` per FR-028/FR-029; `getActiveRegion` returns last region with a visited stop; `getRoutedGroups` excludes abandoned regions (FR-030); `isSegmentSolid` per FR-012
-- [ ] T117 [US1] Write `TripFeed` (Sidebar) tests in `frontend/tests/unit/components/Sidebar.test.tsx`: (a) renders Visited → Planned → Abandoned sections in that order (FR-031); (b) hides sections containing zero regions; (c) region tile shows name, country, and formatted date range; (d) abandoned region tile appears in Abandoned section with strike-through styling and no connector line (US5, FR-030)
+- [x] T117 [US1] Write `TripFeed` (Sidebar) tests in `frontend/tests/unit/components/Sidebar.test.tsx`: (a) renders Visited → Planned → Abandoned sections in that order (FR-031); (b) hides sections containing zero regions; (c) region tile shows name, country, and formatted date range; (d) abandoned region tile appears in Abandoned section with strike-through styling and no connector line (US5, FR-030)
 
 **Checkpoint**: All Phase 21 tests pass; `npm test` green
 
