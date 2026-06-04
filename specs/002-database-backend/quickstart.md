@@ -114,11 +114,17 @@ curl http://localhost:8000/trips/miscellaneous-adventures
 # List visited stops in a region
 curl "http://localhost:8000/stops?status=visited&region_code=OAX"
 
-# Create a trip (auth required)
+# Create a trip (auth required; id is auto-generated from title)
 curl -X POST http://localhost:8000/trips \
   -H "Authorization: Bearer <API_SECRET_KEY>" \
   -H "Content-Type: application/json" \
-  -d '{"id":"test-trip","title":"Test","description":"desc","start_date":"2029-01-01","end_date":"2029-12-31"}'
+  -d '{"title":"Test Trip 2029","description":"desc","start_date":"2029-01-01","end_date":"2029-12-31"}'
+
+# List all regions
+curl http://localhost:8000/regions
+
+# Health check
+curl http://localhost:8000/health
 ```
 
 Auto-generated API docs are available at `http://localhost:8000/docs` (Swagger UI).

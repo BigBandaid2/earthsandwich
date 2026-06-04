@@ -76,7 +76,10 @@ function RegionSidebar({
                         stop={stop}
                         isLast={idx === arr.length - 1}
                         nextIsAbandoned={nextIsAbandoned}
-                        onClick={() => onOpenStop(stop.id, orderedIds)}
+                        onClick={() => {
+                          if (stop.post.type === 'planned') return;
+                          onOpenStop(stop.id, orderedIds);
+                        }}
                       />
                     );
                   })}

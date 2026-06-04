@@ -134,6 +134,24 @@ def make_instagram_post(
     return post
 
 
+def make_region(
+    iata_code: str = "MDE",
+    name: str = "Medellín",
+    airport_name: str = "José María Córdova International Airport",
+    country: str = "Colombia",
+    lat: Decimal = Decimal("6.1645000"),
+    lng: Decimal = Decimal("-75.4231000"),
+) -> MagicMock:
+    region = MagicMock()
+    region.iata_code = iata_code
+    region.name = name
+    region.airport_name = airport_name
+    region.country = country
+    region.lat = lat
+    region.lng = lng
+    return region
+
+
 def make_substack_post(
     id: uuid.UUID | None = None,
     stop_id: str | None = "stop-1",

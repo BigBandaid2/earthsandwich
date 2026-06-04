@@ -1,8 +1,8 @@
-# Specification Quality Checklist: Database & Backend
+# Specification Quality Checklist: Database Backend & REST API
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-05-08
-**Updated**: 2026-05-22 (after the 002 split — ingestion content moved to `003-ingestion-pipeline`)
+**Updated**: 2026-06-01 (full overhaul — spec rewritten from scratch); 2026-06-01 addendum — Regions table added
 **Feature**: [../spec.md](../spec.md)
 
 ## Content Quality
@@ -32,7 +32,11 @@
 
 ## Notes
 
-- The choice of Python backend framework and specific database engine are deferred to the planning phase (`plan.md`) per spec guidelines.
-- The frontend update to consume the API (replacing hardcoded imports) is tracked in spec 001 as a follow-on; this spec covers the backend only.
-- FR-045 (region end-date endpoint) is added with preliminary requirements; full contract and data model details are TBD and MUST be resolved in `contracts/api.md` before implementation begins (T037).
-- **2026-05-22 update**: The original `002-data-ingestion` spec was split into `002-database-backend` (this spec) and `003-ingestion-pipeline`. All US3 (Instagram), US5 (Substack), and related FR-016–FR-027/FR-040–FR-044 content moved to `003-ingestion-pipeline/spec.md`. Phase 5 and Phase 7 in `tasks.md` are now stubs pointing to the new spec. Completed Phases 1–3 remain in place per Cardinal Rule #1.
+- **2026-06-01 overhaul**: spec.md rewritten from scratch to reflect shipped work (Phases 1–4), retired assumptions, corrected schema (no `sequence_order`), corrected env var scope (no ingestion credentials), added TDD mandate (US3, FR-014–FR-016), and added the AI-assisted trip planning feature (US5, FR-020–FR-023, SC-009–SC-010).
+- **2026-06-01 addendum**: Added `regions` reference table (FR-040) with `iata_code` (PK), `name`, `airport_name`, `country`, `lat`, `lng`. Updated `stops.region_code` to be a FK → `regions.iata_code` (FR-003). Added `GET /regions` read endpoint (FR-041). Added Region key entity. Updated seed pipeline (FR-006) to include `frontend/src/data/regions.ts`. Updated MCP FR-020 to expose region coordinates. Schema sourced from the existing `frontend/src/data/regions.ts` and `frontend/src/data/types.ts` Region interface.
+- `sequence_order` is explicitly removed from FR-003 and Assumptions. It was dropped in the initial migration and must not be re-introduced.
+- `backend/session.json` security concern captured in FR-032 and the spec header. Must be gitignored before any public push.
+- MCP/trip-intelligence (US5, FR-020–FR-023) includes an explicit research-first gate (SC-009). The contract must be documented before implementation.
+- `POST /regions/end-date` persistence strategy is gated behind a design task (FR-019, US4 design note) — consistent with existing tasks.md T037 documentation.
+- Frontend changes (Phase 11 / US7) are explicitly delegated to spec 001 per the spec header Dependency note.
+- No ingestion credentials (`INSTA_USERNAME`, `INSTA_PASSWORD`, `SUBSTACK_RSS_URL`) appear anywhere in this spec — those are spec 003 concerns per FR-024 and Assumptions.

@@ -4,6 +4,7 @@ import { groupStopsByRegion } from './utils/regionUtils';
 import type { Trip } from './data/types';
 import { useTrips } from './hooks/useTrips';
 import { useTrip } from './hooks/useTrip';
+import { useRegions } from './hooks/useRegions';
 import { ErrorBoundary } from 'react-error-boundary';
 import WorldMap from './components/MapView';
 import TripFeed from './components/Sidebar';
@@ -25,7 +26,8 @@ function tripIdFromHash(hash: string, trips: Trip[]): string | null {
 }
 
 function App() {
-  const { trips, loading: tripsLoading } = useTrips();
+  const { trips, loading: tripsLoading, error: tripsError } = useTrips();
+  const { regions, loading: regionsLoading, error: regionsError } = useRegions();
   const [activeTripId, setActiveTripId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('trip');
   const [activeRegionCode, setActiveRegionCode] = useState<string | null>(null);
@@ -48,8 +50,8 @@ function App() {
   const { trip: activeTrip } = useTrip(activeTripId);
 
   const regionGroups = useMemo(
-    () => (activeTrip ? groupStopsByRegion(activeTrip) : []),
-    [activeTrip]
+    () => (activeTrip ? groupStopsByRegion(activeTrip, regions) : []),
+    [activeTrip, regions]
   );
 
   const openStop = useMemo(
@@ -119,7 +121,31 @@ function App() {
     };
   }, [trips, activeTripId]);
 
-  if (tripsLoading || !activeTrip) {
+  if (tripsLoading || regionsLoading) {
+    return (
+      <div className="app-shell app-loading">
+        <p>Loading…</p>
+      </div>
+    );
+  }
+
+  if (tripsError || regionsError) {
+    return (
+      <div className="app-shell app-error">
+        <p>{tripsError ?? regionsError}</p>
+      </div>
+    );
+  }
+
+  if (trips.length === 0) {
+    return (
+      <div className="app-shell app-empty">
+        <p>No trips are currently available.</p>
+      </div>
+    );
+  }
+
+  if (!activeTrip) {
     return (
       <div className="app-shell app-loading">
         <p>Loading…</p>
