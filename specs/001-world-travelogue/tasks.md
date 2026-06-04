@@ -382,7 +382,7 @@ With multiple developers:
 - [x] T112 [P] [US6] Update `useTrip` to wrap `getTripDetail()` in `withRetry` in `frontend/src/hooks/useTrip.ts`
 - [x] T113 [P] [US6] Create `useRegions` hook in `frontend/src/hooks/useRegions.ts`: on mount calls `getRegions()` wrapped in `withRetry`; returns `{ regions: Region[], loading: boolean, error: string | null }`; cancels on unmount
 - [x] T114 [US6] Update `groupStopsByRegion` in `frontend/src/utils/regionUtils.ts` to accept `regions: Region[]` as a second parameter instead of importing from the module-level `REGIONS` constant; remove the `REGIONS` import from this file
-- [ ] T115 [US6] Update `frontend/src/App.tsx`: call `useRegions()`; extend the loading gate to include `regionsLoading`; extend the error gate to include `regionsError`; render "No trips are currently available." when `trips.length === 0` after load; pass the fetched `regions` array to `groupStopsByRegion`
+- [x] T115 [US6] Update `frontend/src/App.tsx`: call `useRegions()`; extend the loading gate to include `regionsLoading`; extend the error gate to include `regionsError`; render "No trips are currently available." when `trips.length === 0` after load; pass the fetched `regions` array to `groupStopsByRegion`
 
 **Checkpoint**: `npm test` — all T107–T110 tests pass; TypeScript clean
 
