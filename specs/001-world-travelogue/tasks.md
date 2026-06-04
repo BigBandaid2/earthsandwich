@@ -334,3 +334,92 @@ With multiple developers:
 - SVG projection map is acceptable; Google Maps API integration can be an enhancement
 - Hard-coded itinerary data keeps the site static-deployable
 
+---
+
+## Phase 18: Testing Infrastructure Setup
+
+**Status**: Not started (2026-06-04 — added following spec overhaul; TDD mandate per FR-045)
+
+**Purpose**: Install and configure Vitest + React Testing Library so that all subsequent phases can follow the test-first approach mandated by FR-045.
+
+**⚠️ CRITICAL**: All phases below (19+) depend on this phase. No test can be written until testing infrastructure is in place.
+
+- [ ] T101 [P] Add Vitest devDependencies to `frontend/package.json`: `vitest`, `@vitest/coverage-v8`, `jsdom`, `@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`; add `"test": "vitest"`, `"test:watch": "vitest --watch"`, `"test:coverage": "vitest run --coverage"` scripts
+- [ ] T102 [P] Add Vitest test config block to `frontend/vite.config.ts`: `test: { environment: 'jsdom', setupFiles: ['./tests/setup.ts'], globals: true }`
+- [ ] T103 [P] Create `frontend/tests/setup.ts` with `import '@testing-library/jest-dom'`
+
+**Checkpoint**: `npm test` runs successfully (no test files yet; 0 passing is expected)
+
+---
+
+## Phase 19: API Migration Foundation
+
+**Status**: Not started (2026-06-04 — prerequisite for useRegions and retry-enabled hooks)
+
+**Purpose**: Add the missing API types, adapter, and retry utility that underpin the spec-overhauled data flow. These are shared by all user story phases and must exist before any hook tests can be written.
+
+- [ ] T104 [P] Add `ApiRegion` interface (`iata_code`, `name`, `airport_name`, `country`, `lat`, `lng`) and `getRegions(params?)` fetch function to `frontend/src/api/client.ts`
+- [ ] T105 [P] Add `adaptRegion(apiRegion: ApiRegion): Region` adapter (maps `iata_code→code`, `airport_name→airportName`, `lat/lng→coords`) to `frontend/src/api/adapters.ts`
+- [ ] T106 [P] Create `withRetry<T>(fn: () => Promise<T>, maxAttempts = 3, baseDelayMs = 1000): Promise<T>` exponential-backoff utility in `frontend/src/utils/retry.ts`; delays: 1 s → 2 s; throws last error after exhaustion
+
+**Checkpoint**: TypeScript compiles with no errors (`npm run build`)
+
+---
+
+## Phase 20: User Story 6 — Reliable Data Loading (Priority: P1, TDD)
+
+**Goal**: A visitor sees a loading indicator while data fetches; if the backend is unavailable after retries, a clear error message appears. Empty trips list shows a human-readable message using the same error surface (FR-042–FR-044; clarifications Q2, Q3 2026-06-04).
+
+**Independent Test**: Mock all three data hooks. Verify loading indicator → travelogue on success; loading indicator → error message on failure; "No trips are currently available." for empty list.
+
+**⚠️ TDD**: Write failing tests first (T107–T110), then implement (T111–T115). All tests must pass before this story is complete.
+
+- [ ] T107 [P] [US6] Write `useTrips` hook tests in `frontend/tests/unit/hooks/useTrips.test.ts`: (a) `loading` is `true` on mount before fetch resolves; (b) successful fetch sets `trips` array and clears `loading`; (c) after 3 failed attempts `error` is a non-null string and `trips` is empty; mock `fetch` via `vi.stubGlobal`
+- [ ] T108 [P] [US6] Write `useTrip` hook tests in `frontend/tests/unit/hooks/useTrip.test.ts`: (a) does nothing when `tripId` is null; (b) sets `loading=true` on `tripId` change; (c) successful fetch populates `trip`; (d) after retry exhaustion `error` is set and `trip` is null
+- [ ] T109 [P] [US6] Write `useRegions` hook tests in `frontend/tests/unit/hooks/useRegions.test.ts`: (a) `loading=true` initially; (b) success yields `regions: Region[]` array; (c) retry exhaustion yields `error` string
+- [ ] T110 [US6] Write `App` integration tests in `frontend/tests/unit/components/App.test.tsx` — mock `useTrips`, `useTrip`, `useRegions` via `vi.mock`: (a) loading indicator visible while any hook reports `loading=true`; (b) error panel visible when `useTrips` yields an error; (c) "No trips are currently available." rendered when `useTrips` yields empty list; (d) trip switch triggers `useTrip` with the new trip id
+- [ ] T111 [P] [US6] Update `useTrips` to wrap `getTrips()` in `withRetry` from `frontend/src/utils/retry.ts` in `frontend/src/hooks/useTrips.ts`
+- [ ] T112 [P] [US6] Update `useTrip` to wrap `getTripDetail()` in `withRetry` in `frontend/src/hooks/useTrip.ts`
+- [ ] T113 [P] [US6] Create `useRegions` hook in `frontend/src/hooks/useRegions.ts`: on mount calls `getRegions()` wrapped in `withRetry`; returns `{ regions: Region[], loading: boolean, error: string | null }`; cancels on unmount
+- [ ] T114 [US6] Update `groupStopsByRegion` in `frontend/src/utils/regionUtils.ts` to accept `regions: Region[]` as a second parameter instead of importing from the module-level `REGIONS` constant; remove the `REGIONS` import from this file
+- [ ] T115 [US6] Update `frontend/src/App.tsx`: call `useRegions()`; extend the loading gate to include `regionsLoading`; extend the error gate to include `regionsError`; render "No trips are currently available." when `trips.length === 0` after load; pass the fetched `regions` array to `groupStopsByRegion`
+
+**Checkpoint**: `npm test` — all T107–T110 tests pass; TypeScript clean
+
+---
+
+## Phase 21: User Story 1 — Trip Overview Tests (Priority: P1, TDD)
+
+**Goal**: Automated test coverage for the trip overview map + sidebar, including region grouping logic, date-range derivation, status classification, and the three-section sidebar layout.
+
+**Independent Test**: Pass fixture `RegionGroup[]` and `Trip` to `TripFeed`; assert Visited / Planned / Abandoned sections render in order with the correct region tiles.
+
+- [ ] T116 [P] [US1] Write `regionUtils` unit tests in `frontend/tests/unit/utils/regionUtils.test.ts`: `groupStopsByRegion` groups stops by `region_code`; derives `startDate`/`endDate` per FR-014 (skips abandoned for next-region anchor); excludes Substack dates when non-Substack stops exist (FR-033); rolls up `overallStatus` per FR-028/FR-029; `getActiveRegion` returns last region with a visited stop; `getRoutedGroups` excludes abandoned regions (FR-030); `isSegmentSolid` per FR-012
+- [ ] T117 [US1] Write `TripFeed` (Sidebar) tests in `frontend/tests/unit/components/Sidebar.test.tsx`: (a) renders Visited → Planned → Abandoned sections in that order (FR-031); (b) hides sections containing zero regions; (c) region tile shows name, country, and formatted date range; (d) abandoned region tile appears in Abandoned section with strike-through styling and no connector line (US5, FR-030)
+
+**Checkpoint**: All Phase 21 tests pass; `npm test` green
+
+---
+
+## Phase 22: User Story 2 — Region Drill-Down Tests (Priority: P2, TDD)
+
+**Goal**: Test coverage for the region sidebar drill-down: active region expansion, collapsed headers, stop tile rendering, planned/abandoned suppression, and no-pop-up-on-click for non-openable stop types.
+
+**Independent Test**: Render `RegionSidebar` with fixture data; click a collapsed header; assert it becomes the active (expanded) region.
+
+- [ ] T118 [US2] Write `RegionSidebar` tests in `frontend/tests/unit/components/RegionSidebar.test.tsx`: (a) active region is expanded showing stop tiles; (b) other regions render as collapsed header rows; (c) clicking a collapsed header calls `onSelectRegion` with its `region_code`; (d) Planned stop tiles suppressed when any Instagram/Substack stop exists in the same region (FR-018); (e) Planned stop tile click does NOT call `onOpenStop` (FR-019); (f) Instagram stop tile shows caption and photo; (g) Substack stop tile shows title and preview
+
+**Checkpoint**: All Phase 22 tests pass; `npm test` green
+
+---
+
+## Phase 23: User Story 3 — Stop Detail Tests (Priority: P3, TDD)
+
+**Goal**: Test coverage for the stop detail pop-up: Instagram and Substack post layouts, graceful handling of missing optional fields, and prev/next navigation.
+
+**Independent Test**: Render `StopModal` with an Instagram fixture stop; assert location, caption, and image element are present; assert prev/next arrows call `onNav`.
+
+- [ ] T119 [US3] Write `StopDetail` tests in `frontend/tests/unit/components/StopDetail.test.tsx`: (a) Instagram layout renders location heading, caption, and `<img>` with `media_url` as src; (b) Substack layout renders title heading, subtitle, and body text; (c) missing optional subtitle or caption not rendered; (d) prev arrow calls `onNav('prev')`; (e) next arrow calls `onNav('next')`; (f) close button calls `onClose`
+
+**Checkpoint**: All Phase 23 tests pass; `npm test` fully green — SC-012 satisfied for all US1–US6 acceptance scenarios
+
