@@ -1,0 +1,14 @@
+# pile-app runtime dependencies.
+# Pin to known-good ranges as the App matures; for v1 we accept latest compatibles.
+
+instagrapi
+anthropic
+requests
+python-dotenv
+feedparser
+APScheduler
+PyYAML
+
+# Test runner — included here (not split into requirements-dev.txt) since the App's
+# portability story (FR-110 / SC-010) means "one install gets you everything".
+pytest

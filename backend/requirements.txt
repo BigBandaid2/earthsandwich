@@ -1,0 +1,36 @@
+# Web framework
+fastapi==0.115.*
+uvicorn[standard]
+
+# Database
+sqlalchemy==2.0.*
+asyncpg
+alembic
+
+# Scheduling
+apscheduler==3.*
+
+# Instagram ingestion
+instagrapi
+
+# RSS ingestion
+feedparser
+
+# AI (location inference + IATA determination)
+anthropic
+
+# Rate limiting
+slowapi
+
+# Structured logging
+structlog
+
+# Configuration
+pydantic-settings
+
+# HTTP client (test client + Graph API fallback)
+httpx
+
+# Testing
+pytest
+pytest-asyncio

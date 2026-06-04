@@ -1,0 +1,79 @@
+{
+  "created_at": "2026-05-25T00:00:00Z",
+  "updated_at": "2026-06-01T00:00:00Z",
+  "spec": "002-database-backend",
+  "project": "OCS",
+  "jira_base_url": "https://datacommlab.atlassian.net",
+  "mode": "story-only",
+  "epic": {
+    "key": "OCS-73",
+    "summary": "Database & Backend",
+    "url": "https://datacommlab.atlassian.net/browse/OCS-73"
+  },
+  "stories": [
+    {
+      "key": "OCS-75",
+      "summary": "Phase 1: Setup (Project Initialization)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-75",
+      "tasks": []
+    },
+    {
+      "key": "OCS-76",
+      "summary": "Phase 2: Foundational (Blocking Prerequisites)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-76",
+      "tasks": []
+    },
+    {
+      "key": "OCS-77",
+      "summary": "Phase 3: US1 - Seed the Database (P1, MVP)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-77",
+      "tasks": []
+    },
+    {
+      "key": "OCS-78",
+      "summary": "Phase 4: US2 - Read API Endpoints (P1)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-78",
+      "tasks": []
+    },
+    {
+      "key": "OCS-79",
+      "summary": "Phase 6: US4 - Trip Management & Region End Date (P2)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-79",
+      "tasks": []
+    },
+    {
+      "key": "OCS-80",
+      "summary": "Phase 8: US6 - Containerization (P3)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-80",
+      "tasks": []
+    },
+    {
+      "key": "OCS-81",
+      "summary": "Phase 9: Polish & Cross-Cutting Concerns",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-81",
+      "tasks": []
+    },
+    {
+      "key": "OCS-82",
+      "summary": "Phase 17: Drift Reconciliation (2026-05-25 weekly scan)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-82",
+      "tasks": []
+    },
+    {
+      "key": "OCS-108",
+      "summary": "Phase 11: US7 — Frontend API Integration (P1)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-108",
+      "tasks": []
+    }
+  ],
+  "summary": {
+    "total_stories": 9
+  },
+  "notes": [
+    "All Stories created 2026-05-25 after the 2026-05-22 split of 002-data-ingestion into 002-database-backend and 003-ingestion-pipeline.",
+    "Phases stored at the Story level only — no Subtasks created per the team convention (stories-only sync unless there's a clear reason to break out individual tasks).",
+    "Phase 5 (MOVED to 003 as Phase 1) and Phase 7 (MOVED to 003 as Phase 2) stubs in tasks.md were intentionally NOT created as Stories in JIRA — they live in tasks.md only as historical-record breadcrumbs.",
+    "2026-06-01: Phase 11 US7 Frontend API Integration added as OCS-108. Linked as Duplicate of OCS-66 (user-created sibling ticket 'Wire frontend to backend API'); the spec-kit Story is canonical per workflow.md §JIRA sync. (Same-day Done→To Do revert prompted the workflow.md rule that Stories are never auto-flipped to Done — only ever to In Progress; final Done is a manual JIRA action after Independent Test verification.)",
+    "Per Cardinal Rule #2 (no PM state in synced artifacts), status / sprint / owner fields — and derived status counters — are intentionally absent from this mapping. Track per-issue status in Jira directly."
+  ]
+}

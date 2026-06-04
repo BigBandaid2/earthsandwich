@@ -1,0 +1,27 @@
+# Local secrets and credentials
+.env
+
+# Pile output (runtime data; intentionally not tracked — re-derive by re-scraping)
+pile/
+
+# Per-run logs (auto-pruned; not tracked)
+logs/
+
+# Instagrapi session state (contains auth tokens)
+instagrapi_session.json
+
+# Python build / install artifacts
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+build/
+dist/
+
+# Editor scratch
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
