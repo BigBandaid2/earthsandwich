@@ -32,7 +32,7 @@ export function adaptStop(apiStop: ApiStop): Stop {
     id: apiStop.id,
     date: apiStop.date,
     location: apiStop.location,
-    coords: { lat: apiStop.lat, lng: apiStop.lng },
+    coords: { lat: Number(apiStop.lat), lng: Number(apiStop.lng) },
     status: apiStop.status,
     regionCode: apiStop.region_code,
     post: adaptPost(apiStop),
