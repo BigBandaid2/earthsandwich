@@ -407,7 +407,7 @@ With multiple developers:
 
 **Independent Test**: Render `RegionSidebar` with fixture data; click a collapsed header; assert it becomes the active (expanded) region.
 
-- [ ] T118 [US2] Write `RegionSidebar` tests in `frontend/tests/unit/components/RegionSidebar.test.tsx`: (a) active region is expanded showing stop tiles; (b) other regions render as collapsed header rows; (c) clicking a collapsed header calls `onSelectRegion` with its `region_code`; (d) Planned stop tiles suppressed when any Instagram/Substack stop exists in the same region (FR-018); (e) Planned stop tile click does NOT call `onOpenStop` (FR-019); (f) Instagram stop tile shows caption and photo; (g) Substack stop tile shows title and preview
+- [x] T118 [US2] Write `RegionSidebar` tests in `frontend/tests/unit/components/RegionSidebar.test.tsx`: (a) active region is expanded showing stop tiles; (b) other regions render as collapsed header rows; (c) clicking a collapsed header calls `onSelectRegion` with its `region_code`; (d) Planned stop tiles suppressed when any Instagram/Substack stop exists in the same region (FR-018); (e) Planned stop tile click does NOT call `onOpenStop` (FR-019); (f) Instagram stop tile shows caption and photo; (g) Substack stop tile shows title and preview
 
 **Checkpoint**: All Phase 22 tests pass; `npm test` green
 
