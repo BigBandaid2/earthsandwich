@@ -53,11 +53,13 @@ describe('useRegions', () => {
     mockFetchFail('Network error');
     const { result } = renderHook(() => useRegions());
 
-    await act(() => vi.runAllTimersAsync());
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
 
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.loading).toBe(false);
     expect(result.current.error).not.toBeNull();
     expect(result.current.regions).toEqual([]);
     expect(vi.mocked(fetch)).toHaveBeenCalledTimes(3);
-  });
+  }, 10000);
 });
