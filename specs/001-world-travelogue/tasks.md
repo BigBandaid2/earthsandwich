@@ -419,7 +419,7 @@ With multiple developers:
 
 **Independent Test**: Render `StopModal` with an Instagram fixture stop; assert location, caption, and image element are present; assert prev/next arrows call `onNav`.
 
-- [ ] T119 [US3] Write `StopDetail` tests in `frontend/tests/unit/components/StopDetail.test.tsx`: (a) Instagram layout renders location heading, caption, and `<img>` with `media_url` as src; (b) Substack layout renders title heading, subtitle, and body text; (c) missing optional subtitle or caption not rendered; (d) prev arrow calls `onNav('prev')`; (e) next arrow calls `onNav('next')`; (f) close button calls `onClose`
+- [x] T119 [US3] Write `StopDetail` tests in `frontend/tests/unit/components/StopDetail.test.tsx`: (a) Instagram layout renders location heading, caption, and `<img>` with `media_url` as src; (b) Substack layout renders title heading, subtitle, and body text; (c) missing optional subtitle or caption not rendered; (d) prev arrow calls `onNav('prev')`; (e) next arrow calls `onNav('next')`; (f) close button calls `onClose`
 
 **Checkpoint**: All Phase 23 tests pass; `npm test` fully green — SC-012 satisfied for all US1–US6 acceptance scenarios
 
