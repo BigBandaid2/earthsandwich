@@ -1,10 +1,13 @@
 <!-- SPECKIT START -->
 Three active specs:
 
-**`001-world-travelogue`** — the front-end Travelogue App (Vite + React). Read-only map UX with itinerary stops, city drilldown, and detail panels. Reads from 002's REST API.
+**`001-world-travelogue`** — the front-end Travelogue App (Vite + React). Read-only map UX with itinerary stops, city drilldown, and detail panels. Reads from 002's REST API. TDD mandate (FR-045).
 - Spec: `specs/001-world-travelogue/spec.md`
-- Plan: `specs/001-world-travelogue/plan.md`
+- Plan: `specs/001-world-travelogue/plan.md` *(overhauled 2026-06-04 — API data sourcing, TDD, retry, useRegions)*
 - Data model: `specs/001-world-travelogue/data-model.md`
+- Research: `specs/001-world-travelogue/research.md`
+- Component contracts: `specs/001-world-travelogue/contracts/components.md`
+- Quickstart: `specs/001-world-travelogue/quickstart.md`
 - Tasks: `specs/001-world-travelogue/tasks.md`
 
 **`002-database-backend`** — schema, REST read API, trip management, security, containerization. The Travelogue's persistence layer.
