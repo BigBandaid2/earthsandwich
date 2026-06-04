@@ -173,7 +173,7 @@
 
 **Independent Test**: Run `npx tsx scripts/export-seed-data.ts` → confirm `scripts/seed-data/regions.json` is produced. Run `python scripts/seed.py` against a fresh DB → confirm `regions` rows are present and `stops.region_code` FK is enforced. Call `GET /regions` → verify all regions returned with correct shape. Call `GET /regions?country=Colombia` → verify filtered results.
 
-- [ ] T063 Create `backend/app/models/region.py` with Region SQLAlchemy ORM model: `iata_code VARCHAR(10) PK`, `name VARCHAR(255) NOT NULL`, `airport_name VARCHAR(500) NOT NULL`, `country VARCHAR(255) NOT NULL`, `lat DECIMAL(10,7) NOT NULL`, `lng DECIMAL(10,7) NOT NULL`; no indexes beyond PK (reference table, full-table scans acceptable)
+- [x] T063 Create `backend/app/models/region.py` with Region SQLAlchemy ORM model: `iata_code VARCHAR(10) PK`, `name VARCHAR(255) NOT NULL`, `airport_name VARCHAR(500) NOT NULL`, `country VARCHAR(255) NOT NULL`, `lat DECIMAL(10,7) NOT NULL`, `lng DECIMAL(10,7) NOT NULL`; no indexes beyond PK (reference table, full-table scans acceptable)
 - [ ] T064 [P] Update `backend/app/models/__init__.py` to import Region so Alembic autogenerate detects the new table
 - [ ] T065 [P] Create `backend/app/schemas/region.py` with RegionResponse Pydantic v2 model: all six fields matching the `regions` table; shape must match contracts/api.md GET /regions response
 - [ ] T066 Generate Alembic migration (`alembic revision --autogenerate -m "add regions table and stops region_code fk"`): creates `regions` table with all columns; adds FK constraint `stops.region_code → regions.iata_code` (NULLABLE, ON DELETE SET NULL); apply with `alembic upgrade head` — depends on T063 and T064
