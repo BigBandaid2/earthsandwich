@@ -59,9 +59,18 @@ HALT_PATTERNS = [
     re.compile(r"Bloks"),
     # Private-API throttle (NOT the public web-endpoint 429, which is benign here)
     re.compile(r"Max retries exceeded.*url: /api/v1/users/[^/]+/info"),
-    # Any FetchInterruptedError / inference hard-block / generic failure -> rollback banner
-    re.compile(r"FAILURE — @.* scrape rolled back"),
 ]
+
+# The atomic-rollback FAILURE banner is its own halt signal, handled ahead of
+# HALT_PATTERNS in _scan_halt so we surface its authoritative "Failure detail:"
+# line as the cause. Its operator-advice prose mentions "challenge" generically
+# ("If Instagram raised a challenge ..."), which must NOT be keyword-matched and
+# mislabelled as a real Instagram challenge when the true cause was a throttle
+# or connectivity drop (e.g. "user is null"). The advice line is also stripped
+# before the keyword scan as a second line of defence.
+ROLLBACK_BANNER = re.compile(r"FAILURE — @.* scrape rolled back")
+FAILURE_DETAIL = re.compile(r"^\s*Failure detail:\s*(.+?)\s*$", re.MULTILINE)
+ADVICE_BOILERPLATE = re.compile(r"^\s*Operator action:.*$", re.MULTILINE)
 
 COOLDOWN_AFTER_SMOKE = 20 * 60      # step 1 -> step 2
 COOLDOWN_AFTER_SMALL = 20 * 60      # step 2 -> step 3
@@ -83,9 +92,31 @@ def _python_bin() -> str:
 
 
 def _scan_halt(text: str, step_label: str) -> None:
-    """Raise SystemExit if any halt-marker pattern is present in the text."""
+    """Raise SystemExit if any halt-marker pattern is present in the text.
+
+    Two-tier:
+      1. If the atomic-rollback FAILURE banner is present, that is a definitive
+         halt. We report the banner's own "Failure detail:" line as the cause —
+         NOT a keyword scrape of the banner prose, whose operator-advice text
+         mentions "challenge" generically and would otherwise mislabel a plain
+         throttle/connectivity rollback as an Instagram challenge.
+      2. Otherwise, keyword-scan for raw halt-markers (challenge / Bloks /
+         login_required / throttle) in the API output, with the operator-advice
+         boilerplate stripped first so it can never trip a false match.
+    """
+    if ROLLBACK_BANNER.search(text):
+        detail_match = FAILURE_DETAIL.search(text)
+        detail = detail_match.group(1) if detail_match else "(not found in banner)"
+        raise SystemExit(
+            f"\nHALT — step {step_label}: scrape rolled back "
+            f"(atomic snapshot restored, pile intact).\n"
+            f"Failure detail: {detail}\n"
+            f"Investigate before re-running."
+        )
+
+    scannable = ADVICE_BOILERPLATE.sub("", text)
     for pattern in HALT_PATTERNS:
-        match = pattern.search(text)
+        match = pattern.search(scannable)
         if match:
             raise SystemExit(
                 f"\nHALT — step {step_label} matched halt pattern "
