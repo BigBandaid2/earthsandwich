@@ -12,12 +12,17 @@ Step ladder:
   1. pytest smoke test      (1 post,    rate=normal — pinned by test;
                              only runs when target == 'ourearthsandwich')
   2. small probe            (~10 posts, rate=gentle, single page)
-  3. multi-page probe       (~29 posts, rate=gentle, 3 pages)
   4. full re-scrape         (all posts, rate=gentle, ~2-3h marathon)
 
+(Step 3, the multi-page probe, was retired 2026-06-04: it spent ~30 extra
+private-API requests against the session's short-window throttle budget
+right before the marathon, for signal the marathon's own pagination already
+exercises. The marathon keeps its step-4 identity so `--from-step 4` is
+unchanged.)
+
 Cooldowns between scrape steps (skip with --no-cooldowns, discouraged):
-  - 20 min after step 1 / step 2
-  - 60 min before step 4 (the marathon)
+  - 20 min after step 1 (smoke test)
+  - 20 min after step 2's small probe, before the step-4 marathon
 
 Halt rule: any halt-marker in a step's stdout -> script exits non-zero
 with the offending pattern named. Operator must investigate before
@@ -32,7 +37,7 @@ Usage:
     cd pile-app
     venv/Scripts/python.exe instagram/rescrape_ramp.py <target>
     venv/Scripts/python.exe instagram/rescrape_ramp.py <target> --no-cooldowns
-    venv/Scripts/python.exe instagram/rescrape_ramp.py <target> --from-step 3
+    venv/Scripts/python.exe instagram/rescrape_ramp.py <target> --from-step 4
 """
 
 from __future__ import annotations
@@ -73,8 +78,7 @@ FAILURE_DETAIL = re.compile(r"^\s*Failure detail:\s*(.+?)\s*$", re.MULTILINE)
 ADVICE_BOILERPLATE = re.compile(r"^\s*Operator action:.*$", re.MULTILINE)
 
 COOLDOWN_AFTER_SMOKE = 20 * 60      # step 1 -> step 2
-COOLDOWN_AFTER_SMALL = 20 * 60      # step 2 -> step 3
-COOLDOWN_BEFORE_MARATHON = 60 * 60  # step 3 -> step 4
+COOLDOWN_AFTER_SMALL = 20 * 60      # step 2 -> step 4 marathon
 
 DEFAULT_FULL_CUTOFF = "2015-01-01T00:00:00+0000"
 SMOKE_TEST_TARGET = "ourearthsandwich"
@@ -260,12 +264,14 @@ def main() -> None:
     parser.add_argument("target", help="Instagram handle (without @)")
     parser.add_argument(
         "--no-cooldowns", action="store_true",
-        help="Skip the 20/60-min inter-step pauses. STRONGLY DISCOURAGED — "
+        help="Skip the 20-min inter-step pauses. STRONGLY DISCOURAGED — "
              "the pauses are anti-throttle measures.",
     )
     parser.add_argument(
         "--from-step", type=int, default=0, choices=range(5),
-        help="Resume from a specific step (0-4). Earlier steps skipped. Default: 0.",
+        help="Resume from a specific step (0, 1, 2, or 4 — step 3 retired, "
+             "and a value of 3 falls through to the step-4 marathon). Earlier "
+             "steps skipped. Default: 0.",
     )
     parser.add_argument(
         "--full-cutoff", default=DEFAULT_FULL_CUTOFF,
@@ -299,14 +305,7 @@ def main() -> None:
         print(f"\n=== Step 2: small probe (10 posts, gentle, single page) ===", flush=True)
         print(f"  --newer-than {cutoff}", flush=True)
         run_scrape(target, cutoff, rate="gentle", step_label="2 small probe")
-        cooldown(COOLDOWN_AFTER_SMALL, "after small probe", args.no_cooldowns)
-
-    if args.from_step <= 3:
-        cutoff = _nth_newest_timestamp(target, 30)
-        print(f"\n=== Step 3: multi-page probe (~29 posts, gentle, 3 pages) ===", flush=True)
-        print(f"  --newer-than {cutoff}", flush=True)
-        run_scrape(target, cutoff, rate="gentle", step_label="3 multi-page probe")
-        cooldown(COOLDOWN_BEFORE_MARATHON, "before full re-scrape", args.no_cooldowns)
+        cooldown(COOLDOWN_AFTER_SMALL, "after small probe, before marathon", args.no_cooldowns)
 
     if args.from_step <= 4:
         print(f"\n=== Step 4: FULL RE-SCRAPE (gentle, ~2-3h marathon) ===", flush=True)
