@@ -179,7 +179,7 @@
 - [x] T066 Generate Alembic migration (`alembic revision --autogenerate -m "add regions table and stops region_code fk"`): creates `regions` table with all columns; adds FK constraint `stops.region_code → regions.iata_code` (NULLABLE, ON DELETE SET NULL); apply with `alembic upgrade head` — depends on T063 and T064
 - [x] T067 Update `scripts/export-seed-data.ts` to import `frontend/src/data/regions.ts` and serialize to `scripts/seed-data/regions.json`
 - [x] T068 Update `scripts/seed.py` to read `scripts/seed-data/regions.json` and insert all region records using `INSERT ... ON CONFLICT DO NOTHING` on `iata_code` BEFORE inserting stops (FK order); re-run seed against a fresh DB and regenerate `scripts/seed-dump.sql` — depends on T066
-- [ ] T069 [P] [US2] Write `backend/tests/unit/api/test_regions.py` (TDD — must precede T070): test GET /regions returns 200 with a list of RegionResponse objects; test `country=Colombia` filter returns only regions where country matches; test GET /regions with no filter returns all regions; verify response shape matches contracts/api.md
+- [x] T069 [P] [US2] Write `backend/tests/unit/api/test_regions.py` (TDD — must precede T070): test GET /regions returns 200 with a list of RegionResponse objects; test `country=Colombia` filter returns only regions where country matches; test GET /regions with no filter returns all regions; verify response shape matches contracts/api.md
 - [ ] T070 [US2] Add GET /regions handler to `backend/app/api/regions.py`: query all `regions` rows; apply optional `country` query param filter (exact match); return list of RegionResponse; no authentication required (FR-041) — depends on T069 TDD test existing and failing
 - [ ] T071 Register GET /regions router in `backend/app/main.py`
 
