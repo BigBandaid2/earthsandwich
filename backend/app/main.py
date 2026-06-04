@@ -13,6 +13,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from app.api.posts import router as posts_router
+from app.api.regions import router as regions_router
 from app.api.stops import router as stops_router
 from app.api.trips import router as trips_router
 from app.config import settings
@@ -93,6 +94,7 @@ app.add_middleware(
 app.include_router(trips_router)
 app.include_router(stops_router)
 app.include_router(posts_router)
+app.include_router(regions_router)
 
 
 # ── Error handlers ────────────────────────────────────────────────────────────
