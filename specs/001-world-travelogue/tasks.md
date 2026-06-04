@@ -344,9 +344,9 @@ With multiple developers:
 
 **⚠️ CRITICAL**: All phases below (19+) depend on this phase. No test can be written until testing infrastructure is in place.
 
-- [ ] T101 [P] Add Vitest devDependencies to `frontend/package.json`: `vitest`, `@vitest/coverage-v8`, `jsdom`, `@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`; add `"test": "vitest"`, `"test:watch": "vitest --watch"`, `"test:coverage": "vitest run --coverage"` scripts
-- [ ] T102 [P] Add Vitest test config block to `frontend/vite.config.ts`: `test: { environment: 'jsdom', setupFiles: ['./tests/setup.ts'], globals: true }`
-- [ ] T103 [P] Create `frontend/tests/setup.ts` with `import '@testing-library/jest-dom'`
+- [x] T101 [P] Add Vitest devDependencies to `frontend/package.json`: `vitest`, `@vitest/coverage-v8`, `jsdom`, `@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`; add `"test": "vitest"`, `"test:watch": "vitest --watch"`, `"test:coverage": "vitest run --coverage"` scripts
+- [x] T102 [P] Add Vitest test config block to `frontend/vite.config.ts`: `test: { environment: 'jsdom', setupFiles: ['./tests/setup.ts'], globals: true }`
+- [x] T103 [P] Create `frontend/tests/setup.ts` with `import '@testing-library/jest-dom'`
 
 **Checkpoint**: `npm test` runs successfully (no test files yet; 0 passing is expected)
 
