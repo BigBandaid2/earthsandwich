@@ -1,4 +1,5 @@
 from app.schemas.post import InstagramPostResponse, SubstackPostResponse
+from app.schemas.region import RegionResponse
 from app.schemas.stop import StopResponse
 from app.schemas.trip import TripBase, TripCreate, TripUpdate, TripResponse, TripDetailResponse
 
@@ -9,6 +10,7 @@ TripDetailResponse.model_rebuild()
 __all__ = [
     "InstagramPostResponse",
     "SubstackPostResponse",
+    "RegionResponse",
     "StopResponse",
     "TripBase",
     "TripCreate",
