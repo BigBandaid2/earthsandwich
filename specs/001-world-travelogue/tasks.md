@@ -423,3 +423,15 @@ With multiple developers:
 
 **Checkpoint**: All Phase 23 tests pass; `npm test` fully green — SC-012 satisfied for all US1–US6 acceptance scenarios
 
+---
+
+## Phase 24: Frontend Containerization
+
+**Goal**: Package the frontend as an nginx container that joins the existing docker-compose stack, serving the built SPA and the shared media volume.
+
+- [x] T120 [P] Create `frontend/Dockerfile`: multi-stage build — `node:20-alpine` stage copies the project root, runs `npm ci --prefix frontend && npm run --prefix frontend build` (output lands at project-root `dist/`); `nginx:alpine` stage copies `dist/` into `/usr/share/nginx/html` and copies `frontend/nginx.conf` to `/etc/nginx/conf.d/default.conf`
+- [ ] T121 [P] Create `frontend/nginx.conf`: serve SPA (`root /usr/share/nginx/html`; `try_files $uri $uri/ /index.html` for client-side routing); alias `/public/media` → `/public/media` so mounted media files are served at that path
+- [ ] T122 Add `web` service to `docker-compose.yml`: `build.context: ./frontend` (root `.dockerignore` excludes `frontend/`; using subdirectory context avoids the conflict), `build.dockerfile: Dockerfile`, port `5173:80`, volume `../public/media:/public/media:ro` (relative to context), `depends_on: api`
+
+**Checkpoint**: `docker compose up web` serves the app at `http://localhost:5173`; media files at `http://localhost:5173/public/media/<file>` resolve correctly from the host mount
+
