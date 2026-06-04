@@ -46,3 +46,7 @@ htmlcov/
 # whole team conforms to the same JIRA mappings.
 .specify/extensions/jira/jira-config.local.yml
 
+# SpecKit feature.json represents the source of truth for which feature is active.
+# Each branch should update this to point to the relevant feature directory,
+# but these changes should never be committed as they are specific to the local development environment and would cause problems when merging branches.
+.specify/feature.json
