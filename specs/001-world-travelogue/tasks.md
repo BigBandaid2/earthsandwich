@@ -358,9 +358,9 @@ With multiple developers:
 
 **Purpose**: Add the missing API types, adapter, and retry utility that underpin the spec-overhauled data flow. These are shared by all user story phases and must exist before any hook tests can be written.
 
-- [ ] T104 [P] Add `ApiRegion` interface (`iata_code`, `name`, `airport_name`, `country`, `lat`, `lng`) and `getRegions(params?)` fetch function to `frontend/src/api/client.ts`
-- [ ] T105 [P] Add `adaptRegion(apiRegion: ApiRegion): Region` adapter (maps `iata_code→code`, `airport_name→airportName`, `lat/lng→coords`) to `frontend/src/api/adapters.ts`
-- [ ] T106 [P] Create `withRetry<T>(fn: () => Promise<T>, maxAttempts = 3, baseDelayMs = 1000): Promise<T>` exponential-backoff utility in `frontend/src/utils/retry.ts`; delays: 1 s → 2 s; throws last error after exhaustion
+- [x] T104 [P] Add `ApiRegion` interface (`iata_code`, `name`, `airport_name`, `country`, `lat`, `lng`) and `getRegions(params?)` fetch function to `frontend/src/api/client.ts`
+- [x] T105 [P] Add `adaptRegion(apiRegion: ApiRegion): Region` adapter (maps `iata_code→code`, `airport_name→airportName`, `lat/lng→coords`) to `frontend/src/api/adapters.ts`
+- [x] T106 [P] Create `withRetry<T>(fn: () => Promise<T>, maxAttempts = 3, baseDelayMs = 1000): Promise<T>` exponential-backoff utility in `frontend/src/utils/retry.ts`; delays: 1 s → 2 s; throws last error after exhaustion
 
 **Checkpoint**: TypeScript compiles with no errors (`npm run build`)
 
