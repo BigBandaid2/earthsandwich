@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { Map, AdvancedMarker, Pin, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
+import { Map, AdvancedMarker, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
 import isoCountries from 'i18n-iso-countries';
 import enLocale from 'i18n-iso-countries/langs/en.json';
 import type { RegionGroup } from '../utils/regionUtils';
@@ -263,21 +263,57 @@ function getStopImages(stop: Stop): string[] {
   return [];
 }
 
-// Custom map marker for region view: photo thumbnail with pointer tip.
-// Falls back to a Pin when no image is available.
+// Pushpin marker for region drill-down stops (FR-046).
+// Circle head + triangular needle; colour-coded by status; scales + glows when open.
+// Structured as a flex column so AdvancedMarker's bottom-centre anchor falls at
+// the needle tip (the map pin point).
+function PushPin({ isOpen, isVisited }: { isOpen: boolean; isVisited: boolean }) {
+  const headColor = isOpen ? '#f97316' : isVisited ? '#ea4335' : '#9aa0a6';
+  const borderColor = isOpen ? '#c2410c' : isVisited ? '#c5221f' : '#6b7280';
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        transform: isOpen ? 'scale(1.25)' : undefined,
+        transformOrigin: '50% 100%',
+        filter: isOpen
+          ? 'drop-shadow(0 0 4px rgba(249,115,22,0.7))'
+          : 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))',
+      }}
+    >
+      <div
+        style={{
+          width: '16px',
+          height: '16px',
+          borderRadius: '50%',
+          backgroundColor: headColor,
+          border: `2.5px solid ${borderColor}`,
+        }}
+      />
+      <div
+        style={{
+          width: 0,
+          height: 0,
+          borderLeft: '5px solid transparent',
+          borderRight: '5px solid transparent',
+          borderTop: `7px solid ${headColor}`,
+          marginTop: '-1px',
+        }}
+      />
+    </div>
+  );
+}
+
+// Custom map marker for region view: photo thumbnail with pointer tip (FR-046).
+// Falls back to a pushpin when no image is available.
 function StopMarker({ stop, isOpen }: { stop: Stop; isOpen: boolean }) {
   const images = getStopImages(stop);
   const isVisited = stop.status === 'visited';
 
   if (images.length === 0) {
-    return (
-      <Pin
-        background={isOpen ? '#f97316' : isVisited ? '#ea4335' : '#9aa0a6'}
-        borderColor={isOpen ? '#ea580c' : isVisited ? '#c5221f' : '#6b7280'}
-        glyphColor="#ffffff"
-        scale={isOpen ? 1.1 : 0.8}
-      />
-    );
+    return <PushPin isOpen={isOpen} isVisited={isVisited} />;
   }
 
   const extra = images.length - 1;
