@@ -72,7 +72,7 @@ interface UseRegionsResult {
 
 ### `<App />`
 
-Root component. No props (reads from URL hash). Orchestrates all data hooks and owns all navigation state.
+Root component. No props (reads from URL hash). Orchestrates all data hooks and owns all navigation state, Play Trip state, and landing modal state.
 
 **Rendered surfaces by app state**:
 
@@ -81,9 +81,10 @@ Root component. No props (reads from URL hash). Orchestrates all data hooks and 
 | Any data hook `loading = true` | Loading indicator: `<div class="app-loading">` with "Loading…" text |
 | Any data hook `error` non-null | Error panel: `<div class="app-error">` with human-readable message |
 | `trips.length === 0` (after load) | Error panel with "No trips are currently available." |
-| All data loaded, `viewMode = 'trip'` | Split layout: `<WorldMap>` + `<TripFeed>` |
+| All data loaded, `viewMode = 'trip'` | Split layout: `<WorldMap>` + `<TripFeed>` + `<PlayTripControl>` overlay |
 | All data loaded, `viewMode = 'region'` | Split layout: `<WorldMap>` + `<RegionSidebar>` |
 | `openStop` is non-null | `<StopModal>` overlaid on current split layout |
+| `showLandingModal = true` | `<LandingModal>` overlaid before any map interaction (FR-047, SC-013) |
 
 ---
 
@@ -145,16 +146,67 @@ interface WorldMapProps {
   viewMode: 'trip' | 'region';
   activeRegionCode: string | null;
   openStopId: string | null;
+  playTripActiveRegionCode: string | null;  // new — FR-052; null when not playing
   onSelectRegion: (regionCode: string) => void;
   onOpenStop: (stopId: string, contextStopIds: string[]) => void;
+  onClusterClick: (regionCodes: string[]) => void; // new — FR-051; called when a cluster is clicked
 }
 ```
 
-**View 1 (trip)**: Region markers (large dot, teardrop for active); route polyline connecting non-abandoned regions (solid for visited-adjacent segments, dashed for planned-only segments); back/forward zoom controls.
+**View 1 (trip)**:
+- Region markers use **flag pin** style (FR-046); the active region's pin is highlighted. Markers for qualifying countries are clustered via `@googlemaps/markerclusterer`; US, CA, CN always render individually (FR-051). Clicking a cluster zooms until pins separate.
+- Route polyline connects non-abandoned regions only (FR-030); solid for visited-adjacent segments, dashed for planned-only (FR-012). Each segment bears a directional arrowhead near the destination endpoint (FR-049).
+- Map tiles use postcard-inspired style with no country labels and no road/terrain detail (FR-050). Map is restricted to a single world copy (FR-048).
+- `<PlayTripControl />` is rendered as a floating overlay by the parent `<App />`; `playTripActiveRegionCode` drives pan/focus animation (FR-052).
 
-**View 2 (region)**: Individual stop markers; dashed light-blue chronological route line within the region; full map detail (roads, terrain, waterways).
+**View 2 (region)**: Individual stop markers use **pushpin** style (FR-046); dashed light-blue chronological route line with arrowheads (FR-049); full map detail (roads, terrain, waterways); single-world-copy restriction is lifted.
 
 **Route polyline logic**: Only non-abandoned regions participate (FR-030). Solid vs. dashed per FR-012.
+
+---
+
+---
+
+### `<LandingModal />` (LandingModal.tsx) *(new — FR-047)*
+
+First-visit overlay. Rendered by `App.tsx` only when `localStorage` does not contain the dismissed key.
+
+```ts
+interface LandingModalProps {
+  onDismiss: () => void;
+}
+```
+
+**Rendered content**:
+- Site headline and one-sentence purpose.
+- Trip context block (placeholder copy acceptable initially).
+- How-to-browse guidance.
+- Follow-along callout for friends and family.
+- Dismiss button (e.g. "Start Exploring") — calls `onDismiss`, which causes `App.tsx` to write `localStorage.setItem('travelogue:landing-dismissed', '1')` and unmount the modal.
+
+**Persistence rule**: `App.tsx` initialises a `showLandingModal` state from `localStorage.getItem('travelogue:landing-dismissed')`; if absent the modal renders; once dismissed the key is written and the modal never reappears in the same browser (SC-013).
+
+---
+
+### `<PlayTripControl />` (PlayTripControl.tsx) *(new — FR-052)*
+
+Floating play/pause/exit control. Rendered by `App.tsx` as an overlay on the map canvas when `viewMode = 'trip'`.
+
+```ts
+interface PlayTripControlProps {
+  isPlaying: boolean;
+  onPlay: () => void;   // dispatches 'play' action
+  onPause: () => void;  // dispatches 'pause' action
+  onExit: () => void;   // dispatches 'stop' action and returns to normal map interaction
+}
+```
+
+**Rendered states**:
+- **Ready / Paused**: Play button visible; Exit control hidden (only visible when playback has started at least once in this session).
+- **Playing**: Pause button replaces Play; Exit affordance visible.
+- **After final region**: Play button re-enabled (restarts from first region); Pause hidden.
+
+**Behavior**: Play Trip advances through non-abandoned regions in chronological order on a fixed interval (≥1 s). The map animates to each region via `<WorldMap />`'s `playTripActiveRegionCode` prop. Sidebar scrolls to the highlighted tile. At the last non-abandoned region, playback stops automatically (SC-018).
 
 ---
 
@@ -221,3 +273,9 @@ Each acceptance scenario in the spec maps to at least one automated test:
 | US6 | Loading indicator visible during fetch | `App.test.tsx` |
 | US6 | Error message shown when backend unavailable | `App.test.tsx` |
 | US6 | Trip switch triggers new data fetch | `App.test.tsx` |
+| FR-047 | Landing modal renders on first visit (no localStorage key) | `LandingModal.test.tsx` |
+| FR-047 | Landing modal does not render when localStorage key is set | `LandingModal.test.tsx` |
+| FR-047 | Dismiss writes localStorage key and hides modal | `LandingModal.test.tsx` |
+| FR-052 | Play advances through all non-abandoned regions in order | `PlayTripControl.test.tsx` |
+| FR-052 | Pause suspends interval; resume continues from same index | `PlayTripControl.test.tsx` |
+| FR-052 | Playback stops at final region; Play control re-enabled | `PlayTripControl.test.tsx` |
