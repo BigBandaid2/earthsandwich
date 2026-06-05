@@ -12,96 +12,6 @@ isoCountries.registerLocale(enLocale);
 
 const MAP_ID = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID as string | undefined;
 
-// --- Arrowhead geometry (FR-049) ---
-
-const DEG = Math.PI / 180;
-
-/** Compass bearing in degrees (0 = N, 90 = E, 180 = S, 270 = W) from A to B. */
-function geodesicBearing(
-  a: { lat: number; lng: number },
-  b: { lat: number; lng: number },
-): number {
-  const φ1 = a.lat * DEG, φ2 = b.lat * DEG;
-  const Δλ = (b.lng - a.lng) * DEG;
-  const y = Math.sin(Δλ) * Math.cos(φ2);
-  const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
-  return (Math.atan2(y, x) / DEG + 360) % 360;
-}
-
-/**
- * Spherical linear interpolation along a great-circle arc.
- * t = 0 → a, t = 1 → b.
- */
-function interpolateSlerp(
-  a: { lat: number; lng: number },
-  b: { lat: number; lng: number },
-  t: number,
-): { lat: number; lng: number } {
-  const φ1 = a.lat * DEG, λ1 = a.lng * DEG;
-  const φ2 = b.lat * DEG, λ2 = b.lng * DEG;
-  const ax = Math.cos(φ1) * Math.cos(λ1), ay = Math.cos(φ1) * Math.sin(λ1), az = Math.sin(φ1);
-  const bx = Math.cos(φ2) * Math.cos(λ2), by = Math.cos(φ2) * Math.sin(λ2), bz = Math.sin(φ2);
-  const dot = Math.min(1, Math.max(-1, ax * bx + ay * by + az * bz));
-  const Ω = Math.acos(dot);
-  if (Ω < 1e-10) return a;
-  const sinΩ = Math.sin(Ω);
-  const wa = Math.sin((1 - t) * Ω) / sinΩ;
-  const wb = Math.sin(t * Ω) / sinΩ;
-  const cx = wa * ax + wb * bx, cy = wa * ay + wb * by, cz = wa * az + wb * bz;
-  return {
-    lat: Math.asin(Math.min(1, Math.max(-1, cz))) / DEG,
-    lng: Math.atan2(cy, cx) / DEG,
-  };
-}
-
-/**
- * SVG arrowhead AdvancedMarker placed 12% from the destination end of a
- * route segment (88% from the start), pointing in the direction of travel.
- * Non-interactive: pointer events are suppressed so it never blocks map clicks.
- */
-function SegmentArrow({
-  from,
-  to,
-  color = '#1a73e8',
-}: {
-  from: { lat: number; lng: number };
-  to: { lat: number; lng: number };
-  color?: string;
-}) {
-  const position = useMemo(() => interpolateSlerp(from, to, 0.88), [from, to]);
-  const bearing = useMemo(() => geodesicBearing(from, to), [from, to]);
-
-  return (
-    <AdvancedMarker position={position}>
-      {/* Zero-size container so the SVG is visually centred on the pin point */}
-      <div style={{ position: 'relative', width: 0, height: 0, pointerEvents: 'none' }}>
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 14 14"
-          style={{
-            position: 'absolute',
-            top: '-7px',
-            left: '-7px',
-            transform: `rotate(${bearing}deg)`,
-            transformOrigin: 'center center',
-            pointerEvents: 'none',
-          }}
-        >
-          {/* North-pointing triangle; CSS rotation aligns it to segment bearing */}
-          <polygon
-            points="7,1 13,13 1,13"
-            fill={color}
-            stroke="white"
-            strokeWidth="1"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
-    </AdvancedMarker>
-  );
-}
-
 // --- Flag pin marker (FR-046, trip overview) ---
 
 // Aliases for names the backend uses that don't match i18n-iso-countries' English names.
@@ -246,6 +156,11 @@ function MapPolyline({
 }) {
   const map = useMap();
   const mapsLib = useMapsLibrary('maps');
+  const arrow = {
+    path: 'M 0,0 1,3 -1,3 0,0 z', // 0,0 is the tip of the arrow
+    fillOpacity: 1.0,
+    strokeWeight: 1,
+  };
 
   useEffect(() => {
     if (!map || !mapsLib) return;
@@ -254,6 +169,12 @@ function MapPolyline({
       map,
       path,
       geodesic: true,
+      icons: [
+        {
+          icon: arrow,
+          offset: "100%",
+        },
+      ],
       ...(solid
         ? { strokeColor, strokeOpacity: 1.0, strokeWeight }
         : {
@@ -591,19 +512,7 @@ function TripMap({
               path={[from.region.coords, to.region.coords]}
               solid={solid}
               strokeColor={color}
-              strokeWeight={solid ? 3.5 : 2}
-            />
-          );
-        })}
-        {routedGroups.slice(0, -1).map((from, i) => {
-          const to = routedGroups[i + 1];
-          const solid = isSegmentSolid(from, to);
-          return (
-            <SegmentArrow
-              key={`arrow-${from.region.code}-${to.region.code}`}
-              from={from.region.coords}
-              to={to.region.coords}
-              color={solid ? '#1a73e8' : '#70757a'}
+              strokeWeight={solid ? 3 : 2}
             />
           );
         })}

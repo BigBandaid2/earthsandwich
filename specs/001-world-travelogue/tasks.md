@@ -457,7 +457,7 @@ With multiple developers:
 
 **Purpose**: Render direction-of-travel arrowheads near the destination end of each route segment in both trip view and region view.
 
-- [/] T126 [US-Polish] Implement SVG arrowhead overlays in `frontend/src/components/MapView.tsx` (FR-049, SC-016): for each pair of adjacent non-abandoned endpoints, compute geodesic bearing and render a rotated SVG `<AdvancedMarker>` arrowhead at ~10–15% of segment distance from the destination end; applies to both trip view (region-to-region segments) and region view (stop-to-stop segments)
+- [x] T126 [US-Polish] Implement SVG arrowhead overlays in `frontend/src/components/MapView.tsx` (FR-049, SC-016): for each pair of adjacent non-abandoned endpoints, compute geodesic bearing and render a rotated SVG `<AdvancedMarker>` arrowhead at ~10–15% of segment distance from the destination end; applies to both trip view (region-to-region segments) and region view (stop-to-stop segments)
 
 **Checkpoint**: Every route segment in trip view and region view shows a directional arrowhead pointing in the chronological direction of travel
 
