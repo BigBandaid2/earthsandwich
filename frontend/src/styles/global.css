@@ -676,7 +676,7 @@ button {
 }
 
 .post-subheading {
-  margin: 0;
+  margin: 1rem 0 1rem 0;
   font-size: 1rem;
   color: #94a3b8;
   line-height: 1.5;
