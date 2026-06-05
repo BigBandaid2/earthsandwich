@@ -26,7 +26,7 @@ from instagram.instagrapi_client import (
     init_instagrapi_client,
 )
 from instagram.pipeline import parse_unix_timestamp, run_for_target
-from substack.pipeline import run_for_publication
+from substack.pipeline import run_archive_backfill, run_for_publication
 
 DEFAULT_TARGETS = os.environ.get("INSTAGRAM_TARGET_ACCOUNTS", "ourearthsandwich")
 
@@ -84,9 +84,16 @@ def _run_substack(args: argparse.Namespace) -> int:
     log_dir = str(APP_ROOT / "logs")
     os.makedirs(log_dir, exist_ok=True)
 
-    # run_for_publication handles its own failures (logs + clean return), so a
-    # feed error is a clean exit, not a crash — US4 Independent Test.
-    run_for_publication(slug, args.output, log_dir=log_dir, feed_url=args.feed_url)
+    # Both paths handle their own failures (log + clean return), so an upstream
+    # error is a clean exit, not a crash — US4 Independent Test / FR-031.
+    if args.archive:
+        run_archive_backfill(
+            slug, args.output, log_dir=log_dir,
+            page_delay=(args.page_delay, args.page_delay),
+            max_posts=args.max_posts,
+        )
+    else:
+        run_for_publication(slug, args.output, log_dir=log_dir, feed_url=args.feed_url)
     return 0
 
 
@@ -172,8 +179,32 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help=(
             "Override the RSS feed URL (default: https://<slug>.substack.com/feed). "
-            "Accepts a URL, a local file path, or literal XML — primarily for testing."
+            "Accepts a URL, a local file path, or literal XML — primarily for testing. "
+            "Ignored in --archive mode."
         ),
+    )
+    sub.add_argument(
+        "--archive",
+        action="store_true",
+        help=(
+            "Full-archive backfill (FR-028): enumerate the publication's COMPLETE "
+            "post history via the archive API and fetch each body, instead of the "
+            "~20-entry RSS window. Merges with prior RSS pulls (dedup by substack_id)."
+        ),
+    )
+    sub.add_argument(
+        "--max-posts",
+        type=int,
+        default=None,
+        metavar="N",
+        help="(--archive only) Cap the backfill to the N most-recent archived posts.",
+    )
+    sub.add_argument(
+        "--page-delay",
+        type=float,
+        default=0.7,
+        metavar="SECONDS",
+        help="(--archive only) Polite delay between per-post body fetches (default: 0.7s).",
     )
     sub.set_defaults(func=_run_substack)
 

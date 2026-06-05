@@ -11,8 +11,10 @@ import csv
 import json
 from pathlib import Path
 
-from common.pile import SUBSTACK_TSV_COLUMNS, read_tsv_rows
-from substack.pipeline import run_for_publication
+from common.pile import SUBSTACK_TSV_COLUMNS, read_tsv_rows, write_substack_tsv
+from substack import archive_client as ac
+from substack.pipeline import run_archive_backfill, run_for_publication
+from tests.substack.test_archive_client import make_archive_items, make_fake_transport
 
 OUTPUT_TEMPLATE = "{publication}"  # tests pass an absolute path as the template
 
@@ -164,3 +166,89 @@ def test_rss_window_cap_does_not_tombstone_aged_out_article(tmp_path):
     rows = {r["substack_id"].rsplit("/", 1)[-1]: r for r in read_tsv_rows(out)}
     assert rows["ancient"]["deleted_upstream"] == ""  # aged out, not deleted
     assert len(rows) == 3
+
+
+# ===== Phase 28: full-archive backfill (FR-028…FR-031) =====
+
+def _backfill(tmp_path, monkeypatch, items, **fakekw):
+    monkeypatch.setattr(ac, "_request_json", make_fake_transport(items, **fakekw))
+    out = str(tmp_path / "articles.welaquan.local.tsv")
+    log = str(tmp_path / "logs")
+    run_archive_backfill("welaquan", out, log_dir=log, page_delay=(0, 0))
+    return out, log
+
+
+def test_backfill_ingests_full_archive_beyond_rss_window(tmp_path, monkeypatch):
+    items = make_archive_items(25)  # far more than the ~20 RSS window
+    out, _ = _backfill(tmp_path, monkeypatch, items, first_page_cap=3)
+
+    with open(out, encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f, delimiter="\t")
+        assert reader.fieldnames == SUBSTACK_TSV_COLUMNS
+        rows = list(reader)
+
+    assert len(rows) == 25                      # every archived post, despite short first page
+    assert all(r["body"] for r in rows)         # each got its body fetched
+    assert [r["id"] for r in rows] == [str(i) for i in range(1, 26)]
+    assert rows == sorted(rows, key=lambda r: r["published_at"])
+
+
+def test_backfill_merges_with_existing_rss_rows_no_dupes(tmp_path, monkeypatch):
+    items = make_archive_items(25)
+    out = str(tmp_path / "articles.welaquan.local.tsv")
+    # Pre-seed two rows as if a prior RSS pull wrote them (newest two).
+    seed = []
+    for it in items[:2]:
+        row = {c: "" for c in SUBSTACK_TSV_COLUMNS}
+        row.update(substack_id=it["canonical_url"], link=it["canonical_url"],
+                   title=it["title"], body="<p>from RSS</p>",
+                   published_at=it["post_date"][:19] + "+0000")
+        seed.append(row)
+    write_substack_tsv(out, seed)
+
+    monkeypatch.setattr(ac, "_request_json", make_fake_transport(items))
+    run_archive_backfill("welaquan", out, log_dir=str(tmp_path / "logs"), page_delay=(0, 0))
+
+    rows = read_tsv_rows(out)
+    assert len(rows) == 25                                   # union, no duplicates
+    assert len({r["substack_id"] for r in rows}) == 25
+    # The pre-seeded RSS rows are preserved (not re-fetched/overwritten).
+    rss_rows = [r for r in rows if r["body"] == "<p>from RSS</p>"]
+    assert len(rss_rows) == 2
+
+
+def test_backfill_idempotent_rerun(tmp_path, monkeypatch):
+    items = make_archive_items(12)
+    out, _ = _backfill(tmp_path, monkeypatch, items)
+    assert len(read_tsv_rows(out)) == 12
+    # Re-run against the same archive → zero new.
+    monkeypatch.setattr(ac, "_request_json", make_fake_transport(items))
+    run_archive_backfill("welaquan", out, log_dir=str(tmp_path / "logs"), page_delay=(0, 0))
+    assert len(read_tsv_rows(out)) == 12
+
+
+def test_backfill_skips_post_on_body_failure(tmp_path, monkeypatch):
+    items = make_archive_items(10)
+    fail_slug = items[4]["slug"]
+    out, log = _backfill(tmp_path, monkeypatch, items, fail_body_slug=fail_slug)
+
+    rows = read_tsv_rows(out)
+    assert len(rows) == 9  # the one failed post is skipped, not aborted
+    assert fail_slug not in {r["substack_id"].rsplit("/", 1)[-1] for r in rows}
+    failures = (Path(log) / "scrape-failures.jsonl").read_text()
+    assert "post_body_fetch_error" in failures
+
+
+def test_backfill_wholesale_failure_clean_exit_pile_intact(tmp_path, monkeypatch):
+    # Pre-existing pile, then the archive endpoint fails entirely.
+    items = make_archive_items(5)
+    out, _ = _backfill(tmp_path, monkeypatch, items)
+    before = Path(out).read_bytes()
+
+    monkeypatch.setattr(ac, "_request_json", make_fake_transport([], fail_archive=True))
+    log2 = str(tmp_path / "logs2")
+    run_archive_backfill("welaquan", out, log_dir=log2, page_delay=(0, 0))
+
+    assert Path(out).read_bytes() == before  # pile untouched
+    failures = (Path(log2) / "scrape-failures.jsonl").read_text()
+    assert "archive_fetch_error" in failures

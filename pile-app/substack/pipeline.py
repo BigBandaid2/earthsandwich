@@ -27,8 +27,14 @@ from __future__ import annotations
 import time
 from datetime import datetime, timezone
 
+from common.anti_throttle import jittered_sleep
 from common.pile import SUBSTACK_TSV_COLUMNS, read_tsv_rows, write_substack_tsv
 from common.run_logging import write_failure_record
+from substack.archive_client import (
+    ArchiveFetchError,
+    fetch_archive_metadata,
+    fetch_post_body,
+)
 from substack.deletion_detection import find_tombstones_in_feed
 from substack.rss_client import FeedFetchError, fetch_feed_entries, normalize_slug
 
@@ -139,8 +145,120 @@ def run_for_publication(
     )
 
 
+def _apply_tombstones(existing_rows: list[dict], tombstones: set[str]) -> int:
+    """Mark in-place any existing row whose substack_id is in `tombstones`
+    (FR-106, set-once-monotonic). Returns the count newly tombstoned."""
+    if not tombstones:
+        return 0
+    now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S%z")
+    count = 0
+    for row in existing_rows:
+        sid = row.get("substack_id", "")
+        if sid in tombstones and not row.get("deleted_upstream"):
+            row["deleted_upstream"] = "true"
+            row["deleted_upstream_at"] = now_iso
+            count += 1
+    return count
+
+
+def run_archive_backfill(
+    slug: str,
+    output_template: str,
+    log_dir: str = "",
+    *,
+    base_url: str | None = None,
+    page_delay: tuple[float, float] = (0.4, 1.0),
+    max_posts: int | None = None,
+) -> None:
+    """Full-archive backfill (FR-028…FR-031): ingest a publication's COMPLETE
+    archive, not just the RSS window.
+
+    Enumerates every post via the archive API, fetches the body for each post
+    not already in the pile (politely, with a jittered inter-request delay),
+    tombstones in-range absent rows, and writes the merged pile atomically.
+    Dedup by `substack_id` (= archive `canonical_url` = RSS `<guid>`) means this
+    merges cleanly with rows a prior RSS pull wrote. A wholesale archive failure
+    is a clean exit (pile untouched); a single post-body failure is logged and
+    skipped (FR-031).
+    """
+    slug = normalize_slug(slug)
+    output_path = output_template.format(publication=slug)
+    print(f"\n=== Substack ARCHIVE backfill: {slug} → {output_path} ===")
+
+    run_started_at_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S%z")
+    run_started_at_mono = time.monotonic()
+
+    existing_rows = read_tsv_rows(output_path)
+    existing_by_id: dict[str, dict] = {
+        r["substack_id"]: r for r in existing_rows if r.get("substack_id")
+    }
+    print(f"  existing pile: {len(existing_rows)} row(s).")
+
+    try:
+        meta = fetch_archive_metadata(slug, base_url=base_url, max_posts=max_posts)
+    except ArchiveFetchError as exc:
+        elapsed = round(time.monotonic() - run_started_at_mono, 2)
+        print(
+            "\n" + "=" * 72
+            + f"\nFAILURE — Substack {slug} archive unavailable; pile left unchanged."
+            + f"\n  Failure detail: {exc}"
+            + "\n" + "=" * 72
+        )
+        write_failure_record(log_dir, {
+            "target": slug,
+            "service": "substack",
+            "failure_type": "archive_fetch_error",
+            "failure_detail": str(exc),
+            "run_started_at": run_started_at_iso,
+            "elapsed_seconds": elapsed,
+            "output_path": output_path,
+            "operator_hint": "Verify the publication slug and that the archive API is reachable.",
+        })
+        return
+
+    print(f"  archive lists {len(meta)} post(s).")
+    new_meta = [m for m in meta if m["substack_id"] and m["substack_id"] not in existing_by_id]
+    print(f"  {len(new_meta)} not yet in pile; fetching bodies...")
+
+    new_rows: list[dict] = []
+    skipped = 0
+    for idx, m in enumerate(new_meta, start=1):
+        try:
+            body = fetch_post_body(m["slug"], base_url=base_url)
+        except ArchiveFetchError as exc:
+            print(f"  ! [{idx}/{len(new_meta)}] skip {m['slug']!r}: body fetch failed ({exc})")
+            write_failure_record(log_dir, {
+                "target": slug,
+                "service": "substack",
+                "failure_type": "post_body_fetch_error",
+                "failure_detail": str(exc),
+                "slug": m["slug"],
+                "substack_id": m["substack_id"],
+            })
+            skipped += 1
+            continue
+        new_rows.append(_new_row({**m, "body": body}))
+        if idx < len(new_meta):
+            jittered_sleep(*page_delay, label="")  # polite, silent
+
+    tombstones = find_tombstones_in_feed(meta, existing_by_id)
+    tombstoned = _apply_tombstones(existing_rows, tombstones)
+
+    if not new_rows and not tombstoned:
+        print(f"  no new articles, no tombstones for {slug}. Pile unchanged"
+              + (f" ({skipped} post(s) skipped on body-fetch errors)." if skipped else "."))
+        return
+
+    merged = existing_rows + new_rows
+    write_substack_tsv(output_path, merged)
+    print(
+        f"  done: {len(new_rows)} new article(s), {skipped} skipped, {tombstoned} tombstoned, "
+        f"{len(merged)} total row(s) written to {output_path}."
+    )
+
+
 # Convenience alias so the service exposes a uniform `run(...)` entry point
 # alongside the Instagram service's `run_for_target`.
 run = run_for_publication
 
-__all__ = ["run_for_publication", "run", "SUBSTACK_TSV_COLUMNS"]
+__all__ = ["run_for_publication", "run_archive_backfill", "run", "SUBSTACK_TSV_COLUMNS"]

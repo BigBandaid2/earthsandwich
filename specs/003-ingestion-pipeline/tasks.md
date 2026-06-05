@@ -190,6 +190,22 @@
 
 ---
 
+## Phase 28: Substack full-archive backfill (FR-028…FR-031)
+
+**Goal**: Lift the RSS-window cap on the Substack service with an operator-invoked backfill mode that ingests a publication's COMPLETE archive (every post, not just the most-recent ~20 RSS entries), merging cleanly with RSS-pulled rows. Surfaced 2026-06-05 when a `welaquan` RSS pull captured only 20 of the publication's much longer post history.
+
+**Independent Test**: Run `pile_app run substack <pub> --archive` against a publication with more than the RSS window of posts. Verify `pile-app/pile/articles.<pub>.local.tsv` contains every archived post (far more than ~20), each with a full HTML `body`, deduped against any prior RSS pull. Re-run; zero new rows. Simulate a single post-body fetch failure; verify it's logged and skipped without aborting the run.
+
+- [X] T259 [BACKFILL] Created `pile-app/substack/archive_client.py`: `fetch_archive_metadata(slug, *, base_url=None, page_size=50, max_posts=None)` pages `GET /api/v1/archive?sort=new&offset=N&limit=L`, stepping `offset += len(page)` (ACTUAL count, not `limit` — the first page is empirically short (~23) and stepping by `limit` skips posts; this was the exact bug behind the initial "23 posts" mismeasurement). De-dups by `canonical_url` until an empty page or `max_posts`. `normalize_archive_item` → `{substack_id=canonical_url, link, title, subtitle (subtitle|description), published_at (post_date→ISO 8601 UTC via fromisoformat with Z→+00:00), slug}`. Single HTTP seam `_request_json` (monkeypatched in tests). Self-contained — no `instagram/` import
+- [X] T260 [BACKFILL] Added `fetch_post_body(slug, *, base_url=None)`: `GET /api/v1/posts/<slug>` → `body_html` (verified the archive listing returns `body_html: None`, so a per-post fetch is required; the by-id endpoint does NOT return the body). Typed `ArchiveFetchError` on network/HTTP failure lets the caller log+skip one post
+- [X] T261 [BACKFILL] Added `run_archive_backfill(...)` to `pile-app/substack/pipeline.py`: enumerate archive → for each NEW `substack_id` not in the pile, fetch body with a jittered polite delay (`common.anti_throttle.jittered_sleep`), skip+log (`post_body_fetch_error`) on per-post failure → tombstone in-range absent rows (`find_tombstones_in_feed` over the full archive via the new `_apply_tombstones` helper) → merge + atomic `write_substack_tsv`. Wholesale archive failure logs `archive_fetch_error` and returns with the pile intact
+- [X] T262 [BACKFILL] Added `--archive` (+ `--max-posts`, `--page-delay`) to `run substack` in `pile-app/cli.py`; `_run_substack` dispatches to `run_archive_backfill` when `--archive` is set, else the RSS incremental path
+- [X] T263 [BACKFILL] `pile-app/tests/substack/test_archive_client.py` (8 tests — headline: pagination captures all 25 across a short first page, plus normalization, ISO date, subtitle fallback, body fetch, max-posts cap, error propagation) + 5 backfill cases in `test_pipeline.py` (full-archive ingest of 25 > RSS window, merge with pre-seeded RSS rows = union no-dupes, idempotent re-run, per-post body failure logged+skipped, wholesale archive failure → pile intact + `archive_fetch_error` logged). Transport monkeypatched — no network. 27 Substack tests pass; full suite 172 passed / 1 skipped / 1 deselected
+
+**Checkpoint**: Substack backfill complete — a publication's full archive is ingestible on demand and merges with the RSS path; SC-012 / SC-013 satisfied.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
