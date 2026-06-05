@@ -668,22 +668,6 @@ function RegionMap({
         <CartoBDVoyagerTiles />
         <FitBounds coords={stopCoords} padding={60} />
 
-        <MapPolyline
-          path={stopCoords}
-          solid={false}
-          strokeColor="#1a73e8"
-          strokeWeight={2.5}
-        />
-
-        {group.stops.slice(0, -1).map((stop, i) => (
-          <SegmentArrow
-            key={`arrow-${stop.id}-${group.stops[i + 1].id}`}
-            from={stop.coords}
-            to={group.stops[i + 1].coords}
-            color="#1a73e8"
-          />
-        ))}
-
         {group.stops.map((stop) => {
           const isOpen = stop.id === openStopId;
           return (
