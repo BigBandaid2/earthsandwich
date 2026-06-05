@@ -1,9 +1,13 @@
 import { useEffect, useMemo } from 'react';
 import { Map, AdvancedMarker, Pin, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
+import isoCountries from 'i18n-iso-countries';
+import enLocale from 'i18n-iso-countries/langs/en.json';
 import type { RegionGroup } from '../utils/regionUtils';
 import { getActiveRegion, getRoutedGroups, isSegmentSolid } from '../utils/regionUtils';
 import type { ViewMode } from '../App';
 import type { Stop } from '../data/types';
+
+isoCountries.registerLocale(enLocale);
 
 const MAP_ID = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID as string | undefined;
 
@@ -94,6 +98,75 @@ function SegmentArrow({
         </svg>
       </div>
     </AdvancedMarker>
+  );
+}
+
+// --- Flag pin marker (FR-046, trip overview) ---
+
+// Aliases for names the backend uses that don't match i18n-iso-countries' English names.
+const COUNTRY_ALIASES: Record<string, string> = {
+  'Micronesia': 'FM', // package name is "Micronesia, Federated States of"
+};
+
+/**
+ * Flag pin for trip-overview region markers (FR-046).
+ * Uses flagcdn.com to serve actual flag images — works on all platforms
+ * including Windows where flag emoji renders as text codes.
+ * The flex column centres the staff under the flag image so AdvancedMarker's
+ * bottom-centre anchor falls at the staff base (the map pin point).
+ * Abandoned regions appear faded; the active region scales up with a glow.
+ */
+function FlagPin({
+  country,
+  isActive,
+  isAbandoned,
+}: {
+  country: string;
+  isActive: boolean;
+  isAbandoned: boolean;
+}) {
+  const iso2 = COUNTRY_ALIASES[country] ?? isoCountries.getAlpha2Code(country, 'en') ?? undefined;
+  const scale = isActive ? 1.3 : isAbandoned ? 0.85 : 1.0;
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        cursor: 'pointer',
+        opacity: isAbandoned ? 0.45 : 1,
+        transform: `scale(${scale})`,
+        transformOrigin: '50% 100%',
+        ...(isActive ? { filter: 'drop-shadow(0 0 4px rgba(249,115,22,0.8))' } : {}),
+      }}
+    >
+      {iso2 ? (
+        <img
+          src={`https://flagcdn.com/w20/${iso2.toLowerCase()}.png`}
+          alt={country}
+          style={{
+            display: 'block',
+            width: '22px',
+            height: '14px',
+            objectFit: 'cover',
+            border: '0.5px solid rgba(0,0,0,0.2)',
+            borderRadius: '1px',
+          }}
+        />
+      ) : (
+        <div style={{ width: '22px', height: '14px', backgroundColor: '#9aa0a6', borderRadius: '1px' }} />
+      )}
+      {/* Staff — centred by the flex container */}
+      <div
+        style={{
+          width: '2px',
+          height: '10px',
+          backgroundColor: isAbandoned ? '#94a3b8' : isActive ? '#ea580c' : '#374151',
+          borderRadius: '0 0 1px 1px',
+        }}
+      />
+    </div>
   );
 }
 
@@ -308,10 +381,10 @@ function TripMap({
         {regionGroups.map((group) => {
           const isActive = activeRegion?.region.code === group.region.code;
           const isAbandoned = group.overallStatus === 'abandoned';
-          const isVisited = group.overallStatus === 'visited' || group.overallStatus === 'mixed';
-          // Abandoned regions render as a faded grey pin; visited as red; planned as default grey.
-          const background = isAbandoned ? '#cbd5e1' : isVisited ? '#ea4335' : '#9aa0a6';
-          const borderColor = isAbandoned ? '#94a3b8' : isVisited ? '#c5221f' : '#6b7280';
+          // const isVisited = group.overallStatus === 'visited' || group.overallStatus === 'mixed';
+          // // Abandoned regions render as a faded grey pin; visited as red; planned as default grey.
+          // const background = isAbandoned ? '#cbd5e1' : isVisited ? '#ea4335' : '#9aa0a6';
+          // const borderColor = isAbandoned ? '#94a3b8' : isVisited ? '#c5221f' : '#6b7280';
           return (
             <AdvancedMarker
               key={group.region.code}
@@ -319,11 +392,10 @@ function TripMap({
               title={`${group.region.name}, ${group.region.country}${isAbandoned ? ' (abandoned)' : ''}`}
               onClick={() => onSelectRegion(group.region.code)}
             >
-              <Pin
-                background={background}
-                borderColor={borderColor}
-                glyphColor="#ffffff"
-                scale={isActive ? 1.3 : isAbandoned ? 0.85 : 1.0}
+              <FlagPin
+                country={group.region.country}
+                isActive={isActive}
+                isAbandoned={isAbandoned}
               />
             </AdvancedMarker>
           );

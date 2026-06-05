@@ -457,7 +457,7 @@ With multiple developers:
 
 **Purpose**: Render direction-of-travel arrowheads near the destination end of each route segment in both trip view and region view.
 
-- [x] T126 [US-Polish] Implement SVG arrowhead overlays in `frontend/src/components/MapView.tsx` (FR-049, SC-016): for each pair of adjacent non-abandoned endpoints, compute geodesic bearing and render a rotated SVG `<AdvancedMarker>` arrowhead at ~10–15% of segment distance from the destination end; applies to both trip view (region-to-region segments) and region view (stop-to-stop segments)
+- [/] T126 [US-Polish] Implement SVG arrowhead overlays in `frontend/src/components/MapView.tsx` (FR-049, SC-016): for each pair of adjacent non-abandoned endpoints, compute geodesic bearing and render a rotated SVG `<AdvancedMarker>` arrowhead at ~10–15% of segment distance from the destination end; applies to both trip view (region-to-region segments) and region view (stop-to-stop segments)
 
 **Checkpoint**: Every route segment in trip view and region view shows a directional arrowhead pointing in the chronological direction of travel
 
@@ -469,7 +469,7 @@ With multiple developers:
 
 **Purpose**: Replace default map markers with purpose-specific styles and add country-level clustering for region markers at the global zoom level.
 
-- [ ] T127 [P] [US-Polish] Implement flag pin `<AdvancedMarker>` style for region markers at trip overview level in `frontend/src/components/MapView.tsx` (FR-046): visually highlight the active region's pin with an accent color
+- [/] T127 [P] [US-Polish] Implement flag pin `<AdvancedMarker>` style for region markers at trip overview level in `frontend/src/components/MapView.tsx` (FR-046): visually highlight the active region's pin with an accent color
 - [ ] T128 [P] [US-Polish] Implement pushpin `<AdvancedMarker>` style for stop markers at region drill-down level in `frontend/src/components/MapView.tsx` (FR-046)
 - [ ] T129 [US-Polish] Add country clustering via `@googlemaps/markerclusterer` in `frontend/src/components/MapView.tsx` (FR-051, SC-017): route US/CA/CN region markers outside the clusterer so they always render individually; clicking a cluster calls `map.fitBounds(cluster.bounds)` to zoom until pins separate; add `onClusterClick: (regionCodes: string[]) => void` prop to `WorldMapProps`
 - [ ] T130 [US-Polish] Wire `onClusterClick` handler in `frontend/src/App.tsx` (FR-051)
