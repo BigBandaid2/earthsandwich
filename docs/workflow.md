@@ -8,16 +8,17 @@
 
 ## Weekly Cadence
 
-Two rhythms operate here. **Per User Story** (the "After Each User Story" sub-section below) fires whenever a Story finishes — could happen twice in a week, or zero times — and is the gate between "operator marked all tasks done" and the manual JIRA Done flip. **Weekly** (the three meeting-anchored sub-sections after it) is the team-meeting rhythm: drift scan, sync, attest, plan.
+Two rhythms operate here. **Per User Story** (the "After Each User Story" sub-section below) fires whenever a Story finishes — could happen twice in a week, or zero times — and is the gate between "operator marked all tasks done" and clearing the Story *to merge*; the manual JIRA Done flip follows once it's merged to master with the full suite green. **Weekly** (the three meeting-anchored sub-sections after it) is the team-meeting rhythm: drift scan, sync, attest, plan.
 
 ### After Each User Story
 
-Triggered when an operator believes a User Story is complete (all its tasks `[x]`-marked). Required gate before flipping the JIRA Story to Done.
+Triggered when an operator believes a User Story is complete (all its tasks `[x]`-marked). Required gate before flipping the JIRA Story to Done — but a **self-review satisfies it**. Peers already know the Story from planning and grooming; pull one in only when the Story genuinely warrants a second set of eyes, not as a standing tax. The point is to walk the Definition of Done before Done, not to add friction when nothing is broken.
+
+**Official DONE is stricter than the review.** The JIRA Story flips to Done only once the work is **merged to master with the full test suite green** — i.e., it has entered the master→production CICD cadence. The self-review clears a Story *to merge*; the merge + green suite is what actually marks it Done. A Story can pass review and still sit In Progress until it lands on master.
 
 1. **Build the DoD review playground** at `specs/<spec>/reviews/phase-NN-usN.html` (see [§Definition of Done Review](#definition-of-done-review) for table contents, carry-forward handling, and the prompt-back convention).
-2. **Schedule a peer-review walkthrough** with at least one other team member — never the builder alone. Peer is the knowledge-share + accountability check, not a rubber stamp.
-3. **Reviewer fills disposition fields** in the playground: name, general comment, `DONE` / `Needs work`.
-4. **Paste the playground's copy-out prompt into Claude.** Records the outcome: peer-review attestation in `tasks.md`, any peer-driven spec amendments, and (DONE only) the manual JIRA Story flip from In Progress → Done.
+2. **Fill the disposition fields** in the playground: reviewer name (the builder self-reviewing is fine), general comment, `DONE` / `Needs work`.
+3. **Paste the playground's copy-out prompt into Claude.** It records the outcome and ends — DONE path — with the gated flip: merge to master + full suite green, *then* JIRA Done.
 
 ### Before Weekly Team Meeting
 
@@ -115,7 +116,7 @@ Standard ceremony for a feature with no prior history:
 3. `/speckit.plan` → `/speckit.tasks` → `/speckit.implement`.
 4. `/speckit.jira.specstoissues <slug>` — Epic + Stories + active-phase Subtasks.
 5. PR to default branch — review, merge, delete branch.
-6. `/speckit.jira.sync-status <slug>` — Subtasks flip to Done automatically; Stories advance to In Progress. Walk each Story's Independent Test and flip to Done manually in JIRA when verified.
+6. `/speckit.jira.sync-status <slug>` — Subtasks flip to Done automatically; Stories advance to In Progress. Flip each Story to Done manually in JIRA only once it's merged to master (step 5) with the full suite green and its Independent Test verified — official DONE (see [§Definition of Done Review](#definition-of-done-review)).
 7. **Propagate** (see [§Project-Level Doc Propagation](#project-level-doc-propagation)).
 
 ### Project-Level Doc Propagation
@@ -153,9 +154,9 @@ Cadence: per-commit is too noisy; per-push (lightweight drift check via `after_i
 Two commands keep JIRA aligned with the spec state:
 
 - `/speckit.jira.specstoissues <spec>` — creates an Epic for the spec and a Story for each `## Phase N: ...` in its `tasks.md`. Existing Stories are left alone; only new phases are pushed. Subtasks are *not* created by default — sync at the Story level unless there's a clear reason to break out individual tasks (e.g. active forward-sprint work that needs triage in JIRA).
-- `/speckit.jira.sync-status <spec>` — reads `[ ]` / `[~]` / `[x]` task flips in `tasks.md` and transitions the corresponding JIRA issues. **Subtasks** map straight through: `[ ]` → `To Do`, `[~]` → `In Progress`, `[x]` → `Done`. **Stories** advance only as far as `In Progress` (any `[~]` or `[x]` task → `In Progress`); the final flip to `Done` is **manual in JIRA** by the operator who has verified the Story's Independent Test passes. Sync never advances a Story to Done, even when all its tasks are `[x]`.
+- `/speckit.jira.sync-status <spec>` — reads `[ ]` / `[~]` / `[x]` task flips in `tasks.md` and transitions the corresponding JIRA issues. **Subtasks** map straight through: `[ ]` → `To Do`, `[~]` → `In Progress`, `[x]` → `Done`. **Stories** advance only as far as `In Progress` (any `[~]` or `[x]` task → `In Progress`); the final flip to `Done` is **manual in JIRA**, done only once the Story is **merged to master with the full test suite green** (official DONE; see [§Definition of Done Review](#definition-of-done-review)) and its Independent Test verified. Sync never advances a Story to Done, even when all its tasks are `[x]`.
 
-> **Why Stories don't auto-flip to Done.** Task-IDs in commit messages prove a commit *touched* the task, not that the *Story* is shippable. The Story's Independent Test (in its description) is the acceptance bar — and the sync agent has no way to run it. Manual Done flip = "I (a human) verified this Story actually works end-to-end." This rule was added 2026-06-01 after OCS-108 was auto-flipped Done off [T056]–[T062] commits while the frontend↔backend wiring wasn't actually live.
+> **Why Stories don't auto-flip to Done.** Task-IDs in commit messages prove a commit *touched* the task, not that the *Story* is shippable. The Story's Independent Test (in its description) is the acceptance bar — and the sync agent has no way to run it. Manual Done flip = "I (a human) verified this Story actually works end-to-end." This rule was added 2026-06-01 after OCS-108 was auto-flipped Done off [T056]–[T062] commits while the frontend↔backend wiring wasn't actually live. Official DONE tightens this further (2026-06-05): not just verified, but **merged to master with the full suite green and in the release cadence** — a passing Independent Test on a feature branch is necessary but doesn't ship the Story.
 
 ### Sprint membership rule
 
@@ -191,7 +192,7 @@ Per [Cardinal Rule #2](../.specify/memory/constitution.md#cardinal-rules), `spec
 
 ## Definition of Done Review
 
-Each User Story closes with a peer-reviewed Definition-of-Done walkthrough — the [§After Each User Story](#after-each-user-story) gate referenced in the weekly cadence. Purpose: knowledge-share, sanity-check, gap-finding, capturing criteria that can't be fully satisfied, and accountability (the builder is not also their sole tester and judge).
+Each User Story closes with a Definition-of-Done walkthrough — the [§After Each User Story](#after-each-user-story) gate referenced in the weekly cadence. **Self-review is the default**; the builder can run it alone. Purpose: sanity-check, gap-finding, and capturing criteria that can't be fully satisfied (the `forward` items). Pull in a peer only when the Story warrants it — a second opinion is a tool to reach for when something feels unsettled, not a mandatory hop for every Story.
 
 ### The playground
 
@@ -210,7 +211,7 @@ Each row carries: builder's pre-review AI assessment (`satisfied` / `partial` / 
 
 ### Carry-forward items
 
-Items that can only be tested in another App (typical case: a constraint the consuming App must honour but which the producing App cannot self-verify) get a `forward` assessment in the playground. The peer-review walkthrough is responsible for **routing the forward item to the spec that will eventually test it** — leaving forward items in the playground alone is not enough.
+Items that can only be tested in another App (typical case: a constraint the consuming App must honour but which the producing App cannot self-verify) get a `forward` assessment in the playground. The review is responsible for **routing the forward item to the spec that will eventually test it** — leaving forward items in the playground alone is not enough.
 
 Two-step protocol per forward item:
 
@@ -221,9 +222,9 @@ Worked example: 003 Phase 22 / US3 has two bridge-app-side Acceptance Scenarios 
 
 ### Disposition + prompt
 
-The reviewer's binary `DONE` / `Needs work` disposition drives the copy-out prompt's tail. DONE-path lists 5 follow-up actions (Checkpoint attestation in `tasks.md`, spec amendments if any, JIRA Story flip In Progress → Done, commit + push). Needs-work-path lists 4 different ones (address unsatisfied items, amend spec if any, schedule second pass, Story stays In Progress).
+The reviewer's binary `DONE` / `Needs work` disposition drives the copy-out prompt's tail. DONE-path lists 7 follow-up actions (Checkpoint attestation in `tasks.md`, carry-forward routing, spec amendments if any, recording the review's input state back into the playground, commit + push on the feature branch, merge to master + full-suite verification, and — gated on that being green — the JIRA Story flip In Progress → Done). Needs-work-path lists 5 (address unsatisfied items, amend spec if any, schedule second pass, record the input state into the playground, commit + push; Story stays In Progress).
 
-Without the peer-review prompt being executed, no Story → Done. The In-Progress-only sync rule (see [§JIRA sync](#jira-sync)) presumes peer review is the final hop.
+Without the DoD review prompt being executed, no Story → Done — but the review is necessary, not sufficient. **Official DONE = merged to master + full test suite green + in the master→production CICD cadence.** The review clears a Story to merge; the merge and green suite are the final hop. The In-Progress-only sync rule (see [§JIRA sync](#jira-sync)) reflects this: a Story stays In Progress through review and merge prep, and flips to Done only once it's on master and releasing.
 
 ---
 
