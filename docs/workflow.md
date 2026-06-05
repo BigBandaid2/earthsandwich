@@ -12,12 +12,11 @@ Two rhythms operate here. **Per User Story** (the "After Each User Story" sub-se
 
 ### After Each User Story
 
-Triggered when an operator believes a User Story is complete (all its tasks `[x]`-marked). Required gate before flipping the JIRA Story to Done.
+Triggered when an operator believes a User Story is complete (all its tasks `[x]`-marked). Required gate before flipping the JIRA Story to Done — but a **self-review satisfies it**. Peers already know the Story from planning and grooming; pull one in only when the Story genuinely warrants a second set of eyes, not as a standing tax. The point is to walk the Definition of Done before Done, not to add friction when nothing is broken.
 
 1. **Build the DoD review playground** at `specs/<spec>/reviews/phase-NN-usN.html` (see [§Definition of Done Review](#definition-of-done-review) for table contents, carry-forward handling, and the prompt-back convention).
-2. **Schedule a peer-review walkthrough** with at least one other team member — never the builder alone. Peer is the knowledge-share + accountability check, not a rubber stamp.
-3. **Reviewer fills disposition fields** in the playground: name, general comment, `DONE` / `Needs work`.
-4. **Paste the playground's copy-out prompt into Claude.** Records the outcome: peer-review attestation in `tasks.md`, any peer-driven spec amendments, and (DONE only) the manual JIRA Story flip from In Progress → Done.
+2. **Fill the disposition fields** in the playground: reviewer name (the builder self-reviewing is fine), general comment, `DONE` / `Needs work`.
+3. **Paste the playground's copy-out prompt into Claude.** Records the outcome: review attestation in `tasks.md`, any review-driven spec amendments, and (DONE only) the manual JIRA Story flip from In Progress → Done.
 
 ### Before Weekly Team Meeting
 
@@ -191,7 +190,7 @@ Per [Cardinal Rule #2](../.specify/memory/constitution.md#cardinal-rules), `spec
 
 ## Definition of Done Review
 
-Each User Story closes with a peer-reviewed Definition-of-Done walkthrough — the [§After Each User Story](#after-each-user-story) gate referenced in the weekly cadence. Purpose: knowledge-share, sanity-check, gap-finding, capturing criteria that can't be fully satisfied, and accountability (the builder is not also their sole tester and judge).
+Each User Story closes with a Definition-of-Done walkthrough — the [§After Each User Story](#after-each-user-story) gate referenced in the weekly cadence. **Self-review is the default**; the builder can run it alone. Purpose: sanity-check, gap-finding, and capturing criteria that can't be fully satisfied (the `forward` items). Pull in a peer only when the Story warrants it — a second opinion is a tool to reach for when something feels unsettled, not a mandatory hop for every Story.
 
 ### The playground
 
@@ -210,7 +209,7 @@ Each row carries: builder's pre-review AI assessment (`satisfied` / `partial` / 
 
 ### Carry-forward items
 
-Items that can only be tested in another App (typical case: a constraint the consuming App must honour but which the producing App cannot self-verify) get a `forward` assessment in the playground. The peer-review walkthrough is responsible for **routing the forward item to the spec that will eventually test it** — leaving forward items in the playground alone is not enough.
+Items that can only be tested in another App (typical case: a constraint the consuming App must honour but which the producing App cannot self-verify) get a `forward` assessment in the playground. The review is responsible for **routing the forward item to the spec that will eventually test it** — leaving forward items in the playground alone is not enough.
 
 Two-step protocol per forward item:
 
@@ -221,9 +220,9 @@ Worked example: 003 Phase 22 / US3 has two bridge-app-side Acceptance Scenarios 
 
 ### Disposition + prompt
 
-The reviewer's binary `DONE` / `Needs work` disposition drives the copy-out prompt's tail. DONE-path lists 5 follow-up actions (Checkpoint attestation in `tasks.md`, spec amendments if any, JIRA Story flip In Progress → Done, commit + push). Needs-work-path lists 4 different ones (address unsatisfied items, amend spec if any, schedule second pass, Story stays In Progress).
+The reviewer's binary `DONE` / `Needs work` disposition drives the copy-out prompt's tail. DONE-path lists 6 follow-up actions (Checkpoint attestation in `tasks.md`, carry-forward routing, spec amendments if any, JIRA Story flip In Progress → Done, recording the review's input state back into the playground, commit + push). Needs-work-path lists 5 (address unsatisfied items, amend spec if any, schedule second pass, record the input state into the playground, commit + push; Story stays In Progress).
 
-Without the peer-review prompt being executed, no Story → Done. The In-Progress-only sync rule (see [§JIRA sync](#jira-sync)) presumes peer review is the final hop.
+Without the DoD review prompt being executed, no Story → Done. The In-Progress-only sync rule (see [§JIRA sync](#jira-sync)) presumes this review — self or peer — is the final hop.
 
 ---
 
