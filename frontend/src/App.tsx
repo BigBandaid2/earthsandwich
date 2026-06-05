@@ -10,6 +10,7 @@ import WorldMap from './components/MapView';
 import TripFeed from './components/Sidebar';
 import RegionSidebar from './components/RegionSidebar';
 import StopModal from './components/StopDetail';
+import LandingModal from './components/LandingModal';
 
 export type ViewMode = 'trip' | 'region';
 
@@ -34,6 +35,9 @@ function App() {
   const [openStopId, setOpenStopId] = useState<string | null>(null);
   const [modalStopList, setModalStopList] = useState<string[]>([]);
   const [tripSelectorOpen, setTripSelectorOpen] = useState(false);
+  const [showLandingModal, setShowLandingModal] = useState(
+    !localStorage.getItem('travelogue:landing-dismissed'),
+  );
 
   // Resolve the active trip from the URL hash once the trips list loads.
   useEffect(() => {
@@ -242,6 +246,15 @@ function App() {
               onNav={handleModalNav}
             />
           </ErrorBoundary>
+        )}
+
+        {showLandingModal && (
+          <LandingModal
+            onDismiss={() => {
+              localStorage.setItem('travelogue:landing-dismissed', '1');
+              setShowLandingModal(false);
+            }}
+          />
         )}
       </div>
     </APIProvider>

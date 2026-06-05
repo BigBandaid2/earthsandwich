@@ -487,9 +487,9 @@ With multiple developers:
 
 **⚠️ TDD**: Write failing tests first (T132), then implement (T133–T134). All tests must pass before this phase is complete.
 
-- [ ] T132 [P] [US-Polish] Write `LandingModal` tests in `frontend/tests/unit/components/LandingModal.test.tsx` (TDD, FR-047, SC-013): (a) modal renders when `travelogue:landing-dismissed` localStorage key is absent; (b) modal does not render when key is set; (c) clicking dismiss button calls `onDismiss`; mock `localStorage` via `vi.stubGlobal`
-- [ ] T133 [P] [US-Polish] Create `frontend/src/components/LandingModal.tsx`: full-screen overlay containing site headline, trip context block (placeholder copy acceptable per FR-047), how-to-browse guidance, follow-along callout for friends/family, and dismiss button (e.g. "Start Exploring") that calls `onDismiss` prop (FR-047)
-- [ ] T134 [US-Polish] Wire `LandingModal` into `frontend/src/App.tsx` (FR-047, SC-013): initialise `showLandingModal` state from `localStorage.getItem('travelogue:landing-dismissed')`; render `<LandingModal onDismiss={...} />` when flag is false; on dismiss write `localStorage.setItem('travelogue:landing-dismissed', '1')` and set flag to false
+- [x] T132 [P] [US-Polish] Write `LandingModal` tests in `frontend/tests/unit/components/LandingModal.test.tsx` (TDD, FR-047, SC-013): (a) modal renders when `travelogue:landing-dismissed` localStorage key is absent; (b) modal does not render when key is set; (c) clicking dismiss button calls `onDismiss`; mock `localStorage` via `vi.stubGlobal`
+- [x] T133 [P] [US-Polish] Create `frontend/src/components/LandingModal.tsx`: full-screen overlay containing site headline, trip context block (placeholder copy acceptable per FR-047), how-to-browse guidance, follow-along callout for friends/family, and dismiss button (e.g. "Start Exploring") that calls `onDismiss` prop (FR-047)
+- [x] T134 [US-Polish] Wire `LandingModal` into `frontend/src/App.tsx` (FR-047, SC-013): initialise `showLandingModal` state from `localStorage.getItem('travelogue:landing-dismissed')`; render `<LandingModal onDismiss={...} />` when flag is false; on dismiss write `localStorage.setItem('travelogue:landing-dismissed', '1')` and set flag to false
 
 **Checkpoint**: `npm test` — all T132 tests pass; loading app for first time shows modal; reload after dismiss does not show modal (SC-013)
 
