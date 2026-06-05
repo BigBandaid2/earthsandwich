@@ -12,7 +12,7 @@ import pytest
 
 from substack import archive_client as ac
 
-BASE = "https://welaquan.substack.com"
+BASE = "https://testpub.substack.com"
 
 
 def make_archive_items(n: int) -> list[dict]:
@@ -36,14 +36,19 @@ def make_archive_items(n: int) -> list[dict]:
     return items
 
 
-def make_fake_transport(items, *, first_page_cap=3, fail_body_slug=None, fail_archive=False):
+def make_fake_transport(items, *, first_page_cap=3, fail_body_slug=None,
+                        fail_archive=False, expect_base=None):
     """Return a fake `_request_json(url, params)` serving `items` + bodies.
 
     `first_page_cap` makes the offset=0 response short (fewer than the requested
     limit) to exercise offset-by-actual-count stepping. `fail_body_slug` raises
     on that one post's body; `fail_archive` raises on the archive endpoint.
+    `expect_base` (if set) asserts every request targets that publication host —
+    guards against the post-slug-as-subdomain URL bug.
     """
     def fake(url, params=None):
+        if expect_base is not None:
+            assert url.startswith(expect_base + "/"), f"wrong host: {url}"
         if url.endswith(ac.ARCHIVE_PATH):
             if fail_archive:
                 raise ac.ArchiveFetchError("archive unreachable (simulated)")
@@ -65,7 +70,7 @@ def test_pagination_captures_all_despite_short_first_page(monkeypatch):
     items = make_archive_items(25)
     monkeypatch.setattr(ac, "_request_json", make_fake_transport(items, first_page_cap=3))
 
-    got = ac.fetch_archive_metadata("welaquan", page_size=10)
+    got = ac.fetch_archive_metadata("testpub", page_size=10)
 
     assert len(got) == 25  # NOT 3+10=13 or a gapped count — every post captured
     assert [g["substack_id"] for g in got] == [it["canonical_url"] for it in items]
@@ -75,13 +80,13 @@ def test_pagination_captures_all_despite_short_first_page(monkeypatch):
 def test_max_posts_caps_enumeration(monkeypatch):
     items = make_archive_items(25)
     monkeypatch.setattr(ac, "_request_json", make_fake_transport(items))
-    got = ac.fetch_archive_metadata("welaquan", page_size=10, max_posts=7)
+    got = ac.fetch_archive_metadata("testpub", page_size=10, max_posts=7)
     assert len(got) == 7
 
 
 def test_empty_archive_returns_empty(monkeypatch):
     monkeypatch.setattr(ac, "_request_json", make_fake_transport([]))
-    assert ac.fetch_archive_metadata("welaquan", page_size=10) == []
+    assert ac.fetch_archive_metadata("testpub", page_size=10) == []
 
 
 def test_item_normalization_and_iso_date():
@@ -114,7 +119,18 @@ def test_fetch_post_body(monkeypatch):
     assert ac.fetch_post_body("post-001") == "<p>body of post-001</p>"
 
 
+def test_fetch_post_body_url_uses_publication_host_not_post_slug(monkeypatch):
+    # Regression: the post slug is a PATH segment, never the subdomain.
+    captured = {}
+    def fake(url, params=None):
+        captured["url"] = url
+        return {"body_html": "<p>ok</p>"}
+    monkeypatch.setattr(ac, "_request_json", fake)
+    ac.fetch_post_body("asking-for-help", base_url="https://testpub.substack.com")
+    assert captured["url"] == "https://testpub.substack.com/api/v1/posts/asking-for-help"
+
+
 def test_archive_fetch_error_propagates(monkeypatch):
     monkeypatch.setattr(ac, "_request_json", make_fake_transport([], fail_archive=True))
     with pytest.raises(ac.ArchiveFetchError):
-        ac.fetch_archive_metadata("welaquan", page_size=10)
+        ac.fetch_archive_metadata("testpub", page_size=10)

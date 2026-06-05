@@ -32,6 +32,7 @@ from common.pile import SUBSTACK_TSV_COLUMNS, read_tsv_rows, write_substack_tsv
 from common.run_logging import write_failure_record
 from substack.archive_client import (
     ArchiveFetchError,
+    base_url_for,
     fetch_archive_metadata,
     fetch_post_body,
 )
@@ -194,8 +195,14 @@ def run_archive_backfill(
     }
     print(f"  existing pile: {len(existing_rows)} row(s).")
 
+    # Resolve the PUBLICATION base URL once. Both the archive listing and every
+    # per-post body fetch must use this host — a post's own slug is a PATH
+    # segment, never the subdomain (the 2026-06-05 backfill bug: fetch_post_body
+    # was deriving the host from each post slug → asking-for-help.substack.com).
+    pub_base = base_url_for(slug, base_url)
+
     try:
-        meta = fetch_archive_metadata(slug, base_url=base_url, max_posts=max_posts)
+        meta = fetch_archive_metadata(slug, base_url=pub_base, max_posts=max_posts)
     except ArchiveFetchError as exc:
         elapsed = round(time.monotonic() - run_started_at_mono, 2)
         print(
@@ -224,7 +231,7 @@ def run_archive_backfill(
     skipped = 0
     for idx, m in enumerate(new_meta, start=1):
         try:
-            body = fetch_post_body(m["slug"], base_url=base_url)
+            body = fetch_post_body(m["slug"], base_url=pub_base)
         except ArchiveFetchError as exc:
             print(f"  ! [{idx}/{len(new_meta)}] skip {m['slug']!r}: body fetch failed ({exc})")
             write_failure_record(log_dir, {

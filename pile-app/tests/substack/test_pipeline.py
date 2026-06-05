@@ -28,7 +28,7 @@ def _feed(*items: str) -> str:
 
 
 def _item(slug: str, pubdate: str, body: str = "<p>hi</p>") -> str:
-    url = f"https://welalive.substack.com/p/{slug}"
+    url = f"https://testpub.substack.com/p/{slug}"
     return (
         "<item>"
         f"<title>{slug}</title>"
@@ -41,11 +41,11 @@ def _item(slug: str, pubdate: str, body: str = "<p>hi</p>") -> str:
     )
 
 
-def _run(tmp_path: Path, feed: str | None, name="articles.welalive.local.tsv"):
+def _run(tmp_path: Path, feed: str | None, name="articles.testpub.local.tsv"):
     out = str(tmp_path / name)
     log_dir = str(tmp_path / "logs")
     run_for_publication(
-        "welalive", out, log_dir=log_dir,
+        "testpub", out, log_dir=log_dir,
         feed_url=feed if feed is not None else "http://127.0.0.1:9/feed",
     )
     return out, log_dir
@@ -170,11 +170,17 @@ def test_rss_window_cap_does_not_tombstone_aged_out_article(tmp_path):
 
 # ===== Phase 28: full-archive backfill (FR-028…FR-031) =====
 
+PUB_BASE = "https://testpub.substack.com"
+
+
 def _backfill(tmp_path, monkeypatch, items, **fakekw):
+    # expect_base guards that every request (archive + each post body) targets
+    # the publication host, not a post-slug subdomain (the 2026-06-05 URL bug).
+    fakekw.setdefault("expect_base", PUB_BASE)
     monkeypatch.setattr(ac, "_request_json", make_fake_transport(items, **fakekw))
-    out = str(tmp_path / "articles.welaquan.local.tsv")
+    out = str(tmp_path / "articles.testpub.local.tsv")
     log = str(tmp_path / "logs")
-    run_archive_backfill("welaquan", out, log_dir=log, page_delay=(0, 0))
+    run_archive_backfill("testpub", out, log_dir=log, page_delay=(0, 0))
     return out, log
 
 
@@ -195,7 +201,7 @@ def test_backfill_ingests_full_archive_beyond_rss_window(tmp_path, monkeypatch):
 
 def test_backfill_merges_with_existing_rss_rows_no_dupes(tmp_path, monkeypatch):
     items = make_archive_items(25)
-    out = str(tmp_path / "articles.welaquan.local.tsv")
+    out = str(tmp_path / "articles.testpub.local.tsv")
     # Pre-seed two rows as if a prior RSS pull wrote them (newest two).
     seed = []
     for it in items[:2]:
@@ -206,8 +212,8 @@ def test_backfill_merges_with_existing_rss_rows_no_dupes(tmp_path, monkeypatch):
         seed.append(row)
     write_substack_tsv(out, seed)
 
-    monkeypatch.setattr(ac, "_request_json", make_fake_transport(items))
-    run_archive_backfill("welaquan", out, log_dir=str(tmp_path / "logs"), page_delay=(0, 0))
+    monkeypatch.setattr(ac, "_request_json", make_fake_transport(items, expect_base=PUB_BASE))
+    run_archive_backfill("testpub", out, log_dir=str(tmp_path / "logs"), page_delay=(0, 0))
 
     rows = read_tsv_rows(out)
     assert len(rows) == 25                                   # union, no duplicates
@@ -222,8 +228,8 @@ def test_backfill_idempotent_rerun(tmp_path, monkeypatch):
     out, _ = _backfill(tmp_path, monkeypatch, items)
     assert len(read_tsv_rows(out)) == 12
     # Re-run against the same archive → zero new.
-    monkeypatch.setattr(ac, "_request_json", make_fake_transport(items))
-    run_archive_backfill("welaquan", out, log_dir=str(tmp_path / "logs"), page_delay=(0, 0))
+    monkeypatch.setattr(ac, "_request_json", make_fake_transport(items, expect_base=PUB_BASE))
+    run_archive_backfill("testpub", out, log_dir=str(tmp_path / "logs"), page_delay=(0, 0))
     assert len(read_tsv_rows(out)) == 12
 
 
@@ -247,7 +253,7 @@ def test_backfill_wholesale_failure_clean_exit_pile_intact(tmp_path, monkeypatch
 
     monkeypatch.setattr(ac, "_request_json", make_fake_transport([], fail_archive=True))
     log2 = str(tmp_path / "logs2")
-    run_archive_backfill("welaquan", out, log_dir=log2, page_delay=(0, 0))
+    run_archive_backfill("testpub", out, log_dir=log2, page_delay=(0, 0))
 
     assert Path(out).read_bytes() == before  # pile untouched
     failures = (Path(log2) / "scrape-failures.jsonl").read_text()

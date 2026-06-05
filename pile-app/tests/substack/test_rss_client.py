@@ -20,20 +20,20 @@ SAMPLE_FEED = """<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
 <channel>
   <title>Wela Live</title>
-  <link>https://welalive.substack.com</link>
+  <link>https://testpub.substack.com</link>
   <item>
     <title>Second Post</title>
     <description>The deck of the second post</description>
-    <link>https://welalive.substack.com/p/second-post</link>
-    <guid isPermaLink="false">https://welalive.substack.com/p/second-post</guid>
+    <link>https://testpub.substack.com/p/second-post</link>
+    <guid isPermaLink="false">https://testpub.substack.com/p/second-post</guid>
     <pubDate>Tue, 03 Jun 2025 12:30:00 GMT</pubDate>
     <content:encoded><![CDATA[<p>Body of the <b>second</b> post.</p>]]></content:encoded>
   </item>
   <item>
     <title>First Post</title>
     <description>The deck of the first post</description>
-    <link>https://welalive.substack.com/p/first-post</link>
-    <guid isPermaLink="false">https://welalive.substack.com/p/first-post</guid>
+    <link>https://testpub.substack.com/p/first-post</link>
+    <guid isPermaLink="false">https://testpub.substack.com/p/first-post</guid>
     <pubDate>Mon, 02 Jun 2025 10:00:00 GMT</pubDate>
     <content:encoded><![CDATA[<p>Body of the first post.</p>]]></content:encoded>
   </item>
@@ -43,19 +43,19 @@ SAMPLE_FEED = """<?xml version="1.0" encoding="UTF-8"?>
 
 
 def test_feed_url_and_slug_normalization():
-    assert feed_url_for("welalive") == "https://welalive.substack.com/feed"
-    assert feed_url_for("@welalive/") == "https://welalive.substack.com/feed"
-    assert normalize_slug("  @welalive/ ") == "welalive"
+    assert feed_url_for("testpub") == "https://testpub.substack.com/feed"
+    assert feed_url_for("@testpub/") == "https://testpub.substack.com/feed"
+    assert normalize_slug("  @testpub/ ") == "testpub"
 
 
 def test_fetch_parses_entries_with_all_fields():
-    entries = fetch_feed_entries("welalive", url=SAMPLE_FEED)
+    entries = fetch_feed_entries("testpub", url=SAMPLE_FEED)
     assert len(entries) == 2
 
     # feedparser yields items in document order (newest-first here).
     second = entries[0]
-    assert second["substack_id"] == "https://welalive.substack.com/p/second-post"
-    assert second["link"] == "https://welalive.substack.com/p/second-post"
+    assert second["substack_id"] == "https://testpub.substack.com/p/second-post"
+    assert second["link"] == "https://testpub.substack.com/p/second-post"
     assert second["title"] == "Second Post"
     assert second["subtitle"] == "The deck of the second post"
     assert "<b>second</b>" in second["body"]  # content:encoded, CDATA stripped
@@ -64,11 +64,11 @@ def test_fetch_parses_entries_with_all_fields():
 
 
 def test_fetch_uses_guid_as_substack_id():
-    entries = fetch_feed_entries("welalive", url=SAMPLE_FEED)
+    entries = fetch_feed_entries("testpub", url=SAMPLE_FEED)
     ids = {e["substack_id"] for e in entries}
     assert ids == {
-        "https://welalive.substack.com/p/first-post",
-        "https://welalive.substack.com/p/second-post",
+        "https://testpub.substack.com/p/first-post",
+        "https://testpub.substack.com/p/second-post",
     }
 
 
@@ -77,19 +77,19 @@ def test_empty_but_valid_feed_returns_empty_list():
         '<?xml version="1.0"?><rss version="2.0"><channel>'
         "<title>Empty</title></channel></rss>"
     )
-    assert fetch_feed_entries("welalive", url=empty_feed) == []
+    assert fetch_feed_entries("testpub", url=empty_feed) == []
 
 
 def test_unparseable_feed_raises_feedfetcherror():
     # A non-feed string yields no entries + a bozo_exception → error path.
     with pytest.raises(FeedFetchError):
-        fetch_feed_entries("welalive", url="this is not xml at all <<<")
+        fetch_feed_entries("testpub", url="this is not xml at all <<<")
 
 
 def test_unreachable_host_raises_feedfetcherror():
     # Port 9 (discard) on localhost refuses fast → URLError, no entries.
     with pytest.raises(FeedFetchError):
-        fetch_feed_entries("welalive", url="http://127.0.0.1:9/feed")
+        fetch_feed_entries("testpub", url="http://127.0.0.1:9/feed")
 
 
 # ---------- common.pile.write_substack_tsv ----------
@@ -102,7 +102,7 @@ def _make_row(sid, published_at, **over):
 
 
 def test_writer_sorts_by_published_at_and_reids(tmp_path):
-    path = str(tmp_path / "articles.welalive.local.tsv")
+    path = str(tmp_path / "articles.testpub.local.tsv")
     rows = [
         _make_row("b", "2025-06-03T12:30:00+0000"),
         _make_row("a", "2025-06-02T10:00:00+0000"),
@@ -119,7 +119,7 @@ def test_writer_sorts_by_published_at_and_reids(tmp_path):
 
 
 def test_writer_escapes_tabs_and_preserves_body_newlines(tmp_path):
-    path = str(tmp_path / "articles.welalive.local.tsv")
+    path = str(tmp_path / "articles.testpub.local.tsv")
     rows = [_make_row(
         "x", "2025-06-02T10:00:00+0000",
         title="has\ttab", body="<p>line one</p>\n<p>line two</p>",
