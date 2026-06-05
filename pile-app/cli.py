@@ -3,9 +3,9 @@
 Invoked via the `pile_app` console script (after `pip install -e .`) or
 directly with `python cli.py ...` from inside `pile-app/`.
 
-V1 surface: a single `run instagram <target>` subcommand that mirrors the
-shape of the prior `load_posts_tsv.py --targets ... --rate ...` invocation.
-Substack + scheduler subcommands are added in Phases 23 / 24.
+Surface: `run instagram <target>` (mirrors the prior `load_posts_tsv.py
+--targets ... --rate ...` invocation) and `run substack <publication>`
+(Phase 23). The scheduler subcommand is added in Phase 24.
 """
 
 from __future__ import annotations
@@ -15,12 +15,18 @@ import os
 import sys
 
 from common.anti_throttle import DEFAULT_RATE_PRESET, RATE_PRESETS
-from common.pile import APP_ROOT, DEFAULT_MEDIA_DIR, DEFAULT_OUTPUT_TEMPLATE
+from common.pile import (
+    APP_ROOT,
+    DEFAULT_MEDIA_DIR,
+    DEFAULT_OUTPUT_TEMPLATE,
+    DEFAULT_SUBSTACK_OUTPUT_TEMPLATE,
+)
 from instagram.instagrapi_client import (
     INSTAGRAPI_SESSION_FILE,
     init_instagrapi_client,
 )
 from instagram.pipeline import parse_unix_timestamp, run_for_target
+from substack.pipeline import run_for_publication
 
 DEFAULT_TARGETS = os.environ.get("INSTAGRAM_TARGET_ACCOUNTS", "ourearthsandwich")
 
@@ -66,6 +72,21 @@ def _run_instagram(args: argparse.Namespace) -> int:
             ig_client, target, args.output, args.media_dir, rate_config,
             log_dir=log_dir, newer_than_ts=newer_than_ts,
         )
+    return 0
+
+
+def _run_substack(args: argparse.Namespace) -> int:
+    slug = args.publication.strip().lstrip("@").rstrip("/")
+    if not slug:
+        print("\nERROR: no publication slug specified.")
+        return 1
+
+    log_dir = str(APP_ROOT / "logs")
+    os.makedirs(log_dir, exist_ok=True)
+
+    # run_for_publication handles its own failures (logs + clean return), so a
+    # feed error is a clean exit, not a crash — US4 Independent Test.
+    run_for_publication(slug, args.output, log_dir=log_dir, feed_url=args.feed_url)
     return 0
 
 
@@ -130,6 +151,31 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     ig.set_defaults(func=_run_instagram)
+
+    sub = run_sub.add_parser("substack", help="Run the Substack pipeline service for one publication.")
+    sub.add_argument(
+        "publication",
+        help="Substack publication slug (e.g. 'welalive' for welalive.substack.com).",
+    )
+    sub.add_argument(
+        "--output",
+        metavar="TEMPLATE",
+        default=DEFAULT_SUBSTACK_OUTPUT_TEMPLATE,
+        help=(
+            f"TSV path template; {{publication}} is substituted "
+            f"(default: {DEFAULT_SUBSTACK_OUTPUT_TEMPLATE})."
+        ),
+    )
+    sub.add_argument(
+        "--feed-url",
+        metavar="URL",
+        default=None,
+        help=(
+            "Override the RSS feed URL (default: https://<slug>.substack.com/feed). "
+            "Accepts a URL, a local file path, or literal XML — primarily for testing."
+        ),
+    )
+    sub.set_defaults(func=_run_substack)
 
     return parser
 
