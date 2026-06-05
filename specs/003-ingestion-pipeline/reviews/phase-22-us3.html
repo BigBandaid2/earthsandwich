@@ -67,6 +67,9 @@
 <div class="meta">
   Builder walks the table with a peer reviewer. Each row carries the AI's pre-review assessment, the supporting evidence, and an editable peer comment + satisfaction checkbox. Story-level fields (reviewer name, overall comment, DONE / Needs Work) and any add/delete/edit of DoD items feed the copy-out prompt at the bottom.
 </div>
+<div class="meta">
+  <strong>Recorded review:</strong> this file is pre-loaded with the completed peer review (Ethan Shen, 2026-06-05, <strong>DONE</strong>, 9/9 satisfied) that flipped OCS-99 to Done — the input state that generated the prompt now logged in <code>tasks.md</code> Phase 22. &ldquo;Reset peer fields&rdquo; clears it for a fresh pass; reloading restores the record.
+</div>
 
 <h2>Definition of Done — checklist</h2>
 <div class="legend">
@@ -181,12 +184,37 @@ const INITIAL_ITEMS = [
   }
 ];
 
+// ---------- Recorded review (2026-06-05) ----------
+// The peer-review session that produced the OCS-99 -> Done outcome, captured
+// verbatim so this playground loads in the exact input state that generated the
+// prompt now recorded in tasks.md Phase 22. This file is therefore a RECORD of a
+// completed review, not a blank form — "Reset peer fields" clears it for a fresh
+// pass, and reloading the page restores the recorded state. peerComments are
+// keyed by INITIAL_ITEMS index; allSatisfied=true because the peer marked 9/9.
+const RECORDED_REVIEW = {
+  reviewerName: "Ethan Shen",
+  reviewerComment: "All objectives satisfied",
+  status: "DONE",
+  date: "2026-06-05",
+  allSatisfied: true,
+  peerComments: {
+    1: "manually accepted without final IG integration test",   // Independent Test (b)
+    4: "ran portability test  successfully",                    // AS#3
+    7: "manually accepted without IG integration test"          // SC-010
+  }
+};
+
 // ---------- State ----------
 const state = {
-  items: INITIAL_ITEMS.map(it => ({ ...it, peerComment: "", satisfied: false, custom: false })),
-  reviewerName: "",
-  reviewerComment: "",
-  status: "Needs work"
+  items: INITIAL_ITEMS.map((it, i) => ({
+    ...it,
+    peerComment: RECORDED_REVIEW.peerComments[i] || "",
+    satisfied: RECORDED_REVIEW.allSatisfied,
+    custom: false
+  })),
+  reviewerName: RECORDED_REVIEW.reviewerName,
+  reviewerComment: RECORDED_REVIEW.reviewerComment,
+  status: RECORDED_REVIEW.status
 };
 
 const BADGE = {
@@ -232,7 +260,9 @@ function escapeHtml(s) {
 function updatePrompt() {
   const lines = [];
   const reviewer = state.reviewerName.trim() || "[reviewer name not supplied]";
-  const todayISO = new Date().toISOString().slice(0, 10);
+  // Pinned to the recorded review date so this record reproduces the original
+  // prompt; falls back to today only if the recorded date is ever cleared.
+  const todayISO = RECORDED_REVIEW.date || new Date().toISOString().slice(0, 10);
 
   lines.push(`Record the Phase 22 / US3 DoD peer-review outcome for OCS-99 in the repo.`);
   lines.push("");
@@ -283,24 +313,38 @@ function updatePrompt() {
   lines.push("");
   if (state.status === "DONE") {
     lines.push("Actions to take:");
-    lines.push("  1. Update tasks.md Phase 22 Checkpoint with a peer-review attestation line:");
-    lines.push(`     \"Peer-reviewed by ${reviewer} on ${todayISO}: DONE.\"`);
+    lines.push("  1. Update tasks.md Phase 22 Checkpoint with a review attestation line:");
+    lines.push(`     \"Reviewed by ${reviewer} on ${todayISO}: meets Definition of Done.\"`);
     lines.push("  2. If any 'forward' items remain (bridge-app-side ASs typically), record them as deferred under a 'Carry-forward' bullet under Phase 22, OR open a new follow-on task at the bottom of Phase 22 referencing the bridge-app spec.");
-    lines.push("  3. If peer added new DoD items above, amend specs/003-ingestion-pipeline/spec.md (User Story 3 Acceptance Scenarios OR Success Criteria block) to include them; commit on 003-ingestion-pipeline.");
-    lines.push("  4. Transition OCS-99 from In Progress to Done in JIRA (manual flip, per the workflow rule that sync never auto-Done's Stories).");
-    lines.push("  5. Commit + push the tasks.md / spec.md changes on 003-ingestion-pipeline.");
+    lines.push("  3. If the review added new DoD items above, amend specs/003-ingestion-pipeline/spec.md (User Story 3 Acceptance Scenarios OR Success Criteria block) to include them; commit on 003-ingestion-pipeline.");
+    lines.push("  4. Update this review playground (specs/003-ingestion-pipeline/reviews/phase-22-us3.html) to record the input state that produced this prompt: set its RECORDED_REVIEW (reviewer name, general comment, disposition, date) plus each item's satisfied checkbox + peer comment and any add/delete/edit of DoD items, so reloading the file reproduces this review.");
+    lines.push("  5. Commit + push the tasks.md / spec.md / review-playground changes on 003-ingestion-pipeline.");
+    lines.push("  6. Merge 003-ingestion-pipeline into master and confirm the FULL test suite passes (the master -> production CICD cadence). Official DONE = merged to master + full suite green.");
+    lines.push("  7. ONLY after the work is on master with the full suite green: transition OCS-99 from In Progress to Done in JIRA (manual flip). Until then OCS-99 stays In Progress — review approval alone does not Done it.");
   } else {
     lines.push("Actions to take:");
     lines.push("  1. Address the unsatisfied items above before re-review. OCS-99 stays In Progress.");
-    lines.push("  2. If peer added new DoD items, amend specs/003-ingestion-pipeline/spec.md or tasks.md to capture them.");
+    lines.push("  2. If the review added new DoD items, amend specs/003-ingestion-pipeline/spec.md or tasks.md to capture them.");
     lines.push("  3. Schedule a second pass once the unsatisfied items are closed.");
-    lines.push("  4. Commit + push any tasks.md / spec.md changes on 003-ingestion-pipeline.");
+    lines.push("  4. Update this review playground (specs/003-ingestion-pipeline/reviews/phase-22-us3.html) to record the input state that produced this prompt: set its RECORDED_REVIEW (reviewer name, general comment, disposition, date) plus each item's satisfied checkbox + peer comment and any add/delete/edit of DoD items, so reloading the file reproduces this review.");
+    lines.push("  5. Commit + push any tasks.md / spec.md / review-playground changes on 003-ingestion-pipeline.");
   }
   document.getElementById("prompt").textContent = lines.join("\n");
 }
 
 // ---------- Event wiring ----------
 function rerender() { renderRows(); updatePrompt(); }
+
+// Reflect the story-level state (reviewer name, general comment, disposition)
+// in the DOM controls. The table rows already render from state in renderRows;
+// these three controls are static HTML, so they need an explicit sync on load
+// for the recorded review to be visible (not just present in the prompt).
+function syncControls() {
+  document.getElementById("reviewer-name").value = state.reviewerName;
+  document.getElementById("reviewer-comment").value = state.reviewerComment;
+  const radio = document.querySelector(`input[name="status"][value="${state.status}"]`);
+  if (radio) radio.checked = true;
+}
 
 document.getElementById("rows").addEventListener("input", e => {
   const t = e.target;
@@ -399,6 +443,7 @@ document.getElementById("reset-btn").addEventListener("click", () => {
 });
 
 // ---------- Render-on-load ----------
+syncControls();
 rerender();
 </script>
 </body>
