@@ -10,6 +10,7 @@ import WorldMap from './components/MapView';
 import TripFeed from './components/Sidebar';
 import RegionSidebar from './components/RegionSidebar';
 import StopModal from './components/StopDetail';
+import LandingModal from './components/LandingModal';
 
 export type ViewMode = 'trip' | 'region';
 
@@ -34,6 +35,9 @@ function App() {
   const [openStopId, setOpenStopId] = useState<string | null>(null);
   const [modalStopList, setModalStopList] = useState<string[]>([]);
   const [tripSelectorOpen, setTripSelectorOpen] = useState(false);
+  const [showLandingModal, setShowLandingModal] = useState(
+    !localStorage.getItem('travelogue:landing-dismissed'),
+  );
 
   // Resolve the active trip from the URL hash once the trips list loads.
   useEffect(() => {
@@ -71,6 +75,13 @@ function App() {
 
   const handleSelectRegion = (regionCode: string) => {
     setActiveRegionCode(regionCode);
+  };
+
+  // FR-051: primary cluster-click behavior (fitBounds) is handled inside CountryClusterer.
+  // This handler exists for future App-level responses (e.g. highlighting clustered regions).
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleClusterClick = (_regionCodes: string[]) => {
+    // no-op: zoom-to-separate is handled imperatively by CountryClusterer
   };
 
   const handleOpenStop = (stopId: string, contextStopIds: string[]) => {
@@ -198,6 +209,7 @@ function App() {
                 openStopId={openStopId}
                 onSelectRegion={handleExpandRegion}
                 onOpenStop={handleOpenStop}
+                onClusterClick={handleClusterClick}
               />
             </ErrorBoundary>
           </div>
@@ -234,6 +246,15 @@ function App() {
               onNav={handleModalNav}
             />
           </ErrorBoundary>
+        )}
+
+        {showLandingModal && (
+          <LandingModal
+            onDismiss={() => {
+              localStorage.setItem('travelogue:landing-dismissed', '1');
+              setShowLandingModal(false);
+            }}
+          />
         )}
       </div>
     </APIProvider>

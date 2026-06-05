@@ -1,11 +1,137 @@
-import { useEffect, useMemo } from 'react';
-import { Map, AdvancedMarker, Pin, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
+import { useEffect, useMemo, useRef } from 'react';
+import { MarkerClusterer } from '@googlemaps/markerclusterer';
+import { Map, AdvancedMarker, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
+import isoCountries from 'i18n-iso-countries';
+import enLocale from 'i18n-iso-countries/langs/en.json';
 import type { RegionGroup } from '../utils/regionUtils';
 import { getActiveRegion, getRoutedGroups, isSegmentSolid } from '../utils/regionUtils';
 import type { ViewMode } from '../App';
 import type { Stop } from '../data/types';
 
+isoCountries.registerLocale(enLocale);
+
 const MAP_ID = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID as string | undefined;
+
+// --- Flag pin marker (FR-046, trip overview) ---
+
+// Aliases for names the backend uses that don't match i18n-iso-countries' English names.
+const COUNTRY_ALIASES: Record<string, string> = {
+  'Micronesia': 'FM', // package name is "Micronesia, Federated States of"
+};
+
+function getCountryIso2(country: string): string | undefined {
+  return COUNTRY_ALIASES[country] ?? isoCountries.getAlpha2Code(country, 'en') ?? undefined;
+}
+
+// Imperative DOM version of FlagPin, used as AdvancedMarkerElement content inside
+// MarkerClusterer (which requires native DOM nodes, not React elements).
+function createFlagPinElement(
+  country: string,
+  isActive: boolean,
+  isAbandoned: boolean,
+): HTMLElement {
+  const iso2 = getCountryIso2(country)?.toLowerCase();
+  const scale = isActive ? 1.3 : isAbandoned ? 0.85 : 1.0;
+
+  const el = document.createElement('div');
+  el.style.cssText = [
+    'display:flex',
+    'flex-direction:column',
+    'align-items:center',
+    'cursor:pointer',
+    `opacity:${isAbandoned ? '0.45' : '1'}`,
+    `transform:scale(${scale}) rotate(-5deg)`,
+    'transform-origin:50% 100%',
+    ...(isActive ? ['filter:drop-shadow(0 0 4px rgba(249,115,22,0.8))'] : []),
+  ].join(';');
+
+  if (iso2) {
+    const img = document.createElement('img');
+    img.src = `https://flagcdn.com/w20/${iso2}.png`;
+    img.alt = country;
+    img.style.cssText =
+      'display:block;width:22px;height:14px;object-fit:cover;border:0.5px solid rgba(0,0,0,0.2);border-radius:1px;transform:translate(9px)';
+    el.appendChild(img);
+  } else {
+    const placeholder = document.createElement('div');
+    placeholder.style.cssText = 'width:22px;height:14px;background-color:#9aa0a6;border-radius:1px';
+    el.appendChild(placeholder);
+  }
+
+  const staff = document.createElement('div');
+  staff.style.cssText = [
+    'width:2px',
+    'height:10px',
+    `background-color:${isAbandoned ? '#94a3b8' : isActive ? '#ea580c' : '#374151'}`,
+    'border-radius:0 0 1px 1px',
+  ].join(';');
+  el.appendChild(staff);
+
+  return el;
+}
+
+/**
+ * Flag pin for trip-overview region markers (FR-046).
+ * Uses flagcdn.com to serve actual flag images — works on all platforms
+ * including Windows where flag emoji renders as text codes.
+ * The flex column centres the staff under the flag image so AdvancedMarker's
+ * bottom-centre anchor falls at the staff base (the map pin point).
+ * Abandoned regions appear faded; the active region scales up with a glow.
+ */
+function FlagPin({
+  country,
+  isActive,
+  isAbandoned,
+}: {
+  country: string;
+  isActive: boolean;
+  isAbandoned: boolean;
+}) {
+  const iso2 = COUNTRY_ALIASES[country] ?? isoCountries.getAlpha2Code(country, 'en') ?? undefined;
+  const scale = isActive ? 1.3 : isAbandoned ? 0.85 : 1.0;
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        cursor: 'pointer',
+        opacity: isAbandoned ? 0.45 : 1,
+        transform: `scale(${scale}) rotate(-5deg)`,
+        transformOrigin: '50% 100%',
+        ...(isActive ? { filter: 'drop-shadow(0 0 4px rgba(249,115,22,0.8))' } : {}),
+      }}
+    >
+      {iso2 ? (
+        <img
+          src={`https://flagcdn.com/w20/${iso2.toLowerCase()}.png`}
+          alt={country}
+          style={{
+            display: 'block',
+            width: '22px',
+            height: '14px',
+            objectFit: 'cover',
+            border: '0.5px solid rgba(0,0,0,0.2)',
+            borderRadius: '1px',
+            transform: 'translate(9px)',
+          }}
+        />
+      ) : (
+        <div style={{ width: '22px', height: '14px', backgroundColor: '#9aa0a6', borderRadius: '1px' }} />
+      )}
+      {/* Staff — centred by the flex container */}
+      <div
+        style={{
+          width: '2px',
+          height: '10px',
+          backgroundColor: isAbandoned ? '#94a3b8' : isActive ? '#ea580c' : '#374151',
+          borderRadius: '0 0 1px 1px',
+        }}
+      />
+    </div>
+  );
+}
 
 interface WorldMapProps {
   regionGroups: RegionGroup[];
@@ -14,6 +140,7 @@ interface WorldMapProps {
   openStopId: string | null;
   onSelectRegion: (regionCode: string) => void;
   onOpenStop: (stopId: string, contextStopIds: string[]) => void;
+  onClusterClick: (regionCodes: string[]) => void;
 }
 
 // Renders a geodesic polyline. Solid or dashed, using the imperative Maps API.
@@ -30,6 +157,11 @@ function MapPolyline({
 }) {
   const map = useMap();
   const mapsLib = useMapsLibrary('maps');
+  const arrow = {
+    path: 'M 0,0 1,3 -1,3 0,0 z', // 0,0 is the tip of the arrow
+    fillOpacity: 1.0,
+    strokeWeight: 1,
+  };
 
   useEffect(() => {
     if (!map || !mapsLib) return;
@@ -38,6 +170,12 @@ function MapPolyline({
       map,
       path,
       geodesic: true,
+      icons: [
+        {
+          icon: arrow,
+          offset: "100%",
+        },
+      ],
       ...(solid
         ? { strokeColor, strokeOpacity: 1.0, strokeWeight }
         : {
@@ -95,26 +233,96 @@ function FitBounds({
   return null;
 }
 
+// FR-050: CartoDB Voyager tile layer; warm illustrated style.
+// noLabels suppresses all country/city labels — use this at global zoom.
+function CartoBDVoyagerTiles({ noLabels = false }: { noLabels?: boolean }) {
+  const map = useMap();
+  const mapsLib = useMapsLibrary('maps');
+
+  useEffect(() => {
+    if (!map || !mapsLib) return;
+
+    const subdomains = ['a', 'b', 'c', 'd'] as const;
+    const style = noLabels ? 'voyager_nolabels' : 'voyager';
+    const tileLayer = new google.maps.ImageMapType({
+      getTileUrl: (coord: google.maps.Point, zoom: number): string => {
+        const s = subdomains[Math.abs(coord.x + coord.y) % subdomains.length];
+        const r = window.devicePixelRatio >= 2 ? '@2x' : '';
+        return `https://${s}.basemaps.cartocdn.com/rastertiles/${style}/${zoom}/${coord.x}/${coord.y}${r}.png`;
+      },
+      tileSize: new google.maps.Size(256, 256),
+      name: 'CartoDB Voyager',
+      maxZoom: 20,
+    });
+
+    const typeId = noLabels ? 'cartoDBVoyagerNoLabels' : 'cartoDBVoyager';
+    map.mapTypes.set(typeId, tileLayer);
+    map.setMapTypeId(typeId);
+
+    return () => {
+      map.setMapTypeId('roadmap');
+    };
+  }, [map, mapsLib, noLabels]);
+
+  return null;
+}
+
 function getStopImages(stop: Stop): string[] {
   if (stop.post.type === 'instagram' && stop.post.image) return [stop.post.image];
   return [];
 }
 
-// Custom map marker for region view: photo thumbnail with pointer tip.
-// Falls back to a Pin when no image is available.
+// Pushpin marker for region drill-down stops (FR-046).
+// Circle head + triangular needle; colour-coded by status; scales + glows when open.
+// Structured as a flex column so AdvancedMarker's bottom-centre anchor falls at
+// the needle tip (the map pin point).
+function PushPin({ isOpen, isVisited }: { isOpen: boolean; isVisited: boolean }) {
+  const headColor = isOpen ? '#f97316' : isVisited ? '#ea4335' : '#9aa0a6';
+  const borderColor = isOpen ? '#c2410c' : isVisited ? '#c5221f' : '#6b7280';
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        transform: isOpen ? 'scale(1.25)' : undefined,
+        transformOrigin: '50% 100%',
+        filter: isOpen
+          ? 'drop-shadow(0 0 4px rgba(249,115,22,0.7))'
+          : 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))',
+      }}
+    >
+      <div
+        style={{
+          width: '16px',
+          height: '16px',
+          borderRadius: '50%',
+          backgroundColor: headColor,
+          border: `2.5px solid ${borderColor}`,
+        }}
+      />
+      <div
+        style={{
+          width: 0,
+          height: 0,
+          borderLeft: '5px solid transparent',
+          borderRight: '5px solid transparent',
+          borderTop: `7px solid ${headColor}`,
+          marginTop: '-1px',
+        }}
+      />
+    </div>
+  );
+}
+
+// Custom map marker for region view: photo thumbnail with pointer tip (FR-046).
+// Falls back to a pushpin when no image is available.
 function StopMarker({ stop, isOpen }: { stop: Stop; isOpen: boolean }) {
   const images = getStopImages(stop);
   const isVisited = stop.status === 'visited';
 
   if (images.length === 0) {
-    return (
-      <Pin
-        background={isOpen ? '#f97316' : isVisited ? '#ea4335' : '#9aa0a6'}
-        borderColor={isOpen ? '#ea580c' : isVisited ? '#c5221f' : '#6b7280'}
-        glyphColor="#ffffff"
-        scale={isOpen ? 1.1 : 0.8}
-      />
-    );
+    return <PushPin isOpen={isOpen} isVisited={isVisited} />;
   }
 
   const extra = images.length - 1;
@@ -139,6 +347,7 @@ function WorldMap({
   openStopId,
   onSelectRegion,
   onOpenStop,
+  onClusterClick,
 }: WorldMapProps) {
   const activeRegion = getActiveRegion(regionGroups);
   const activeGroup = regionGroups.find((g) => g.region.code === activeRegionCode) ?? null;
@@ -154,8 +363,84 @@ function WorldMap({
       regionGroups={regionGroups}
       activeRegion={activeRegion}
       onSelectRegion={onSelectRegion}
+      onClusterClick={onClusterClick}
     />
   );
+}
+
+// One MarkerClusterer instance per qualifying country (FR-051).
+// Markers from the same country cluster together when nearby; click zooms to separate them.
+// Uses useMapsLibrary('marker') so construction is typed through MarkerLibrary, not the ambient
+// google.maps.marker namespace (which causes TypeScript parser issues as generic type args).
+// Callbacks are held in refs so the effect only re-runs when groups or activeRegion changes,
+// not every time the parent re-renders with a new function reference.
+function CountryClusterer({
+  groups,
+  activeRegion,
+  onSelectRegion,
+  onClusterClick,
+}: {
+  groups: RegionGroup[];
+  activeRegion: RegionGroup | null;
+  onSelectRegion: (code: string) => void;
+  onClusterClick: (regionCodes: string[]) => void;
+}) {
+  const map = useMap();
+  const markerLib = useMapsLibrary('marker');
+  const onSelectRef = useRef(onSelectRegion);
+  const onClusterRef = useRef(onClusterClick);
+  onSelectRef.current = onSelectRegion;
+  onClusterRef.current = onClusterClick;
+
+  useEffect(() => {
+    if (!map || !markerLib) return;
+
+    // WeakMap avoids naming conflict with the imported React Map component.
+    const markerToCode = new WeakMap<object, string>();
+    const markerEls = groups.map((group) => {
+      const isActive = activeRegion?.region.code === group.region.code;
+      const isAbandoned = group.overallStatus === 'abandoned';
+      const marker = new markerLib.AdvancedMarkerElement({
+        position: group.region.coords,
+        title: `${group.region.name}, ${group.region.country}${isAbandoned ? ' (abandoned)' : ''}`,
+        content: createFlagPinElement(group.region.country, isActive, isAbandoned),
+        gmpClickable: true,
+      });
+      marker.addEventListener('gmp-click', () => onSelectRef.current(group.region.code));
+      markerToCode.set(marker, group.region.code);
+      return marker;
+    });
+
+    const country = groups[0].region.country;
+    const clusterer = new MarkerClusterer({
+      map,
+      markers: markerEls,
+      renderer: {
+        render({ position }) {
+          return new markerLib.AdvancedMarkerElement({
+            position,
+            content: createFlagPinElement(country, false, false),
+            gmpClickable: true,
+          });
+        },
+      },
+      onClusterClick: (_event, cluster) => {
+        if (cluster.bounds) map.fitBounds(cluster.bounds);
+        const codes = (cluster.markers ?? [])
+          .map((m) => markerToCode.get(m as object))
+          .filter((c): c is string => !!c);
+        if (codes.length) onClusterRef.current(codes);
+      },
+    });
+
+    return () => {
+      markerEls.forEach((m) => { m.map = null; });
+      clusterer.setMap(null);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, markerLib, groups, activeRegion]);
+
+  return null;
 }
 
 // Trip overview: world map with region markers and route line.
@@ -163,10 +448,12 @@ function TripMap({
   regionGroups,
   activeRegion,
   onSelectRegion,
+  onClusterClick,
 }: {
   regionGroups: RegionGroup[];
   activeRegion: RegionGroup | null;
   onSelectRegion: (code: string) => void;
+  onClusterClick: (regionCodes: string[]) => void;
 }) {
   const regionCoords = useMemo(
     () => regionGroups.map((g) => g.region.coords),
@@ -176,6 +463,32 @@ function TripMap({
   // non-abandoned regions on either side directly to each other.
   const routedGroups = useMemo(() => getRoutedGroups(regionGroups), [regionGroups]);
 
+  // FR-051: split markers into individually-rendered (US/CA/CN + single-region countries)
+  // and clustered groups (countries with 2+ regions, excluding US/CA/CN).
+  const { indivGroups, countryGroups } = useMemo(() => {
+    const byCountry = new globalThis.Map<string, RegionGroup[]>();
+    const excluded: RegionGroup[] = [];
+
+    regionGroups.forEach((group) => {
+      const iso = getCountryIso2(group.region.country);
+      if (!iso) {
+        excluded.push(group);
+        return;
+      }
+      const existing = byCountry.get(iso) ?? [];
+      byCountry.set(iso, [...existing, group]);
+    });
+
+    const indiv = [...excluded];
+    const multi: RegionGroup[][] = [];
+    byCountry.forEach((groups) => {
+      if (groups.length === 1) indiv.push(groups[0]);
+      else multi.push(groups);
+    });
+
+    return { indivGroups: indiv, countryGroups: multi };
+  }, [regionGroups]);
+
   return (
     <div className="map-canvas map-canvas-trip" aria-label="World trip overview map">
       <Map
@@ -184,31 +497,31 @@ function TripMap({
         defaultZoom={2}
         gestureHandling="greedy"
         zoomControl={true}
+        restriction={{ latLngBounds: { north: 85, south: -85, west: -180, east: 180 }, strictBounds: true }}
         style={{ width: '100%', height: '100%' }}
       >
+        <CartoBDVoyagerTiles noLabels />
         <FitBounds coords={regionCoords} padding={80} />
 
         {routedGroups.slice(0, -1).map((from, i) => {
           const to = routedGroups[i + 1];
           const solid = isSegmentSolid(from, to);
+          const color = solid ? '#1a73e8' : '#70757a';
           return (
             <MapPolyline
               key={`${from.region.code}-${to.region.code}`}
               path={[from.region.coords, to.region.coords]}
               solid={solid}
-              strokeColor={solid ? '#1a73e8' : '#70757a'}
-            strokeWeight={solid ? 3.5 : 2}
+              strokeColor={color}
+              strokeWeight={solid ? 3 : 2}
             />
           );
         })}
 
-        {regionGroups.map((group) => {
+        {/* Individual React markers: countries with only 1 region */}
+        {indivGroups.map((group) => {
           const isActive = activeRegion?.region.code === group.region.code;
           const isAbandoned = group.overallStatus === 'abandoned';
-          const isVisited = group.overallStatus === 'visited' || group.overallStatus === 'mixed';
-          // Abandoned regions render as a faded grey pin; visited as red; planned as default grey.
-          const background = isAbandoned ? '#cbd5e1' : isVisited ? '#ea4335' : '#9aa0a6';
-          const borderColor = isAbandoned ? '#94a3b8' : isVisited ? '#c5221f' : '#6b7280';
           return (
             <AdvancedMarker
               key={group.region.code}
@@ -216,15 +529,25 @@ function TripMap({
               title={`${group.region.name}, ${group.region.country}${isAbandoned ? ' (abandoned)' : ''}`}
               onClick={() => onSelectRegion(group.region.code)}
             >
-              <Pin
-                background={background}
-                borderColor={borderColor}
-                glyphColor="#ffffff"
-                scale={isActive ? 1.3 : isAbandoned ? 0.85 : 1.0}
+              <FlagPin
+                country={group.region.country}
+                isActive={isActive}
+                isAbandoned={isAbandoned}
               />
             </AdvancedMarker>
           );
         })}
+
+        {/* Imperative clusterers: one per qualifying country with 2+ regions */}
+        {countryGroups.map((groups) => (
+          <CountryClusterer
+            key={`cluster-${groups[0].region.country}`}
+            groups={groups}
+            activeRegion={activeRegion}
+            onSelectRegion={onSelectRegion}
+            onClusterClick={onClusterClick}
+          />
+        ))}
       </Map>
     </div>
   );
@@ -253,14 +576,8 @@ function RegionMap({
         zoomControl={true}
         style={{ width: '100%', height: '100%' }}
       >
+        <CartoBDVoyagerTiles />
         <FitBounds coords={stopCoords} padding={60} />
-
-        <MapPolyline
-          path={stopCoords}
-          solid={false}
-          strokeColor="#1a73e8"
-          strokeWeight={2.5}
-        />
 
         {group.stops.map((stop) => {
           const isOpen = stop.id === openStopId;
