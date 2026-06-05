@@ -1,8 +1,9 @@
 """Portability guardrail for the pile-app/ directory — SC-010 / FR-110.
 
 Exercises the "movable to a fresh repo" claim: copy pile-app/ to a temp
-directory, create an isolated venv inside that copy, `pip install -e .`,
-and run the unit suite. If it passes there, the App is portable.
+directory, create an isolated venv inside that copy, `pip install -e .[dev]`
+(the dev extra carries pytest so the inner suite can run), and run the unit
+suite. If it passes there, the App is portable.
 
 Gated behind an env var because a clean run is ~3-5 minutes (venv build
 + pip install + full unit pass) and the IO is heavy enough that we don't
@@ -62,8 +63,10 @@ def test_pile_app_is_portable(tmp_path: Path) -> None:
     assert py.exists(), f"venv python not at expected path {py}"
 
     # Install the package in editable mode against the COPY, not the original.
+    # The [dev] extra pulls in pytest so the inner suite below can actually run
+    # in the fresh venv — `pip install -e .` alone gives only runtime deps.
     subprocess.run(
-        [str(py), "-m", "pip", "install", "-e", str(dest), "--quiet"],
+        [str(py), "-m", "pip", "install", "-e", f"{dest}[dev]", "--quiet"],
         check=True,
     )
 
