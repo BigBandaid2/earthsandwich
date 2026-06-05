@@ -40,7 +40,7 @@ function createFlagPinElement(
     'align-items:center',
     'cursor:pointer',
     `opacity:${isAbandoned ? '0.45' : '1'}`,
-    `transform:scale(${scale})`,
+    `transform:scale(${scale}) rotate(-5deg)`,
     'transform-origin:50% 100%',
     ...(isActive ? ['filter:drop-shadow(0 0 4px rgba(249,115,22,0.8))'] : []),
   ].join(';');
@@ -50,7 +50,7 @@ function createFlagPinElement(
     img.src = `https://flagcdn.com/w20/${iso2}.png`;
     img.alt = country;
     img.style.cssText =
-      'display:block;width:22px;height:14px;object-fit:cover;border:0.5px solid rgba(0,0,0,0.2);border-radius:1px';
+      'display:block;width:22px;height:14px;object-fit:cover;border:0.5px solid rgba(0,0,0,0.2);border-radius:1px;transform:translate(9px)';
     el.appendChild(img);
   } else {
     const placeholder = document.createElement('div');
@@ -98,7 +98,7 @@ function FlagPin({
         alignItems: 'center',
         cursor: 'pointer',
         opacity: isAbandoned ? 0.45 : 1,
-        transform: `scale(${scale})`,
+        transform: `scale(${scale}) rotate(-5deg)`,
         transformOrigin: '50% 100%',
         ...(isActive ? { filter: 'drop-shadow(0 0 4px rgba(249,115,22,0.8))' } : {}),
       }}
@@ -114,6 +114,7 @@ function FlagPin({
             objectFit: 'cover',
             border: '0.5px solid rgba(0,0,0,0.2)',
             borderRadius: '1px',
+            transform: 'translate(9px)',
           }}
         />
       ) : (
