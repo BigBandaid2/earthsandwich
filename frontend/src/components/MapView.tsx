@@ -311,6 +311,40 @@ function FitBounds({
   return null;
 }
 
+// FR-050: CartoDB Voyager tile layer; warm illustrated style.
+// noLabels suppresses all country/city labels — use this at global zoom.
+function CartoBDVoyagerTiles({ noLabels = false }: { noLabels?: boolean }) {
+  const map = useMap();
+  const mapsLib = useMapsLibrary('maps');
+
+  useEffect(() => {
+    if (!map || !mapsLib) return;
+
+    const subdomains = ['a', 'b', 'c', 'd'] as const;
+    const style = noLabels ? 'voyager_nolabels' : 'voyager';
+    const tileLayer = new google.maps.ImageMapType({
+      getTileUrl: (coord: google.maps.Point, zoom: number): string => {
+        const s = subdomains[Math.abs(coord.x + coord.y) % subdomains.length];
+        const r = window.devicePixelRatio >= 2 ? '@2x' : '';
+        return `https://${s}.basemaps.cartocdn.com/rastertiles/${style}/${zoom}/${coord.x}/${coord.y}${r}.png`;
+      },
+      tileSize: new google.maps.Size(256, 256),
+      name: 'CartoDB Voyager',
+      maxZoom: 20,
+    });
+
+    const typeId = noLabels ? 'cartoDBVoyagerNoLabels' : 'cartoDBVoyager';
+    map.mapTypes.set(typeId, tileLayer);
+    map.setMapTypeId(typeId);
+
+    return () => {
+      map.setMapTypeId('roadmap');
+    };
+  }, [map, mapsLib, noLabels]);
+
+  return null;
+}
+
 function getStopImages(stop: Stop): string[] {
   if (stop.post.type === 'instagram' && stop.post.image) return [stop.post.image];
   return [];
@@ -543,6 +577,7 @@ function TripMap({
         zoomControl={true}
         style={{ width: '100%', height: '100%' }}
       >
+        <CartoBDVoyagerTiles noLabels />
         <FitBounds coords={regionCoords} padding={80} />
 
         {routedGroups.slice(0, -1).map((from, i) => {
@@ -630,6 +665,7 @@ function RegionMap({
         zoomControl={true}
         style={{ width: '100%', height: '100%' }}
       >
+        <CartoBDVoyagerTiles />
         <FitBounds coords={stopCoords} padding={60} />
 
         <MapPolyline
