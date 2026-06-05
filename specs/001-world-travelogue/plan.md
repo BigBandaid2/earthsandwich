@@ -133,7 +133,7 @@ The frontend is substantially built. The following is already implemented and sh
 11. **`MapView.tsx` anti-meridian wrap prevention (FR-048)**: configure the mapping API to restrict to a single world copy at the global zoom level
 12. **`MapView.tsx` directional arrowheads (FR-049)**: render SVG arrowhead overlays near the destination end of every route segment (trip view and region view)
 13. **`MapView.tsx` postcard tile style (FR-050)**: select a tile provider / style that suppresses country name labels and road/terrain detail at global zoom
-14. **`MapView.tsx` country clustering (FR-051)**: cluster region markers via `@googlemaps/markerclusterer`; exclude US, CA, CN from clustering; click cluster to zoom until pins separate
+14. **`MapView.tsx` country clustering (FR-051)**: cluster region markers via `@googlemaps/markerclusterer`; click cluster to zoom until pins separate
 
 ### MVP scope
 

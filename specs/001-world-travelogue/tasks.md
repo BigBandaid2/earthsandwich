@@ -443,7 +443,7 @@ With multiple developers:
 
 **Purpose**: Apply postcard-inspired tile style and restrict the map to a single world copy at global zoom. These changes are prerequisites for the pin and clustering work in Phase 27.
 
-- [ ] T123 [P] [US-Polish] Add `@googlemaps/markerclusterer` to `frontend/package.json` dependencies (prerequisite for country clustering in Phase 27, FR-051)
+- [x] T123 [P] [US-Polish] Add `@googlemaps/markerclusterer` to `frontend/package.json` dependencies (prerequisite for country clustering in Phase 27, FR-051)
 - [ ] T124 [US-Polish] Apply postcard-inspired tile style in trip view in `frontend/src/components/MapView.tsx` (FR-050, SC-014): configure tile provider / Cloud-based map style to suppress country labels and road/terrain detail at global zoom; revert to full-detail style in region view
 - [ ] T125 [US-Polish] Configure Google Maps `restriction: { latLngBounds: { north: 85, south: -85, west: -180, east: 180 }, strictBounds: true }` on trip view map instance in `frontend/src/components/MapView.tsx` (FR-048, SC-015); lift restriction in region view
 
@@ -471,8 +471,8 @@ With multiple developers:
 
 - [/] T127 [P] [US-Polish] Implement flag pin `<AdvancedMarker>` style for region markers at trip overview level in `frontend/src/components/MapView.tsx` (FR-046): visually highlight the active region's pin with an accent color
 - [x] T128 [P] [US-Polish] Implement pushpin `<AdvancedMarker>` style for stop markers at region drill-down level in `frontend/src/components/MapView.tsx` (FR-046)
-- [ ] T129 [US-Polish] Add country clustering via `@googlemaps/markerclusterer` in `frontend/src/components/MapView.tsx` (FR-051, SC-017): route US/CA/CN region markers outside the clusterer so they always render individually; clicking a cluster calls `map.fitBounds(cluster.bounds)` to zoom until pins separate; add `onClusterClick: (regionCodes: string[]) => void` prop to `WorldMapProps`
-- [ ] T130 [US-Polish] Wire `onClusterClick` handler in `frontend/src/App.tsx` (FR-051)
+- [x] T129 [US-Polish] Add country clustering via `@googlemaps/markerclusterer` in `frontend/src/components/MapView.tsx` (FR-051, SC-017); clicking a cluster calls `map.fitBounds(cluster.bounds)` to zoom until pins separate; add `onClusterClick: (regionCodes: string[]) => void` prop to `WorldMapProps`
+- [x] T130 [US-Polish] Wire `onClusterClick` handler in `frontend/src/App.tsx` (FR-051)
 - [ ] T131 [US-Polish] Manual test: verify SC-014 (no country labels at global zoom), SC-015 (no tile wrap for Earth Sandwich 2015 route), SC-016 (arrowhead on every segment in trip and region views), SC-017 (qualifying-country clusters appear; US/CA/CN pins always render individually; clicking cluster zooms to separate pins)
 
 **Checkpoint**: All four map-level acceptance scenarios (SC-014–SC-017) pass manual review

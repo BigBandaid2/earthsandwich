@@ -73,6 +73,13 @@ function App() {
     setActiveRegionCode(regionCode);
   };
 
+  // FR-051: primary cluster-click behavior (fitBounds) is handled inside CountryClusterer.
+  // This handler exists for future App-level responses (e.g. highlighting clustered regions).
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleClusterClick = (_regionCodes: string[]) => {
+    // no-op: zoom-to-separate is handled imperatively by CountryClusterer
+  };
+
   const handleOpenStop = (stopId: string, contextStopIds: string[]) => {
     setOpenStopId(stopId);
     setModalStopList(contextStopIds);
@@ -198,6 +205,7 @@ function App() {
                 openStopId={openStopId}
                 onSelectRegion={handleExpandRegion}
                 onOpenStop={handleOpenStop}
+                onClusterClick={handleClusterClick}
               />
             </ErrorBoundary>
           </div>

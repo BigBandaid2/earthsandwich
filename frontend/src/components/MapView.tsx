@@ -1,4 +1,5 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
+import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { Map, AdvancedMarker, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
 import isoCountries from 'i18n-iso-countries';
 import enLocale from 'i18n-iso-countries/langs/en.json';
@@ -108,6 +109,57 @@ const COUNTRY_ALIASES: Record<string, string> = {
   'Micronesia': 'FM', // package name is "Micronesia, Federated States of"
 };
 
+function getCountryIso2(country: string): string | undefined {
+  return COUNTRY_ALIASES[country] ?? isoCountries.getAlpha2Code(country, 'en') ?? undefined;
+}
+
+// Imperative DOM version of FlagPin, used as AdvancedMarkerElement content inside
+// MarkerClusterer (which requires native DOM nodes, not React elements).
+function createFlagPinElement(
+  country: string,
+  isActive: boolean,
+  isAbandoned: boolean,
+): HTMLElement {
+  const iso2 = getCountryIso2(country)?.toLowerCase();
+  const scale = isActive ? 1.3 : isAbandoned ? 0.85 : 1.0;
+
+  const el = document.createElement('div');
+  el.style.cssText = [
+    'display:flex',
+    'flex-direction:column',
+    'align-items:center',
+    'cursor:pointer',
+    `opacity:${isAbandoned ? '0.45' : '1'}`,
+    `transform:scale(${scale})`,
+    'transform-origin:50% 100%',
+    ...(isActive ? ['filter:drop-shadow(0 0 4px rgba(249,115,22,0.8))'] : []),
+  ].join(';');
+
+  if (iso2) {
+    const img = document.createElement('img');
+    img.src = `https://flagcdn.com/w20/${iso2}.png`;
+    img.alt = country;
+    img.style.cssText =
+      'display:block;width:22px;height:14px;object-fit:cover;border:0.5px solid rgba(0,0,0,0.2);border-radius:1px';
+    el.appendChild(img);
+  } else {
+    const placeholder = document.createElement('div');
+    placeholder.style.cssText = 'width:22px;height:14px;background-color:#9aa0a6;border-radius:1px';
+    el.appendChild(placeholder);
+  }
+
+  const staff = document.createElement('div');
+  staff.style.cssText = [
+    'width:2px',
+    'height:10px',
+    `background-color:${isAbandoned ? '#94a3b8' : isActive ? '#ea580c' : '#374151'}`,
+    'border-radius:0 0 1px 1px',
+  ].join(';');
+  el.appendChild(staff);
+
+  return el;
+}
+
 /**
  * Flag pin for trip-overview region markers (FR-046).
  * Uses flagcdn.com to serve actual flag images — works on all platforms
@@ -177,6 +229,7 @@ interface WorldMapProps {
   openStopId: string | null;
   onSelectRegion: (regionCode: string) => void;
   onOpenStop: (stopId: string, contextStopIds: string[]) => void;
+  onClusterClick: (regionCodes: string[]) => void;
 }
 
 // Renders a geodesic polyline. Solid or dashed, using the imperative Maps API.
@@ -338,6 +391,7 @@ function WorldMap({
   openStopId,
   onSelectRegion,
   onOpenStop,
+  onClusterClick,
 }: WorldMapProps) {
   const activeRegion = getActiveRegion(regionGroups);
   const activeGroup = regionGroups.find((g) => g.region.code === activeRegionCode) ?? null;
@@ -353,8 +407,84 @@ function WorldMap({
       regionGroups={regionGroups}
       activeRegion={activeRegion}
       onSelectRegion={onSelectRegion}
+      onClusterClick={onClusterClick}
     />
   );
+}
+
+// One MarkerClusterer instance per qualifying country (FR-051).
+// Markers from the same country cluster together when nearby; click zooms to separate them.
+// Uses useMapsLibrary('marker') so construction is typed through MarkerLibrary, not the ambient
+// google.maps.marker namespace (which causes TypeScript parser issues as generic type args).
+// Callbacks are held in refs so the effect only re-runs when groups or activeRegion changes,
+// not every time the parent re-renders with a new function reference.
+function CountryClusterer({
+  groups,
+  activeRegion,
+  onSelectRegion,
+  onClusterClick,
+}: {
+  groups: RegionGroup[];
+  activeRegion: RegionGroup | null;
+  onSelectRegion: (code: string) => void;
+  onClusterClick: (regionCodes: string[]) => void;
+}) {
+  const map = useMap();
+  const markerLib = useMapsLibrary('marker');
+  const onSelectRef = useRef(onSelectRegion);
+  const onClusterRef = useRef(onClusterClick);
+  onSelectRef.current = onSelectRegion;
+  onClusterRef.current = onClusterClick;
+
+  useEffect(() => {
+    if (!map || !markerLib) return;
+
+    // WeakMap avoids naming conflict with the imported React Map component.
+    const markerToCode = new WeakMap<object, string>();
+    const markerEls = groups.map((group) => {
+      const isActive = activeRegion?.region.code === group.region.code;
+      const isAbandoned = group.overallStatus === 'abandoned';
+      const marker = new markerLib.AdvancedMarkerElement({
+        position: group.region.coords,
+        title: `${group.region.name}, ${group.region.country}${isAbandoned ? ' (abandoned)' : ''}`,
+        content: createFlagPinElement(group.region.country, isActive, isAbandoned),
+        gmpClickable: true,
+      });
+      marker.addEventListener('gmp-click', () => onSelectRef.current(group.region.code));
+      markerToCode.set(marker, group.region.code);
+      return marker;
+    });
+
+    const country = groups[0].region.country;
+    const clusterer = new MarkerClusterer({
+      map,
+      markers: markerEls,
+      renderer: {
+        render({ position }) {
+          return new markerLib.AdvancedMarkerElement({
+            position,
+            content: createFlagPinElement(country, false, false),
+            gmpClickable: true,
+          });
+        },
+      },
+      onClusterClick: (_event, cluster) => {
+        if (cluster.bounds) map.fitBounds(cluster.bounds);
+        const codes = (cluster.markers ?? [])
+          .map((m) => markerToCode.get(m as object))
+          .filter((c): c is string => !!c);
+        if (codes.length) onClusterRef.current(codes);
+      },
+    });
+
+    return () => {
+      markerEls.forEach((m) => { m.map = null; });
+      clusterer.setMap(null);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, markerLib, groups, activeRegion]);
+
+  return null;
 }
 
 // Trip overview: world map with region markers and route line.
@@ -362,10 +492,12 @@ function TripMap({
   regionGroups,
   activeRegion,
   onSelectRegion,
+  onClusterClick,
 }: {
   regionGroups: RegionGroup[];
   activeRegion: RegionGroup | null;
   onSelectRegion: (code: string) => void;
+  onClusterClick: (regionCodes: string[]) => void;
 }) {
   const regionCoords = useMemo(
     () => regionGroups.map((g) => g.region.coords),
@@ -374,6 +506,32 @@ function TripMap({
   // FR-030: route line skips fully-abandoned regions, connecting the
   // non-abandoned regions on either side directly to each other.
   const routedGroups = useMemo(() => getRoutedGroups(regionGroups), [regionGroups]);
+
+  // FR-051: split markers into individually-rendered (US/CA/CN + single-region countries)
+  // and clustered groups (countries with 2+ regions, excluding US/CA/CN).
+  const { indivGroups, countryGroups } = useMemo(() => {
+    const byCountry = new globalThis.Map<string, RegionGroup[]>();
+    const excluded: RegionGroup[] = [];
+
+    regionGroups.forEach((group) => {
+      const iso = getCountryIso2(group.region.country);
+      if (!iso) {
+        excluded.push(group);
+        return;
+      }
+      const existing = byCountry.get(iso) ?? [];
+      byCountry.set(iso, [...existing, group]);
+    });
+
+    const indiv = [...excluded];
+    const multi: RegionGroup[][] = [];
+    byCountry.forEach((groups) => {
+      if (groups.length === 1) indiv.push(groups[0]);
+      else multi.push(groups);
+    });
+
+    return { indivGroups: indiv, countryGroups: multi };
+  }, [regionGroups]);
 
   return (
     <div className="map-canvas map-canvas-trip" aria-label="World trip overview map">
@@ -414,13 +572,10 @@ function TripMap({
           );
         })}
 
-        {regionGroups.map((group) => {
+        {/* Individual React markers: countries with only 1 region */}
+        {indivGroups.map((group) => {
           const isActive = activeRegion?.region.code === group.region.code;
           const isAbandoned = group.overallStatus === 'abandoned';
-          // const isVisited = group.overallStatus === 'visited' || group.overallStatus === 'mixed';
-          // // Abandoned regions render as a faded grey pin; visited as red; planned as default grey.
-          // const background = isAbandoned ? '#cbd5e1' : isVisited ? '#ea4335' : '#9aa0a6';
-          // const borderColor = isAbandoned ? '#94a3b8' : isVisited ? '#c5221f' : '#6b7280';
           return (
             <AdvancedMarker
               key={group.region.code}
@@ -436,6 +591,17 @@ function TripMap({
             </AdvancedMarker>
           );
         })}
+
+        {/* Imperative clusterers: one per qualifying country with 2+ regions */}
+        {countryGroups.map((groups) => (
+          <CountryClusterer
+            key={`cluster-${groups[0].region.country}`}
+            groups={groups}
+            activeRegion={activeRegion}
+            onSelectRegion={onSelectRegion}
+            onClusterClick={onClusterClick}
+          />
+        ))}
       </Map>
     </div>
   );

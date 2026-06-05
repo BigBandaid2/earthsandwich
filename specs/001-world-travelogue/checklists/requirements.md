@@ -71,7 +71,7 @@ Spec updated 2026-06-04 (UI enhancement pass):
 - FR-048: Map wrap-around prevention for globe-spanning trips (antimeridian fix).
 - FR-049: Directional arrowheads on route-connecting lines.
 - FR-050: Postcard-inspired tile style for global view; no country text labels.
-- FR-051: Country-level pin clustering (excluding US, Canada, China).
+- FR-051: Country-level pin clustering.
 - FR-052: [DESIGN PENDING] Play Trip mode placeholder — no implementation until design is approved.
 - SC-013–SC-017 added for new requirements.
 - UI Design section updated to reference FR-046–FR-052 and add Landing Modal section.
