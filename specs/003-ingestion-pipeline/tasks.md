@@ -116,6 +116,10 @@
 
 **Checkpoint**: US3 complete — segregation verified inside-out (T233) and outside-in (T258), both directions explicit to readers (T234).
 
+**Carry-forward**: Acceptance Scenarios AS#1 (bridge-app reads the pile via file-level conventions, no service-internal names) and AS#2 (swapping a pipeline-service implementation is invisible to the bridge-app) are bridge-app-side properties — they can only be exercised by the consuming App, which does not yet exist. Carried forward to `specs/004-bridge-builder-toolkit/spec.md` FR-092 (editorial pickup, 2026-06-03) so the bridge-app spec that 004's bundle seeds inherits them where they can finally be tested. This is a one-time editorial inclusion, NOT a systemic cross-spec link — see the review record below.
+
+**Peer review (Definition of Done)**: Peer-reviewed by Ethan Shen on 2026-06-05: DONE. 9 / 9 DoD items marked satisfied ("all objectives satisfied"). Reviewer caveat: AS#3, SC-010, and Independent Test (b) were manually accepted on the strength of the portability test's in-copy suite pass (`tests/integration/test_portability.py` — 1 passed in 63 s, fresh-venv build + install + suite green); the live end-to-end Instagram scrape inside the fresh copy was NOT executed (it needs `.env` crawler credentials that are deliberately not carried across), so SC-010's "an Instagram scrape against a public target completes" clause is accepted-without-live-run. Review record: `specs/003-ingestion-pipeline/reviews/phase-22-us3.html`.
+
 ---
 
 ## Phase 23: User Story 4 — Scrape a Substack publication into the pile (Priority: P2)
