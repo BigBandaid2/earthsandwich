@@ -47,3 +47,6 @@ htmlcov/
 # whole team conforms to the same JIRA mappings.
 .specify/extensions/jira/jira-config.local.yml
 
+
+# SpecKit feature.json — per-dev pointer, never commit
+.specify/feature.json
