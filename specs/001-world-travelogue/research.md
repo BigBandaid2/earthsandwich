@@ -83,6 +83,119 @@ This makes retry logic testable in isolation and reusable across `useTrips`, `us
 
 ---
 
+## 4. Map Tile Provider & Postcard Style (FR-050)
+
+**Decision**: CartoDB Voyager (via the `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png` tile URL, or equivalent via the Google Maps Cloud-based map styling JSON if sticking with the Google Maps JavaScript API).
+
+**Rationale**: CartoDB Voyager has a warm, illustrated aesthetic with no country name labels at global zoom and suppressed road/terrain detail — matching FR-050's "postcard-inspired" style. It requires no API key of its own and is free for public, non-commercial use at the project's expected traffic volumes. If the site remains on the Google Maps JavaScript API, a custom Cloud-based map style (JSON) can approximate the same aesthetic while retaining the existing `@vis.gl/react-google-maps` integration.
+
+**Implementation**: Pass the chosen style configuration to the map component at the global zoom level only. At the region drill-down level, revert to the default full-detail style so roads, terrain, and waterways are visible (FR-050 applies only to the global level).
+
+**Alternatives considered**:
+- Stamen Watercolor: Highly artistic but now requires a Stadia Maps API key. Heavier visual style may obscure markers.
+- OpenStreetMap (default tiles): No postcard aesthetic; full road and label detail at all zooms.
+- Google Maps default: Shows country labels; not compliant with FR-050.
+
+---
+
+## 5. Anti-Meridian Wrap Prevention (FR-048)
+
+**Decision**: Restrict the Google Maps instance at the global trip overview level to a single world copy using `restriction: { latLngBounds: { north: 85, south: -85, west: -180, east: 180 }, strictBounds: true }` or the equivalent `minZoom` cap that prevents the user from zooming out to see adjacent world copies.
+
+**Rationale**: FR-048 requires that map tiles do not repeat into adjacent copies of the globe. The Google Maps JavaScript API supports `restriction` on the `Map` object which enforces a pan/zoom boundary. Setting `strictBounds: true` with world-spanning bounds prevents tile wrapping while still allowing free pan within those bounds. Polyline edge-jumping across the antimeridian is explicitly accepted by the spec (clarification Q3, 2026-06-04) — only tile repetition is prevented.
+
+**Implementation**: Apply restriction only in `viewMode: 'trip'`. In `viewMode: 'region'` remove the restriction so the user can pan freely within the zoomed region.
+
+**Alternatives considered**:
+- `worldCopyJump: false` (Leaflet API concept): Not directly applicable to the Google Maps JS API.
+- Coordinate normalization of polyline points: Would prevent edge-jumping but is explicitly out of scope per the clarification.
+
+---
+
+## 6. Directional Arrowheads on Route Segments (FR-049)
+
+**Decision**: Render arrowheads as SVG `AdvancedMarkerElement` overlays placed near the destination end of each polyline segment. Each arrowhead is an SVG triangle rotated to the bearing of its segment.
+
+**Rationale**: The Google Maps JavaScript API's `Polyline` does not natively support arrowheads. The `AdvancedMarkerElement` API (available in `@vis.gl/react-google-maps` via `<AdvancedMarker>`) allows custom HTML/SVG content to be placed at any latitude/longitude. Computing the segment bearing and placing a rotated SVG arrow near the destination point is a self-contained, testable approach with no additional library dependency.
+
+**Implementation**:
+- For each pair of adjacent non-abandoned endpoints, compute the geodesic bearing (lat/lng → degrees).
+- Place an `<AdvancedMarker>` at a point 10–15% of the segment distance from the destination end.
+- The marker content is a small SVG polygon (arrowhead) rotated via CSS `transform: rotate({bearing}deg)`.
+- Applies to both the trip view segments (between region markers) and the region view segments (between stop markers).
+
+**Alternatives considered**:
+- `google.maps.Symbol` with `FORWARD_OPEN_ARROW`: Available on `Polyline` via `icons`, but limited styling control and behavior in newer Maps API versions is inconsistent.
+- Canvas overlay: More complex, harder to test.
+
+---
+
+## 7. Country Clustering for Region Markers (FR-051)
+
+**Decision**: `@googlemaps/markerclusterer` with a custom renderer that groups only markers sharing the same country, excluding US, Canada, and China.
+
+**Rationale**: `@vis.gl/react-google-maps` supports `@googlemaps/markerclusterer` via the `useMarkerClusterer` hook pattern. This library is the standard Google Maps clustering solution and integrates directly with `AdvancedMarkerElement`. The exclusion logic (US, CA, CN) is implemented by pre-filtering: markers from those countries are added to the map individually outside the clusterer, while all others are added through the clusterer.
+
+**Algorithm**: Standard `GridAlgorithm` or `SuperClusterAlgorithm` (better geographic accuracy). Cluster count badge is rendered via the default or a custom renderer.
+
+**Click behavior**: Clicking a cluster calls `map.fitBounds(cluster.bounds)` which zooms the map until markers separate — matching the clarification (Q1, 2026-06-04): no spiderfy.
+
+**Countries excluded from clustering**: United States (`US`), Canada (`CA`), China (`CN`). Country codes are derived from the `country` field on each `Region` reference record.
+
+**Alternatives considered**:
+- Supercluster standalone: Lower-level, requires more wiring. `@googlemaps/markerclusterer` wraps it.
+- Custom distance-based grouping: Reinvents the wheel; harder to tune visually.
+
+---
+
+## 8. Play Trip Mode (FR-052)
+
+**Decision**: `useReducer`-managed playback state in `App.tsx`; interval driven by `useEffect` with `setInterval`; map focuses each region via `map.panTo` / `map.fitBounds`.
+
+**Rationale**: Play Trip is a UI state machine: playing → paused → stopped → playing. `useReducer` cleanly models the transitions without prop drilling or a separate context. The interval is created inside a `useEffect` that depends on `isPlaying` — when paused, the effect cleanup clears the interval. This is idiomatic React and straightforward to test by dispatching actions against the reducer.
+
+**State shape** (held in `App.tsx`):
+```ts
+type PlayTripState = {
+  isPlaying: boolean;
+  currentIndex: number;  // index into non-abandoned regions array
+};
+type PlayTripAction =
+  | { type: 'play' }
+  | { type: 'pause' }
+  | { type: 'advance' }
+  | { type: 'stop' };   // final region reached
+```
+
+**Playback interval**: 3 seconds per region (configurable constant). Advancing calls `dispatch({ type: 'advance' })`; when `currentIndex` reaches the last non-abandoned region, `dispatch({ type: 'stop' })` fires, returning to the ready-to-play state.
+
+**Sidebar sync**: `App.tsx` passes `playTripActiveRegionCode` down to `<TripFeed />`, which scrolls and highlights the matching tile.
+
+**Tests**: `PlayTripControl.test.tsx` verifies play/pause/stop transitions and that the region advances correctly using fake timers (`vi.useFakeTimers()`).
+
+**Alternatives considered**:
+- `useState`: Adequate for a boolean but becomes unwieldy for the index + playing combo; transitions harder to test atomically.
+- External animation library (GSAP, framer-motion): Overkill for a timed interval advance.
+
+---
+
+## 9. Landing Modal & Local Storage Persistence (FR-047)
+
+**Decision**: Check `localStorage.getItem('travelogue:landing-dismissed')` on mount; if absent, show the modal. On dismiss, write the key with a truthy value.
+
+**Rationale**: FR-047 requires the dismissed state to persist in the visitor's browser with no server-side tracking. `localStorage` is the canonical browser-native persistent store for exactly this pattern. The key is namespaced (`travelogue:landing-dismissed`) to avoid collision with other uses of `localStorage` on the same origin.
+
+**Implementation**: `<LandingModal>` receives an `onDismiss` callback from `App.tsx`. The `App.tsx` decides whether to render `<LandingModal>` at all based on a `useState` flag initialized from `localStorage`. On `onDismiss`, `App.tsx` writes the localStorage key and sets the flag to `false`.
+
+**Test approach**: `LandingModal.test.tsx` uses `vi.stubGlobal` or `Object.defineProperty` to mock `localStorage`; asserts modal renders when key is absent, does not render when key is present, and that `onDismiss` causes the key to be written.
+
+**Alternatives considered**:
+- `sessionStorage`: Does not survive tab close / browser restart — too ephemeral.
+- Cookie: Works but requires no server; heavier API than localStorage for this use case.
+- IndexedDB: Overkill for a single boolean flag.
+
+---
+
 ## 4. Loading and Error State Architecture
 
 **Decision**: Single shared loading/error surface in `App.tsx`, not distributed across child components.

@@ -2,7 +2,7 @@
 
 **Feature Branch**: `001-world-travelogue`
 **Created**: 2026-04-22
-**Updated**: 2026-06-04 (overhauled — constitution v2.1.x alignment; data source changed from hard-coded to live backend service; TDD mandate added)
+**Updated**: 2026-06-04 (overhauled — constitution v2.1.x alignment; data source changed from hard-coded to live backend service; TDD mandate added); 2026-06-04 (UI enhancement pass — map pins, landing modal, wrap-around fix, travel direction arrows, postcard style, country clustering, play-trip feature)
 **Status**: Draft
 **Input**: User description: "I am building a travel website that will show the trip itinerary of an upcoming round-the-world trip with roughly 50 major stop. Each stop will have a location, caption, date, image (optional), and long form blog post (optional).
 
@@ -16,6 +16,11 @@ There are two types of users who will use the site: One are the travelers themse
 
 ### Session 2026-06-04
 
+- Q: When a visitor clicks a region-pin cluster at the global trip overview level, what should happen? → A: The map zooms in to a level where the individual pins separate and become individually clickable. No spiderfy or in-place expansion.
+- Q: When Play Trip reaches the last non-abandoned region, what should happen? → A: Playback stops at the final region and the Play control becomes available again to restart from the beginning. No looping, no auto-restart.
+- Q: For globe-spanning trips, should wrap-around prevention apply to the route polyline, the map tiles, or both? → A: Tiles only — restrict the map to a single world copy so tiles do not repeat. Polyline edge-jumping is acceptable; the visitor can pan manually if needed.
+- Q: Is there a specific reference tile style for the postcard aesthetic (FR-050), or is the visual target open to the implementer? → A: Open to the implementer. Named styles such as Stamen Watercolor or CartoDB Voyager, or a warm/muted illustrated aesthetic, are good reference points but no specific provider is mandated.
+- Q: Where should directional arrowheads appear on route-connecting line segments (FR-049)? → A: Near the destination end of each segment — one arrowhead close to the arriving region or stop, pointing in the direction of travel.
 - Q: Should the frontend group stops into regions using the API-provided `region_code` on each stop, or independently compute region membership from stop coordinates? → A: Use the API-provided `region_code` per stop — no coordinate-based computation is performed in the frontend. Region display details (name, country, coordinates) are looked up from the region reference data returned by the backend.
 - Q: What should the visitor see if the backend returns an empty trips list? → A: Show a human-readable "no trips available" message using the same error-state surface defined in FR-044 — no separate empty-state UI.
 - Q: Should the error state include a user-actionable retry mechanism? → A: Auto-retry silently after a short delay, with no visible retry button. If retries are exhausted and the failure persists, show the FR-044 error message.
@@ -192,6 +197,13 @@ A visitor opening the site sees a loading indicator while trip data is fetched f
 - **FR-043**: The system MUST display a loading indicator while data is being fetched from the backend. The indicator MUST appear on initial page load and on any subsequent trip switch that requires a new network request.
 - **FR-044**: When data cannot be retrieved from the backend, or when the backend returns an empty trips list, the system MUST auto-retry silently after a short delay (keeping the loading indicator visible during retries) with no visible retry button shown to the visitor. If all retry attempts are exhausted and the failure persists, the system MUST display a human-readable error message (e.g., "Could not load trip data. Please try again later." or "No trips are currently available."). The error state MUST prevent a blank or crashed UI. No internal error details, stack traces, or server messages are shown to visitors.
 - **FR-045**: All new frontend feature code MUST be developed test-first: automated tests covering each Acceptance Scenario MUST be written and verified before the feature code is considered complete. A feature is only releasable when its automated tests pass.
+- **FR-046**: The system MUST replace the default large map pin style with smaller, purpose-specific marker styles. At the trip overview (global) level, region markers MUST use a **flag pin** style. At the region drill-down level, stop markers MUST use a **pushpin** style. The flag pin and pushpin styles MUST be visually distinct from each other and from the existing large dot/teardrop markers.
+- **FR-047**: The system MUST display a landing modal overlay to first-time visitors immediately after the page finishes loading, before any map interaction is available. The modal MUST contain: (a) a description of the site and its purpose, (b) context about the ongoing trip, (c) guidance on how to browse the map and sidebar, and (d) information on how friends and family can follow along. The modal MUST include a dismiss action. Placeholder (lorem ipsum) copy is acceptable in the initial implementation. The modal MUST NOT reappear on subsequent visits from the same browser — the dismissed state MUST be persisted in the visitor's browser (e.g. local storage) with no server-side tracking required.
+- **FR-048**: The system MUST restrict the map at the trip overview level to a single world copy so that map tiles do not repeat into adjacent copies of the globe. The map MUST NOT render a second (or more) copy of the world at any zoom level available at the trip overview. Preventing polyline edge-jumping across the antimeridian is not required; the visitor can pan the map manually if needed.
+- **FR-049**: The system MUST render a directional arrowhead near the destination end of each route-connecting line segment to indicate the direction of travel. Each segment connecting two adjacent non-abandoned regions (trip view) or two adjacent stops (region view) MUST display one arrowhead close to the arriving endpoint, pointing in chronological direction.
+- **FR-050**: The system MUST apply a postcard-inspired visual style to the map at the trip overview (global) level. This style MUST suppress all country name text labels from the map tiles. Road, terrain, and administrative boundary detail that would be shown at the regional zoom level MUST NOT be displayed at the global level. The specific tile provider and style are left to the implementer's judgment; reference points include warm/muted illustrated styles such as Stamen Watercolor or CartoDB Voyager, but no specific provider is mandated.
+- **FR-051**: The system MUST cluster region markers at the global trip overview level for qualifying countries. A cluster is shown when two or more region markers from the same country fall within the clustering threshold at the current zoom level. A cluster indicator MUST display the count of grouped markers. Clicking a cluster MUST zoom the map in to a level where the individual pins separate and become individually clickable; no spiderfy or in-place expansion is used. Clustering applies only at the trip overview zoom level; region drill-down always shows individual stop markers.
+- **FR-052**: The system MUST support a "Play Trip" mode at the trip overview level that advances through the trip's non-abandoned regions in chronological order, one region at a time. When Play Trip is active: (a) the map animates to focus on each region in sequence, with the region's marker visually highlighted; (b) the trip feed sidebar scrolls to and highlights the corresponding region tile; (c) playback advances automatically on a fixed interval with a visible Pause control. The visitor MUST be able to pause and resume playback at any time. The visitor MUST be able to exit Play Trip mode and return to normal map interaction. When playback reaches the last non-abandoned region, it MUST stop automatically and the Play control MUST become available again to restart from the first region; no looping or auto-restart occurs. Play Trip advances region-by-region (not stop-by-stop); the region drill-down view is not entered during playback. The feature MUST be covered by automated tests per FR-045.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -206,24 +218,34 @@ A visitor opening the site sees a loading indicator while trip data is fetched f
 
 **Wireframe reference**: [specs/001-world-travelogue/wireframes/travelogue-wireframes.svg](specs/001-world-travelogue/wireframes/travelogue-wireframes.svg)
 
-The interface has three distinct views. Views 1 and 2 share a persistent split layout (map canvas + sidebar). View 3 is a modal pop-up overlay over whichever view is current.
+The interface has three distinct views plus a landing modal. Views 1 and 2 share a persistent split layout (map canvas + sidebar). View 3 is a modal pop-up overlay over whichever view is current.
+
+### Landing Modal (First Visit)
+
+Displayed as a full-screen or centered overlay on the first visit before any map interaction is possible (see FR-047). Contains:
+- **Site headline**: The name and one-sentence purpose of the travelogue.
+- **Trip context block**: A short description of the current trip (lorem ipsum placeholder acceptable initially).
+- **How-to-browse guidance**: A brief explanation of the map + sidebar interaction model.
+- **Follow-along callout**: How friends and family can keep tabs on the travelers.
+- **Dismiss button**: A clearly labeled button (e.g., "Start Exploring" or "Enter") that closes the modal and stores the dismissed state in the browser so it does not reappear.
 
 ### View 1: Trip Overview (Continent-Level Map)
 
 The main landing page. Screen splits into a map canvas (~72% width) on the left and a trip feed sidebar (~28% width) on the right.
 
 **Map canvas**:
-- Shows the trip route as a line connecting region markers. Visited segments render as a solid line; planned segments render as a dashed line (see FR-012).
-- Each region uses a large filled dot as its marker. The active region uses a teardrop location pin in red.
+- Shows the trip route as a line connecting region markers. Visited segments render as a solid line; planned segments render as a dashed line (see FR-012). Route lines bear directional arrowheads (see FR-049).
+- The map uses a postcard-inspired tile style with no country text labels and no road/terrain detail at global zoom (see FR-050). The map MUST NOT wrap around for globe-spanning trips (see FR-048).
+- Each region uses a **flag pin** marker (see FR-046). The active region's flag pin is visually highlighted (e.g., accent color). Region pins for qualifying countries are clustered when multiple pins are nearby (see FR-051).
 - Floating card top-left: trip title and hamburger icon. Clicking the hamburger opens a trip selector list.
 - Zoom controls anchored bottom-right.
-- At this zoom level the map shows city labels and geopolitical boundaries only; road and terrain detail is hidden.
+- A "Play" control anchored to the map canvas (exact final placement determined at implementation time) initiates Play Trip mode (see FR-052). While Play Trip is active, a Pause control replaces it and a visible exit affordance is available.
 
 **Trip feed sidebar**:
 - Two collapsible sections with headers: "Visited" (above) and "Planned" (below). Sections irrelevant to the current trip are hidden (see FR-002).
 - Within each section, region tiles are listed in reverse-chronological order with no border between tiles.
 - Each region tile contains:
-  - Marker icon matching the map dot, connected to adjacent tiles by a vertical line (solid or dashed, mirroring the route logic).
+  - Flag pin icon matching the map marker, connected to adjacent tiles by a vertical line (solid or dashed, mirroring the route logic).
   - Region name, country, start date, and end date.
   - A horizontal row of up to four Instagram photo thumbnails; if more than four exist, a "+X" overlay appears on the fourth.
   - Up to four Substack post tiles, each showing a small Substack icon, post title, and a 3-line text preview; if more than four exist, a "+X" overlay appears on the fourth.
@@ -235,8 +257,8 @@ Accessed by selecting "Expand Region →" from the trip overview. Same split lay
 
 **Map canvas**:
 - Shows full map detail: roads, terrain, waterways, and parks.
-- Each stop in the region is shown as a standard dot marker.
-- A dashed light-blue route line connects stops in chronological order.
+- Each stop in the region is shown as a **pushpin** marker (see FR-046).
+- A dashed light-blue route line connects stops in chronological order, with directional arrowheads indicating direction of travel (see FR-049).
 - Floating card top-left: back arrow and "BACK TO TRIP" label.
 
 **Region sidebar**:
@@ -281,6 +303,12 @@ Opens as a modal overlay that dims the background and occupies approximately 80%
 - **SC-010**: Trip data loads and renders within 3 seconds under normal network conditions. A loading indicator is visible throughout the loading period.
 - **SC-011**: A clear error message appears within 5 seconds when the backend service is unavailable, and no part of the UI crashes or renders blank.
 - **SC-012**: All Acceptance Scenarios across US1–US6 have corresponding automated tests that pass before any feature is considered releasable.
+- **SC-013**: On the first visit, the landing modal appears before any map interaction; returning visitors (same browser) are not shown the modal again.
+- **SC-014**: At the trip overview zoom level, no country name text labels are visible on the map.
+- **SC-015**: For a trip that spans the antimeridian (e.g., Earth Sandwich 2015), the route line renders as a continuous path without jumping to the opposite map edge.
+- **SC-016**: Every route segment (trip view and region view) displays at least one arrowhead indicating the chronological direction of travel.
+- **SC-017**: At the global zoom level, regions in qualifying countries with multiple nearby pins are replaced by cluster indicators; pins in the United States, Canada, and China always render individually.
+- **SC-018**: In Play Trip mode, the map advances through all non-abandoned regions in chronological order without requiring visitor input; pause and resume controls respond within one interaction.
 
 ## Assumptions
 
@@ -298,4 +326,10 @@ Opens as a modal overlay that dims the background and occupies approximately 80%
 - The `"Sofia, Belarus"` entry in the Earth Sandwich 2015 data is a data error; the correct location is Sofia, Bulgaria. This is corrected in the backend seed data.
 - Database, backend API, and containerization assumptions are documented in [specs/002-database-backend/spec.md](../002-database-backend/spec.md). Automated data ingestion assumptions live in [specs/003-ingestion-pipeline/spec.md](../003-ingestion-pipeline/spec.md).
 - New feature code follows test-driven development: tests are written and passing before a feature is considered releasable. Test coverage for existing shipped code is tracked and improved incrementally.
+- The landing modal (FR-047) uses browser local storage to track the dismissed state. No server-side session or tracking is required.
+- The postcard map style (FR-050) is achieved by selecting an appropriate map tile provider style or custom style configuration; the exact provider is determined at implementation time within the constraints of the chosen mapping service.
+- Anti-meridian wrap prevention (FR-048) relies on the mapping service's configuration options; the exact mechanism (e.g., `worldCopyJump`, coordinate normalization) is determined at implementation time.
+- Play Trip (FR-052) advances region-by-region at the trip overview level. The exact playback interval and animation easing are determined at implementation time, within the constraints of the mapping service. Stop-by-stop playback and region drill-down during playback are out of scope.
+- Country clustering (FR-051) uses the API-provided `region_code` country field to determine a marker's country for clustering purposes. The clustering threshold (distance/zoom level at which markers group) is determined at implementation time based on visual testing.
+- Arrowhead rendering (FR-049) is constrained by the capabilities of the chosen mapping/overlay library. If the library does not natively support arrowheads, a custom overlay approach (e.g., SVG arrows placed along polyline segments) is acceptable.
 - The site does not auto-refresh trip data during a session. Data is fetched once on page load and once per explicit trip switch. Visitors who want to see content added after their initial load must perform a full browser reload.

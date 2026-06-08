@@ -97,7 +97,9 @@ frontend/tests/
 │       ├── App.test.tsx              # US1, US6: loading/error surface, trip switch
 │       ├── Sidebar.test.tsx          # US1, US4, US5: section grouping, suppression rules
 │       ├── RegionSidebar.test.tsx    # US2, US3, US4: drill-down, stop tiles
-│       └── StopDetail.test.tsx       # US3: Instagram/Substack/planned layouts
+│       ├── StopDetail.test.tsx       # US3: Instagram/Substack/planned layouts
+│       ├── LandingModal.test.tsx     # FR-047: first-visit display, localStorage, dismiss
+│       └── PlayTripControl.test.tsx  # FR-052: play/pause/stop transitions, region advance
 ```
 
 ---
@@ -128,6 +130,28 @@ frontend/tests/
 1. Copy the URL hash shown when viewing a trip (e.g., `http://localhost:5173/#/trip/earth-sandwich-2015`)
 2. Open it in a new tab
 3. Verify: the matching trip loads immediately
+
+### Landing modal (FR-047)
+
+1. Clear `travelogue:landing-dismissed` from localStorage (DevTools → Application → Local Storage → delete key)
+2. Open `http://localhost:5173` (or reload)
+3. Verify: landing modal overlay appears before map interaction is possible
+4. Click the dismiss button
+5. Verify: modal disappears and the localStorage key is now set
+6. Reload the page
+7. Verify: modal does not reappear
+
+### Play Trip mode (FR-052)
+
+1. Load a trip with at least three non-abandoned regions
+2. Click the Play button on the map canvas
+3. Verify: the map advances to each region in chronological order, the sidebar scrolls to the matching tile, and a Pause control is visible
+4. Click Pause
+5. Verify: playback stops at the current region; Pause is replaced by Play
+6. Click Play again
+7. Verify: playback resumes from where it paused
+8. Wait for playback to reach the final non-abandoned region
+9. Verify: playback stops automatically and the Play button re-enables (no looping)
 
 ---
 
