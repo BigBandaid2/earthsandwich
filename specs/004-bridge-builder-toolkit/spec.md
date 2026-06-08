@@ -5,6 +5,15 @@
 **Status**: Draft
 **Input**: See [specify-prompt-draft.md](specify-prompt-draft.md) for the full natural-language prompt this spec is derived from.
 
+## Clarifications
+
+### Session 2026-06-08
+
+- Q: How does the bridge produce AI-inferred target columns relative to the dbt artifact? → A: Hybrid — dbt expresses the deterministic mappings; a separate toolkit-side LLM step (in the orchestrator, not inside dbt) produces the AI-inferred columns; dbt's `schema.yml` marks which columns are AI-inferred but does not execute the inference.
+- Q: Which target types does the initial implementation support? → A: Relational DB only (Postgres via SQLAlchemy / dbt-postgres) for v1. FR-005's schema-file and API-URL forms remain the eventual surface but are deferred; the toolkit may reject non-DB targets at project creation.
+- Q: Where do the "transformed records" that US6 reviews come from, given the oracle only round-trips single rows? → A: The bridge materializes its full transformed output to a LOCAL artifact in the iteration folder (keyed by the pile's dedup id); US6 review and accept-bundle read that file. The target DB is read-only except the transient oracle round-trip — no bulk load into the target.
+- Q: Does the oracle validate one pile row or a sample? → A: A small sample (3–5) of real pile rows, deterministically chosen to include constraint-stressing rows (most empty/null fields, longest values); the oracle passes only if ALL sampled rows insert+delete cleanly.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 — Create a new bridge project and validate connections (Priority: P1)
@@ -80,7 +89,7 @@ This stage produces the **initial** bridge proposal. When the target is a relati
 
 ### User Story 4 — Automatic oracle-driven refinement (Priority: P4)
 
-When a project has insert+delete permissions on a relational target, every bridge synthesis triggers an automatic acceptance check: the orchestrator transforms a real pile row per the current mapping, attempts to insert it into the target, and (on success) deletes it. The outcome drives an automatic feedback loop — on failure, the toolkit synthesizes a feedback prompt from the database error and the broken record, re-runs bridge synthesis with that prompt, and tries the oracle again. The loop iterates until the oracle passes or 5 consecutive failures, at which point control hands off to the operator (User Story 5).
+When a project has insert+delete permissions on a relational target, every bridge synthesis triggers an automatic acceptance check: the orchestrator transforms a small sample (3–5) of real pile rows — deterministically chosen to include constraint-stressing rows — per the current mapping, attempts to insert each into the target, and (on success) deletes them; the check passes only if all sampled rows round-trip cleanly. The outcome drives an automatic feedback loop — on failure, the toolkit synthesizes a feedback prompt from the database error and the broken record(s), re-runs bridge synthesis with that prompt, and tries the oracle again. The loop iterates until the oracle passes or 5 consecutive failures, at which point control hands off to the operator (User Story 5).
 
 Critically, this is an **automatic** loop: the operator does NOT see intermediate failed iterations during the loop's execution. They see the final state — either an oracle-validated bridge or a halt banner naming the persistent failure — when control returns.
 
@@ -90,7 +99,7 @@ Critically, this is an **automatic** loop: the operator does NOT see intermediat
 
 **Acceptance Scenarios**:
 
-1. **Given** bridge synthesis completes for a project with insert+delete permissions, **When** the orchestrator runs the oracle check, **Then** it selects one real pile row, transforms it per the mapping, inserts it into the target, deletes it on success, and records the outcome (success, schema-violation failure, or transient failure) in the iteration's metadata.
+1. **Given** bridge synthesis completes for a project with insert+delete permissions, **When** the orchestrator runs the oracle check, **Then** it selects a small sample (3–5) of real pile rows (including constraint-stressing rows), transforms each per the mapping, inserts them into the target, deletes them on success — passing only if all sampled rows round-trip cleanly — and records the outcome (success, schema-violation failure, or transient failure) in the iteration's metadata.
 2. **Given** an oracle check fails because the mapping produced an invalid record, **When** the orchestrator processes the failure, **Then** it automatically synthesizes a feedback prompt incorporating the database error message and the transformed dummy record, feeds that prompt into a new bridge synthesis run, increments the iteration counter, and re-runs the oracle check — all without operator intervention.
 3. **Given** the automatic loop is iterating, **When** the operator inspects the project folder, **Then** each automatic iteration is persisted in the iteration history (raw dbt + enhanced playground + oracle result + synthesized feedback) — operators can review the full trail after the loop terminates.
 4. **Given** the oracle passes on automatic iteration N, **When** the orchestrator records the success, **Then** the loop exits, the iteration is marked "oracle-validated", and control passes to the operator (User Story 5) with the validated bridge presented for review.
@@ -173,7 +182,7 @@ The baseline is **deliberately editable**, not frozen, for two reasons: (a) the 
 
 **Project lifecycle (User Story 1)**
 
-- **FR-005**: Toolkit MUST support creating a named bridge project via the CLI. Project creation accepts: a project name, a pile path, a target endpoint (schema file path OR API URL OR database connection string), and target credentials (or a reference to where credentials live, e.g., env var name).
+- **FR-005**: Toolkit MUST support creating a named bridge project via the CLI. Project creation accepts: a project name, a pile path, a target endpoint (schema file path OR API URL OR database connection string), and target credentials (or a reference to where credentials live, e.g., env var name). **v1 scope**: the initial implementation MUST support a **relational database** target (Postgres via SQLAlchemy / `dbt-postgres`) only; the schema-file and API-URL forms are the eventual surface but are deferred. The toolkit MAY reject a non-DB target at project creation with a "deferred to a future version" message. Everything downstream (ER diagram, dbt artifact, the FR-070 oracle round-trip, SQLAlchemy reflection) assumes the relational-DB target in v1.
 - **FR-006**: Project creation MUST persist the project's configuration to a per-project config file (e.g. `bridge-builder-toolkit/projects/<name>/project.yml`) so subsequent CLI invocations can act on the project by name.
 - **FR-007**: Project creation MUST run a **connection-validation step** before the project folder is finalized: the toolkit attempts to read the pile, reach the target, and probe target permissions (read access, insert access, delete access). Each probe's result MUST be recorded in the project's config or validation report.
 - **FR-008**: If any required check fails (pile unreadable, target unreachable), project creation MUST abort cleanly — no partially-created folder, clear error reporting.
@@ -204,6 +213,8 @@ The baseline is **deliberately editable**, not frozen, for two reasons: (a) the 
 - **FR-044**: The enhanced bridge playground MUST label every section as one of: **"dbt baseline"**, **"LLM-extended"**, or **"toolkit-novel"**. The labels are visible in the playground UI and reflected in the copy-out-a-prompt payload.
 - **FR-045**: The enhanced bridge playground MUST cite which schema-matching algorithmic style its mapping proposals borrow from (canonical references: `Valentine` library matchers, LLM-based matchers like `Magneto` / `Jellyfish`).
 - **FR-046**: When the project has insert+delete permissions on the target (per FR-007's recorded status), bridge synthesis MUST automatically pass control to the oracle loop (FR-070) before exposing the bridge to the operator. When permissions are absent, control passes directly to the manual refinement path (User Story 5).
+- **FR-047**: The bridge transform is a **hybrid**: deterministic field/table mappings are expressed in the dbt project artifact (FR-041), while AI-inferred target columns are produced by a separate toolkit-side LLM inference step that runs in the orchestrator (NOT inside dbt). The dbt project's `schema.yml` MUST mark which columns are AI-inferred (the designation FR-153 reads), but the dbt SQL itself MUST NOT execute the inference. Re-running the bridge MAY therefore yield different AI-inferred values across iterations even with an unchanged deterministic dbt artifact — this is the basis for the inference-quality review in User Story 6.
+- **FR-048**: Bridge synthesis MUST **materialize the full transformed output** of the current mapping (deterministic dbt mappings + the FR-047 toolkit-side inference) over the pile to a **local artifact** in the iteration folder (e.g. `bridge.output.tsv`/`.json`, keyed by the pile's dedup id). This local output is what the User Story 6 review (FR-151) and `accept-bundle` (FR-090) read. The target database MUST remain read-only except for the transient single-row oracle round-trip (FR-070); the bridge MUST NOT bulk-load its full output into the target.
 
 **Playground contract (binding on Stages 1–3 enhanced playgrounds)**
 
@@ -215,7 +226,7 @@ The baseline is **deliberately editable**, not frozen, for two reasons: (a) the 
 
 **Automatic oracle-driven refinement loop (User Story 4)**
 
-- **FR-070**: When the project's recorded validation status indicates both insert and delete permissions on the target, the toolkit MUST automatically run an oracle check after each bridge synthesis (FR-046): transform one real pile row per the current mapping, attempt to insert it into the target, delete it on success, and record the outcome (success, schema-violation failure, or transient failure) in the iteration's metadata.
+- **FR-070**: When the project's recorded validation status indicates both insert and delete permissions on the target, the toolkit MUST automatically run an oracle check after each bridge synthesis (FR-046): transform a small sample (3–5) of real pile rows per the current mapping — deterministically chosen to include constraint-stressing rows (most empty/null fields, longest values) — attempt to insert each into the target, delete each on success, and record the outcome (success, schema-violation failure, or transient failure) in the iteration's metadata. The oracle check PASSES only if ALL sampled rows round-trip cleanly; any sampled row's schema-violation failure fails the check.
 - **FR-071**: When the oracle check fails with a schema-violation failure (mapping is the problem), the toolkit MUST automatically synthesize a feedback prompt incorporating the database error message and the transformed dummy record, feed that prompt into a new bridge synthesis run, increment the iteration counter, and re-run the oracle — without operator intervention.
 - **FR-072**: When the oracle check fails with a transient failure (network outage, target temporarily unavailable), the orchestrator MUST retry with backoff before classifying the iteration as a "consecutive failure" against the 5-fail ceiling.
 - **FR-073**: After 5 consecutive automatic schema-violation failures, the loop MUST halt and surface an operator-intervention banner naming the persistent failure mode. The 5-fail counter MUST track ONLY consecutive automatic oracle failures; a successful oracle pass OR a subsequent manual user iteration MUST reset it.
@@ -280,7 +291,7 @@ The baseline is **deliberately editable**, not frozen, for two reasons: (a) the 
 - **ER-Diagram Artifact**: A raw, untouched ER-diagram produced per side per iteration WHEN the side is a relational database. Canonical Stage-2 schema-visualization baseline. Absent for non-relational sides.
 - **dbt Project Artifact**: A stock-dbt-runnable project produced by the bridge-synthesis stage. Canonical Stage-3 declarative-transformation baseline.
 - **Enhanced Playground**: A single-file HTML playground produced per stage per iteration. Consumes its stage's prior-art artifact(s) and adds the LLM-analyst layer. Per-section labeled "prior-art baseline / LLM-extended / toolkit-novel" (FR-022 / FR-044).
-- **Iteration**: One pass through bridge synthesis within a project. Has an integer index, an origin (automatic — from oracle feedback; or manual — from operator feedback), and an oracle-validation status (validated / failed / skipped). Owns: all per-iteration artifacts (raw + enhanced × stage), the feedback payload that drove it, and the oracle Validation Result.
+- **Iteration**: One pass through bridge synthesis within a project. Has an integer index, an origin (automatic — from oracle feedback; or manual — from operator feedback), and an oracle-validation status (validated / failed / skipped). Owns: all per-iteration artifacts (raw + enhanced × stage), the materialized bridge output artifact (FR-048), the feedback payload that drove it, and the oracle Validation Result.
 - **Iteration History**: An on-disk versioned record of all iterations for a project, mixing automatic and manual iterations chronologically. Movable as part of the final bundle.
 - **Mapping Proposal**: The set of table- and field-level mappings between pile and target at a given iteration. Serialized as the dbt project artifact's models + schema.yml, plus comments captured via the enhanced bridge playground.
 - **Validation Result**: The outcome of one insert+delete round trip against the target during an iteration — success, schema-violation failure, transient failure (retried), or "skipped" — with the transformed dummy record and any error message.
