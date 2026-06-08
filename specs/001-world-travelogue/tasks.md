@@ -151,10 +151,10 @@
 
 ### Stakeholder visual feedback (added 2026-05-04, not yet sprinted)
 
-- [ ] T093 [US-Polish] Replace large default Google Maps pin in continental view with a country-flag pin of similar size (decorative + informational about each stop's country) in `src/components/MapView.tsx`. If the flag pin is judged visually overwhelming after a side-by-side review, fall back to a smaller profile push-pin instead.
-- [ ] T094 [US-Polish] Add directional arrowheads to the route polyline connecting region pins so the trip direction is visually unambiguous in `src/components/MapView.tsx`.
+- [ ] T093 [US-Polish] **[Superseded by T127–T128, Phase 27]** Formalized as FR-046: replace default region markers with flag pins at trip overview level and stop markers with pushpins at region drill-down level in `frontend/src/components/MapView.tsx`
+- [ ] T094 [US-Polish] **[Superseded by T126, Phase 26]** Formalized as FR-049: directional arrowheads near destination end of each route segment, in both trip view (region-to-region) and region view (stop-to-stop) in `frontend/src/components/MapView.tsx`
 - [ ] T095 [US-Polish] Add distinct Start and Finish pins for the first and last stop of each trip so big trips have an obvious visual focal point in `src/components/MapView.tsx`. Today, large trips read as a tangle of lines with no anchor for the eye.
-- [ ] T096 [US-Polish] Apply a vintage postcard-style map skin to the continental view: simpler palette, no country labels, no desert/mountain terrain detail. Likely via a custom Google Maps style or `mapId`. Region drill-down view should retain current full detail.
+- [ ] T096 [US-Polish] **[Superseded by T124, Phase 25]** Formalized as FR-050: postcard-inspired tile style at global zoom suppressing country labels and road/terrain detail; full-detail style retained in region view in `frontend/src/components/MapView.tsx`
 
 **Checkpoint**: Feature complete, polished, and ready for deployment
 
@@ -434,4 +434,79 @@ With multiple developers:
 - [x] T122 Add `web` service to `docker-compose.yml`: `build.context: ./frontend` (root `.dockerignore` excludes `frontend/`; using subdirectory context avoids the conflict), `build.dockerfile: Dockerfile`, port `5173:80`, volume `../public/media:/public/media:ro` (relative to context), `depends_on: api`
 
 **Checkpoint**: `docker compose up web` serves the app at `http://localhost:5173`; media files at `http://localhost:5173/public/media/<file>` resolve correctly from the host mount
+
+---
+
+## Phase 25: Map Visual Foundation — Postcard Style & Anti-Meridian (FR-050, FR-048)
+
+**Status**: Not started (2026-06-05 — added following UI enhancement pass)
+
+**Purpose**: Apply postcard-inspired tile style and restrict the map to a single world copy at global zoom. These changes are prerequisites for the pin and clustering work in Phase 27.
+
+- [x] T123 [P] [US-Polish] Add `@googlemaps/markerclusterer` to `frontend/package.json` dependencies (prerequisite for country clustering in Phase 27, FR-051)
+- [x] T124 [US-Polish] Apply postcard-inspired tile style in trip view in `frontend/src/components/MapView.tsx` (FR-050, SC-014): configure tile provider / Cloud-based map style to suppress country labels and road/terrain detail at global zoom; revert to full-detail style in region view
+- [x] T125 [US-Polish] Configure Google Maps `restriction: { latLngBounds: { north: 85, south: -85, west: -180, east: 180 }, strictBounds: true }` on trip view map instance in `frontend/src/components/MapView.tsx` (FR-048, SC-015); lift restriction in region view
+
+**Checkpoint**: Global map shows postcard tile style with no country labels; Earth Sandwich 2015 route does not wrap into adjacent tile copies
+
+---
+
+## Phase 26: Directional Arrowheads (FR-049)
+
+**Status**: Not started (2026-06-05 — added following UI enhancement pass)
+
+**Purpose**: Render direction-of-travel arrowheads near the destination end of each route segment in both trip view and region view.
+
+- [x] T126 [US-Polish] Implement SVG arrowhead overlays in `frontend/src/components/MapView.tsx` (FR-049, SC-016): for each pair of adjacent non-abandoned endpoints, compute geodesic bearing and render a rotated SVG `<AdvancedMarker>` arrowhead at ~10–15% of segment distance from the destination end; applies to both trip view (region-to-region segments) and region view (stop-to-stop segments)
+
+**Checkpoint**: Every route segment in trip view and region view shows a directional arrowhead pointing in the chronological direction of travel
+
+---
+
+## Phase 27: Custom Map Pins & Country Clustering (FR-046, FR-051)
+
+**Status**: Not started (2026-06-05 — added following UI enhancement pass)
+
+**Purpose**: Replace default map markers with purpose-specific styles and add country-level clustering for region markers at the global zoom level.
+
+- [/] T127 [P] [US-Polish] Implement flag pin `<AdvancedMarker>` style for region markers at trip overview level in `frontend/src/components/MapView.tsx` (FR-046): visually highlight the active region's pin with an accent color
+- [x] T128 [P] [US-Polish] Implement pushpin `<AdvancedMarker>` style for stop markers at region drill-down level in `frontend/src/components/MapView.tsx` (FR-046)
+- [x] T129 [US-Polish] Add country clustering via `@googlemaps/markerclusterer` in `frontend/src/components/MapView.tsx` (FR-051, SC-017); clicking a cluster calls `map.fitBounds(cluster.bounds)` to zoom until pins separate; add `onClusterClick: (regionCodes: string[]) => void` prop to `WorldMapProps`
+- [x] T130 [US-Polish] Wire `onClusterClick` handler in `frontend/src/App.tsx` (FR-051)
+- [x] T131 [US-Polish] Manual test: verify SC-014 (no country labels at global zoom), SC-015 (no tile wrap for Earth Sandwich 2015 route), SC-016 (arrowhead on every segment in trip and region views), SC-017 (qualifying-country clusters appear; US/CA/CN pins always render individually; clicking cluster zooms to separate pins)
+
+**Checkpoint**: All four map-level acceptance scenarios (SC-014–SC-017) pass manual review
+
+---
+
+## Phase 28: Landing Modal (FR-047, TDD)
+
+**Status**: Not started (2026-06-05 — added following UI enhancement pass)
+
+**Purpose**: First-visit overlay displayed before any map interaction, with dismissed state persisted in browser localStorage so it does not reappear on return visits.
+
+**⚠️ TDD**: Write failing tests first (T132), then implement (T133–T134). All tests must pass before this phase is complete.
+
+- [x] T132 [P] [US-Polish] Write `LandingModal` tests in `frontend/tests/unit/components/LandingModal.test.tsx` (TDD, FR-047, SC-013): (a) modal renders when `travelogue:landing-dismissed` localStorage key is absent; (b) modal does not render when key is set; (c) clicking dismiss button calls `onDismiss`; mock `localStorage` via `vi.stubGlobal`
+- [x] T133 [P] [US-Polish] Create `frontend/src/components/LandingModal.tsx`: full-screen overlay containing site headline, trip context block (placeholder copy acceptable per FR-047), how-to-browse guidance, follow-along callout for friends/family, and dismiss button (e.g. "Start Exploring") that calls `onDismiss` prop (FR-047)
+- [x] T134 [US-Polish] Wire `LandingModal` into `frontend/src/App.tsx` (FR-047, SC-013): initialise `showLandingModal` state from `localStorage.getItem('travelogue:landing-dismissed')`; render `<LandingModal onDismiss={...} />` when flag is false; on dismiss write `localStorage.setItem('travelogue:landing-dismissed', '1')` and set flag to false
+
+**Checkpoint**: `npm test` — all T132 tests pass; loading app for first time shows modal; reload after dismiss does not show modal (SC-013)
+
+---
+
+## Phase 29: Play Trip Mode (FR-052, TDD)
+
+**Status**: Not started (2026-06-05 — added following UI enhancement pass)
+
+**Purpose**: Interval-based playback mode that advances the map through non-abandoned regions in chronological order with play/pause/exit controls anchored to the map canvas.
+
+**⚠️ TDD**: Write failing tests first (T135), then implement (T136–T138). All tests must pass before this phase is complete.
+
+- [ ] T135 [P] [US-Polish] Write `PlayTripControl` tests in `frontend/tests/unit/components/PlayTripControl.test.tsx` (TDD, FR-052, SC-018) using `vi.useFakeTimers()`: (a) clicking Play advances through non-abandoned regions on fixed interval; (b) clicking Pause suspends interval and retains `currentIndex`; (c) clicking Play again resumes from same index; (d) playback stops automatically at final non-abandoned region and Play button re-enables; (e) clicking Exit calls `onExit`
+- [ ] T136 [P] [US-Polish] Add `PlayTripState`, `PlayTripAction` types and `playTripReducer` to `frontend/src/App.tsx` (FR-052): transitions — `play` (set `isPlaying: true`); `pause` (set `isPlaying: false`, retain index); `advance` (increment index, or dispatch `stop` when at final region); `stop` (set `isPlaying: false, currentIndex: 0`)
+- [ ] T137 [P] [US-Polish] Create `frontend/src/components/PlayTripControl.tsx`: Play/Pause/Exit floating controls; rendered states — ready/paused (Play button visible, Exit hidden), playing (Pause + Exit visible), final-region-reached (Play re-enabled, Pause hidden); props: `isPlaying`, `onPlay`, `onPause`, `onExit` (FR-052)
+- [ ] T138 [US-Polish] Wire Play Trip into `frontend/src/App.tsx` (FR-052, SC-018): `useReducer(playTripReducer, { isPlaying: false, currentIndex: 0 })`; `useEffect` with `setInterval` (default 3 s) dispatches `advance` while `isPlaying`; derive `playTripActiveRegionCode` from `nonAbandonedRegions[currentIndex].code`; pass `playTripActiveRegionCode` to `<WorldMap>` for pan/focus animation and to `<TripFeed>` for sidebar scroll+highlight; render `<PlayTripControl>` overlay when `viewMode = 'trip'` (SC-018)
+
+**Checkpoint**: `npm test` — all T135 tests pass; in-browser: Play advances through all non-abandoned regions in chronological order, Pause/resume work correctly, playback stops at final region and Play control re-enables with no looping (SC-018)
 

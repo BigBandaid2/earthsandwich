@@ -201,6 +201,36 @@ interface RegionGroup {
 
 ---
 
+## UI State Types (`src/App.tsx`)
+
+These types model interactive UI state owned by the root component.
+
+### `PlayTripState` *(new — FR-052)*
+
+```ts
+type PlayTripState = {
+  isPlaying: boolean;
+  currentIndex: number;  // index into the non-abandoned regions array (chronological order)
+};
+
+type PlayTripAction =
+  | { type: 'play' }     // start or restart from currentIndex
+  | { type: 'pause' }    // suspend interval; retain currentIndex
+  | { type: 'advance' }  // move to next non-abandoned region
+  | { type: 'stop' };    // final region reached; reset to ready state (isPlaying: false, currentIndex: 0)
+```
+
+**Transition rules** (enforced in reducer):
+- `play` from ready state → `isPlaying: true`; index unchanged (restarts from 0 on first play after stop).
+- `pause` → `isPlaying: false`; index unchanged.
+- `advance` while playing and `currentIndex < lastIndex` → increment index.
+- `advance` while playing and `currentIndex === lastIndex` → `stop`.
+- `stop` → `isPlaying: false`, `currentIndex: 0`.
+
+**Landing modal dismissed state** is a `boolean` `useState` in `App.tsx`, initialised from `localStorage.getItem('travelogue:landing-dismissed')`. No separate type needed; value is `true` (suppress modal) or `false` (show modal).
+
+---
+
 ## Adapter Functions (`src/api/adapters.ts`)
 
 Adapters translate API types to app types. One function per API entity.
