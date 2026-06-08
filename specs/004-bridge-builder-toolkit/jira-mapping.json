@@ -1,0 +1,69 @@
+{
+  "spec": "004-bridge-builder-toolkit",
+  "project": "OCS",
+  "jira_base_url": "https://datacommlab.atlassian.net",
+  "mode": "2-level",
+  "subtasks_synced": false,
+  "subtasks_note": "Subtasks (T001-T040) are intentionally NOT synced to JIRA by default; tasks.md is their source of truth. Phases are tracked as Stories only.",
+  "epic": {
+    "key": "OCS-115",
+    "summary": "bridge-builder-toolkit (spec 004)",
+    "url": "https://datacommlab.atlassian.net/browse/OCS-115"
+  },
+  "stories": [
+    {
+      "key": "OCS-116",
+      "phase": "Phase 1: Setup",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-116",
+      "tasks": ["T001", "T002", "T003", "T004"]
+    },
+    {
+      "key": "OCS-117",
+      "phase": "Phase 2: Foundational",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-117",
+      "tasks": ["T005", "T006", "T007", "T008", "T009"]
+    },
+    {
+      "key": "OCS-118",
+      "phase": "Phase 3: US1 — Create a project + validate connections (P1, MVP)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-118",
+      "tasks": ["T010", "T011", "T012", "T013"]
+    },
+    {
+      "key": "OCS-119",
+      "phase": "Phase 4: US2 — Pile & target data-profiling (P2)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-119",
+      "tasks": ["T014", "T015", "T016", "T017", "T018"]
+    },
+    {
+      "key": "OCS-120",
+      "phase": "Phase 5: US3 — Bridge-mapping synthesis (P3)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-120",
+      "tasks": ["T019", "T020", "T021", "T022", "T023", "T024"]
+    },
+    {
+      "key": "OCS-121",
+      "phase": "Phase 6: US4 — Automatic oracle-driven refinement (P4)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-121",
+      "tasks": ["T025", "T026", "T027"]
+    },
+    {
+      "key": "OCS-122",
+      "phase": "Phase 7: US5 — Manual iterate + accept-bundle (P5)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-122",
+      "tasks": ["T028", "T029", "T030", "T031"]
+    },
+    {
+      "key": "OCS-123",
+      "phase": "Phase 8: US6 — Truth-baseline review of bridge output (P6)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-123",
+      "tasks": ["T032", "T033", "T034", "T035", "T036"]
+    },
+    {
+      "key": "OCS-124",
+      "phase": "Phase 9: Polish & Cross-Cutting Concerns",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-124",
+      "tasks": ["T037", "T038", "T039", "T040"]
+    }
+  ]
+}
