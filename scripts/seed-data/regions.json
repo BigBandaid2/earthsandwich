@@ -1,0 +1,914 @@
+[
+  {
+    "iata_code": "MDE",
+    "name": "Medellín",
+    "airport_name": "José María Córdova International Airport",
+    "country": "Colombia",
+    "lat": 6.1645,
+    "lng": -75.4231
+  },
+  {
+    "iata_code": "JFK",
+    "name": "New York",
+    "airport_name": "John F. Kennedy International Airport",
+    "country": "USA",
+    "lat": 40.6413,
+    "lng": -73.7781
+  },
+  {
+    "iata_code": "ARN",
+    "name": "Stockholm",
+    "airport_name": "Stockholm Arlanda Airport",
+    "country": "Sweden",
+    "lat": 59.6519,
+    "lng": 17.9186
+  },
+  {
+    "iata_code": "MEX",
+    "name": "Mexico City",
+    "airport_name": "Benito Juárez International Airport",
+    "country": "Mexico",
+    "lat": 19.4363,
+    "lng": -99.0721
+  },
+  {
+    "iata_code": "OAX",
+    "name": "Oaxaca",
+    "airport_name": "Xoxocotlán International Airport",
+    "country": "Mexico",
+    "lat": 17.0517,
+    "lng": -96.7264
+  },
+  {
+    "iata_code": "DUB",
+    "name": "Dublin",
+    "airport_name": "Dublin Airport",
+    "country": "Ireland",
+    "lat": 53.4213,
+    "lng": -6.2701
+  },
+  {
+    "iata_code": "LIS",
+    "name": "Lisbon",
+    "airport_name": "Humberto Delgado Airport",
+    "country": "Portugal",
+    "lat": 38.7756,
+    "lng": -9.1354
+  },
+  {
+    "iata_code": "FAO",
+    "name": "Faro (Algarve)",
+    "airport_name": "Faro Airport",
+    "country": "Portugal",
+    "lat": 37.0144,
+    "lng": -7.9659
+  },
+  {
+    "iata_code": "SVQ",
+    "name": "Seville",
+    "airport_name": "Seville Airport",
+    "country": "Spain",
+    "lat": 37.418,
+    "lng": -5.8931
+  },
+  {
+    "iata_code": "GRX",
+    "name": "Granada",
+    "airport_name": "Federico García Lorca Granada-Jaén Airport",
+    "country": "Spain",
+    "lat": 37.1887,
+    "lng": -3.7774
+  },
+  {
+    "iata_code": "AGP",
+    "name": "Málaga (Costa del Sol)",
+    "airport_name": "Málaga-Costa del Sol Airport",
+    "country": "Spain",
+    "lat": 36.6749,
+    "lng": -4.4991
+  },
+  {
+    "iata_code": "AMS",
+    "name": "Amsterdam",
+    "airport_name": "Amsterdam Airport Schiphol",
+    "country": "Netherlands",
+    "lat": 52.3086,
+    "lng": 4.7639
+  },
+  {
+    "iata_code": "BRU",
+    "name": "Brussels",
+    "airport_name": "Brussels Airport",
+    "country": "Belgium",
+    "lat": 50.901,
+    "lng": 4.4844
+  },
+  {
+    "iata_code": "LUX",
+    "name": "Luxembourg",
+    "airport_name": "Luxembourg Findel Airport",
+    "country": "Luxembourg",
+    "lat": 49.6233,
+    "lng": 6.2044
+  },
+  {
+    "iata_code": "FRA",
+    "name": "Frankfurt (Rhine-Neckar)",
+    "airport_name": "Frankfurt Airport",
+    "country": "Germany",
+    "lat": 50.0379,
+    "lng": 8.5622
+  },
+  {
+    "iata_code": "MUC",
+    "name": "Munich",
+    "airport_name": "Munich Airport",
+    "country": "Germany",
+    "lat": 48.3537,
+    "lng": 11.775
+  },
+  {
+    "iata_code": "DRS",
+    "name": "Dresden",
+    "airport_name": "Dresden Airport",
+    "country": "Germany",
+    "lat": 51.1328,
+    "lng": 13.7672
+  },
+  {
+    "iata_code": "BER",
+    "name": "Berlin",
+    "airport_name": "Berlin Brandenburg Airport",
+    "country": "Germany",
+    "lat": 52.3667,
+    "lng": 13.5033
+  },
+  {
+    "iata_code": "SZG",
+    "name": "Salzburg",
+    "airport_name": "Salzburg Airport",
+    "country": "Austria",
+    "lat": 47.7933,
+    "lng": 13.0043
+  },
+  {
+    "iata_code": "VIE",
+    "name": "Vienna",
+    "airport_name": "Vienna International Airport",
+    "country": "Austria",
+    "lat": 48.1103,
+    "lng": 16.5697
+  },
+  {
+    "iata_code": "VCE",
+    "name": "Venice",
+    "airport_name": "Venice Marco Polo Airport",
+    "country": "Italy",
+    "lat": 45.5053,
+    "lng": 12.3519
+  },
+  {
+    "iata_code": "BLQ",
+    "name": "Bologna",
+    "airport_name": "Bologna Guglielmo Marconi Airport",
+    "country": "Italy",
+    "lat": 44.5354,
+    "lng": 11.2887
+  },
+  {
+    "iata_code": "FLR",
+    "name": "Florence",
+    "airport_name": "Florence Peretola Airport",
+    "country": "Italy",
+    "lat": 43.81,
+    "lng": 11.2051
+  },
+  {
+    "iata_code": "FCO",
+    "name": "Rome",
+    "airport_name": "Leonardo da Vinci–Fiumicino Airport",
+    "country": "Italy",
+    "lat": 41.8003,
+    "lng": 12.2389
+  },
+  {
+    "iata_code": "PRG",
+    "name": "Prague",
+    "airport_name": "Václav Havel Airport Prague",
+    "country": "Czech Republic",
+    "lat": 50.1008,
+    "lng": 14.26
+  },
+  {
+    "iata_code": "BUD",
+    "name": "Budapest",
+    "airport_name": "Budapest Ferenc Liszt International Airport",
+    "country": "Hungary",
+    "lat": 47.4298,
+    "lng": 19.2611
+  },
+  {
+    "iata_code": "WAW",
+    "name": "Warsaw",
+    "airport_name": "Warsaw Chopin Airport",
+    "country": "Poland",
+    "lat": 52.1657,
+    "lng": 20.9671
+  },
+  {
+    "iata_code": "KRK",
+    "name": "Kraków",
+    "airport_name": "John Paul II International Airport Kraków-Balice",
+    "country": "Poland",
+    "lat": 50.0777,
+    "lng": 19.7848
+  },
+  {
+    "iata_code": "RIX",
+    "name": "Riga",
+    "airport_name": "Riga International Airport",
+    "country": "Latvia",
+    "lat": 56.9236,
+    "lng": 23.9711
+  },
+  {
+    "iata_code": "TNG",
+    "name": "Tangier (Northern Morocco)",
+    "airport_name": "Tangier Ibn Battouta Airport",
+    "country": "Morocco",
+    "lat": 35.7269,
+    "lng": -5.9169
+  },
+  {
+    "iata_code": "FEZ",
+    "name": "Fez",
+    "airport_name": "Fès–Saïss Airport",
+    "country": "Morocco",
+    "lat": 33.9273,
+    "lng": -4.9779
+  },
+  {
+    "iata_code": "RAK",
+    "name": "Marrakech",
+    "airport_name": "Marrakech Menara Airport",
+    "country": "Morocco",
+    "lat": 31.6069,
+    "lng": -8.0363
+  },
+  {
+    "iata_code": "CAI",
+    "name": "Cairo",
+    "airport_name": "Cairo International Airport",
+    "country": "Egypt",
+    "lat": 30.1219,
+    "lng": 31.4056
+  },
+  {
+    "iata_code": "ASW",
+    "name": "Aswan",
+    "airport_name": "Aswan International Airport",
+    "country": "Egypt",
+    "lat": 23.9644,
+    "lng": 32.8199
+  },
+  {
+    "iata_code": "LXR",
+    "name": "Luxor",
+    "airport_name": "Luxor International Airport",
+    "country": "Egypt",
+    "lat": 25.671,
+    "lng": 32.7066
+  },
+  {
+    "iata_code": "BEY",
+    "name": "Beirut",
+    "airport_name": "Beirut Rafic Hariri International Airport",
+    "country": "Lebanon",
+    "lat": 33.8209,
+    "lng": 35.4884
+  },
+  {
+    "iata_code": "AMM",
+    "name": "Amman",
+    "airport_name": "Queen Alia International Airport",
+    "country": "Jordan",
+    "lat": 31.7226,
+    "lng": 35.9932
+  },
+  {
+    "iata_code": "TLV",
+    "name": "Tel Aviv (Israel)",
+    "airport_name": "Ben Gurion Airport",
+    "country": "Israel",
+    "lat": 32.0055,
+    "lng": 34.8706
+  },
+  {
+    "iata_code": "DXB",
+    "name": "Dubai",
+    "airport_name": "Dubai International Airport",
+    "country": "UAE",
+    "lat": 25.2532,
+    "lng": 55.3657
+  },
+  {
+    "iata_code": "DOH",
+    "name": "Doha",
+    "airport_name": "Hamad International Airport",
+    "country": "Qatar",
+    "lat": 25.2609,
+    "lng": 51.6138
+  },
+  {
+    "iata_code": "BAH",
+    "name": "Bahrain",
+    "airport_name": "Bahrain International Airport",
+    "country": "Bahrain",
+    "lat": 26.2708,
+    "lng": 50.6336
+  },
+  {
+    "iata_code": "RUH",
+    "name": "Riyadh",
+    "airport_name": "King Khalid International Airport",
+    "country": "Saudi Arabia",
+    "lat": 24.9576,
+    "lng": 46.6988
+  },
+  {
+    "iata_code": "IST",
+    "name": "Istanbul",
+    "airport_name": "Istanbul Airport",
+    "country": "Turkey",
+    "lat": 41.2753,
+    "lng": 28.7519
+  },
+  {
+    "iata_code": "ADB",
+    "name": "Izmir (Aegean Coast)",
+    "airport_name": "Adnan Menderes Airport",
+    "country": "Turkey",
+    "lat": 38.2924,
+    "lng": 27.157
+  },
+  {
+    "iata_code": "DNZ",
+    "name": "Pamukkale (Denizli)",
+    "airport_name": "Çardak Airport",
+    "country": "Turkey",
+    "lat": 37.7856,
+    "lng": 29.7013
+  },
+  {
+    "iata_code": "AYT",
+    "name": "Antalya (Mediterranean Coast)",
+    "airport_name": "Antalya Airport",
+    "country": "Turkey",
+    "lat": 36.8987,
+    "lng": 30.8005
+  },
+  {
+    "iata_code": "ASR",
+    "name": "Cappadocia (Kayseri)",
+    "airport_name": "Kayseri Erkilet International Airport",
+    "country": "Turkey",
+    "lat": 38.7704,
+    "lng": 35.4954
+  },
+  {
+    "iata_code": "JTR",
+    "name": "Santorini (Greek Islands)",
+    "airport_name": "Santorini (Thira) National Airport",
+    "country": "Greece",
+    "lat": 36.3992,
+    "lng": 25.4793
+  },
+  {
+    "iata_code": "ATH",
+    "name": "Athens",
+    "airport_name": "Athens International Airport Eleftherios Venizelos",
+    "country": "Greece",
+    "lat": 37.9364,
+    "lng": 23.9445
+  },
+  {
+    "iata_code": "KGS",
+    "name": "Kos (Greek Islands)",
+    "airport_name": "Kos Island International Airport",
+    "country": "Greece",
+    "lat": 36.7931,
+    "lng": 27.0914
+  },
+  {
+    "iata_code": "SOF",
+    "name": "Sofia",
+    "airport_name": "Sofia Airport",
+    "country": "Bulgaria",
+    "lat": 42.6952,
+    "lng": 23.4114
+  },
+  {
+    "iata_code": "VAR",
+    "name": "Varna",
+    "airport_name": "Varna Airport",
+    "country": "Bulgaria",
+    "lat": 43.2321,
+    "lng": 27.8251
+  },
+  {
+    "iata_code": "OTP",
+    "name": "Bucharest",
+    "airport_name": "Henri Coandă International Airport",
+    "country": "Romania",
+    "lat": 44.5722,
+    "lng": 26.1022
+  },
+  {
+    "iata_code": "BEG",
+    "name": "Belgrade",
+    "airport_name": "Belgrade Nikola Tesla Airport",
+    "country": "Serbia",
+    "lat": 44.8184,
+    "lng": 20.3091
+  },
+  {
+    "iata_code": "SJJ",
+    "name": "Sarajevo",
+    "airport_name": "Sarajevo International Airport",
+    "country": "Bosnia and Herzegovina",
+    "lat": 43.8246,
+    "lng": 18.3315
+  },
+  {
+    "iata_code": "DBV",
+    "name": "Dubrovnik",
+    "airport_name": "Dubrovnik Airport",
+    "country": "Croatia",
+    "lat": 42.5614,
+    "lng": 18.2682
+  },
+  {
+    "iata_code": "SPU",
+    "name": "Split",
+    "airport_name": "Split Airport",
+    "country": "Croatia",
+    "lat": 43.5389,
+    "lng": 16.2998
+  },
+  {
+    "iata_code": "ZAG",
+    "name": "Zagreb",
+    "airport_name": "Zagreb Airport",
+    "country": "Croatia",
+    "lat": 45.7429,
+    "lng": 16.0688
+  },
+  {
+    "iata_code": "EVN",
+    "name": "Yerevan",
+    "airport_name": "Zvartnots International Airport",
+    "country": "Armenia",
+    "lat": 40.1473,
+    "lng": 44.3959
+  },
+  {
+    "iata_code": "TAS",
+    "name": "Tashkent",
+    "airport_name": "Tashkent International Airport",
+    "country": "Uzbekistan",
+    "lat": 41.2579,
+    "lng": 69.2811
+  },
+  {
+    "iata_code": "ALA",
+    "name": "Almaty",
+    "airport_name": "Almaty International Airport",
+    "country": "Kazakhstan",
+    "lat": 43.3521,
+    "lng": 77.0405
+  },
+  {
+    "iata_code": "FRU",
+    "name": "Bishkek",
+    "airport_name": "Manas International Airport",
+    "country": "Kyrgyzstan",
+    "lat": 43.0613,
+    "lng": 74.4777
+  },
+  {
+    "iata_code": "PVG",
+    "name": "Shanghai",
+    "airport_name": "Shanghai Pudong International Airport",
+    "country": "China",
+    "lat": 31.1443,
+    "lng": 121.8083
+  },
+  {
+    "iata_code": "PEK",
+    "name": "Beijing",
+    "airport_name": "Beijing Capital International Airport",
+    "country": "China",
+    "lat": 40.0799,
+    "lng": 116.6031
+  },
+  {
+    "iata_code": "KWL",
+    "name": "Guilin (Yangshuo)",
+    "airport_name": "Guilin Liangjiang International Airport",
+    "country": "China",
+    "lat": 25.2181,
+    "lng": 110.039
+  },
+  {
+    "iata_code": "URC",
+    "name": "Ürümqi",
+    "airport_name": "Ürümqi Diwopu International Airport",
+    "country": "China",
+    "lat": 43.9071,
+    "lng": 87.4742
+  },
+  {
+    "iata_code": "TPE",
+    "name": "Taipei",
+    "airport_name": "Taiwan Taoyuan International Airport",
+    "country": "Taiwan",
+    "lat": 25.0777,
+    "lng": 121.2328
+  },
+  {
+    "iata_code": "NRT",
+    "name": "Tokyo",
+    "airport_name": "Narita International Airport",
+    "country": "Japan",
+    "lat": 35.7647,
+    "lng": 140.3864
+  },
+  {
+    "iata_code": "KTM",
+    "name": "Kathmandu",
+    "airport_name": "Tribhuvan International Airport",
+    "country": "Nepal",
+    "lat": 27.6966,
+    "lng": 85.3591
+  },
+  {
+    "iata_code": "PBH",
+    "name": "Paro (Bhutan)",
+    "airport_name": "Paro International Airport",
+    "country": "Bhutan",
+    "lat": 27.4033,
+    "lng": 89.4246
+  },
+  {
+    "iata_code": "SIN",
+    "name": "Singapore",
+    "airport_name": "Singapore Changi Airport",
+    "country": "Singapore",
+    "lat": 1.3644,
+    "lng": 103.9915
+  },
+  {
+    "iata_code": "DPS",
+    "name": "Bali",
+    "airport_name": "Ngurah Rai International Airport",
+    "country": "Indonesia",
+    "lat": -8.7482,
+    "lng": 115.167
+  },
+  {
+    "iata_code": "MNL",
+    "name": "Manila",
+    "airport_name": "Ninoy Aquino International Airport",
+    "country": "Philippines",
+    "lat": 14.5086,
+    "lng": 121.0197
+  },
+  {
+    "iata_code": "GUM",
+    "name": "Guam",
+    "airport_name": "Antonio B. Won Pat International Airport",
+    "country": "USA",
+    "lat": 13.4834,
+    "lng": 144.7959
+  },
+  {
+    "iata_code": "PNI",
+    "name": "Pohnpei (Micronesia)",
+    "airport_name": "Pohnpei International Airport",
+    "country": "Micronesia",
+    "lat": 6.9851,
+    "lng": 158.209
+  },
+  {
+    "iata_code": "HNL",
+    "name": "Honolulu (Hawaii)",
+    "airport_name": "Daniel K. Inouye International Airport",
+    "country": "USA",
+    "lat": 21.3187,
+    "lng": -157.9224
+  },
+  {
+    "iata_code": "IAH",
+    "name": "Houston",
+    "airport_name": "George Bush Intercontinental Airport",
+    "country": "USA",
+    "lat": 29.9902,
+    "lng": -95.3368
+  },
+  {
+    "iata_code": "MSY",
+    "name": "New Orleans",
+    "airport_name": "Louis Armstrong New Orleans International Airport",
+    "country": "USA",
+    "lat": 29.9934,
+    "lng": -90.258
+  },
+  {
+    "iata_code": "HAV",
+    "name": "Havana",
+    "airport_name": "José Martí International Airport",
+    "country": "Cuba",
+    "lat": 22.9892,
+    "lng": -82.4091
+  },
+  {
+    "iata_code": "YYZ",
+    "name": "Toronto",
+    "airport_name": "Toronto Pearson International Airport",
+    "country": "Canada",
+    "lat": 43.6777,
+    "lng": -79.6248
+  },
+  {
+    "iata_code": "NAS",
+    "name": "Nassau (Bahamas)",
+    "airport_name": "Lynden Pindling International Airport",
+    "country": "Bahamas",
+    "lat": 25.039,
+    "lng": -77.466
+  },
+  {
+    "iata_code": "SEA",
+    "name": "Seattle",
+    "airport_name": "Seattle–Tacoma International Airport",
+    "country": "USA",
+    "lat": 47.4502,
+    "lng": -122.3088
+  },
+  {
+    "iata_code": "YVR",
+    "name": "Vancouver",
+    "airport_name": "Vancouver International Airport",
+    "country": "Canada",
+    "lat": 49.1939,
+    "lng": -123.1844
+  },
+  {
+    "iata_code": "LAS",
+    "name": "Las Vegas",
+    "airport_name": "Harry Reid International Airport",
+    "country": "USA",
+    "lat": 36.084,
+    "lng": -115.1537
+  },
+  {
+    "iata_code": "SFO",
+    "name": "San Francisco",
+    "airport_name": "San Francisco International Airport",
+    "country": "USA",
+    "lat": 37.6213,
+    "lng": -122.379
+  },
+  {
+    "iata_code": "BOG",
+    "name": "Bogotá",
+    "airport_name": "El Dorado International Airport",
+    "country": "Colombia",
+    "lat": 4.7016,
+    "lng": -74.1469
+  },
+  {
+    "iata_code": "PEI",
+    "name": "Pereira",
+    "airport_name": "Matecaña International Airport",
+    "country": "Colombia",
+    "lat": 4.8127,
+    "lng": -75.7395
+  },
+  {
+    "iata_code": "CTG",
+    "name": "Cartagena",
+    "airport_name": "Rafael Núñez International Airport",
+    "country": "Colombia",
+    "lat": 10.4424,
+    "lng": -75.513
+  },
+  {
+    "iata_code": "SMR",
+    "name": "Santa Marta",
+    "airport_name": "Simón Bolívar International Airport",
+    "country": "Colombia",
+    "lat": 11.1196,
+    "lng": -74.2306
+  },
+  {
+    "iata_code": "LET",
+    "name": "Leticia",
+    "airport_name": "Alfredo Vásquez Cobo International Airport",
+    "country": "Colombia",
+    "lat": -4.1933,
+    "lng": -69.9432
+  },
+  {
+    "iata_code": "MAO",
+    "name": "Manaus",
+    "airport_name": "Eduardo Gomes International Airport",
+    "country": "Brazil",
+    "lat": -3.0386,
+    "lng": -60.0497
+  },
+  {
+    "iata_code": "GIG",
+    "name": "Rio de Janeiro",
+    "airport_name": "Rio de Janeiro Galeão International Airport",
+    "country": "Brazil",
+    "lat": -22.8099,
+    "lng": -43.2505
+  },
+  {
+    "iata_code": "GRU",
+    "name": "São Paulo",
+    "airport_name": "São Paulo/Guarulhos International Airport",
+    "country": "Brazil",
+    "lat": -23.4356,
+    "lng": -46.4731
+  },
+  {
+    "iata_code": "SRE",
+    "name": "Sucre (Southern Bolivia)",
+    "airport_name": "Alcantarí International Airport",
+    "country": "Bolivia",
+    "lat": -19.247,
+    "lng": -65.1549
+  },
+  {
+    "iata_code": "LPB",
+    "name": "La Paz",
+    "airport_name": "El Alto International Airport",
+    "country": "Bolivia",
+    "lat": -16.5133,
+    "lng": -68.1922
+  },
+  {
+    "iata_code": "IQQ",
+    "name": "Iquique",
+    "airport_name": "Diego Aracena International Airport",
+    "country": "Chile",
+    "lat": -20.5353,
+    "lng": -70.1812
+  },
+  {
+    "iata_code": "PMC",
+    "name": "Puerto Montt",
+    "airport_name": "El Tepual International Airport",
+    "country": "Chile",
+    "lat": -41.4389,
+    "lng": -73.094
+  },
+  {
+    "iata_code": "SCL",
+    "name": "Santiago",
+    "airport_name": "Arturo Merino Benítez International Airport",
+    "country": "Chile",
+    "lat": -33.393,
+    "lng": -70.7858
+  },
+  {
+    "iata_code": "MDZ",
+    "name": "Mendoza",
+    "airport_name": "Governor Francisco Gabrielli International Airport",
+    "country": "Argentina",
+    "lat": -32.8317,
+    "lng": -68.7929
+  },
+  {
+    "iata_code": "EZE",
+    "name": "Buenos Aires",
+    "airport_name": "Ministro Pistarini International Airport",
+    "country": "Argentina",
+    "lat": -34.8222,
+    "lng": -58.5358
+  },
+  {
+    "iata_code": "GPS",
+    "name": "Galápagos Islands",
+    "airport_name": "Seymour Airport",
+    "country": "Ecuador",
+    "lat": -0.4538,
+    "lng": -90.2659
+  },
+  {
+    "iata_code": "FTE",
+    "name": "El Calafate (Patagonia)",
+    "airport_name": "Comandante Armando Tola International Airport",
+    "country": "Argentina",
+    "lat": -50.2803,
+    "lng": -72.0531
+  },
+  {
+    "iata_code": "AKL",
+    "name": "Auckland",
+    "airport_name": "Auckland Airport",
+    "country": "New Zealand",
+    "lat": -37.0082,
+    "lng": 174.785
+  },
+  {
+    "iata_code": "TRG",
+    "name": "Tauranga",
+    "airport_name": "Tauranga Airport",
+    "country": "New Zealand",
+    "lat": -37.6719,
+    "lng": 176.1961
+  },
+  {
+    "iata_code": "WLG",
+    "name": "Wellington",
+    "airport_name": "Wellington International Airport",
+    "country": "New Zealand",
+    "lat": -41.3272,
+    "lng": 174.805
+  },
+  {
+    "iata_code": "CHC",
+    "name": "Christchurch",
+    "airport_name": "Christchurch Airport",
+    "country": "New Zealand",
+    "lat": -43.4894,
+    "lng": 172.5322
+  },
+  {
+    "iata_code": "NSN",
+    "name": "Nelson",
+    "airport_name": "Nelson Airport",
+    "country": "New Zealand",
+    "lat": -41.2983,
+    "lng": 173.2211
+  },
+  {
+    "iata_code": "ZQN",
+    "name": "Queenstown",
+    "airport_name": "Queenstown Airport",
+    "country": "New Zealand",
+    "lat": -45.0211,
+    "lng": 168.7392
+  },
+  {
+    "iata_code": "SYD",
+    "name": "Sydney",
+    "airport_name": "Sydney Kingsford Smith Airport",
+    "country": "Australia",
+    "lat": -33.9399,
+    "lng": 151.1753
+  },
+  {
+    "iata_code": "CNS",
+    "name": "Cairns",
+    "airport_name": "Cairns Airport",
+    "country": "Australia",
+    "lat": -16.8858,
+    "lng": 145.7552
+  },
+  {
+    "iata_code": "CPT",
+    "name": "Cape Town",
+    "airport_name": "Cape Town International Airport",
+    "country": "South Africa",
+    "lat": -33.9715,
+    "lng": 18.6021
+  },
+  {
+    "iata_code": "GBE",
+    "name": "Gaborone",
+    "airport_name": "Sir Seretse Khama International Airport",
+    "country": "Botswana",
+    "lat": -24.5552,
+    "lng": 25.9182
+  },
+  {
+    "iata_code": "KGL",
+    "name": "Kigali",
+    "airport_name": "Kigali International Airport",
+    "country": "Rwanda",
+    "lat": -1.9686,
+    "lng": 30.1395
+  },
+  {
+    "iata_code": "WDH",
+    "name": "Windhoek",
+    "airport_name": "Hosea Kutako International Airport",
+    "country": "Namibia",
+    "lat": -22.4799,
+    "lng": 17.4709
+  }
+]

@@ -14,6 +14,7 @@ import { fileURLToPath } from 'url';
 import { miscellaneousAdventures } from '../frontend/src/data/miscellaneous-adventures';
 import { earthSandwich2015 } from '../frontend/src/data/earth-sandwich-2015';
 import { earthClubSandwich2027 } from '../frontend/src/data/earth-club-sandwich-2027';
+import { REGIONS } from '../frontend/src/data/regions';
 import type { Trip, Stop, InstagramPost, SubstackPost } from '../frontend/src/data/types';
 
 // ── Output directory ──────────────────────────────────────────────────────────
@@ -63,6 +64,15 @@ interface SubstackPostRecord {
   subtitle: string | null;
   body: string;
   published_at: string;
+}
+
+interface RegionRecord {
+  iata_code: string;
+  name: string;
+  airport_name: string;
+  country: string;
+  lat: number;
+  lng: number;
 }
 
 // ── Transform logic ───────────────────────────────────────────────────────────
@@ -142,9 +152,19 @@ function write(filename: string, data: unknown[]): void {
   console.log(`Wrote ${data.length} records → ${path}`);
 }
 
+const regions: RegionRecord[] = REGIONS.map((r) => ({
+  iata_code: r.code,
+  name: r.name,
+  airport_name: r.airportName,
+  country: r.country,
+  lat: r.coords.lat,
+  lng: r.coords.lng,
+}));
+
 write('trips.json', trips);
 write('stops.json', stops);
 write('instagram_posts.json', instagramPosts);
 write('substack_posts.json', substackPosts);
+write('regions.json', regions);
 
 console.log('Export complete.');

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Trip } from '../data/types';
 import { getTrips } from '../api/client';
 import { adaptTripSummary } from '../api/adapters';
+import { withRetry } from '../utils/retry';
 
 interface UseTripsResult {
   trips: Trip[];
@@ -17,7 +18,7 @@ export function useTrips(): UseTripsResult {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    getTrips()
+    withRetry(() => getTrips())
       .then((data) => {
         if (!cancelled) {
           setTrips(data.map(adaptTripSummary));

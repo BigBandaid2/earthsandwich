@@ -78,6 +78,15 @@ export interface ApiTripDetail extends ApiTrip {
   stops: ApiStop[];
 }
 
+export interface ApiRegion {
+  iata_code: string;
+  name: string;
+  airport_name: string;
+  country: string;
+  lat: number;
+  lng: number;
+}
+
 // ── Query param shapes ────────────────────────────────────────────────────────
 
 export interface GetTripsParams {
@@ -97,6 +106,10 @@ export interface GetPostsParams {
   stop_id?: string;
   after?: string;
   before?: string;
+}
+
+export interface GetRegionsParams {
+  country?: string;
 }
 
 // ── Fetch functions ───────────────────────────────────────────────────────────
@@ -119,4 +132,8 @@ export function getInstagramPosts(params?: GetPostsParams): Promise<ApiInstagram
 
 export function getSubstackPosts(params?: GetPostsParams): Promise<ApiSubstackPost[]> {
   return apiFetch<ApiSubstackPost[]>('/substack-posts', params as Record<string, string | undefined>);
+}
+
+export function getRegions(params?: GetRegionsParams): Promise<ApiRegion[]> {
+  return apiFetch<ApiRegion[]>('/regions', params as Record<string, string | undefined>);
 }

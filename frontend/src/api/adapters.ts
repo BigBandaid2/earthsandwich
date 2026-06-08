@@ -1,5 +1,5 @@
-import type { Stop, Trip, InstagramPost, SubstackPost, PlannedPost } from '../data/types';
-import type { ApiTrip, ApiTripDetail, ApiStop, ApiInstagramPost, ApiSubstackPost } from './client';
+import type { Stop, Trip, Region, InstagramPost, SubstackPost, PlannedPost } from '../data/types';
+import type { ApiTrip, ApiTripDetail, ApiStop, ApiInstagramPost, ApiSubstackPost, ApiRegion } from './client';
 
 function adaptPost(stop: ApiStop): Stop['post'] {
   if (stop.post_type === 'instagram' && stop.post !== null) {
@@ -32,7 +32,7 @@ export function adaptStop(apiStop: ApiStop): Stop {
     id: apiStop.id,
     date: apiStop.date,
     location: apiStop.location,
-    coords: { lat: apiStop.lat, lng: apiStop.lng },
+    coords: { lat: Number(apiStop.lat), lng: Number(apiStop.lng) },
     status: apiStop.status,
     regionCode: apiStop.region_code,
     post: adaptPost(apiStop),
@@ -54,5 +54,15 @@ export function adaptTripSummary(apiTrip: ApiTrip): Trip {
     title: apiTrip.title,
     description: apiTrip.description,
     stops: [],
+  };
+}
+
+export function adaptRegion(apiRegion: ApiRegion): Region {
+  return {
+    code: apiRegion.iata_code,
+    name: apiRegion.name,
+    airportName: apiRegion.airport_name,
+    country: apiRegion.country,
+    coords: { lat: apiRegion.lat, lng: apiRegion.lng },
   };
 }

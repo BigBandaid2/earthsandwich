@@ -1,39 +1,144 @@
-# Quickstart: World Travelogue
+# Quickstart: World Travelogue (useful-app frontend)
 
-## Setup
+**Phase**: 1 | **Plan**: [plan.md](./plan.md) | **Date**: 2026-06-04 (overhauled; original 2026-04-24)
 
-1. Install project dependencies:
+The frontend depends on the backend API (spec 002) being reachable at runtime. Start the backend first.
+
+---
+
+## Prerequisites
+
+- Node 20+ (check: `node -v`)
+- Backend API running — see [../002-database-backend/quickstart.md](../002-database-backend/quickstart.md)
+- Google Maps API key (for the map component)
+
+---
+
+## Environment Setup
+
+Copy the example env file and fill in the required values:
 
 ```bash
+cp frontend/.env.example frontend/.env
+```
+
+Edit `frontend/.env`:
+
+```
+VITE_GOOGLE_MAPS_API_KEY=<your Google Maps JavaScript API key>
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+`VITE_API_BASE_URL` defaults to `http://localhost:8000` if omitted.
+
+---
+
+## Install Dependencies
+
+All commands run from the `frontend/` directory:
+
+```bash
+cd frontend
 npm install
 ```
 
-2. Start the local development server:
+---
+
+## Start Dev Server
 
 ```bash
 npm run dev
 ```
 
-## Run locally
+Opens at `http://localhost:5173`. The dev server proxies are not configured — the frontend calls `VITE_API_BASE_URL` directly.
 
-Open the local development URL shown in the terminal, typically `http://localhost:5173`.
+---
 
-## Build for production
+## Build for Production
 
 ```bash
 npm run build
 ```
 
-## Preview the production build
+Outputs to `dist/` at the project root (configured in `vite.config.ts`).
+
+---
+
+## Run Tests
 
 ```bash
-npm run preview
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
 ```
 
-## Notes
+Tests live in `frontend/tests/`. Vitest is the runner; jsdom is the DOM environment. No live network connections — all API calls are mocked.
 
-- All itinerary content is hard-coded in `src/data/itinerary.ts`.
-- The interactive world map is planned to use the Google Maps JavaScript API in `src/components/MapView.tsx`.
-- `src/components/Sidebar.tsx` and `src/components/StopDetail.tsx` provide itinerary and stop detail interactions.
-- Future geocoding may leverage Google Location Search for stop lookup and location search features.
-- Use `specs/001-world-travelogue/data-model.md` for the data shape and `specs/001-world-travelogue/research.md` for design decisions.
+---
+
+## Test Structure
+
+```text
+frontend/tests/
+├── setup.ts                          # jest-dom matchers
+├── unit/
+│   ├── hooks/
+│   │   ├── useTrips.test.ts          # US6: loading, error, retry
+│   │   ├── useTrip.test.ts           # US6: loading, error, retry
+│   │   └── useRegions.test.ts        # region fetch, error, retry
+│   ├── utils/
+│   │   └── regionUtils.test.ts       # groupStopsByRegion, getActiveRegion, FR-014, FR-028–FR-033
+│   └── components/
+│       ├── App.test.tsx              # US1, US6: loading/error surface, trip switch
+│       ├── Sidebar.test.tsx          # US1, US4, US5: section grouping, suppression rules
+│       ├── RegionSidebar.test.tsx    # US2, US3, US4: drill-down, stop tiles
+│       └── StopDetail.test.tsx       # US3: Instagram/Substack/planned layouts
+```
+
+---
+
+## Integration Scenarios
+
+### Happy path — all data available
+
+1. Backend running with seeded data (`python scripts/seed.py`)
+2. `npm run dev` in `frontend/`
+3. Navigate to `http://localhost:5173`
+4. Verify: loading indicator appears briefly, then the world map renders with trip data
+
+### Error state — backend unavailable
+
+1. Stop the backend (`docker compose stop api`)
+2. Open `http://localhost:5173` (or reload)
+3. Verify: loading indicator appears, then after retry exhaustion a human-readable error message is shown. No blank page, no stack trace.
+
+### Empty trip list
+
+1. Connect to a backend with no trips seeded (`docker compose exec db psql -U postgres -d earthsandwich -c "TRUNCATE trips CASCADE;"`)
+2. Open `http://localhost:5173`
+3. Verify: "No trips are currently available." message is displayed in the error panel.
+
+### URL hash routing (FR-027)
+
+1. Copy the URL hash shown when viewing a trip (e.g., `http://localhost:5173/#/trip/earth-sandwich-2015`)
+2. Open it in a new tab
+3. Verify: the matching trip loads immediately
+
+---
+
+## Connecting to the Backend
+
+The backend is defined in spec 002. Its REST API contract is at [../002-database-backend/contracts/api.md](../002-database-backend/contracts/api.md). Key read endpoints used by the frontend:
+
+| Endpoint | Used by |
+|---|---|
+| `GET /trips` | `useTrips` — trip selector list |
+| `GET /trips/:id` | `useTrip` — full stop data for active trip |
+| `GET /regions` | `useRegions` — region reference data |
+
+Write endpoints and authentication are not used by the frontend.

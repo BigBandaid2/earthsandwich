@@ -1,0 +1,574 @@
+# scrape-diff v5 — generated 2026-06-03
+# old: pile-app/instagram/validation/posts.local.tsv (truth baseline, 10-col schema, hand-curated locations)
+# new: pile-app/pile/posts.ourearthsandwich.local.tsv (current pile, 16-col schema, machine-inferred locations)
+
+old TSV rows: 322   new TSV rows: 323
+shared shortcodes: 322   only-old: 0   only-new: 1
+
+Among 322 shared shortcodes:
+  exact match: 26 (8.1%)
+  differ:      296 (91.9%)
+
+Diff buckets:
+  old_undetermined              : 35
+  new_undetermined              : 0
+  new_with_fallback_note        : 3
+  new_appends_geo               : 165
+  old_appends_geo               : 4
+  truly_different               : 89
+
+# Bucket semantics (subsequence-based, not contiguous):
+# - old_undetermined       : OLD baseline had no location, NEW found one (discovery)
+# - new_undetermined       : OLD had a location, NEW found none (REGRESSION)
+# - new_with_fallback_note : NEW used fallback inference (reasoning contains 'fallback')
+# - new_appends_geo        : OLD parts appear in order inside NEW; NEW added detail
+# - old_appends_geo        : NEW parts appear in order inside OLD; NEW dropped detail
+# - truly_different        : neither side is a subsequence of the other — needs review
+
+--- v4 had: 18 exact, 304 differ; old_undetermined=35, new_undetermined=0, fallback=7,
+    old_appends_country=197, truly_diff=65, only_old=0, only_new=1 ---
+
+========================================================================
+BUCKET: new_undetermined  (0)
+========================================================================
+
+========================================================================
+BUCKET: new_with_fallback_note  (3)
+========================================================================
+  sc=BGRhG3AlnEe  old_id=80  new_id=243
+    OLD: Military Museum, Kalemegdan, Belgrade
+    NEW: Sarajevo
+    reasoning: fallback: no observable evidence in image/caption; used the prior post's city (Sarajevo, derived from 'Latin Bridge, Sarajevo, Bosnia and Herzegovina'); lat/lng/region inherited from that post.
+  sc=BMZgSVmhTmR  old_id=59  new_id=264
+    OLD: Seattle, Washington
+    NEW: Copenhagen
+    reasoning: fallback: no observable evidence in image/caption; used the prior post's city (Copenhagen, derived from 'Freetown Christiania, Copenhagen, Denmark'); lat/lng/region inherited from that post.
+  sc=Bd8J9ZrgftF  old_id=49  new_id=274
+    OLD: New York, New York
+    NEW: Matagorda
+    reasoning: fallback: no observable evidence in image/caption; used the prior post's city (Matagorda, derived from 'Matagorda Bay, Matagorda, United States'); lat/lng/region inherited from that post.
+
+========================================================================
+BUCKET: truly_different  (89)
+========================================================================
+  sc=50acq0lnDR  old_id=292  new_id=31
+    OLD: Long Room Library, Trinity College, Dublin
+    NEW: The Long Room Library, Trinity College, Dublin, Ireland
+  sc=58Dx3vlnHK  old_id=287  new_id=36
+    OLD: Ruínas do Convento do Carmo, Lisbon
+    NEW: Ruins of the Carmo Convent, Lisbon, Portugal
+  sc=62g1tGFnJG  old_id=255  new_id=68
+    OLD: Place Jemâa el-Fna, Marrakech
+    NEW: Jemaa el-Fna, Marrakech, Morocco
+  sc=68WgY3FnK_  old_id=254  new_id=69
+    OLD: Tulip Market, Amsterdam
+    NEW: Bloemenmarkt, Amsterdam, Netherlands
+  sc=6BC2zyFnLg  old_id=280  new_id=43
+    OLD: Cruz Alta, Pena Park, Sintra
+    NEW: Cruz Alta - Pena National Palace Park, Sintra, Portugal
+  sc=6QrTtRFnAM  old_id=274  new_id=49
+    OLD: Giralda, Seville Cathedral
+    NEW: Giralda, Seville, Spain
+  sc=6QrzP8lnA-  old_id=273  new_id=50
+    OLD: Tiana, Catalonia, Spain
+    NEW: Tiana, Barcelona, Spain
+  sc=6WD06KlnM5  old_id=270  new_id=53
+    OLD: Plaza de Toros de la Real Maestranza, Seville
+    NEW: Plaza de Toros de la Real Maestranza de Caballería de Sevilla, Seville, Spain
+  sc=6fSguQlnAl  old_id=265  new_id=58
+    OLD: Palacios Nazaríes, Alhambra, Granada
+    NEW: Nasrid Palaces, Granada, Spain
+  sc=6io-7FFnOi  old_id=262  new_id=61
+    OLD: Medina of Tetouan, Morocco
+    NEW: Khasa Medina, Tetouan, Morocco
+  sc=6iorSelnON  old_id=263  new_id=60
+    OLD: Medina of Tetouan, Morocco
+    NEW: Khasa Medina, Tetouan, Morocco
+  sc=6nubLTlnAf  old_id=260  new_id=63
+    OLD: Medina of Tetouan, Morocco
+    NEW: Khassa Medina, Tetouan, Morocco
+  sc=6x8KBBFnKW  old_id=257  new_id=66
+    OLD: Merzouga, Sahara Desert, Morocco
+    NEW: Merzouga, Errachidia, Morocco
+  sc=70hwVvlnHL  old_id=237  new_id=86
+    OLD: San Petronio Basilica, Bologna
+    NEW: Basilica di San Petronio, Bologna, Italy
+  sc=73Zpu-lnLq  old_id=234  new_id=89
+    OLD: Leonardo da Vinci Museum, Florence
+    NEW: Museo Nazionale della Scienza e della Tecnologia Leonardo da Vinci, Florence, Italy
+  sc=73aLrBFnM6  old_id=233  new_id=90
+    OLD: Mercato Centrale, Florence
+    NEW: Central Market, Florence, Italy
+  sc=7SdN4UFnLk  old_id=249  new_id=74
+    OLD: Luxembourg City Park
+    NEW: Pétrusse Park, Luxembourg City, Luxembourg
+  sc=7ShPyYFnD2  old_id=247  new_id=76
+    OLD: Grand Place, Brussels
+    NEW: Grand Market Hall, Brussels, Belgium
+  sc=7cO6OIFnNy  old_id=246  new_id=77
+    OLD: Englischer Garten, Munich
+    NEW: Englischer Garten (Surfers), Munich, Germany
+  sc=7i5Kr6lnIp  old_id=243  new_id=80
+    OLD: Mirabellgarten, Salzburg
+    NEW: Mirabell Gardens, Salzburg, Austria
+  sc=8RGkcWlnHW  old_id=227  new_id=96
+    OLD: St Peter's Basilica, Vatican City
+    NEW: St. Peter's Basilica, Vatican City, Vatican City
+  sc=9Q1Lf9lnOV  old_id=215  new_id=108
+    OLD: Sanho Night Market, Taipei
+    NEW: Sanhe Night Market, Taipei, Taiwan
+  sc=9o1sA3FnHK  old_id=211  new_id=112
+    OLD: Great Wall of China, Jinshanling
+    NEW: Jinshanling Great Wall, Beijing, China
+  sc=9oz7qEFnEl  old_id=214  new_id=109
+    OLD: New Orleans, Louisiana, USA
+    NEW: New Orleans East, New Orleans, United States
+  sc=B2paAgIh_Pv  old_id=18  new_id=305
+    OLD: Hells Kitchen, New York
+    NEW: Hell's Kitchen, New York City, USA
+  sc=B3T7cNwjiCd  old_id=17  new_id=306
+    OLD: Ikea, Stockholm, Sweden
+    NEW: Stockholm, Stockholm, Sweden
+  sc=B4BrPSyDgSn  old_id=16  new_id=307
+    OLD: Hell's Kitchen
+    NEW: Alamo Drafthouse Cinema, Brooklyn, United States
+  sc=B4Y42VQDVCO  old_id=15  new_id=308
+    OLD: Ciudad de Mexico CDMX
+    NEW: Mexico City, Mexico City, Mexico
+  sc=B4eJItyjLl4  old_id=13  new_id=310
+    OLD: Biblioteca Jos� Vasconcelos
+    NEW: Biblioteca José Vasconcelos, Mexico City, Mexico
+  sc=B4gp4YxDDJP  old_id=12  new_id=311
+    OLD: El Drag�n Restaurante Chino
+    NEW: El Dragón Restaurante Chino, Mexico City, Mexico
+  sc=B4jSd1mDW2H  old_id=11  new_id=312
+    OLD: Las Pir�mides de Teotihuac�n. M�xico
+    NEW: Teotihuacan Pyramids, Teotihuacan, Mexico
+  sc=B4ofJptjTsA  old_id=9  new_id=314
+    OLD: Coyoac�n
+    NEW: Coyoacán, Mexico City, Mexico
+  sc=B4rDVUQjQby  old_id=8  new_id=315
+    OLD: Arena Mexico Lucha Libre Y C
+    NEW: Arena México, Mexico City, Mexico
+  sc=BAH7i4gFnGZ  old_id=185  new_id=138
+    OLD: Reserva Eduardo Avaroa, Bolivia
+    NEW: Eduardo Avaroa Andean Fauna National Reserve, Uyuni, Bolivia
+  sc=BAM1A7CFnJ4  old_id=180  new_id=143
+    OLD: Train Cemetery, Uyuni, Bolivia
+    NEW: Cementerio De Trenes/ Train Cemetery
+  sc=BAMw0balnBU  old_id=182  new_id=141
+    OLD: Death Road, La Paz, Bolivia
+    NEW: Death Road (Yungas Road), La Paz, Bolivia
+  sc=BAMxmiDlnC2  old_id=181  new_id=142
+    OLD: Salvador Dalí Desert, Bolivia
+    NEW: Desert Salvador Dali , Bolivia
+  sc=BAXKqr9FnKQ  old_id=175  new_id=148
+    OLD: Lake Titicaca, Copacabana, Bolivia
+    NEW: Copacabana, Lake Titicaca, Bolivia
+  sc=BAxP7OxlnGu  old_id=169  new_id=154
+    OLD: Ensenada, Los Lagos, Chile
+    NEW: Ensenada, Puerto Montt, Chile
+  sc=BBBhww9lnNE  old_id=165  new_id=158
+    OLD: Volcán Osorno, Puerto Varas, Chile
+    NEW: Osorno Volcano, Puerto Varas, Chile
+  sc=BBOrulpFnGI  old_id=164  new_id=159
+    OLD: Cerro Santa Lucía, Santiago, Chile
+    NEW: Mirador Cerro Santa Lucia, Santiago, Chile
+  sc=BBkTHzMFnJd  old_id=157  new_id=166
+    OLD: Barrio Chino, Barrancas de Belgrano, Buenos Aires
+    NEW: Barrio Chino, Buenos Aires, Argentina
+  sc=BBvtN0qlnK7  old_id=155  new_id=168
+    OLD: Cementerio de la Recoleta, Buenos Aires
+    NEW: Recoleta Cemetery, Buenos Aires, Argentina
+  sc=BBy08ZNlnC1  old_id=154  new_id=169
+    OLD: Palacio de las Aguas Corrientes, Buenos Aires
+    NEW: Palacio de Aguas Corrientes, Buenos Aires, Argentina
+  sc=BC9BeL3FnM-  old_id=144  new_id=179
+    OLD: Arrowtown, South Island, New Zealand
+    NEW: Arrowtown, Queenstown, New Zealand
+  sc=BCPnnQmFnN9  old_id=152  new_id=171
+    OLD: Kitekite Falls, Piha, New Zealand
+    NEW: Kitekite Falls, Auckland, New Zealand
+  sc=BCPotg3FnPM  old_id=150  new_id=173
+    OLD: Auckland Museum
+    NEW: Auckland War Memorial Museum, Auckland, New Zealand
+  sc=BChkQ6tlnDx  old_id=146  new_id=177
+    OLD: Weta Cave, Miramar, Wellington
+    NEW: Weta Workshop, Miramar, Wellington, New Zealand
+  sc=BChkf3kFnEA  old_id=145  new_id=178
+    OLD: Weta Cave, Miramar, Wellington
+    NEW: Weka Street, Raglan, New Zealand
+  sc=BD2h3_ulnPC  old_id=119  new_id=204
+    OLD: Al Jame Anwar, Cairo
+    NEW: Al Jame Anwar Mosque, Cairo, Egypt
+  sc=BDAUJNoFnIs  old_id=139  new_id=184
+    OLD: Little Paradise Lodge & Gardens, Glenorchy, New Zealand
+    NEW: Larnach Castle Gardens, Dunedin, New Zealand
+  sc=BDAVzMklnKI  old_id=138  new_id=185
+    OLD: Little Paradise Lodge & Gardens, Glenorchy, New Zealand
+    NEW: Little Paradise Lodge, Queenstown-Lakes District, New Zealand
+  sc=BDIIek_FnEA  old_id=135  new_id=188
+    OLD: Arrowtown, South Island, New Zealand
+    NEW: Arrowtown, Queenstown, New Zealand
+  sc=BDapWGnlnKw  old_id=133  new_id=190
+    OLD: Scenic World Blue Mountains, Australia
+    NEW: Scenic World, Katoomba, Australia
+  sc=BDuPbYWFnJg  old_id=126  new_id=197
+    OLD: Chillagoe & Mungana Caves, Australia
+    NEW: Chillagoe-Mungana Caves National Park, Chillagoe, Australia
+  sc=BEImhc8FnEq  old_id=114  new_id=209
+    OLD: Winter Palace, Luxor
+    NEW: Winter Palace Hotel, Luxor, Egypt
+  sc=BF2-KC3FnEJ  old_id=87  new_id=236
+    OLD: Blue Mosque, Istanbul
+    NEW: Blue Mosque (Sultan Ahmed Mosque), Istanbul, Turkey
+  sc=BF273hSFnAq  old_id=88  new_id=235
+    OLD: İstanbul Sabiha Gökçen International Airport
+    NEW: Sabiha Gökçen International Airport, Istanbul, Turkey
+  sc=BF3tRL3lnLE  old_id=86  new_id=237
+    OLD: Athens International Airport "Eleftherios Venizelos"
+    NEW: Athens International Airport Eleftherios Venizelos, Athens, Greece
+  sc=BFgoDnNlnLu  old_id=97  new_id=226
+    OLD: Paşabağ, Ürgüp
+    NEW: Pasha Bagi (Monk's Valley), Ürgüp, Turkey
+  sc=BGw4mBYFnHj  old_id=73  new_id=250
+    OLD: Seattle Tacoma International Airport
+    NEW: Seattle-Tacoma International Airport, Seattle, United States
+  sc=BHc2mvchQS9  old_id=71  new_id=252
+    OLD: Lake Union Park, Seattle
+    NEW: Lake Union, Seattle, Washington, USA
+  sc=BKBxxm8hgv3  old_id=63  new_id=260
+    OLD: Washington Dulles International Airport, Dulles, VA
+    NEW: Washington Dulles International Airport, Washington D.C., United States
+  sc=BMxDvzMhjdz  old_id=58  new_id=265
+    OLD: Uwajimaya Seattle
+    NEW: Uwajimaya, Seattle, USA
+  sc=BdWIk6LA0ad  old_id=50  new_id=273
+    OLD: Matagorda Bay, Texas
+    NEW: Matagorda Bay, Matagorda, United States
+  sc=Bf6bSrCARBY  old_id=48  new_id=275
+    OLD: Texas Legation, St James's, London
+    NEW: Texas Legation, 3 St. James's Street, Westminster, London, UK
+  sc=BgMU6tEA2dC  old_id=44  new_id=279
+    OLD: St Paul's Church, Munich
+    NEW: St. Paul's Church, Munich, Germany
+  sc=Bj0WpYkh3C3  old_id=40  new_id=283
+    OLD: New York, New York
+    NEW: New Zealand
+  sc=Bkb7YR0BO2h  old_id=39  new_id=284
+    OLD: Hamlet Castle
+    NEW: Kronborg Castle, Helsingør, Denmark
+  sc=BlPL1MZhTHN  old_id=34  new_id=289
+    OLD: The Hill Cumorah Pageant
+    NEW: Hill Cumorah Pageant, Palmyra, United States
+  sc=Bno-dHdBEOf  old_id=31  new_id=292
+    OLD: J.Stalin's Underground Printing House Museum
+    NEW: J. Stalin's Underground Printing House Museum, Tbilisi, Georgia
+  sc=BpyHpGfhYyG  old_id=28  new_id=295
+    OLD: Hudson River Park, New York City, New York, USA
+    NEW: Pier 54, New York City, USA
+  sc=BxBmsHFBR-J  old_id=27  new_id=296
+    OLD: Aeropuerto Internacional El Dorado, Bogotá, Colombia
+    NEW: El Dorado International Airport, Bogotá, Colombia
+  sc=BxKg6b5h1wk  old_id=26  new_id=297
+    OLD: Jardín, Antioquia, Colombia
+    NEW: Mirador Finca Morrogacho, Manizales, Colombia
+  sc=BxUmecLBg-3  old_id=25  new_id=298
+    OLD: Coffee farm, Antioquia, Colombia
+    NEW: Hacienda Guayabal, Manizales, Colombia
+  sc=BxZ6Y-Zh1jC  old_id=23  new_id=300
+    OLD: La Piedra Del Pe�ol
+    NEW: La Piedra del Peñol, Guatapé, Colombia
+  sc=BxaGGFohpKw  old_id=22  new_id=301
+    OLD: La Piedra Del Pe�ol
+    NEW: La Piedra del Peñol, Guatapé, Colombia
+  sc=BxbL5AoBPfV  old_id=21  new_id=302
+    OLD: Medell�n, Antioquia, Colombia
+    NEW: Medellín, Antioquia, Colombia
+  sc=BxbM1kQBraE  old_id=20  new_id=303
+    OLD: Plaza Botero, Carabobo, Medell�n, Antioquia
+    NEW: Plaza Botero, Medellín, Colombia
+  sc=BxbPatKBeTk  old_id=19  new_id=304
+    OLD: Aeropuerto Jose Maria Cordova De Medellin
+    NEW: José María Córdova International Airport, Medellín, Colombia
+  sc=C3dp3LnPeQ1  old_id=6  new_id=317
+    OLD: Centro Acad�mico y Cultural San Pablo (Antiguo Callej�n de San Pablo), Oaxaca de Ju�rez, Mexico
+    NEW: Centro, Oaxaca City, Mexico
+  sc=C3g2CZGMyYy  old_id=4  new_id=319
+    OLD: El Arbol Del Tule, Sta Maria Del Tule Oaxaca, Mexico
+    NEW: El Árbol del Tule, Santa María del Tule, Mexico
+  sc=C3jJxkzMGvi  old_id=2  new_id=321
+    OLD: Oaxaca City, Oaxaca, Mexico
+    NEW: Oaxaca, Oaxaca, Mexico
+  sc=C3jXFRlMZoJ  old_id=1  new_id=322
+    OLD: Oaxaca City, Oaxaca, Mexico
+    NEW: Oaxaca Centro, Oaxaca City, Mexico
+  sc=_DU5XpFnPQ  old_id=191  new_id=132
+    OLD: Amazon Forest
+    NEW: Amazon Rainforest, Loreto, Peru
+  sc=_DUk6ZFnOx  old_id=192  new_id=131
+    OLD: Amazon Forest
+    NEW: Amazon Rainforest, Iquitos, Peru
+  sc=_DWDIOlnBH  old_id=190  new_id=133
+    OLD: Amazon Forest
+    NEW: Amazon Rainforest, Iquitos, Peru
+  sc=_DY8DslnF2  old_id=189  new_id=134
+    OLD: Amazon Forest
+    NEW: Amazon Rainforest, Loreto, Peru
+  sc=_nfyScFnBX  old_id=188  new_id=135
+    OLD: Viru Viru International Airport, Santa Cruz, Bolivia
+    NEW: Viru Viru International Airport, Santa Cruz de la Sierra, Bolivia
+
+========================================================================
+BUCKET: old_undetermined  (35)
+========================================================================
+  sc=-RMFY8FnOQ  old_id=199  new_id=124
+    OLD: 
+    NEW: Vereda El Rosario, Manizales, Colombia
+  sc=4-vKLiFnHN  old_id=310  new_id=13
+    OLD: 
+    NEW: Costco Wholesale
+  sc=42c_5ClnEN  old_id=312  new_id=11
+    OLD: 
+    NEW: Canada (McDonald's restaurant)
+  sc=45EA90FnDO  old_id=311  new_id=12
+    OLD: 
+    NEW: Costco Wholesale
+  sc=4MgtN7FnOe  old_id=322  new_id=1
+    OLD: 
+    NEW: Hudson River, sailing toward Lower Manhattan, New York, USA
+  sc=4WuYp6lnF0  old_id=321  new_id=2
+    OLD: 
+    NEW: New York
+  sc=4XH8OvFnGe  old_id=320  new_id=3
+    OLD: 
+    NEW: Upper West Side, New York, USA
+  sc=4YTqPjlnFf  old_id=319  new_id=4
+    OLD: 
+    NEW: New York
+  sc=4ZTJ3DFnDY  old_id=318  new_id=5
+    OLD: 
+    NEW: John F. Kennedy International Airport, New York, USA
+  sc=4aCGbhlnDv  old_id=317  new_id=6
+    OLD: 
+    NEW: San Francisco Bay Area, approaching SFO, California, USA
+  sc=4cKiSglnJf  old_id=316  new_id=7
+    OLD: 
+    NEW: Las Vegas, Nevada, USA
+  sc=4gN0y0lnII  old_id=315  new_id=8
+    OLD: 
+    NEW: Las Vegas, Nevada, USA
+  sc=4pjpz6lnAR  old_id=314  new_id=9
+    OLD: 
+    NEW: Nevada
+  sc=4sf-_dlnMv  old_id=313  new_id=10
+    OLD: 
+    NEW: Canada (McDonald's restaurant)
+  sc=5-rW2KlnF7  old_id=285  new_id=38
+    OLD: 
+    NEW: Rua Augusta da Prata, Lisbon, Portugal
+  sc=51XnncFnD1  old_id=290  new_id=33
+    OLD: 
+    NEW: Guinness Storehouse, Dublin, Ireland
+  sc=547dePlnC7  old_id=289  new_id=34
+    OLD: 
+    NEW: Powerscourt Gardens, Enniskerry, County Wicklow, Ireland
+  sc=548ERElnEY  old_id=288  new_id=35
+    OLD: 
+    NEW: Powerscourt Gardens Tower, Enniskerry, County Wicklow, Ireland
+  sc=5A0VYXlnIW  old_id=309  new_id=14
+    OLD: 
+    NEW: Costco Wholesale
+  sc=5IzQD2FnNR  old_id=308  new_id=15
+    OLD: 
+    NEW: Vancouver International Airport, Vancouver, BC, Canada
+  sc=5OssbxFnLD  old_id=307  new_id=16
+    OLD: 
+    NEW: Alki Beach, Seattle, Washington, USA
+  sc=5fuI_0FnCe  old_id=303  new_id=20
+    OLD: 
+    NEW: Compass Cay Marina, Exumas, Bahamas
+  sc=5t7qpalnJj  old_id=296  new_id=27
+    OLD: 
+    NEW: Buffet B79, Dublin, Ireland
+  sc=6Ndp8DFnOI  old_id=276  new_id=47
+    OLD: 
+    NEW: Portugal, Spain
+  sc=6NgZgjFnCm  old_id=275  new_id=48
+    OLD: 
+    NEW: Portugal, Spain
+  sc=6txb7VlnPN  old_id=258  new_id=65
+    OLD: 
+    NEW: Souk Medina, Fez, Morocco
+  sc=7ScG0MlnJ1  old_id=251  new_id=72
+    OLD: 
+    NEW: Heidelberg Castle Illumination, Heidelberg, Germany
+  sc=8HGzZZFnDm  old_id=229  new_id=94
+    OLD: 
+    NEW: Lazio
+  sc=9CiXJGlnCw  old_id=223  new_id=100
+    OLD: 
+    NEW: Yangshuo, Guilin, China
+  sc=9PhvblFnHo  old_id=217  new_id=106
+    OLD: 
+    NEW: Taiwan Peace Park, Taipei, Taiwan
+  sc=BAH7keKlnGc  old_id=184  new_id=139
+    OLD: 
+    NEW: Salar de Uyuni, Uyuni, Bolivia
+  sc=BAZ1ZUPlnC7  old_id=171  new_id=152
+    OLD: 
+    NEW: Cholita Wrestling, El Alto, Bolivia
+  sc=BBBgI_YFnJv  old_id=166  new_id=157
+    OLD: 
+    NEW: MosaicCafé, Santiago, Chile
+  sc=BBOsiIMlnHr  old_id=163  new_id=160
+    OLD: 
+    NEW: Santiago
+  sc=BBOtF1QFnIm  old_id=162  new_id=161
+    OLD: 
+    NEW: Wairau Valley, Marlborough, New Zealand
+
+========================================================================
+BUCKET: old_appends_geo  (4)
+========================================================================
+  sc=BCIK3K9FnG5  old_id=153  new_id=170
+    OLD: Buenos Aires, Argentina
+    NEW: Buenos Aires
+  sc=BJGdT9-BYeE  old_id=65  new_id=258
+    OLD: Seattle, Washington
+    NEW: Seattle
+  sc=BMFsW9thGGT  old_id=60  new_id=263
+    OLD: Seattle, Washington
+    NEW: Seattle
+  sc=BjxaZmbBaPU  old_id=41  new_id=282
+    OLD: New York, New York
+    NEW: New York
+
+========================================================================
+BUCKET: new_appends_geo  (165)  (showing first 40)
+========================================================================
+  sc=-FxdjNFnEK  old_id=202  new_id=121
+    OLD: Salt Cathedral of Zipaquirá, Colombia
+    NEW: Salt Cathedral of Zipaquirá, Zipaquirá, Colombia
+  sc=-RLZjwFnNE  old_id=201  new_id=122
+    OLD: Hacienda Venecia Coffee Farm, Colombia
+    NEW: Hacienda Venecia Coffee Farm, Manizales, Colombia
+  sc=-RLt1zlnNk  old_id=200  new_id=123
+    OLD: Hacienda Venecia Coffee Farm, Colombia
+    NEW: Hacienda Venecia Coffee Farm, Manizales, Colombia
+  sc=-Xaa6sFnJO  old_id=198  new_id=125
+    OLD: Cartagena, Colombia
+    NEW: Cartagena, Bolívar, Colombia
+  sc=-XbXXalnLE  old_id=197  new_id=126
+    OLD: Cartagena, Colombia
+    NEW: Cartagena, Bolívar, Colombia
+  sc=5-qW_7lnEh  old_id=286  new_id=37
+    OLD: Rua da Bica de Duarte Belo, Lisbon
+    NEW: Rua da Bica de Duarte Belo, Lisbon, Portugal
+  sc=50dqxiFnIq  old_id=291  new_id=32
+    OLD: Dublin, Ireland
+    NEW: Dublin, County Dublin, Ireland
+  sc=5Ot-OTFnMy  old_id=304  new_id=19
+    OLD: Seattle Aquarium
+    NEW: Seattle Aquarium, Seattle, USA
+  sc=5OtGZYlnLm  old_id=306  new_id=17
+    OLD: Alki Beach Park, Seattle
+    NEW: Alki Beach Park, Seattle, USA
+  sc=5OtXvIFnME  old_id=305  new_id=18
+    OLD: Alki Beach Park, Seattle
+    NEW: Alki Beach Park, Seattle, USA
+  sc=5mctThFnIX  old_id=302  new_id=21
+    OLD: Compass Point Beach Resort, Bahamas
+    NEW: Compass Point Beach Resort, Nassau, Bahamas
+  sc=5nM0rkFnGg  old_id=301  new_id=22
+    OLD: Compass Point Beach Resort, Bahamas
+    NEW: Compass Point Beach Resort, Nassau, Bahamas
+  sc=5osaSrFnA5  old_id=300  new_id=23
+    OLD: Toronto, Ontario
+    NEW: Toronto, Ontario, Canada
+  sc=5tuSCulnGh  old_id=299  new_id=24
+    OLD: Dublin, Ireland
+    NEW: Dublin, Dublin, Ireland
+  sc=5tu_ZOlnHf  old_id=298  new_id=25
+    OLD: Dublin, Ireland
+    NEW: Dublin, Dublin, Ireland
+  sc=5tvsUJlnIg  old_id=297  new_id=26
+    OLD: Saint Patrick's Cathedral, Dublin
+    NEW: Saint Patrick's Cathedral, Dublin, Ireland
+  sc=5x58KzlnLa  old_id=293  new_id=30
+    OLD: The Cobblestone, Dublin
+    NEW: The Cobblestone, Dublin, Ireland
+  sc=5xbqoxlnOJ  old_id=295  new_id=28
+    OLD: Dublin, Ireland
+    NEW: Dublin, Dublin, Ireland
+  sc=5xcgVKFnP9  old_id=294  new_id=29
+    OLD: Galway, Ireland
+    NEW: Galway, Galway, Ireland
+  sc=68W2JvlnLo  old_id=253  new_id=70
+    OLD: Amsterdam, Netherlands
+    NEW: Amsterdam, North Holland, Netherlands
+  sc=6AvJSglnEB  old_id=283  new_id=40
+    OLD: Monserrate Palace, Sintra
+    NEW: Monserrate Palace, Sintra, Portugal
+  sc=6AwZefFnGJ  old_id=282  new_id=41
+    OLD: Pena Palace, Sintra
+    NEW: Pena Palace, Sintra, Portugal
+  sc=6BBVdKlnIh  old_id=281  new_id=42
+    OLD: Palácio da Pena, Sintra
+    NEW: Palácio da Pena, Sintra, Portugal
+  sc=6BDYzLFnMv  old_id=279  new_id=44
+    OLD: Sintra, Portugal
+    NEW: Sintra, Lisbon, Portugal
+  sc=6DlaPzFnDj  old_id=278  new_id=45
+    OLD: Chiado, Lisbon
+    NEW: Chiado, Lisbon, Portugal
+  sc=6KLD-XlnEC  old_id=277  new_id=46
+    OLD: Lagos, Portugal
+    NEW: Lagos, Faro, Portugal
+  sc=6QtCK7FnDN  old_id=272  new_id=51
+    OLD: Maria Luisa Park, Seville
+    NEW: Maria Luisa Park, Seville, Spain
+  sc=6WC7_yFnLF  old_id=271  new_id=52
+    OLD: Plaza de España, Seville
+    NEW: Plaza de España, Seville, Spain
+  sc=6Zu6UrFnNO  old_id=269  new_id=54
+    OLD: Granada, Spain
+    NEW: Granada, Granada, Spain
+  sc=6bArkrlnCr  old_id=268  new_id=55
+    OLD: Granada, Spain
+    NEW: Granada, Andalusia, Spain
+  sc=6cWDFlFnM4  old_id=267  new_id=56
+    OLD: Granada, Spain
+    NEW: Granada, Andalusia, Spain
+  sc=6hcMk9lnK-  old_id=264  new_id=59
+    OLD: Rock of Gibraltar
+    NEW: Rock of Gibraltar, Gibraltar, Gibraltar
+  sc=6k61ISFnBy  old_id=261  new_id=62
+    OLD: Fez, Morocco
+    NEW: Fez, Fez-Meknes, Morocco
+  sc=6pmrY9FnFa  old_id=259  new_id=64
+    OLD: Riad Idrissy & The Ruined Garden, Fez
+    NEW: Riad Idrissy & The Ruined Garden, Fez, Morocco
+  sc=70DXlclnPZ  old_id=238  new_id=85
+    OLD: Bologna, Italy
+    NEW: Bologna, Emilia-Romagna, Italy
+  sc=70r2T-lnDG  old_id=236  new_id=87
+    OLD: Piazza Maggiore, Bologna
+    NEW: Piazza Maggiore, Bologna, Italy
+  sc=70s_qoFnFh  old_id=235  new_id=88
+    OLD: Towers of Bologna
+    NEW: Towers of Bologna, Bologna, Italy
+  sc=78uIebFnGN  old_id=231  new_id=92
+    OLD: Leaning Tower of Pisa
+    NEW: Leaning Tower of Pisa, Pisa, Italy
+  sc=7Sa-ONFnH8  old_id=252  new_id=71
+    OLD: Heidelberg, Germany
+    NEW: Heidelberg, Baden-Württemberg, Germany
+  sc=7SdtbVFnMS  old_id=248  new_id=75
+    OLD: Brussels, Belgium
+    NEW: Brussels, Brussels, Belgium
+
+========================================================================
+ONLY-OLD (0)  /  ONLY-NEW (1)
+========================================================================
+  only-new sc=DYFNMcHxKDv  id=323  ts=2026-05-08T14:39:41+0000  loc=Mexico City, Mexico City, Mexico
