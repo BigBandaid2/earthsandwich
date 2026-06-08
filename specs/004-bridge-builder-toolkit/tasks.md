@@ -53,11 +53,11 @@
 
 ---
 
-## Phase 4: User Story 2 — Pile & target data-profile analysis (Priority: P2)
+## Phase 4: User Story 2 — Pile & target data-profiling (Priority: P2)
 
-**Goal**: Raw prior-art baselines + enhanced LLM-analyst playgrounds for both sides, with transparent prior-art-vs-toolkit labeling.
+**Goal**: Raw prior-art baselines + enhanced LLM-analyst playgrounds for both sides, with transparent prior-art-vs-toolkit labeling. Writes into the **data-profiling loop** (its own iteration history, independent of bridge-mapping).
 
-**Independent Test**: `analyze pile` + `analyze target` on the validated project produce `pile.ydata-profile.html`, `pile.enhanced.html`, `target.ydata-profile.html`, `target.er-diagram.svg`, `target.enhanced.html` in `iteration-1/`. Raw artifacts are canonical; enhanced sections are labeled baseline/LLM-extended/toolkit-novel.
+**Independent Test**: `analyze pile` + `analyze target` on the validated project produce `pile.ydata-profile.html`, `pile.enhanced.html`, `target.ydata-profile.html`, `target.er-diagram.svg`, `target.enhanced.html` in `data-profiling/iteration-1/`. Raw artifacts are canonical; enhanced sections are labeled baseline/LLM-extended/toolkit-novel.
 
 - [ ] T014 [P] [US2] Implement `bridge-builder-toolkit/analyze/introspect.py` — SQLAlchemy 2.x reflection of the target schema (tables, columns, types, PK/FK, NOT-NULL constraints)
 - [ ] T015 [US2] Implement `bridge-builder-toolkit/analyze/pile.py` — run `ydata-profiling` on a sampled pile → `pile.ydata-profile.html` (raw, FR-021); build `pile.enhanced.html` covering ID-candidates, entity classification, pipeline-metadata-vs-source, likely-inferred fields, AI-workflow evidence, public-knowledge enrichment w/ citations, sampled linked-media (FR-023/024) with per-section labels; hard-error (exit 2) if ydata fails (FR-105)
@@ -106,8 +106,8 @@
 
 **Independent Test**: Adjust a mapping + comment in the bridge playground, copy the prompt, run `iterate` → new iteration (re-synth, re-oracle if perms). Run `accept-bundle` → a `/speckit.specify`-ready bundle.
 
-- [ ] T028 [US5] Implement `bridge-builder-toolkit/iterate/iterate.py` — accept a feedback payload (bridge-playground prompt OR a US6 review summary), produce a new iteration: re-run synthesis, re-enter the oracle loop if perms, and re-run profile analyses only when the feedback surfaces an uncovered property (FR-080/081); persist alongside prior iterations (FR-082)
-- [ ] T029 [US5] Implement `bridge-builder-toolkit/iterate/accept_bundle.py` — materialize `final-bundle/`: a `bundle.yml` manifest + all iteration artifacts (raw + enhanced × stage) + final `mapping.yml` + `bridge.output.tsv` + full iteration history + captured prompt payloads + the two **verbatim 003-US3 carry-forward items** (FR-083/090/091/092)
+- [ ] T028 [US5] Implement `bridge-builder-toolkit/iterate/iterate.py` — accept a feedback payload (bridge-playground prompt OR a US6 review summary), produce a new **bridge-mapping iteration**: re-run synthesis, re-enter the oracle loop if perms; when feedback surfaces an uncovered property, produce a new **data-profiling iteration** (in its own loop) that the new bridge-mapping iteration `profiling_ref`s — NOT embedded in the bridge iteration (FR-080/081); persist alongside prior iterations of each loop (FR-082)
+- [ ] T029 [US5] Implement `bridge-builder-toolkit/iterate/accept_bundle.py` — materialize `final-bundle/`: a `bundle.yml` manifest + all iteration artifacts (raw + enhanced × stage) from BOTH the data-profiling and bridge-mapping iteration histories + final `mapping.yml` + `bridge.output.tsv` + captured prompt payloads + the two **verbatim 003-US3 carry-forward items** (FR-083/090/091/092)
 - [ ] T030 [US5] Wire `iterate` (`--feedback`) + `accept-bundle` (`--iteration`) into `cli.py`
 - [ ] T031 [US5] Integration test `bridge-builder-toolkit/tests/integration/test_iterate_bundle.py` — feedback → new iteration produced; `accept-bundle` → bundle structure usable as `/speckit.specify` input without structural hand-editing (SC-011); FR-092 carry-forward items present verbatim
 
@@ -146,7 +146,7 @@
 - **Setup (P1)** → **Foundational (P2)** → all user stories. Foundational (config, locking, inference, playground) blocks every story.
 - **US1 (P1)** has no story dependency beyond Foundational — it's the MVP gate; every later story operates on a project US1 creates.
 - **US2 (P2)** depends on US1 (needs a validated project).
-- **US3 (P3)** depends on US2 (synthesis consumes the profile analyses).
+- **US3 (P3)** depends on US2 (bridge-mapping synthesis consumes the latest data-profiling iteration).
 - **US4 (P4)** depends on US3 (oracle validates a produced mapping) + US1's permission status.
 - **US5 (P5)** depends on US3 (and US4 if perms) — iteration re-runs synthesis/oracle.
 - **US6 (P6)** depends on US3–US5 having produced output to review.

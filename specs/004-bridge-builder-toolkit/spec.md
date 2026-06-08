@@ -10,9 +10,10 @@
 ### Session 2026-06-08
 
 - Q: How does the bridge produce AI-inferred target columns relative to the dbt artifact? → A: Hybrid — dbt expresses the deterministic mappings; a separate toolkit-side LLM step (in the orchestrator, not inside dbt) produces the AI-inferred columns; dbt's `schema.yml` marks which columns are AI-inferred but does not execute the inference.
-- Q: Which target types does the initial implementation support? → A: Relational DB only (Postgres via SQLAlchemy / dbt-postgres) for v1. FR-005's schema-file and API-URL forms remain the eventual surface but are deferred; the toolkit may reject non-DB targets at project creation.
+- Q: Which target types does the initial implementation support? → A: Relational DB only (Postgres via SQLAlchemy reflection; transform on dbt-duckdb) for v1. FR-005's schema-file and API-URL forms remain the eventual surface but are deferred; the toolkit may reject non-DB targets at project creation.
 - Q: Where do the "transformed records" that US6 reviews come from, given the oracle only round-trips single rows? → A: The bridge materializes its full transformed output to a LOCAL artifact in the iteration folder (keyed by the pile's dedup id); US6 review and accept-bundle read that file. The target DB is read-only except the transient oracle round-trip — no bulk load into the target.
 - Q: Does the oracle validate one pile row or a sample? → A: A small sample (3–5) of real pile rows, deterministically chosen to include constraint-stressing rows (most empty/null fields, longest values); the oracle passes only if ALL sampled rows insert+delete cleanly.
+- Q: Are the data-profiling and bridge-mapping (synthesis→oracle→review) loops one iteration sequence? → A: No — two INDEPENDENT loops. The **data-profiling** loop (pile + target profiling) has its own iteration sequence (re-profile without re-synthesizing); the **bridge-mapping** loop (synthesis→oracle→review) has its own. A bridge-mapping iteration records a reference to the LATEST data-profiling iteration it was built against, but the loops are not locked: re-profiling neither invalidates nor advances bridge-mapping iterations, and a bridge-mapping iteration does not force a new data-profiling pass. Each loop keeps its OWN preserved iteration history; each data-profiling iteration records a fingerprint of the pile state it profiled (row count + content hash + timestamp) so pile evolution (re-scrapes, new data) is auditable over time.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -34,9 +35,9 @@ A repository operator opens the toolkit, names a new bridge project (e.g. "IG po
 
 ---
 
-### User Story 2 — Pile and target data-profile analysis (Priority: P2)
+### User Story 2 — Pile and target data-profiling (Priority: P2)
 
-For a validated project, the operator runs the data-profile analysis stages: pile profiling and target profiling. For EACH side, the toolkit produces multiple artifacts side by side:
+For a validated project, the operator runs the data-profiling stages: pile profiling and target profiling. For EACH side, the toolkit produces multiple artifacts side by side:
 
 - A **raw `ydata-profiling` HTML report** (the canonical prior-art data-profiling tool's untouched output) — preserved in the project folder as a baseline that an operator already familiar with ydata-profiling can immediately read.
 - When the side is a **relational database** (the target in the IG→Travelogue case; future DB-backed piles), a **raw ER diagram artifact** produced by an established schema-visualization tool (canonical references: `eralchemy`, `schemaspy`) — also preserved untouched as a baseline.
@@ -95,7 +96,7 @@ Critically, this is an **automatic** loop: the operator does NOT see intermediat
 
 **Why this priority**: Round-trip insertion validation as an automatic acceptance oracle is the toolkit's most defensible novelty over existing schema-mapping tools. Running the oracle BEFORE presenting the bridge to the operator means the operator's manual refinement effort (User Story 5) is spent only on bridges that already work mechanically — they can focus on semantic correctness rather than schema-level wiring. P4 because it depends on P3 producing a proposal, and on P1's validation having detected the relevant permissions.
 
-**Independent Test**: Operator's project uses the 002 Travelogue Docker stack as the target (full read/write/delete). Operator runs bridge synthesis (User Story 3) with a deliberately-broken proposal scaffolding. The oracle loop fires automatically, produces a series of automatic iterations in the iteration-history directory, and either converges to an oracle pass or halts at iteration-5-failed. The operator never has to manually intervene during the loop. After the loop terminates, the operator can inspect each intermediate iteration in the history.
+**Independent Test**: Operator's project uses the 002 Travelogue Docker stack as the target (full read/write/delete). Operator runs bridge synthesis (User Story 3) with a deliberately-broken proposal scaffolding. The oracle loop fires automatically, produces a series of automatic iterations in the bridge-mapping iteration history, and either converges to an oracle pass or halts at iteration-5-failed. The operator never has to manually intervene during the loop. After the loop terminates, the operator can inspect each intermediate iteration in the history.
 
 **Acceptance Scenarios**:
 
@@ -123,7 +124,7 @@ After bridge synthesis (and the automatic oracle loop, if applicable) terminates
 2. **Given** the project has insert+delete permissions, **When** a manual iteration is produced, **Then** it automatically re-enters the oracle loop (User Story 4) before being presented to the operator for the next round of manual refinement.
 3. **Given** feedback in a manual iteration surfaces a property the pile- or target-analysis report didn't cover, **When** the iteration runs, **Then** the upstream profile analyses for that iteration are re-run and extended to cover the new property (both raw prior-art baselines and enhanced playground refreshed if needed).
 4. **Given** any iteration (automatic or manual) has completed, **When** the operator inspects the project folder, **Then** every iteration's artifacts plus the feedback payload that drove the next iteration are present and readable.
-5. **Given** an iteration is mid-flight, **When** the orchestrator process is killed, **Then** the project's iteration-history directory remains in a consistent state and the next invocation can start a fresh iteration cleanly.
+5. **Given** an iteration is mid-flight, **When** the orchestrator process is killed, **Then** the project's iteration histories (data-profiling and bridge-mapping) remain in a consistent state and the next invocation can start a fresh iteration cleanly.
 6. **Given** the operator decides the current bridge is final, **When** they invoke the toolkit's accept-bundle command, **Then** a final-bundle directory is materialized inside the project — suitable as input to `/speckit.specify` for authoring the downstream bridge spec.
 
 ---
@@ -215,6 +216,7 @@ The baseline is **deliberately editable**, not frozen, for two reasons: (a) the 
 - **FR-046**: When the project has insert+delete permissions on the target (per FR-007's recorded status), bridge synthesis MUST automatically pass control to the oracle loop (FR-070) before exposing the bridge to the operator. When permissions are absent, control passes directly to the manual refinement path (User Story 5).
 - **FR-047**: The bridge transform is a **hybrid**: deterministic field/table mappings are expressed in the dbt project artifact (FR-041), while AI-inferred target columns are produced by a separate toolkit-side LLM inference step that runs in the orchestrator (NOT inside dbt). The dbt project's `schema.yml` MUST mark which columns are AI-inferred (the designation FR-153 reads), but the dbt SQL itself MUST NOT execute the inference. Re-running the bridge MAY therefore yield different AI-inferred values across iterations even with an unchanged deterministic dbt artifact — this is the basis for the inference-quality review in User Story 6.
 - **FR-048**: Bridge synthesis MUST **materialize the full transformed output** of the current mapping (deterministic dbt mappings + the FR-047 toolkit-side inference) over the pile to a **local artifact** in the iteration folder (e.g. `bridge.output.tsv`/`.json`, keyed by the pile's dedup id). This local output is what the User Story 6 review (FR-151) and `accept-bundle` (FR-090) read. The target database MUST remain read-only except for the transient single-row oracle round-trip (FR-070); the bridge MUST NOT bulk-load its full output into the target.
+- **FR-049**: The toolkit-side AI inference step (FR-047) MUST preserve its inputs (Constitution Principle V / Cardinal Rule #4): for every AI-inferred target column, the pile fields fed to the inference and the inference rationale MUST be persisted alongside the inferred value in the materialized output artifact (FR-048) and carried into the Final Bundle (FR-090), so an inference can be re-run or audited with a different model without re-deriving it from the pile.
 
 **Playground contract (binding on Stages 1–3 enhanced playgrounds)**
 
@@ -238,8 +240,8 @@ The baseline is **deliberately editable**, not frozen, for two reasons: (a) the 
 
 **Manual iterative refinement (User Story 5)**
 
-- **FR-080**: The operator MUST be able to take the bridge playground's prompt output, run an `iterate` CLI command with that payload as input, and produce a new iteration that incorporates the feedback.
-- **FR-081**: A manual iteration MUST re-run bridge synthesis (producing fresh dbt project and enhanced playground); MAY re-run pile and target profile analyses if the feedback surfaces a property a prior iteration didn't cover; and MUST re-enter the oracle loop (FR-046) if the project has insert+delete permissions.
+- **FR-080**: The operator MUST be able to take the bridge playground's prompt output, run an `iterate` CLI command with that payload as input, and produce a new **bridge iteration** that incorporates the feedback.
+- **FR-081**: A manual bridge-mapping iteration MUST re-run bridge-mapping synthesis (producing a fresh dbt project + enhanced playground) and MUST re-enter the oracle loop (FR-046) if the project has insert+delete permissions. If the feedback surfaces a property the current data-profiling didn't cover, the toolkit MUST produce a **new Data-Profiling Iteration** in the independent data-profiling loop (versioned in its own history) that this and subsequent bridge-mapping iterations reference — the re-run profiling is NOT embedded inside the bridge-mapping iteration.
 - **FR-082**: Every manual iteration MUST be persisted on disk inside the project folder alongside automatic iterations. The on-disk layout MUST allow an operator to inspect any prior iteration without re-running the toolkit.
 - **FR-083**: The operator MUST be able to mark the current bridge as final via an `accept-bundle` CLI command, which materializes a final-bundle directory inside the project — suitable as input to `/speckit.specify` for authoring the downstream bridge spec.
 
@@ -283,7 +285,7 @@ The baseline is **deliberately editable**, not frozen, for two reasons: (a) the 
 
 ### Key Entities
 
-- **Bridge Project**: A named workspace for one bridge effort (e.g. "IG post scrape to Travelogue"). Owns: a config file recording pile location, target endpoint, credential references, and creation-time validation status; an iteration-history directory; a final-bundle directory after acceptance. Multiple bridge projects coexist isolatedly in `bridge-builder-toolkit/projects/`.
+- **Bridge Project**: A named workspace for one bridge effort (e.g. "IG post scrape to Travelogue"). Owns: a config file recording pile location, target endpoint, credential references, and creation-time validation status; a **data-profiling iteration history** and a separate **bridge-mapping iteration history** (the two independent loops); a final-bundle directory after acceptance. Multiple bridge projects coexist isolatedly in `bridge-builder-toolkit/projects/`.
 - **Pile**: Operator-supplied input source referenced from a project's config. Filesystem-accessible at run time.
 - **Target Model**: Operator-supplied input destination referenced from a project's config. May be a schema file, snapshot, API surface, or direct DB access. Treated as read-only.
 - **Connection Validation Result**: The recorded outcome of probing a project's endpoints at creation time. Per-endpoint: reachable/readable yes-no, plus for the target: insert/delete access yes-no. Drives whether the oracle loop runs (FR-070) or is skipped (FR-075).
@@ -291,8 +293,10 @@ The baseline is **deliberately editable**, not frozen, for two reasons: (a) the 
 - **ER-Diagram Artifact**: A raw, untouched ER-diagram produced per side per iteration WHEN the side is a relational database. Canonical Stage-2 schema-visualization baseline. Absent for non-relational sides.
 - **dbt Project Artifact**: A stock-dbt-runnable project produced by the bridge-synthesis stage. Canonical Stage-3 declarative-transformation baseline.
 - **Enhanced Playground**: A single-file HTML playground produced per stage per iteration. Consumes its stage's prior-art artifact(s) and adds the LLM-analyst layer. Per-section labeled "prior-art baseline / LLM-extended / toolkit-novel" (FR-022 / FR-044).
-- **Iteration**: One pass through bridge synthesis within a project. Has an integer index, an origin (automatic — from oracle feedback; or manual — from operator feedback), and an oracle-validation status (validated / failed / skipped). Owns: all per-iteration artifacts (raw + enhanced × stage), the materialized bridge output artifact (FR-048), the feedback payload that drove it, and the oracle Validation Result.
-- **Iteration History**: An on-disk versioned record of all iterations for a project, mixing automatic and manual iterations chronologically. Movable as part of the final bundle.
+- **Data-Profiling Iteration**: One versioned pass of pile + target data-profiling. Has an integer index and an origin (initial; operator re-run; or feedback-driven — e.g. a bridge-mapping iteration's feedback surfacing an uncovered property, FR-081). Records a **fingerprint of the pile state it profiled** (row count + content hash + timestamp) so pile evolution is auditable. Owns the raw ydata-Profile + ER-Diagram artifacts, the pile/target Enhanced Playgrounds, and the feedback payload (if any) that drove it. Its latest version is what bridge-mapping synthesis references.
+- **Data-Profiling Iteration History**: An on-disk versioned record of all data-profiling iterations for a project. Earlier profiles + their driving feedback are **preserved to audit** how the data profile and operator understanding evolved over time — including across pile changes (re-scrapes, new data). Independent of the bridge-mapping loop; movable as part of the final bundle.
+- **Bridge-Mapping Iteration**: One pass through bridge-mapping synthesis → oracle → (manual refinement) → review. Has an integer index, an origin (automatic — from oracle feedback; or manual — from operator feedback), an oracle-validation status (validated / failed / skipped), and a **reference to the Data-Profiling Iteration it was built against**. Owns: the Mapping Proposal, the dbt Project Artifact, the enhanced bridge playground, the materialized bridge output artifact (FR-048), the feedback payload that drove it, the oracle Validation Result, and any Review Sessions.
+- **Bridge-Mapping Iteration History**: An on-disk versioned record of all bridge-mapping iterations for a project, mixing automatic and manual iterations chronologically. Independent of the Data-Profiling Iteration History — the two loops are not locked together. Movable as part of the final bundle.
 - **Mapping Proposal**: The set of table- and field-level mappings between pile and target at a given iteration. Serialized as the dbt project artifact's models + schema.yml, plus comments captured via the enhanced bridge playground.
 - **Validation Result**: The outcome of one insert+delete round trip against the target during an iteration — success, schema-violation failure, transient failure (retried), or "skipped" — with the transformed dummy record and any error message.
 - **Synthesized Feedback Prompt**: A natural-language payload generated automatically from an oracle failure, used to seed the next automatic iteration's bridge synthesis. Distinct from operator-generated feedback in that it requires no user intervention.
@@ -333,7 +337,7 @@ The baseline is **deliberately editable**, not frozen, for two reasons: (a) the 
 ## Assumptions
 
 - The operator has Python 3.12+, Docker, and an Anthropic LLM API key available at run time (matches the rest of the project's environment).
-- `ydata-profiling`, an ER-diagram tool (`eralchemy` or `schemaspy`), and `dbt-core` (with the relevant adapter for the IG→Travelogue case, e.g. `dbt-postgres`) are installable in the toolkit's venv.
+- `ydata-profiling`, an ER-diagram tool (`eralchemy2` — the maintained SQLAlchemy-2.x fork — or `schemaspy`), and `dbt-core` with the **`dbt-duckdb`** adapter are installable in the toolkit's venv. Per plan/research, the deterministic transform runs locally on DuckDB (pile TSV → DuckDB → output) — keeping the target Postgres read-only and the toolkit portable; the target Postgres is used only for schema reflection and the oracle round-trip.
 - The pile is filesystem-accessible to the toolkit process. Remote piles are out of scope for the initial implementation.
 - The target's schema is introspectable. For the IG→Travelogue first execution, this means a live Postgres database (via the existing `docker compose up` stack) or a static schema file. For future targets, SQLAlchemy reflection is the assumed mechanism.
 - For the automatic oracle loop (User Story 4), the operator can supply credentials with both insert and delete permissions on the target — but the toolkit DOES NOT require this; projects without those permissions skip the oracle loop and rely on manual refinement (User Story 5) alone.

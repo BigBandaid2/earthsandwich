@@ -44,7 +44,7 @@ bridge_builder project list      # confirms name, pile, target, validation statu
 bridge_builder analyze pile   --project "IG post scrape to Travelogue"
 bridge_builder analyze target --project "IG post scrape to Travelogue"
 ```
-Produces in `iterations/iteration-1/`:
+Produces in `data-profiling/iteration-1/`:
 - `pile.ydata-profile.html` (canonical ydata — recognizable; SC-003), `pile.enhanced.html` (no ER — non-relational pile, FR-027).
 - `target.ydata-profile.html`, `target.er-diagram.svg` (canonical eralchemy2; SC-004), `target.enhanced.html` (ranked candidate tables to populate — `stops` is the obvious one).
 

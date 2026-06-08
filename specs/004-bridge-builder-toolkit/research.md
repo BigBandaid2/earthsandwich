@@ -62,7 +62,7 @@ Resolves the "deferred to planning" items from the [Clarifications](spec.md#clar
 
 ## 7. On-disk project layout & concurrency
 
-- **Decision**: `bridge-builder-toolkit/projects/<name>/` per project (FR-006/009); inside it `project.yml`, `iterations/iteration-<N>/`, `truth-baseline/`, and `final-bundle/` after acceptance. Per-project locking via a **lockfile holding PID + start time**, reclaimed if the PID is dead (FR-110) — using the `filelock` library or an os-level advisory lock.
+- **Decision**: `bridge-builder-toolkit/projects/<name>/` per project (FR-006/009); inside it `project.yml`, `data-profiling/iteration-<N>/`, `bridge-mapping/iteration-<N>/`, `truth-baseline/`, and `final-bundle/` after acceptance. Per-project locking via a **lockfile holding PID + start time**, reclaimed if the PID is dead (FR-110) — using the `filelock` library or an os-level advisory lock.
 - **Rationale**: Mirrors pile-app's "everything under one movable root" (FR-003/SC-015). Iteration-numbered subfolders give the inspectable history (FR-082) and side-by-side compare (US5). A PID lockfile is the simplest crash-reclaimable lock.
 - **Alternatives**: a SQLite metadata DB per installation — heavier than flat folders + YAML; rejected for the same "legible, greppable, movable" reasons the pile is flat files.
 

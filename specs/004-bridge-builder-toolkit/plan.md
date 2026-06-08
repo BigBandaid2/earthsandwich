@@ -17,7 +17,7 @@ The toolkit wraps established prior-art tools (`ydata-profiling`, `eralchemy2`, 
 
 **Language/Version**: Python 3.12+
 **Primary Dependencies**: Typer (CLI); `ydata-profiling` ≥4.18 (data profiling); `eralchemy2` + system GraphViz (ER diagrams); `dbt-core` + `dbt-duckdb` + `duckdb` (declarative mapping, run locally); SQLAlchemy 2.x + `psycopg[binary]` (Postgres reflection + oracle); `anthropic` (LLM analyst + bridge inference); `PyYAML` (project config); `filelock` (per-project lock); `pytest` (tests)
-**Storage**: Filesystem — per-project folders (`project.yml`, `iterations/iteration-<N>/`, `truth-baseline/`, `final-bundle/`); per-iteration DuckDB file; raw prior-art artifacts + enhanced playground HTML; truth-baseline TSV + edit-history sidecar. No toolkit-owned database server.
+**Storage**: Filesystem — per-project folders (`project.yml`, `data-profiling/iteration-<N>/`, `bridge-mapping/iteration-<N>/`, `truth-baseline/`, `final-bundle/`) — two independent iteration loops; per-bridge-iteration DuckDB file; raw prior-art artifacts + enhanced playground HTML; truth-baseline TSV + edit-history sidecar. No toolkit-owned database server.
 **Testing**: pytest — unit (mapping/transform/inference helpers, with mocked LLM + DuckDB fixtures), integration (oracle round-trip against the 002 Docker Postgres; full IG→Travelogue stage walkthrough), synthetic oracle cases (SC-007/008/009/010)
 **Target Platform**: Local developer machine (Linux/macOS/Windows) with Python venv, Docker (for the 002 Postgres target), GraphViz, and an Anthropic API key
 **Project Type**: Single-project CLI tool (one new App root `bridge-builder-toolkit/`)

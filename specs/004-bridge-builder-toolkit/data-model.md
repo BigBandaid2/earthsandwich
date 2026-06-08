@@ -15,27 +15,33 @@ bridge-builder-toolkit/projects/<project-name>/
 ├── truth-baseline/
 │   ├── baseline.tsv                    # Truth Baseline (human-editable; FR-157)
 │   └── baseline.edit-history.jsonl     # append-only edit history sidecar (FR-155)
-├── iterations/
+├── data-profiling/                    # DATA-PROFILING LOOP — its own preserved history
 │   ├── iteration-1/
-│   │   ├── iteration.yml               # Iteration metadata (origin, oracle status, parent)
-│   │   ├── pile.ydata-profile.html     # raw ydata (FR-021)            — Stage 2
-│   │   ├── pile.enhanced.html          # enhanced playground (FR-022)  — Stage 2
-│   │   ├── target.ydata-profile.html   # raw ydata
-│   │   ├── target.er-diagram.svg       # raw eralchemy2 (relational only; FR-027)
-│   │   ├── target.enhanced.html        # enhanced playground
-│   │   ├── mapping.yml                 # Mapping Proposal (incl. AI-Inferred designation)
-│   │   ├── bridge.dbt-project/         # raw stock-runnable dbt-duckdb project (FR-041)
-│   │   ├── bridge.duckdb               # local staging+transform engine (gitignored)
-│   │   ├── bridge.output.tsv           # materialized full output (FR-048)
-│   │   ├── bridge.enhanced.html        # enhanced bridge playground (FR-042)
-│   │   ├── oracle.result.json          # Validation Result (FR-070) — absent if skipped
-│   │   ├── feedback.in.txt             # feedback payload that DROVE this iteration
-│   │   ├── feedback.synthesized.txt    # auto feedback this iteration EMITTED (oracle fail)
-│   │   └── review/                     # Review Sessions against this iteration (US6)
+│   │   ├── profiling.yml              # index, origin, pile fingerprint, driving feedback
+│   │   ├── pile.ydata-profile.html    # raw ydata (FR-021)            — Stage 2
+│   │   ├── pile.enhanced.html         # enhanced playground (FR-022)  — Stage 2
+│   │   ├── target.ydata-profile.html  # raw ydata
+│   │   ├── target.er-diagram.svg      # raw eralchemy2 (relational only; FR-027)
+│   │   └── target.enhanced.html       # enhanced playground
+│   └── iteration-2/ ...               # re-runs preserved (pile may have evolved)
+├── bridge-mapping/                    # BRIDGE-MAPPING LOOP — synthesis → oracle → review
+│   ├── iteration-1/
+│   │   ├── mapping-iteration.yml      # index, origin, oracle status, profiling_ref
+│   │   ├── mapping.yml                # Mapping Proposal (incl. AI-Inferred designation)
+│   │   ├── bridge.dbt-project/        # raw stock-runnable dbt-duckdb project (FR-041)
+│   │   ├── bridge.duckdb              # local staging+transform engine (gitignored)
+│   │   ├── bridge.output.tsv          # materialized full output (FR-048)
+│   │   ├── bridge.enhanced.html       # enhanced bridge playground (FR-042)
+│   │   ├── oracle.result.json         # Validation Result (FR-070) — absent if skipped
+│   │   ├── feedback.in.txt            # feedback payload that DROVE this iteration
+│   │   ├── feedback.synthesized.txt   # auto feedback this iteration EMITTED (oracle fail)
+│   │   └── review/                    # Review Sessions against this iteration (US6)
 │   │       └── session-<ts>.summary.json
-│   └── iteration-2/ ...                # mixed automatic + manual, chronological (FR-082)
-└── final-bundle/                       # materialized by accept-bundle (FR-090); absent until then
+│   └── iteration-2/ ...               # mixed automatic + manual, chronological (FR-082)
+└── final-bundle/                      # materialized by accept-bundle (FR-090); absent until then
 ```
+
+The **two loops are independent** (see spec Clarifications): the **data-profiling** loop versions pile/target profiles (each `data-profiling/iteration-N` records the pile fingerprint it saw, so pile evolution is auditable); the **bridge-mapping** loop versions synthesis→oracle→review and each `bridge-mapping/iteration-N` records the `profiling_ref` it was built against. Re-running one never advances the other.
 
 ---
 
@@ -67,20 +73,38 @@ validation:                            # Connection Validation Result (FR-007)
 ### Connection Validation Result
 The `validation:` block above. Per-endpoint booleans + timestamp + reason. Recorded at creation (FR-007); re-checked at each iteration's oracle/validation step and re-surfaced if credentials changed (Edge Case).
 
-### Iteration — `iteration.yml`
+### Data-Profiling Iteration — `data-profiling/iteration-<N>/profiling.yml`
+The data-profiling loop, with its own preserved history (re-runs kept for audit; the pile may evolve between them).
+```yaml
+index: 1
+origin: "initial"                      # initial | operator-rerun | feedback-driven (FR-081)
+created_at: "..."
+pile_fingerprint:                      # so pile evolution (re-scrapes, new data) is auditable
+  rows: 322
+  content_sha256: "abc123…"
+  observed_at: "..."
+driving_feedback: null                 # the bridge-mapping feedback that triggered this re-run, if any
+artifacts:
+  raw: [pile.ydata-profile.html, target.ydata-profile.html, target.er-diagram.svg]
+  enhanced: [pile.enhanced.html, target.enhanced.html]
+```
+
+### Bridge-Mapping Iteration — `bridge-mapping/iteration-<N>/mapping-iteration.yml`
+The synthesis→oracle→review loop, independent of the data-profiling loop; each bridge-mapping iteration pins the data-profiling version it used.
 ```yaml
 index: 2
 origin: "manual"                       # automatic (oracle feedback) | manual (operator)
 parent_index: 1
+profiling_ref: "data-profiling/iteration-1"   # the Data-Profiling Iteration this was built against
 oracle_status: "validated"             # validated | failed | skipped
 consecutive_auto_failures: 0           # the 5-fail counter (FR-073); reset rules apply
 created_at: "..."
 artifacts:                             # relative filenames present in this folder
-  raw: [pile.ydata-profile.html, target.ydata-profile.html, target.er-diagram.svg, bridge.dbt-project]
-  enhanced: [pile.enhanced.html, target.enhanced.html, bridge.enhanced.html]
+  raw: [bridge.dbt-project]
+  enhanced: [bridge.enhanced.html]
   output: bridge.output.tsv
 ```
-- **State transitions**: `synthesized → oracle(running) → {validated | failed→re-synth (auto) | skipped} → operator-review`. The 5-fail counter resets on an oracle pass OR a manual iteration (FR-073/078).
+- **State transitions**: `synthesized → oracle(running) → {validated | failed→re-synth (auto) | skipped} → operator-review`. The 5-fail counter resets on an oracle pass OR a manual iteration (FR-073/078). A `feedback-driven` re-profiling produces a new Data-Profiling Iteration (its own loop) that subsequent bridge-mapping iterations re-`profiling_ref` (FR-081).
 
 ### Mapping Proposal — `mapping.yml`
 ```yaml
@@ -139,7 +163,7 @@ Raw artifacts are the prior-art tools' untouched output (FR-021). Each **Enhance
 - `baseline.tsv`: human-readable, keyed by the review join key (e.g. `shortcode`); columns are the operator-believed-correct values, focused on AI-inferred fields. Hand-editable (FR-157). May start empty (FR-161 bootstrap).
 - `baseline.edit-history.jsonl`: append-only; one JSON line per `bridge-improved` edit: `{key, column, prior_value, new_value, session_id, timestamp, editor, rationale?}` (FR-155). No edit loss (SC-020).
 
-### Review Session — `iterations/iteration-N/review/session-<ts>.summary.json` (FR-159)
+### Review Session — `bridge-mapping/iteration-<N>/review/session-<ts>.summary.json` (FR-159)
 ```json
 {
   "session_id": "2026-06-08T18:00Z",
