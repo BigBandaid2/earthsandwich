@@ -510,3 +510,17 @@ With multiple developers:
 
 **Checkpoint**: `npm test` — all T135 tests pass; in-browser: Play advances through all non-abandoned regions in chronological order, Pause/resume work correctly, playback stops at final region and Play control re-enables with no looping (SC-018)
 
+---
+
+## Phase 30: Drift Reconciliation (2026-06-08 weekly scan)
+
+Small map polish/bugfixes that landed since the 2026-06-01 scan without task IDs. Appended as historical record (all complete).
+
+- [x] T139 [DRIFT] Flag pins restyled to read more like flags in `frontend/src/components/MapView.tsx`. Commit `cc50ac0`
+- [x] T140 [DRIFT] StopDetail modal: padding between image and caption. Commit `d78ed72`
+- [x] T141 [DRIFT] Stop rendering connecting lines at the Region (zoomed-out) level. Commit `d328e1a`
+- [x] T142 [DRIFT] Fix images not loading. Commit `eff98df`
+- [x] T143 [DRIFT] Fix map bounds error. Commit `0b9dc9c`
+
+**Checkpoint**: Drift reconciled — map polish/bugfix commits now in the historical record.
+

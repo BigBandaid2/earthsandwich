@@ -1,6 +1,6 @@
 # SDLC Workflow Guide
 
-> Source of truth for how this team uses Spec Kit, JIRA (OCS), and Claude Code together. Read before your first commit. Re-read whenever the workflow surprises you.
+> Source of truth for how this team uses Spec Kit, JIRA (OCS), and an AI Coding Assistant together. Read before your first commit. Re-read whenever the workflow surprises you.
 
 **Status**: Living document. Edit via PR; do not silently rewrite.
 
@@ -18,7 +18,7 @@ Triggered when an operator believes a User Story is complete (all its tasks `[x]
 
 1. **Build the DoD review playground** at `specs/<spec>/reviews/phase-NN-usN.html` (see [§Definition of Done Review](#definition-of-done-review) for table contents, carry-forward handling, and the prompt-back convention).
 2. **Fill the disposition fields** in the playground: reviewer name (the builder self-reviewing is fine), general comment, `DONE` / `Needs work`.
-3. **Paste the playground's copy-out prompt into Claude.** It records the outcome and ends — DONE path — with the gated flip: merge to master + full suite green, *then* JIRA Done.
+3. **Paste the playground's copy-out prompt into the AI Coding Assistant.** It records the outcome and ends — DONE path — with the gated flip: merge to master + full suite green, *then* JIRA Done.
 
 ### Before Weekly Team Meeting
 
@@ -58,7 +58,7 @@ The weekly cadence is the contract. The per-feature ceremony (below) is the opti
 | **Code repo** (`src/`, `public/`, etc.) | Implementation. The *how*. |
 | **JIRA** (project `OCS`) | PM state: priority, owner, sprint, story points, status. The *who*, *when*, *in what order*. |
 | **Git** | Reviewable change events. Audit trail. |
-| **Memory** (`.claude/.../memory/`) | Durable preferences across Claude sessions. |
+| **Memory** (`.claude/.../memory/`) | Durable preferences across AI Coding Assistant sessions. |
 
 If unsure where a change belongs, match the question it answers to the table above.
 
@@ -135,15 +135,15 @@ Per [Cardinal Rule #5](../.specify/memory/constitution.md#cardinal-rules), prefe
 
 ---
 
-## Reconciliation: Claude/spec drift scan
+## Reconciliation: spec drift scan
 
-Between Monday meetings, Claude makes small changes that don't always make it into `tasks.md`. The drift scan catches them.
+Between Monday meetings, agent-assisted changes land that don't always make it into `tasks.md`. The drift scan catches them.
 
-Ask Claude: *"Run a spec drift scan. For each commit touching `src/`, `public/`, or `package.json`, list whether it has a corresponding line in any `tasks.md`. Flag everything that doesn't, grouped by spec."*
+Drift-scan prompt: *"Run a spec drift scan. For each commit touching an App's code (e.g. `frontend/`, `backend/`, `pile-app/`, `bridge-builder-toolkit/`) rather than specs or docs, list whether it has a corresponding line in any `tasks.md`. Flag everything that doesn't, grouped by spec."*
 
-**Starting point.** Claude derives `<last_known_good_commit>` itself — never pass a date. The most recent `## Phase N: Drift Reconciliation (YYYY-MM-DD …)` heading across all `specs/**/tasks.md` defines the baseline; scan `<that-commit>..HEAD`. Fall back to last Monday 00:00 if no such phase exists. Scans are idempotent across re-runs and consecutive weeks chain without overlap.
+**Starting point.** Derive `<last_known_good_commit>` from the repo — never pass a date. The most recent `## Phase N: Drift Reconciliation (YYYY-MM-DD …)` heading across all `specs/**/tasks.md` defines the baseline; scan `<that-commit>..HEAD`. Fall back to last Monday 00:00 if no such phase exists. Scans are idempotent across re-runs and consecutive weeks chain without overlap.
 
-Claude enumerates changed files per commit, buckets them by spec, greps `tasks.md` for matches, and outputs unmatched commits as a proposed Phase N+1. Always *propose* — never append directly ([Cardinal Rule #1](../.specify/memory/constitution.md#cardinal-rules)).
+Enumerate changed files per commit, bucket them by spec, grep `tasks.md` for matches, and **append** the unmatched commits as a new `## Phase N+1: Drift Reconciliation (YYYY-MM-DD weekly scan)` at the bottom of each affected `tasks.md` — completed `[x]`, as historical record. Appending a new phase is exactly what [Cardinal Rule #1](../.specify/memory/constitution.md#cardinal-rules) sanctions ("new work appends new phases to the bottom"); its only prohibition is restructuring or rewriting *existing* completed or in-progress phases. The diff is the review — surface the phase before appending only when explicitly asked.
 
 Cadence: per-commit is too noisy; per-push (lightweight drift check via `after_implement` hook) and the weekly Monday scan together are the right catch-up rhythm.
 
@@ -319,7 +319,7 @@ The `before_implement` onboard hook is already enabled in `.specify/extensions.y
 
 **Weekly review** (Monday cadence **Knowledge refresh** step) — two parts, ~5 min per developer:
 
-1. **Digest** — ask Claude: *"Give me a weekly review since last Monday — what shipped, what's active, what's blocked."* Claude composes a `git log` summary plus an Atlassian MCP query for active sprint state. Three sections expected: shipped commits mapped to phases, active sprint issues with owners, items with no movement in 7+ days.
+1. **Digest** — ask the AI Coding Assistant: *"Give me a weekly review since last Monday — what shipped, what's active, what's blocked."* The AI Coding Assistant composes a `git log` summary plus an Atlassian MCP query for active sprint state. Three sections expected: shipped commits mapped to phases, active sprint issues with owners, items with no movement in 7+ days.
 2. **Quiz** — run `/speckit.onboard.quiz`. Generates 5 questions calibrated to your profile level (`junior` / `mid` / `senior`), grounded in real project artifacts, and persisted in `.onboard/profiles/<name>.json` so questions never repeat.
 
 No enforcement, no scoring, no surveillance — just a structured nudge for context refresh. If a quiz reveals confusion, that's a signal to update the spec or the docs.

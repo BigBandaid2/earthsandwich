@@ -206,6 +206,23 @@
 
 ---
 
+## Phase 29: Drift Reconciliation (2026-06-08 weekly scan)
+
+Code that landed since the 2026-06-01 scan without a `tasks.md` line — chiefly the operational **risk-aware re-scrape ramp** built to support the @welawen full rescrapes, plus a parked Google Photos spike. Appended as historical record (all complete).
+
+- [x] T264 [DRIFT] Risk-aware full re-scrape ramp CLI `pile-app/instagram/rescrape_ramp.py` — staged step ladder (0 sanity → 1 smoke-skip → 2 small probe + 20-min cooldown → 4 marathon), per-step halt-scan, operator-gated escalation between steps. Commit `c59c2d9`
+- [x] T265 [DRIFT] rescrape_ramp: explicit UTF-8 on all subprocess pipes (Windows console encoding crash fix). Commit `d3a0772`
+- [x] T266 [DRIFT] rescrape_ramp halt-scan: rollback banner reported as failure detail rather than a false `challenge` match (the rollback-advice-text false positive). Commit `15cea57`
+- [x] T267 [DRIFT] `instagram/pipeline.py` `_fetch_page_with_retry`: escalating multi-retry backoff (`TRANSIENT_RETRY_BACKOFFS_SEC`) for transient page fetches, replacing the single 60–180 s retry. Commit `7767e27`
+- [x] T268 [DRIFT] rescrape_ramp: retire step 3 (multi-page probe) — redundant once the page-fetch retry was hardened (T267). Commit `277eafb`
+- [x] T269 [DRIFT] Google Photos API ingestion spike `pile-app/photos/validation/` (`gphotos_spike.py` + `SETUP.md`) — PARKED (2025 Library API removed `mediaItems.list` for `photoslibrary.readonly`); OAuth credential gitignore (`client_secret*.json` / `token.json`). Commit `c506616`
+- [x] T270 [DRIFT] `tests/test_portability.py`: install the `[dev]` extra so a fresh venv has pytest. Commit `83d35c7`
+- [x] T271 [DRIFT] (validation scaffolding, informal per T252/T283) `instagram/validation/scrape-diff-v5.txt` against the 16-col pile. Commit `6ad4b7a`
+
+**Checkpoint**: Drift reconciled — the re-scrape ramp + parked photos spike are now in the historical record. The ramp and scrape-diff validation remain informal operator scaffolding (no public contract) per T252.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
