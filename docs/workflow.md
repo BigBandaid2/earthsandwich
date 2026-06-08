@@ -114,9 +114,9 @@ Standard ceremony for a feature with no prior history:
 1. `/speckit.specify "<description>"` (the `before_specify` hook handles the feature branch).
 2. `/speckit.clarify` if needed.
 3. `/speckit.plan` → `/speckit.tasks` → `/speckit.analyze`.
-4. `/speckit.jira.specstoissues <slug>` — Epic + Stories + active-phase Subtasks.
+4. `/speckit.jira.specstoissues <slug>` — Epic + Stories. Subtasks are **not** synced by default (`tasks.md` is their source of truth); break them out only for genuinely active-sprint work that needs JIRA triage (see [§JIRA sync](#jira-sync)).
 5. PR to default branch — review, merge, delete branch.
-6. `/speckit.jira.sync-status <slug>` — Subtasks flip to Done automatically; Stories advance to In Progress. Flip each Story to Done manually in JIRA only once it's merged to master (step 5) with the full suite green and its Independent Test verified — official DONE (see [§Definition of Done Review](#definition-of-done-review)).
+6. `/speckit.jira.sync-status <slug>` — Stories advance to In Progress automatically (any synced Subtasks flip per task state; by default there are none). Flip each Story to Done manually in JIRA only once it's merged to master (step 5) with the full suite green and its Independent Test verified — official DONE (see [§Definition of Done Review](#definition-of-done-review)).
 7. **Propagate** (see [§Project-Level Doc Propagation](#project-level-doc-propagation)).
 
 ### Project-Level Doc Propagation
