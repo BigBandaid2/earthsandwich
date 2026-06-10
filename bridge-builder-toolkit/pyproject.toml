@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bridge-builder-toolkit"
+version = "0.1.0"
+description = "Produce validated bridge specifications from a pile + target schema."
+readme = "README.md"
+requires-python = ">=3.12"
+dynamic = ["dependencies"]
+
+[project.scripts]
+# `bridge_builder` after `pip install -e .`; `python cli.py` in dev.
+bridge_builder = "cli:app"
+
+[tool.setuptools]
+py-modules = ["cli"]
+packages = ["common", "project", "analyze", "synthesize", "oracle", "iterate", "review"]
+
+[tool.setuptools.dynamic]
+# requirements.txt is the single source of truth for runtime deps.
+dependencies = { file = ["requirements.txt"] }

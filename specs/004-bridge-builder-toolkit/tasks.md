@@ -15,10 +15,10 @@
 
 ## Phase 1: Setup
 
-- [ ] T001 Create the `bridge-builder-toolkit/` App root with the dir skeleton (`common/`, `project/`, `analyze/`, `synthesize/`, `oracle/`, `iterate/`, `review/`, `projects/`, `tests/{unit,integration,fixtures}`) per plan.md Project Structure
-- [ ] T002 [P] Create `bridge-builder-toolkit/pyproject.toml` (console_scripts `bridge_builder = cli:app`, `py-modules = ["cli"]`, Python 3.12 floor) + `requirements.txt` (typer, ydata-profiling, eralchemy2, dbt-core, dbt-duckdb, duckdb, SQLAlchemy, psycopg[binary], anthropic, PyYAML, filelock, pytest)
-- [ ] T003 [P] Create `bridge-builder-toolkit/.env.example` (ANTHROPIC_API_KEY + target-cred env-var name placeholders), `.gitignore` (`projects/`, `venv/`, `.env`, `*.duckdb`, `__pycache__/`), and `README.md` (App overview + GraphViz/Docker/Anthropic prereqs + movability note)
-- [ ] T004 Create `bridge-builder-toolkit/cli.py` — Typer app registering all subcommands as stubs (`project create|list`, `analyze pile|target`, `synthesize bridge`, `iterate`, `accept-bundle`, `review`) per contracts/cli.md
+- [x] T001 Create the `bridge-builder-toolkit/` App root with the dir skeleton (`common/`, `project/`, `analyze/`, `synthesize/`, `oracle/`, `iterate/`, `review/`, `projects/`, `tests/{unit,integration,fixtures}`) per plan.md Project Structure
+- [x] T002 [P] Create `bridge-builder-toolkit/pyproject.toml` (console_scripts `bridge_builder = cli:app`, `py-modules = ["cli"]`, Python 3.12 floor) + `requirements.txt` (typer, ydata-profiling, eralchemy2, dbt-core, dbt-duckdb, duckdb, SQLAlchemy, psycopg[binary], anthropic, PyYAML, filelock, pytest)
+- [x] T003 [P] Create `bridge-builder-toolkit/.env.example` (ANTHROPIC_API_KEY + target-cred env-var name placeholders), `.gitignore` (`projects/`, `venv/`, `.env`, `*.duckdb`, `__pycache__/`), and `README.md` (App overview + GraphViz/Docker/Anthropic prereqs + movability note)
+- [x] T004 Create `bridge-builder-toolkit/cli.py` — Typer app registering all subcommands as stubs (`project create|list`, `analyze pile|target`, `synthesize bridge`, `iterate`, `accept-bundle`, `review`) per contracts/cli.md
 
 **Checkpoint**: App installs (`pip install -e .`); `bridge_builder --help` lists every stage subcommand.
 

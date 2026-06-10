@@ -1,0 +1,13 @@
+# Runtime dependencies (canonical source; pyproject reads this via dynamic deps).
+typer
+ydata-profiling
+eralchemy2
+dbt-core
+dbt-duckdb
+duckdb
+SQLAlchemy
+psycopg[binary]
+anthropic
+PyYAML
+filelock
+pytest
