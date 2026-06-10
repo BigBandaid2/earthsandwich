@@ -39,7 +39,7 @@ Triggered when an operator believes a User Story is complete (all its tasks `[x]
 
 10. **Pull current-sprint Stories from JIRA** — JQL: `project = OCS AND sprint = openSprints()`. List everything the team committed to this week, with owner and status. This is the baseline for steps 11–17: the planning doc, the link sweep, and the post-meeting push all read off the same set.
 11. **Link related tickets** — `Duplicate` for 1-to-1 parallels with a spec-kit Story, `Blocks` for prerequisite dependencies between tickets, `Relates` for everything else (see [§JIRA sync](#jira-sync)).
-12. **Create New Sprint Plan** — author `docs/planning/YYYY-WW.md` from the step-10 pull, which is canonical: include only people and items it returned. Header: `**Sprint**` + `**Goal**` (verbatim from JIRA). Body: one `### <Person>` sub-section per owner.
+12. **Create New Sprint Plan** — author `docs/planning/YYYY-WW.md` from the step-10 pull (canonical: only the people + items it returned), per [`sprint-review-template.md`](planning/sprint-review-template.md). Header `**Sprint**` + `**Goal**` verbatim from JIRA; one `### <Person>` sub-section per owner, tickets collapsed into ≤7 conceptual groups (see template).
 13. **Push to JIRA** — any phases newly decided in the meeting become new Stories in OCS, placed in the current sprint for velocity attribution. (Drift-discovered phases were already synced + sprint-attributed in steps 4–5.)
 14. **Update time-log artifacts with attested hours** — fold each attendee's step-8 attestation into `docs/planning/time-log.tsv` (fill empty `Hours Attested` cells, add dedicated rows for meeting time), regenerate `docs/planning/time-log.html` from the TSV so its embedded data matches, and update the sprint-review file's Hours section with attested totals.
 15. **Merge master into your feature branch.** Project-level updates from steps 3–6 land on master; each team member merges master into their active feature branch so subsequent work reads off the current state.
@@ -176,13 +176,17 @@ JIRA accumulates parallel issues that describe the same or related work — typi
 
 | Link | When | Direction (`inwardIssue` / `outwardIssue`) |
 |---|---|---|
-| `Duplicate` | Two issues describe the same work 1-to-1 (user ticket ↔ spec-kit Story; pre-overhaul Story ↔ post-overhaul Story) | canonical / duplicate |
+| `Duplicate` | Two issues describe the same work 1-to-1 (user ticket ↔ spec-kit Story; pre-overhaul Story ↔ post-overhaul Story) | duplicate / canonical |
 | `Blocks` | One ticket must finish before another can start | blocker / blocked |
 | `Relates` | Tangential or non-1-to-1 overlap — spike, follow-on, historical context, **or a pre-overhaul Story whose scope was split across multiple post-overhaul Stories** | either |
 
+> **Direction.** In `createIssueLink`, the `inwardIssue` performs the link's *outward* verb on the `outwardIssue` — a `Duplicate` renders "`inwardIssue` duplicates `outwardIssue`", and `Blocks` renders "`inwardIssue` blocks `outwardIssue`". So the **ignorable duplicate is the `inwardIssue`** and the **canonical keeper is the `outwardIssue`** (the JIRA UI lets you pick the verb directly, so this only bites API/MCP-driven linking).
+
 **Duplicate-check is step 4 of the weekly cadence** (`Sync Spec State to JIRA`). For each Story `/speckit.jira.specstoissues` just created, scan: (1) user-created tickets describing the same work; (2) pre-overhaul Stories the new one supersedes. Auto-link on a clean 1-to-1; use `Relates` when scope diverges. Surface candidates in the sprint review when judgement is needed.
 
-Don't touch the Subtasks under spec-kit Stories — those are managed by the speckit-jira agents; link at the Story level only. Surface `Blocks` chains at planning. OCS has no `Blocked` status; the `Blocks` link IS the dependency record. True close-cascade requires Parent-Subtask conversion (out of scope) — manually close duplicates when the spec-kit Story closes.
+**Mark the ignorable side `Dismissed`.** OCS has a `Dismissed` status for tickets that can be ignored. After creating the `Duplicate` link, transition the ignorable ticket to `Dismissed`: the **non-spec-kit** ticket when it duplicates a spec-kit Story, or the **older** (by created date) when both duplicates are non-spec-kit. `Dismissed` is also applied manually to any ticket deemed no longer relevant during planning or grooming. Creating the status itself is a JIRA-admin UI action — the MCP/API cannot add workflow statuses.
+
+Don't touch the Subtasks under spec-kit Stories — those are managed by the speckit-jira agents; link at the Story level only. Surface `Blocks` chains at planning. OCS has no `Blocked` status; the `Blocks` link IS the dependency record. True close-cascade requires Parent-Subtask conversion (out of scope) — `Dismiss` duplicates at reconciliation time, and close them when the spec-kit Story closes.
 
 ### What never goes into the sync
 

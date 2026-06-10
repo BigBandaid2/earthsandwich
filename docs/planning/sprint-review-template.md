@@ -23,7 +23,7 @@
 - <✅|🟡|🔁|⬜> <goal 1 — verbatim from the JIRA Sprint goal>
 - <✅|🟡|🔁|⬜> <goal 2> *(optional one-line note when partial/superseded)*
 
-> Legend: ✅ done · 🟡 partial · 🔁 superseded · ⬜ not started · ⚡ drift / unplanned
+> Legend: ✅ done · 🟡 partial · 🔁 superseded · ⬜ not started · ⚡ drift / unplanned · 🚫 dismissed
 
 ## Sprint plan + review
 <!-- Heading is "## Sprint plan" at plan-time; rename to "+ review" when annotating. -->
@@ -32,12 +32,16 @@
 
 ### <Person>
 
-<!-- PLAN-TIME: one ⬜ line per committed item — `⬜ **<title>** — OCS-NN. <one-line scope>.`
-     REVIEW-TIME: set the icon to the issue's current JIRA status, then append the outcome —
+<!-- PLAN-TIME: collapse each owner's tickets into 7 or fewer CONCEPTUAL groups (e.g. aesthetics/UX,
+     schedule-containerize-deploy, testing/CI-CD) — one ⬜ line per group, every ticket key kept inside
+     its group, each group tagged to the sprint goal it serves. A lone ticket with no peers is its own
+     group. Dismissed items (step 11) get a single 🚫 note, not an active row.
+     REVIEW-TIME: set the icon to each group/item's current JIRA status, then append the outcome —
      the key(s), Done/To Do, what actually shipped, and any supersession (🔁). Add a final
      `⚡` line per owner for unplanned work that landed this sprint. -->
-1. <icon> **<item title>** — OCS-NN <status + outcome note>.
+1. ⬜ **<group title>** *(goal: …)* — OCS-NN (scope), OCS-NN (scope), … <!-- ≤7 groups per owner -->
 2. …
+🚫 **Dismissed (duplicates)** — OCS-NN (↔ OCS-NN), … <!-- if any were dismissed in step 11 -->
 N. <icon> ⚡ **Unplanned** — <drift / unplanned work that shipped, with keys>.
 
 ### <Person>
