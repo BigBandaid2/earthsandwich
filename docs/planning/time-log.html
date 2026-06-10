@@ -276,7 +276,7 @@
       <button class="preset-btn" data-preset="all">All work</button>
       <button class="preset-btn" data-preset="ethan">Ethan only</button>
       <button class="preset-btn" data-preset="elena">Elena only</button>
-      <button class="preset-btn" data-preset="sprint3">Sprint 3 only</button>
+      <button class="preset-btn" data-preset="sprint4">Sprint 4 only</button>
       <button class="preset-btn" data-preset="story-only">Hide Overhead</button>
     </div>
     <div class="section">
@@ -306,7 +306,7 @@
 </footer>
 
 <script>
-// Time-log data embedded inline. Source: docs/planning/time-log.tsv as of 2026-06-01 (post-attestation refresh).
+// Time-log data embedded inline. Source: docs/planning/time-log.tsv as of 2026-06-08 (Sprint 4 estimated-hours refresh; Sprint 4 rows not yet attested).
 const TSV_TEXT = String.raw`Date	DOW	Sprint	Story	Person	Commits	Time Span	Hours Estimated	Hours Attested
 2026-05-05	Tue	Sprint 1	OCS-72	Elena Shen	0a689de (T097 update 2015 trip image routes — small targeted change)	17:00	0.25	0.275
 2026-05-06	Wed	Sprint 1	Overhead	Ethan Shen	6fd2327 (clean up workflow.md after W19 sprint plan landed)	16:02	1.0	1.0
@@ -364,7 +364,39 @@ const TSV_TEXT = String.raw`Date	DOW	Sprint	Story	Person	Commits	Time Span	Hours
 2026-06-01	Mon	Sprint 3	Overhead	Ethan Shen	46515a2 (004 /speckit.specify formal authoring — 5-story spec with project lifecycle + profile analysis + bridge synthesis + auto-oracle loop + manual refinement; 18 SCs; quality checklist passed first iteration)	11:05	1.5	1.5
 2026-06-01	Mon	Sprint 3	Overhead	Ethan Shen	Weekly cadence pre-meeting prep — 13f9184 (drift recon 2026-06-01: 001 Phase 17 + 003 Phase 27); merge sequence 7fb41ae+a8cced5+f28f42b+5a4c96e (001+002+003+004 → master with --no-ff per workflow.md); branch syncs (push 003+004 to origin); time-log composition	ongoing	2.5	2.5
 2026-06-01	Mon	Sprint 3	Overhead	Ethan Shen	Weekly team meeting (discussion, no commits)	—	1.0	1.0
-2026-06-01	Mon	Sprint 3	Overhead	Elena Shen	Weekly team meeting (discussion, no commits)	—	1.0	1.0`;
+2026-06-01	Mon	Sprint 3	Overhead	Elena Shen	Weekly team meeting (discussion, no commits)	—	1.0	1.0
+2026-06-01	Mon	Sprint 3	Overhead	Ethan Shen	Post-meeting cadence steps 10-17 + workflow/mapping updates: 525d7a7 (JIRA sync + planning artifacts), 10ff7de (Duplicate link reconciliation), b555b21/e624657/afdec84 (W22 review + OCS-108 Done→To Do revert), 913e911 (codify OCS-108 lesson), 9056db0 (W23 sprint plan + step 10), c8c096d/4ca0067/5bdf80b (workflow.md edits), e511d1c/2f3b50a (W22 time attestation)	12:40-17:40	2.5
+2026-06-01	Mon	Sprint 3	OCS-139	Ethan Shen	c59c2d9 (formalize risk-aware full re-scrape ramp as CLI script — 003 Phase 29 drift)	14:44	1.0
+2026-06-03	Wed	Sprint 4	Overhead	Ethan Shen	6046e00 (W22 hours-by-category + time-log.html encoding — finalize prior cadence), e3f3b38/6ee5c40 (workflow DoD-review gate), 3d691ef (004 add US6 truth-baseline review), 15f3b1e (004 FR-092 editorial pickup of 003 US3 constraints)	03:16-05:57	1.5
+2026-06-03	Wed	Sprint 4	OCS-99	Ethan Shen	003 Phase 22 US3 portability: a6d4b15 (self-containment guardrails), d783d2c (T258 outside-in segregation check), b7b753c (DoD review playground), 3be5c42 (carry-forward trail AS#1/AS#2)	04:13-05:59	1.5
+2026-06-03	Wed	Sprint 4	OCS-139	Ethan Shen	003 Phase 29: 6ad4b7a (scrape-diff-v5 validation vs 16-col pile), d3a0772 (rescrape_ramp UTF-8 on subprocess pipes)	03:54-08:46	0.75
+2026-06-04	Thu	Sprint 4	Overhead	Elena Shen	Spec restructures: 002 overhaul (b95f4c8/3646d47/a9a9b13/02bbc06/83502f6 — regions + backend data-fetching), 001 realign (997d664/7dbc847/7e96cfd — backend fetching + TDD mandate); 781ff00 (gitignore feature.json)	02:17-05:42	1.5
+2026-06-04	Thu	Sprint 4	OCS-TBD (002 Phase 12 Regions)	Elena Shen	002 Phase 12 Regions Reference Table T063-T071: e4867f8 (region model), 4e7ae6b (RegionResponse), 592acaf (migration), 4fed5b1 (export-seed), f807b81 (seed), 04f163a (tests), 6383280 (/regions endpoint) — no JIRA Story yet (see open items)	03:58-04:27	1.0
+2026-06-04	Thu	Sprint 4	OCS-125	Elena Shen	001 Phase 18 Testing Infra: aa6b76d (T101-T103 Vitest + RTL setup)	05:54	0.25
+2026-06-04	Thu	Sprint 4	OCS-126	Elena Shen	001 Phase 19 API Migration Foundation: aaaa877 (T104-T106 ApiRegion, adaptRegion, withRetry)	06:03	0.25
+2026-06-04	Thu	Sprint 4	OCS-127	Elena Shen	001 Phase 20 US6 Reliable Data Loading (TDD): 694cec3/c858409/f51fd74/02ca0fc (T107-T110 hook + App tests), 174e8b0 (T111-T113 useRegions), ada46c2 (T114), fe0ab7e (T115)	12:25-12:58	1.0
+2026-06-04	Thu	Sprint 4	OCS-128	Elena Shen	001 Phase 21 US1 Trip Overview tests: 999874c (T116 regionUtils), d656e99 (T117 Sidebar)	13:15-13:34	0.5
+2026-06-04	Thu	Sprint 4	OCS-129	Elena Shen	001 Phase 22 US2 Region Drill-Down tests: 457920e (T118 RegionSidebar)	13:43	0.25
+2026-06-04	Thu	Sprint 4	OCS-130	Elena Shen	001 Phase 23 US3 Stop Detail tests: ce23809 (T119 StopDetail)	13:46	0.25
+2026-06-04	Thu	Sprint 4	OCS-131	Elena Shen	001 Phase 24 Frontend Containerization: 7a5d894 (T120 Dockerfile), e629181 (T121 nginx.conf), 8d5921e (T122 docker-compose web service)	14:05-14:12	0.25
+2026-06-04	Thu	Sprint 4	OCS-137	Elena Shen	001 Phase 30 drift fixes: 0b9dc9c (T143 map bounds error), eff98df (T142 images not loading)	13:55-14:37	0.25
+2026-06-04	Thu	Sprint 4	Overhead	Elena Shen	001 spec: 0a1b544 (Wela UI feedback into spec), ecb6703 (plan refresh)	19:07-20:04	0.5
+2026-06-04	Thu	Sprint 4	OCS-139	Ethan Shen	003 Phase 29 rescrape hardening: 15cea57 (halt-scan reports rollback detail), 7767e27 (escalating multi-retry backoff), 277eafb (retire multi-page probe)	17:27-17:45	1.0
+2026-06-05	Fri	Sprint 4	Overhead	Elena Shen	001 Phase 25-29 tasks authoring: 3917bfe (map-polish + Play Trip tasks)	00:49	0.25
+2026-06-05	Fri	Sprint 4	OCS-132	Elena Shen	001 Phase 25 Map Visual Foundation: 747f851 (T123 markerclusterer dep), 779adff (T124 postcard style), f929da3 (T125 max-zoom restriction)	12:14-12:57	0.75
+2026-06-05	Fri	Sprint 4	OCS-133	Elena Shen	001 Phase 26 Directional Arrowheads: 5680b9a (T126 WIP SVG overlay), f819452 (T126 polyline arrowhead icon)	01:03-13:42	0.75
+2026-06-05	Fri	Sprint 4	OCS-134	Elena Shen	001 Phase 27 Custom Pins & Country Clustering: b331d8b (T127 WIP flag pins), aa0ccc8 (T128 pushpins), 747f851 (T129-T130 clustering)	10:15-12:14	1.0
+2026-06-05	Fri	Sprint 4	OCS-135	Elena Shen	001 Phase 28 Landing Modal (TDD): 4d30e3e (T132-T134 modal tests + impl + wiring)	13:15	0.75
+2026-06-05	Fri	Sprint 4	OCS-137	Elena Shen	001 Phase 30 drift: d328e1a (T141 no connector lines at region level), d78ed72 (T140 StopDetail padding), cc50ac0 (T139 flag-pin restyle)	12:43-13:55	0.5
+2026-06-05	Fri	Sprint 4	OCS-99	Ethan Shen	003 Phase 22 US3 DoD close: a08c4a4 (record DoD outcome, OCS-99→Done), 477a765 (review record + gate Done on merge-to-master)	05:58-06:53	0.5
+2026-06-05	Fri	Sprint 4	OCS-139	Ethan Shen	003 Phase 29: 83d35c7 (test_portability install [dev] extra in fresh venv)	05:51	0.25
+2026-06-05	Fri	Sprint 4	Overhead	Ethan Shen	workflow.md: a7a8c60 (self-review satisfies DoD gate), 495d535 (official DONE = merged + suite green); 777770d (untrack feature.json)	05:51-07:18	0.5
+2026-06-05	Fri	Sprint 4	OCS-104	Ethan Shen	003 Phase 23 US4 Substack pipeline service — RSS → pile: 6248fd1	07:39	1.5
+2026-06-05	Fri	Sprint 4	OCS-138	Ethan Shen	003 Phase 28 Substack full-archive backfill (FR-028..031, SC-012/013): c0df06a (backfill), 8bfac77 (per-post body URL uses publication host)	08:20-10:32	1.25
+2026-06-08	Mon	Sprint 4	OCS-138	Ethan Shen	003 Phase 28 DoD review playground draft (pending disposition): c95df40	11:19	0.5
+2026-06-08	Mon	Sprint 4	OCS-139	Ethan Shen	003 Phase 29: c506616 (Google Photos API spike parked + credential gitignore)	11:19	0.5
+2026-06-08	Mon	Sprint 4	Overhead	Ethan Shen	004 spec planning ceremony: f2273dd (clarify — hybrid inference, DB-only v1), 9c706bf (plan + research + data-model + CLI contract + quickstart), a32a3e4 (tasks — 40 tasks US1-US6), c41ac7a (analyze remediation + 2 iteration loops), 165e64e (JIRA Epic + 9 Stories OCS-115..124); a5e809e/1ad3302/1f7e3c6 (gitignore OAuth secrets + untrack feature.json)	11:44-14:50	2.5
+2026-06-08	Mon	Sprint 4	Overhead	Ethan Shen	Weekly cadence: e6232f6 (drift reconciliation 2026-06-08 — 003 Phase 29 + 001 Phase 30), 96d6ac5 (workflow: ceremony ends at /speckit.analyze), 722894d (workflow: Subtasks not synced by default)	14:28-15:37	1.0`;
 
 const PERSON_COLORS = {
   'Ethan Shen': '#5b8fff',
@@ -968,12 +1000,12 @@ function initPresets() {
           checkOnly('#person-filter input', 'person', 'Elena Shen');
           checkAll('#sprint-filter input[type=checkbox]', true);
           break;
-        case 'sprint3':
+        case 'sprint4':
           state.people = new Set(ALL_PEOPLE);
-          state.sprints = new Set(['Sprint 3']);
+          state.sprints = new Set(['Sprint 4']);
           state.excludeOverhead = false;
           checkAll('#person-filter input[type=checkbox]', true);
-          checkOnly('#sprint-filter input', 'sprint', 'Sprint 3');
+          checkOnly('#sprint-filter input', 'sprint', 'Sprint 4');
           break;
         case 'story-only':
           state.excludeOverhead = true;

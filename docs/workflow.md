@@ -27,8 +27,8 @@ Triggered when an operator believes a User Story is complete (all its tasks `[x]
 3. **New Phase/Story for Code Drift** — bundle detected changes as a new Phase appended to the relevant `tasks.md`.
 4. **Sync Spec State to JIRA** — push new phases as Stories, advance Stories with any task progress to **In Progress** (never directly to Done), and check each newly-created Story for `Duplicate` relationships with existing Stories (overhauled predecessors, user tickets) — link them when found (see [§JIRA sync](#jira-sync)).
 5. **Backfill sprint on Done items** — any Done Story missing a sprint goes into the currently-open sprint (see [§Sprint membership rule](#sprint-membership-rule)).
-6. **Log estimated hours** — append daily rows to `docs/planning/time-log.tsv` and add a person/story hours summary to the current sprint plan (see [§Time logging](#time-logging)).
-7. **Check Progress Against Previous Sprint Plan** — append sprint review notes.
+6. **Log estimated hours** — append daily rows to `docs/planning/time-log.tsv`, regenerate `docs/planning/time-log.html` from the TSV so its embedded data matches, and add a person/story hours summary to the current sprint plan (see [§Time logging](#time-logging)).
+7. **Check Progress Against Previous Sprint Plan** — annotate the closing sprint's `docs/planning/YYYY-WW.md` against JIRA per [`sprint-review-template.md`](planning/sprint-review-template.md).
 
 ### During Weekly Team Meeting
 
@@ -250,6 +250,8 @@ Without the DoD review prompt being executed, no Story → Done — but the revi
 
 After the drift scan and JIRA sync, the team lead enumerates commits since the last sync, groups them by Story + person + day, and writes one row each with `Hours Estimated`. Add a person/story summary block at the bottom of `docs/planning/YYYY-WW.md` so the meeting has a quick read of where effort went.
 
+Then **regenerate `docs/planning/time-log.html` from the TSV** so the playground's inline `TSV_TEXT` block matches the new rows — the explorer embeds a copy of the ledger, and stale embedded data is a silent drift source. (Same regeneration step runs again post-attestation in step 14, once `Hours Attested` is filled.)
+
 ### After the weekly team meeting (attestation)
 
 Each team member reviews their rows and fills `Hours Attested`:
@@ -287,7 +289,7 @@ Capture the week's intent in two places: the JIRA Sprint goal (one sentence) and
 > Good: "Ship the scheduled Instagram pull and a draft SDLC workflow guide; explore the legacy comment-bot integration."
 > Bad: "Do all the things from the planning meeting."
 
-**Planning notes**: each Monday produces `docs/planning/YYYY-WW.md` (ISO week number). Header: `**Sprint**` (`OCS Sprint N` + date range) and `**Goal**` (matches the JIRA Sprint goal). Body: one `### <Person>` sub-section per team member, each listing that person's stories for the sprint.
+**Planning notes**: each Monday produces `docs/planning/YYYY-WW.md` (ISO week number) from [`sprint-review-template.md`](planning/sprint-review-template.md) — the same file is later annotated at review-time (step 7). Header: `**Sprint**` (`OCS Sprint N` + date range) and `**Goal**` (matches the JIRA Sprint goal). Body: one `### <Person>` sub-section per team member, each listing that person's stories for the sprint.
 
 ---
 
