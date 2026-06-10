@@ -151,10 +151,10 @@
 
 ### Stakeholder visual feedback (added 2026-05-04, not yet sprinted)
 
-- [ ] T093 [US-Polish] Replace large default Google Maps pin in continental view with a country-flag pin of similar size (decorative + informational about each stop's country) in `src/components/MapView.tsx`. If the flag pin is judged visually overwhelming after a side-by-side review, fall back to a smaller profile push-pin instead.
-- [ ] T094 [US-Polish] Add directional arrowheads to the route polyline connecting region pins so the trip direction is visually unambiguous in `src/components/MapView.tsx`.
+- [ ] T093 [US-Polish] **[Superseded by T127–T128, Phase 27]** Formalized as FR-046: replace default region markers with flag pins at trip overview level and stop markers with pushpins at region drill-down level in `frontend/src/components/MapView.tsx`
+- [ ] T094 [US-Polish] **[Superseded by T126, Phase 26]** Formalized as FR-049: directional arrowheads near destination end of each route segment, in both trip view (region-to-region) and region view (stop-to-stop) in `frontend/src/components/MapView.tsx`
 - [ ] T095 [US-Polish] Add distinct Start and Finish pins for the first and last stop of each trip so big trips have an obvious visual focal point in `src/components/MapView.tsx`. Today, large trips read as a tangle of lines with no anchor for the eye.
-- [ ] T096 [US-Polish] Apply a vintage postcard-style map skin to the continental view: simpler palette, no country labels, no desert/mountain terrain detail. Likely via a custom Google Maps style or `mapId`. Region drill-down view should retain current full detail.
+- [ ] T096 [US-Polish] **[Superseded by T124, Phase 25]** Formalized as FR-050: postcard-inspired tile style at global zoom suppressing country labels and road/terrain detail; full-detail style retained in region view in `frontend/src/components/MapView.tsx`
 
 **Checkpoint**: Feature complete, polished, and ready for deployment
 
@@ -250,6 +250,14 @@
 
 ---
 
+## Phase 17: Drift Reconciliation (2026-06-01 weekly scan)
+
+**Status**: Backfill from the 2026-05-25 global drift baseline (`2265cf6`) through HEAD. One drift commit identified for 001 — a top-level ErrorBoundary added to harden the frontend against runtime errors now that data flows from the live API rather than hardcoded modules.
+
+- [x] T100 Add top-level `ErrorBoundary` component (`frontend/src/components/ErrorBoundary.tsx`) to gracefully surface runtime errors instead of white-screening; wire into `frontend/src/App.tsx`; clean up the now-obsolete `effectiveActiveTrip` state that became dead with API-fetched data. Commit: `ec3faf3`.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -325,4 +333,194 @@ With multiple developers:
 - Stop at any checkpoint to validate story independently
 - SVG projection map is acceptable; Google Maps API integration can be an enhancement
 - Hard-coded itinerary data keeps the site static-deployable
+
+---
+
+## Phase 18: Testing Infrastructure Setup
+
+**Status**: Not started (2026-06-04 — added following spec overhaul; TDD mandate per FR-045)
+
+**Purpose**: Install and configure Vitest + React Testing Library so that all subsequent phases can follow the test-first approach mandated by FR-045.
+
+**⚠️ CRITICAL**: All phases below (19+) depend on this phase. No test can be written until testing infrastructure is in place.
+
+- [x] T101 [P] Add Vitest devDependencies to `frontend/package.json`: `vitest`, `@vitest/coverage-v8`, `jsdom`, `@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`; add `"test": "vitest"`, `"test:watch": "vitest --watch"`, `"test:coverage": "vitest run --coverage"` scripts
+- [x] T102 [P] Add Vitest test config block to `frontend/vite.config.ts`: `test: { environment: 'jsdom', setupFiles: ['./tests/setup.ts'], globals: true }`
+- [x] T103 [P] Create `frontend/tests/setup.ts` with `import '@testing-library/jest-dom'`
+
+**Checkpoint**: `npm test` runs successfully (no test files yet; 0 passing is expected)
+
+---
+
+## Phase 19: API Migration Foundation
+
+**Status**: Not started (2026-06-04 — prerequisite for useRegions and retry-enabled hooks)
+
+**Purpose**: Add the missing API types, adapter, and retry utility that underpin the spec-overhauled data flow. These are shared by all user story phases and must exist before any hook tests can be written.
+
+- [x] T104 [P] Add `ApiRegion` interface (`iata_code`, `name`, `airport_name`, `country`, `lat`, `lng`) and `getRegions(params?)` fetch function to `frontend/src/api/client.ts`
+- [x] T105 [P] Add `adaptRegion(apiRegion: ApiRegion): Region` adapter (maps `iata_code→code`, `airport_name→airportName`, `lat/lng→coords`) to `frontend/src/api/adapters.ts`
+- [x] T106 [P] Create `withRetry<T>(fn: () => Promise<T>, maxAttempts = 3, baseDelayMs = 1000): Promise<T>` exponential-backoff utility in `frontend/src/utils/retry.ts`; delays: 1 s → 2 s; throws last error after exhaustion
+
+**Checkpoint**: TypeScript compiles with no errors (`npm run build`)
+
+---
+
+## Phase 20: User Story 6 — Reliable Data Loading (Priority: P1, TDD)
+
+**Goal**: A visitor sees a loading indicator while data fetches; if the backend is unavailable after retries, a clear error message appears. Empty trips list shows a human-readable message using the same error surface (FR-042–FR-044; clarifications Q2, Q3 2026-06-04).
+
+**Independent Test**: Mock all three data hooks. Verify loading indicator → travelogue on success; loading indicator → error message on failure; "No trips are currently available." for empty list.
+
+**⚠️ TDD**: Write failing tests first (T107–T110), then implement (T111–T115). All tests must pass before this story is complete.
+
+- [x] T107 [P] [US6] Write `useTrips` hook tests in `frontend/tests/unit/hooks/useTrips.test.ts`: (a) `loading` is `true` on mount before fetch resolves; (b) successful fetch sets `trips` array and clears `loading`; (c) after 3 failed attempts `error` is a non-null string and `trips` is empty; mock `fetch` via `vi.stubGlobal`
+- [x] T108 [P] [US6] Write `useTrip` hook tests in `frontend/tests/unit/hooks/useTrip.test.ts`: (a) does nothing when `tripId` is null; (b) sets `loading=true` on `tripId` change; (c) successful fetch populates `trip`; (d) after retry exhaustion `error` is set and `trip` is null
+- [x] T109 [P] [US6] Write `useRegions` hook tests in `frontend/tests/unit/hooks/useRegions.test.ts`: (a) `loading=true` initially; (b) success yields `regions: Region[]` array; (c) retry exhaustion yields `error` string
+- [x] T110 [US6] Write `App` integration tests in `frontend/tests/unit/components/App.test.tsx` — mock `useTrips`, `useTrip`, `useRegions` via `vi.mock`: (a) loading indicator visible while any hook reports `loading=true`; (b) error panel visible when `useTrips` yields an error; (c) "No trips are currently available." rendered when `useTrips` yields empty list; (d) trip switch triggers `useTrip` with the new trip id
+- [x] T111 [P] [US6] Update `useTrips` to wrap `getTrips()` in `withRetry` from `frontend/src/utils/retry.ts` in `frontend/src/hooks/useTrips.ts`
+- [x] T112 [P] [US6] Update `useTrip` to wrap `getTripDetail()` in `withRetry` in `frontend/src/hooks/useTrip.ts`
+- [x] T113 [P] [US6] Create `useRegions` hook in `frontend/src/hooks/useRegions.ts`: on mount calls `getRegions()` wrapped in `withRetry`; returns `{ regions: Region[], loading: boolean, error: string | null }`; cancels on unmount
+- [x] T114 [US6] Update `groupStopsByRegion` in `frontend/src/utils/regionUtils.ts` to accept `regions: Region[]` as a second parameter instead of importing from the module-level `REGIONS` constant; remove the `REGIONS` import from this file
+- [x] T115 [US6] Update `frontend/src/App.tsx`: call `useRegions()`; extend the loading gate to include `regionsLoading`; extend the error gate to include `regionsError`; render "No trips are currently available." when `trips.length === 0` after load; pass the fetched `regions` array to `groupStopsByRegion`
+
+**Checkpoint**: `npm test` — all T107–T110 tests pass; TypeScript clean
+
+---
+
+## Phase 21: User Story 1 — Trip Overview Tests (Priority: P1, TDD)
+
+**Goal**: Automated test coverage for the trip overview map + sidebar, including region grouping logic, date-range derivation, status classification, and the three-section sidebar layout.
+
+**Independent Test**: Pass fixture `RegionGroup[]` and `Trip` to `TripFeed`; assert Visited / Planned / Abandoned sections render in order with the correct region tiles.
+
+- [x] T116 [P] [US1] Write `regionUtils` unit tests in `frontend/tests/unit/utils/regionUtils.test.ts`: `groupStopsByRegion` groups stops by `region_code`; derives `startDate`/`endDate` per FR-014 (skips abandoned for next-region anchor); excludes Substack dates when non-Substack stops exist (FR-033); rolls up `overallStatus` per FR-028/FR-029; `getActiveRegion` returns last region with a visited stop; `getRoutedGroups` excludes abandoned regions (FR-030); `isSegmentSolid` per FR-012
+- [x] T117 [US1] Write `TripFeed` (Sidebar) tests in `frontend/tests/unit/components/Sidebar.test.tsx`: (a) renders Visited → Planned → Abandoned sections in that order (FR-031); (b) hides sections containing zero regions; (c) region tile shows name, country, and formatted date range; (d) abandoned region tile appears in Abandoned section with strike-through styling and no connector line (US5, FR-030)
+
+**Checkpoint**: All Phase 21 tests pass; `npm test` green
+
+---
+
+## Phase 22: User Story 2 — Region Drill-Down Tests (Priority: P2, TDD)
+
+**Goal**: Test coverage for the region sidebar drill-down: active region expansion, collapsed headers, stop tile rendering, planned/abandoned suppression, and no-pop-up-on-click for non-openable stop types.
+
+**Independent Test**: Render `RegionSidebar` with fixture data; click a collapsed header; assert it becomes the active (expanded) region.
+
+- [x] T118 [US2] Write `RegionSidebar` tests in `frontend/tests/unit/components/RegionSidebar.test.tsx`: (a) active region is expanded showing stop tiles; (b) other regions render as collapsed header rows; (c) clicking a collapsed header calls `onSelectRegion` with its `region_code`; (d) Planned stop tiles suppressed when any Instagram/Substack stop exists in the same region (FR-018); (e) Planned stop tile click does NOT call `onOpenStop` (FR-019); (f) Instagram stop tile shows caption and photo; (g) Substack stop tile shows title and preview
+
+**Checkpoint**: All Phase 22 tests pass; `npm test` green
+
+---
+
+## Phase 23: User Story 3 — Stop Detail Tests (Priority: P3, TDD)
+
+**Goal**: Test coverage for the stop detail pop-up: Instagram and Substack post layouts, graceful handling of missing optional fields, and prev/next navigation.
+
+**Independent Test**: Render `StopModal` with an Instagram fixture stop; assert location, caption, and image element are present; assert prev/next arrows call `onNav`.
+
+- [x] T119 [US3] Write `StopDetail` tests in `frontend/tests/unit/components/StopDetail.test.tsx`: (a) Instagram layout renders location heading, caption, and `<img>` with `media_url` as src; (b) Substack layout renders title heading, subtitle, and body text; (c) missing optional subtitle or caption not rendered; (d) prev arrow calls `onNav('prev')`; (e) next arrow calls `onNav('next')`; (f) close button calls `onClose`
+
+**Checkpoint**: All Phase 23 tests pass; `npm test` fully green — SC-012 satisfied for all US1–US6 acceptance scenarios
+
+---
+
+## Phase 24: Frontend Containerization
+
+**Goal**: Package the frontend as an nginx container that joins the existing docker-compose stack, serving the built SPA and the shared media volume.
+
+- [x] T120 [P] Create `frontend/Dockerfile`: multi-stage build — `node:20-alpine` stage copies the project root, runs `npm ci --prefix frontend && npm run --prefix frontend build` (output lands at project-root `dist/`); `nginx:alpine` stage copies `dist/` into `/usr/share/nginx/html` and copies `frontend/nginx.conf` to `/etc/nginx/conf.d/default.conf`
+- [x] T121 [P] Create `frontend/nginx.conf`: serve SPA (`root /usr/share/nginx/html`; `try_files $uri $uri/ /index.html` for client-side routing); alias `/public/media` → `/public/media` so mounted media files are served at that path
+- [x] T122 Add `web` service to `docker-compose.yml`: `build.context: ./frontend` (root `.dockerignore` excludes `frontend/`; using subdirectory context avoids the conflict), `build.dockerfile: Dockerfile`, port `5173:80`, volume `../public/media:/public/media:ro` (relative to context), `depends_on: api`
+
+**Checkpoint**: `docker compose up web` serves the app at `http://localhost:5173`; media files at `http://localhost:5173/public/media/<file>` resolve correctly from the host mount
+
+---
+
+## Phase 25: Map Visual Foundation — Postcard Style & Anti-Meridian (FR-050, FR-048)
+
+**Status**: Not started (2026-06-05 — added following UI enhancement pass)
+
+**Purpose**: Apply postcard-inspired tile style and restrict the map to a single world copy at global zoom. These changes are prerequisites for the pin and clustering work in Phase 27.
+
+- [x] T123 [P] [US-Polish] Add `@googlemaps/markerclusterer` to `frontend/package.json` dependencies (prerequisite for country clustering in Phase 27, FR-051)
+- [x] T124 [US-Polish] Apply postcard-inspired tile style in trip view in `frontend/src/components/MapView.tsx` (FR-050, SC-014): configure tile provider / Cloud-based map style to suppress country labels and road/terrain detail at global zoom; revert to full-detail style in region view
+- [x] T125 [US-Polish] Configure Google Maps `restriction: { latLngBounds: { north: 85, south: -85, west: -180, east: 180 }, strictBounds: true }` on trip view map instance in `frontend/src/components/MapView.tsx` (FR-048, SC-015); lift restriction in region view
+
+**Checkpoint**: Global map shows postcard tile style with no country labels; Earth Sandwich 2015 route does not wrap into adjacent tile copies
+
+---
+
+## Phase 26: Directional Arrowheads (FR-049)
+
+**Status**: Not started (2026-06-05 — added following UI enhancement pass)
+
+**Purpose**: Render direction-of-travel arrowheads near the destination end of each route segment in both trip view and region view.
+
+- [x] T126 [US-Polish] Implement SVG arrowhead overlays in `frontend/src/components/MapView.tsx` (FR-049, SC-016): for each pair of adjacent non-abandoned endpoints, compute geodesic bearing and render a rotated SVG `<AdvancedMarker>` arrowhead at ~10–15% of segment distance from the destination end; applies to both trip view (region-to-region segments) and region view (stop-to-stop segments)
+
+**Checkpoint**: Every route segment in trip view and region view shows a directional arrowhead pointing in the chronological direction of travel
+
+---
+
+## Phase 27: Custom Map Pins & Country Clustering (FR-046, FR-051)
+
+**Status**: Not started (2026-06-05 — added following UI enhancement pass)
+
+**Purpose**: Replace default map markers with purpose-specific styles and add country-level clustering for region markers at the global zoom level.
+
+- [/] T127 [P] [US-Polish] Implement flag pin `<AdvancedMarker>` style for region markers at trip overview level in `frontend/src/components/MapView.tsx` (FR-046): visually highlight the active region's pin with an accent color
+- [x] T128 [P] [US-Polish] Implement pushpin `<AdvancedMarker>` style for stop markers at region drill-down level in `frontend/src/components/MapView.tsx` (FR-046)
+- [x] T129 [US-Polish] Add country clustering via `@googlemaps/markerclusterer` in `frontend/src/components/MapView.tsx` (FR-051, SC-017); clicking a cluster calls `map.fitBounds(cluster.bounds)` to zoom until pins separate; add `onClusterClick: (regionCodes: string[]) => void` prop to `WorldMapProps`
+- [x] T130 [US-Polish] Wire `onClusterClick` handler in `frontend/src/App.tsx` (FR-051)
+- [x] T131 [US-Polish] Manual test: verify SC-014 (no country labels at global zoom), SC-015 (no tile wrap for Earth Sandwich 2015 route), SC-016 (arrowhead on every segment in trip and region views), SC-017 (qualifying-country clusters appear; US/CA/CN pins always render individually; clicking cluster zooms to separate pins)
+
+**Checkpoint**: All four map-level acceptance scenarios (SC-014–SC-017) pass manual review
+
+---
+
+## Phase 28: Landing Modal (FR-047, TDD)
+
+**Status**: Not started (2026-06-05 — added following UI enhancement pass)
+
+**Purpose**: First-visit overlay displayed before any map interaction, with dismissed state persisted in browser localStorage so it does not reappear on return visits.
+
+**⚠️ TDD**: Write failing tests first (T132), then implement (T133–T134). All tests must pass before this phase is complete.
+
+- [x] T132 [P] [US-Polish] Write `LandingModal` tests in `frontend/tests/unit/components/LandingModal.test.tsx` (TDD, FR-047, SC-013): (a) modal renders when `travelogue:landing-dismissed` localStorage key is absent; (b) modal does not render when key is set; (c) clicking dismiss button calls `onDismiss`; mock `localStorage` via `vi.stubGlobal`
+- [x] T133 [P] [US-Polish] Create `frontend/src/components/LandingModal.tsx`: full-screen overlay containing site headline, trip context block (placeholder copy acceptable per FR-047), how-to-browse guidance, follow-along callout for friends/family, and dismiss button (e.g. "Start Exploring") that calls `onDismiss` prop (FR-047)
+- [x] T134 [US-Polish] Wire `LandingModal` into `frontend/src/App.tsx` (FR-047, SC-013): initialise `showLandingModal` state from `localStorage.getItem('travelogue:landing-dismissed')`; render `<LandingModal onDismiss={...} />` when flag is false; on dismiss write `localStorage.setItem('travelogue:landing-dismissed', '1')` and set flag to false
+
+**Checkpoint**: `npm test` — all T132 tests pass; loading app for first time shows modal; reload after dismiss does not show modal (SC-013)
+
+---
+
+## Phase 29: Play Trip Mode (FR-052, TDD)
+
+**Status**: Not started (2026-06-05 — added following UI enhancement pass)
+
+**Purpose**: Interval-based playback mode that advances the map through non-abandoned regions in chronological order with play/pause/exit controls anchored to the map canvas.
+
+**⚠️ TDD**: Write failing tests first (T135), then implement (T136–T138). All tests must pass before this phase is complete.
+
+- [ ] T135 [P] [US-Polish] Write `PlayTripControl` tests in `frontend/tests/unit/components/PlayTripControl.test.tsx` (TDD, FR-052, SC-018) using `vi.useFakeTimers()`: (a) clicking Play advances through non-abandoned regions on fixed interval; (b) clicking Pause suspends interval and retains `currentIndex`; (c) clicking Play again resumes from same index; (d) playback stops automatically at final non-abandoned region and Play button re-enables; (e) clicking Exit calls `onExit`
+- [ ] T136 [P] [US-Polish] Add `PlayTripState`, `PlayTripAction` types and `playTripReducer` to `frontend/src/App.tsx` (FR-052): transitions — `play` (set `isPlaying: true`); `pause` (set `isPlaying: false`, retain index); `advance` (increment index, or dispatch `stop` when at final region); `stop` (set `isPlaying: false, currentIndex: 0`)
+- [ ] T137 [P] [US-Polish] Create `frontend/src/components/PlayTripControl.tsx`: Play/Pause/Exit floating controls; rendered states — ready/paused (Play button visible, Exit hidden), playing (Pause + Exit visible), final-region-reached (Play re-enabled, Pause hidden); props: `isPlaying`, `onPlay`, `onPause`, `onExit` (FR-052)
+- [ ] T138 [US-Polish] Wire Play Trip into `frontend/src/App.tsx` (FR-052, SC-018): `useReducer(playTripReducer, { isPlaying: false, currentIndex: 0 })`; `useEffect` with `setInterval` (default 3 s) dispatches `advance` while `isPlaying`; derive `playTripActiveRegionCode` from `nonAbandonedRegions[currentIndex].code`; pass `playTripActiveRegionCode` to `<WorldMap>` for pan/focus animation and to `<TripFeed>` for sidebar scroll+highlight; render `<PlayTripControl>` overlay when `viewMode = 'trip'` (SC-018)
+
+**Checkpoint**: `npm test` — all T135 tests pass; in-browser: Play advances through all non-abandoned regions in chronological order, Pause/resume work correctly, playback stops at final region and Play control re-enables with no looping (SC-018)
+
+---
+
+## Phase 30: Drift Reconciliation (2026-06-08 weekly scan)
+
+Small map polish/bugfixes that landed since the 2026-06-01 scan without task IDs. Appended as historical record (all complete).
+
+- [x] T139 [DRIFT] Flag pins restyled to read more like flags in `frontend/src/components/MapView.tsx`. Commit `cc50ac0`
+- [x] T140 [DRIFT] StopDetail modal: padding between image and caption. Commit `d78ed72`
+- [x] T141 [DRIFT] Stop rendering connecting lines at the Region (zoomed-out) level. Commit `d328e1a`
+- [x] T142 [DRIFT] Fix images not loading. Commit `eff98df`
+- [x] T143 [DRIFT] Fix map bounds error. Commit `0b9dc9c`
+
+**Checkpoint**: Drift reconciled — map polish/bugfix commits now in the historical record.
 

@@ -10,6 +10,11 @@ logs/
 # Instagrapi session state (contains auth tokens)
 instagrapi_session.json
 
+# Google OAuth client secrets + tokens (Photos pipeline / spike) — NEVER commit
+client_secret*.json
+token.json
+*.token.json
+
 # Python build / install artifacts
 venv/
 __pycache__/

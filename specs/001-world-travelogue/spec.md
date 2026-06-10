@@ -2,17 +2,29 @@
 
 **Feature Branch**: `001-world-travelogue`
 **Created**: 2026-04-22
-**Updated**: 2026-05-08
+**Updated**: 2026-06-04 (overhauled — constitution v2.1.x alignment; data source changed from hard-coded to live backend service; TDD mandate added); 2026-06-04 (UI enhancement pass — map pins, landing modal, wrap-around fix, travel direction arrows, postcard style, country clustering, play-trip feature)
 **Status**: Draft
 **Input**: User description: "I am building a travel website that will show the trip itinerary of an upcoming round-the-world trip with roughly 50 major stop. Each stop will have a location, caption, date, image (optional), and long form blog post (optional).
 
 I would like to create a travelogue site that features a world map as a major interactable component, with a sidebar showing itinerary, and expandable components for blurbs, pictures, and travelogue entries. The idea is that there is already an overarching travel plan, and the site will be updated with content throughout the journey. The map can show where the travelers have been so far and where they plan to be in the future. Stops on the trip can have a hierarchical structure, with a high level trip plan showing city to city, and when clicking on a city it zooms into a more detailed city view showing individual sites that have been visited and any pictures or notes associated with them.
 
-There are two types of users who will use the site: One are the travelers themselves, who can update and make adjustments to the itinerary, and post travel content like pictures, short blurbs, and long-from posts. The other is friends and family of the travelers, who can visit the site to see how their travels are going and where they will be. For now, let's just worry about the read-only view of the site and not how to post new content. Assume all content will be hard-coded.
+There are two types of users who will use the site: One are the travelers themselves, who can update and make adjustments to the itinerary, and post travel content like pictures, short blurbs, and long-from posts. The other is friends and family of the travelers, who can visit the site to see how their travels are going and where they will be. For now, let's just worry about the read-only view of the site and not how to post new content."
 
-Here is a site online that is already very close to what I am envisioning in presentation format, if you would like to use it as a reference. The main feature it does not have that I want is the ability to designate content as trip level or city level and doing the zoomed in city view. https://clem.travelmap.net/cycling-around-australia"
+**App**: `useful-app` | **Dependency**: [`specs/002-database-backend/spec.md`](../002-database-backend/spec.md) — all trip, stop, and post data is retrieved from that spec's REST API
 
 ## Clarifications
+
+### Session 2026-06-04
+
+- Q: When a visitor clicks a region-pin cluster at the global trip overview level, what should happen? → A: The map zooms in to a level where the individual pins separate and become individually clickable. No spiderfy or in-place expansion.
+- Q: When Play Trip reaches the last non-abandoned region, what should happen? → A: Playback stops at the final region and the Play control becomes available again to restart from the beginning. No looping, no auto-restart.
+- Q: For globe-spanning trips, should wrap-around prevention apply to the route polyline, the map tiles, or both? → A: Tiles only — restrict the map to a single world copy so tiles do not repeat. Polyline edge-jumping is acceptable; the visitor can pan manually if needed.
+- Q: Is there a specific reference tile style for the postcard aesthetic (FR-050), or is the visual target open to the implementer? → A: Open to the implementer. Named styles such as Stamen Watercolor or CartoDB Voyager, or a warm/muted illustrated aesthetic, are good reference points but no specific provider is mandated.
+- Q: Where should directional arrowheads appear on route-connecting line segments (FR-049)? → A: Near the destination end of each segment — one arrowhead close to the arriving region or stop, pointing in the direction of travel.
+- Q: Should the frontend group stops into regions using the API-provided `region_code` on each stop, or independently compute region membership from stop coordinates? → A: Use the API-provided `region_code` per stop — no coordinate-based computation is performed in the frontend. Region display details (name, country, coordinates) are looked up from the region reference data returned by the backend.
+- Q: What should the visitor see if the backend returns an empty trips list? → A: Show a human-readable "no trips available" message using the same error-state surface defined in FR-044 — no separate empty-state UI.
+- Q: Should the error state include a user-actionable retry mechanism? → A: Auto-retry silently after a short delay, with no visible retry button. If retries are exhausted and the failure persists, show the FR-044 error message.
+- Q: Should the site auto-refresh trip data while a visitor has the page open, or is a browser reload the only way to see new data? → A: No auto-refresh — data is fetched once on page load and on each explicit trip switch. A full browser reload is required to see data added to the backend after the initial load.
 
 ### Session 2026-05-01
 
@@ -26,15 +38,15 @@ Here is a site online that is already very close to what I am envisioning in pre
 
 ### User Story 1 - Browse trip progress on map (Priority: P1)
 
-Travelers and friends/family open the site to see the current round-the-world itinerary, view visited and planned regions on an interactive world map, and use the sidebar to jump to a region.
+Travelers and friends/family open the site to see the current round-the-world itinerary, view visited and planned regions on an interactive world map, and use the sidebar to jump to a region. Trip data is loaded live from the backend service.
 
 **Why this priority**: This is the core experience that makes the travelogue useful and engaging for both the travelers and their audience.
 
-**Independent Test**: Open the site and verify the world map is visible, region markers are plotted, and the sidebar lists regions grouped by visited/planned status.
+**Independent Test**: Open the site and verify the world map is visible, region markers are plotted, and the sidebar lists regions grouped by visited/planned status — all sourced from the live backend.
 
 **Acceptance Scenarios**:
 
-1. **Given** the site is loaded, **When** the visitor views the homepage, **Then** the world map shows the overall route with visited and planned regions clearly distinguished, and the active region (if any) is visually called out.
+1. **Given** the site is loaded and the backend service is available, **When** the visitor views the homepage, **Then** the world map shows the overall route with visited and planned regions clearly distinguished, and the active region (if any) is visually called out.
 2. **Given** the site is loaded, **When** the visitor reviews the sidebar, **Then** the sidebar displays regions grouped into "Visited" and "Planned" sections with region name, country, and date range for each.
 
 ---
@@ -101,6 +113,22 @@ A visitor viewing a trip can see stops that were planned but never visited (thei
 
 ---
 
+### User Story 6 - Experience reliable data loading (Priority: P1)
+
+A visitor opening the site sees a loading indicator while trip data is fetched from the backend service. If data loads successfully, the travelogue experience begins immediately. If the backend is unavailable, the visitor sees a clear, human-readable error message rather than a blank page or silent failure.
+
+**Why this priority**: The site is wholly dependent on the backend service for its content. Without reliable data loading and error communication, no other user story can be reached.
+
+**Independent Test**: With the backend running, open the site and confirm a loading indicator appears then resolves to the travelogue. With the backend stopped, confirm a clear error message is displayed instead of a blank or broken UI.
+
+**Acceptance Scenarios**:
+
+1. **Given** the backend service is available, **When** the visitor opens the site, **Then** a loading indicator is shown while data is fetched, and the travelogue renders fully once data arrives.
+2. **Given** the backend service is unavailable, **When** the visitor opens the site, **Then** a human-readable error message appears explaining that data could not be loaded, and the page does not crash or render blank.
+3. **Given** the site has loaded successfully, **When** a visitor switches trips, **Then** the new trip's data is fetched and rendered, with a loading indicator shown during the transition.
+
+---
+
 > **Data ingestion moved**: All ingestion-related user stories, requirements, and edge cases now live in [specs/003-ingestion-pipeline/spec.md](../003-ingestion-pipeline/spec.md). (Originally moved to `002-data-ingestion`; that spec was split on 2026-05-22 into `002-database-backend` for schema/API/container and `003-ingestion-pipeline` for ingestion.)
 
 ### Edge Cases
@@ -120,6 +148,11 @@ A visitor viewing a trip can see stops that were planned but never visited (thei
 - What happens to a planned stop whose date is exactly today? (Today is not "in the past" — the stop remains "planned".)
 - What happens when a Substack post is dated months after the actual visit? (The Substack stop still appears in its region, but its date does not pull the region's date range forward — see FR-033.)
 - What happens when a region contains only Substack stops and no Instagram/Planned/Abandoned stops? (The region falls back to using the Substack dates for its date range, since no other dates are available.)
+- What happens when the backend returns an empty trips list? (A human-readable "no trips available" message is shown using the same error-state surface as FR-044; no separate empty-state UI.)
+- What happens when the backend service takes longer than expected to respond? (The loading indicator remains visible during auto-retry attempts; the visitor is not shown a partial or broken state.)
+- What does the visitor see while auto-retries are in progress? (The loading indicator remains; no error message is shown until retries are exhausted.)
+- What happens when a partial data response is received (e.g., trip metadata loads but stops fail)? (The site shows an error state for the affected portion and does not silently suppress the failure.)
+
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
@@ -128,9 +161,9 @@ A visitor viewing a trip can see stops that were planned but never visited (thei
 - **FR-002**: The system MUST include a trip feed sidebar that groups regions into two collapsible sections — "Visited" and "Planned". If all regions in the trip share the same status, only that section is shown.
 - **FR-003**: The system MUST provide a stop detail pop-up whose content and layout depend on post type: Instagram posts display location, photo, and caption; Substack posts display title, subtitle, and long-form article body.
 - **FR-004**: The system MUST group stops into regions derived from the nearest international airport and show one region marker per region on the world map rather than individual stop markers.
-- **FR-005**: The system MUST treat regions as dynamic groupings computed from stop coordinates; they are not explicit itinerary entries and carry no separately stored content.
+- **FR-005**: The system MUST group stops into regions using the `region_code` provided by the backend on each stop. Region display details (name, country, coordinates) are looked up from the region reference data returned by the backend. Regions are not explicit itinerary entries and carry no separately stored content in the frontend.
 - **FR-006**: The system MUST allow visitors to navigate from the trip overview to a region-level view by selecting a region tile, where they can browse individual stop posts on a zoomed map.
-- **FR-007**: The system MUST render the site as read-only; all content is hard-coded and no visitor input is saved.
+- **FR-007**: The system MUST be read-only; no visitor input is saved. All trip, stop, and post content is retrieved from the backend service (see FR-034); no travel data is stored in the frontend application itself.
 - **FR-008**: The system MUST allow visitors to expand and collapse region sections in the trip feed without leaving the current view.
 - **FR-009**: The system MUST gracefully handle stops with missing optional content by displaying only the fields that are present.
 - **FR-010**: The system MUST support multiple trip itineraries and show the most recent trip by default on page load. The trip selector list MUST display all available itineraries in reverse chronological order, sorted by the date of each trip's earliest stop. Visitors MUST be able to switch between trips by selecting from this list.
@@ -143,7 +176,7 @@ A visitor viewing a trip can see stops that were planned but never visited (thei
 - **FR-017**: Planned stops MUST always carry `status: "planned"` and never carry a photo. An optional caption field may provide brief context for the stop.
 - **FR-018**: The system MUST suppress Planned and Abandoned stop tiles from the region sidebar when any Instagram or Substack stop exists in the same region. If a region contains only Planned and/or Abandoned stops, those tiles MUST be shown.
 - **FR-019**: The system MUST NOT open a stop detail pop-up when a visitor clicks a Planned stop marker or tile; clicking a Planned stop takes no action.
-- **FR-020**: The system MUST include hard-coded itinerary data for two additional trips: "Earth Sandwich 2015" (82 stops, July 2015 – August 2016) and "Earth Club Sandwich 2027" (30 stops, March 2027 – May 2028). All stops in both trips use the Planned post type.
+- **FR-020**: *(Retired 2026-06-04)* The specific trip itineraries shown by the travelogue are managed by the backend service (see [specs/002-database-backend/spec.md](../002-database-backend/spec.md)). The frontend renders whatever trips the backend returns; no trip data is hard-coded in the frontend. As of 2026-06-04, the backend seeds three trips: Miscellaneous Adventures, Earth Sandwich 2015, and Earth Club Sandwich 2027.
 - **FR-021**: The trip overview sidebar region tile MUST omit the Instagram thumbnail row and Substack tile row for regions that contain only Planned stops, showing only the region header, date range, and "Expand Region →" button.
 - **FR-022**: Both the trip feed sidebar (View 1) and the region sidebar (View 2) MUST be independently scrollable with a visible scrollbar that is clearly distinguishable against the sidebar background.
 - **FR-023**: When a region becomes the active region in the region view (either by drilling in from the trip overview or by selecting another region's collapsed header), the region sidebar MUST scroll so that the newly active region's header is positioned as close to the top of the sidebar as possible, keeping its expanded stop list visible below.
@@ -157,38 +190,62 @@ A visitor viewing a trip can see stops that were planned but never visited (thei
 - **FR-031**: The trip feed sidebar MUST add a third collapsible section, "Abandoned", to the existing "Visited" and "Planned" sections. The three sections are rendered in a fixed top-to-bottom order: Visited → Planned → Abandoned. Fully-abandoned regions are listed in the Abandoned section and are excluded from the Visited and Planned sections. Sections that contain no regions for the current trip remain hidden (consistent with FR-002).
 - **FR-032**: Abandoned stops MUST follow the same interaction and suppression rules as Planned stops: clicking an abandoned stop marker on the map or an abandoned stop tile in the sidebar MUST NOT open the stop detail pop-up; and abandoned stop tiles MUST be suppressed from the region sidebar whenever any Instagram or Substack stop exists in the same region (per FR-018). When shown, abandoned stop tiles display location, date, and optional caption.
 - **FR-033**: The system MUST exclude Substack stop dates from a region's start-date and end-date computation (FR-014) when the region contains any non-Substack stop. Rationale: Substack articles are typically authored after the visit, so their dates represent publication, not presence. The Substack stop itself MUST still appear within the region (on the map and in the region sidebar); only its date is excluded from the date-range bounds. If a region contains only Substack stops, the system falls back to those stops' dates so the region still displays a date range.
-> **Ingestion requirements FR-034 to FR-041 moved to [specs/003-ingestion-pipeline/spec.md](../003-ingestion-pipeline/spec.md).** (Originally moved to `002-data-ingestion`, then split out to `003-ingestion-pipeline` on 2026-05-22.)
+
+> **Ingestion requirements FR-034 to FR-041 moved to [specs/003-ingestion-pipeline/spec.md](../003-ingestion-pipeline/spec.md).** (Originally moved to `002-data-ingestion`, then split out to `003-ingestion-pipeline` on 2026-05-22.) New frontend-specific requirements continue at FR-042 below.
+
+- **FR-042**: The system MUST retrieve all trip, stop, and post data from the backend REST API (see [specs/002-database-backend/contracts/api.md](../002-database-backend/contracts/api.md)). No trip, stop, or post content is hard-coded in the frontend. Region reference data (airport code, name, country, coordinates) is also retrieved from the API.
+- **FR-043**: The system MUST display a loading indicator while data is being fetched from the backend. The indicator MUST appear on initial page load and on any subsequent trip switch that requires a new network request.
+- **FR-044**: When data cannot be retrieved from the backend, or when the backend returns an empty trips list, the system MUST auto-retry silently after a short delay (keeping the loading indicator visible during retries) with no visible retry button shown to the visitor. If all retry attempts are exhausted and the failure persists, the system MUST display a human-readable error message (e.g., "Could not load trip data. Please try again later." or "No trips are currently available."). The error state MUST prevent a blank or crashed UI. No internal error details, stack traces, or server messages are shown to visitors.
+- **FR-045**: All new frontend feature code MUST be developed test-first: automated tests covering each Acceptance Scenario MUST be written and verified before the feature code is considered complete. A feature is only releasable when its automated tests pass.
+- **FR-046**: The system MUST replace the default large map pin style with smaller, purpose-specific marker styles. At the trip overview (global) level, region markers MUST use a **flag pin** style. At the region drill-down level, stop markers MUST use a **pushpin** style. The flag pin and pushpin styles MUST be visually distinct from each other and from the existing large dot/teardrop markers.
+- **FR-047**: The system MUST display a landing modal overlay to first-time visitors immediately after the page finishes loading, before any map interaction is available. The modal MUST contain: (a) a description of the site and its purpose, (b) context about the ongoing trip, (c) guidance on how to browse the map and sidebar, and (d) information on how friends and family can follow along. The modal MUST include a dismiss action. Placeholder (lorem ipsum) copy is acceptable in the initial implementation. The modal MUST NOT reappear on subsequent visits from the same browser — the dismissed state MUST be persisted in the visitor's browser (e.g. local storage) with no server-side tracking required.
+- **FR-048**: The system MUST restrict the map at the trip overview level to a single world copy so that map tiles do not repeat into adjacent copies of the globe. The map MUST NOT render a second (or more) copy of the world at any zoom level available at the trip overview. Preventing polyline edge-jumping across the antimeridian is not required; the visitor can pan the map manually if needed.
+- **FR-049**: The system MUST render a directional arrowhead near the destination end of each route-connecting line segment to indicate the direction of travel. Each segment connecting two adjacent non-abandoned regions (trip view) or two adjacent stops (region view) MUST display one arrowhead close to the arriving endpoint, pointing in chronological direction.
+- **FR-050**: The system MUST apply a postcard-inspired visual style to the map at the trip overview (global) level. This style MUST suppress all country name text labels from the map tiles. Road, terrain, and administrative boundary detail that would be shown at the regional zoom level MUST NOT be displayed at the global level. The specific tile provider and style are left to the implementer's judgment; reference points include warm/muted illustrated styles such as Stamen Watercolor or CartoDB Voyager, but no specific provider is mandated.
+- **FR-051**: The system MUST cluster region markers at the global trip overview level for qualifying countries. A cluster is shown when two or more region markers from the same country fall within the clustering threshold at the current zoom level. A cluster indicator MUST display the count of grouped markers. Clicking a cluster MUST zoom the map in to a level where the individual pins separate and become individually clickable; no spiderfy or in-place expansion is used. Clustering applies only at the trip overview zoom level; region drill-down always shows individual stop markers.
+- **FR-052**: The system MUST support a "Play Trip" mode at the trip overview level that advances through the trip's non-abandoned regions in chronological order, one region at a time. When Play Trip is active: (a) the map animates to focus on each region in sequence, with the region's marker visually highlighted; (b) the trip feed sidebar scrolls to and highlights the corresponding region tile; (c) playback advances automatically on a fixed interval with a visible Pause control. The visitor MUST be able to pause and resume playback at any time. The visitor MUST be able to exit Play Trip mode and return to normal map interaction. When playback reaches the last non-abandoned region, it MUST stop automatically and the Play control MUST become available again to restart from the first region; no looping or auto-restart occurs. Play Trip advances region-by-region (not stop-by-stop); the region drill-down view is not entered during playback. The feature MUST be covered by automated tests per FR-045.
 
 ### Key Entities *(include if feature involves data)*
 
-- **Trip Itinerary**: A named journey composed of an ordered sequence of stops. Multiple itineraries coexist in the site; the most recent by date is shown by default. Each itinerary has a title, description, and an ordered list of stops.
-- **Stop**: A single itinerary entry belonging to exactly one region. Each stop has a date, location string, geocoded coordinates, a stored status (visited or planned), and a post type (Instagram, Substack, or Planned). At render time a third effective status, "abandoned", is derived for any planned stop whose date has passed (see FR-028).
-- **Instagram Post**: A stop post type sourced from an Instagram post. Always carries `status: "visited"`. Contains: photo URL, caption text, location string, and timestamp. Identified by Instagram media ID and shortcode.
-- **Substack Post**: A stop post type sourced from a Substack article. Always carries `status: "visited"`. Contains: title, subtitle, and long-form body text. Note: a Substack stop's `date` represents the article's publication date and is typically later than the actual visit; it is therefore excluded from region date-range computation (see FR-033).
-- **Planned Post**: A stop post type representing a planned itinerary entry with no published content. Always carries `status: "planned"`. Contains: location, date, and an optional caption. Has no photo and no detail pop-up.
-- **Region**: A dynamic grouping of nearby stops derived from the nearest international airport. Computed from stop coordinates at build time; not stored as an explicit entity. Characterized by an airport code, region name, country, and reference coordinates. Date range is derived from the region's stops and the subsequent region's start date (see FR-014). A region's overall status is one of visited, planned, mixed, or abandoned (see FR-029).
+- **Trip Itinerary**: A named journey composed of an ordered sequence of stops. Multiple itineraries may exist; the most recent by start date is shown by default. Each itinerary has a stable identifier, title, description, start date, and end date. Sourced from the backend API.
+- **Stop**: A single itinerary entry belonging to exactly one region. Each stop has a date, location string, geocoded coordinates, a stored status (visited or planned), and a post type (Instagram, Substack, or Planned). At render time a third effective status, "abandoned", is derived for any planned stop whose date has passed (see FR-028). Sourced from the backend API.
+- **Instagram Post**: A stop post type sourced from an Instagram post. Always carries `status: "visited"`. Contains: photo URL, caption text, location string, and timestamp. Sourced from the backend API.
+- **Substack Post**: A stop post type sourced from a Substack article. Always carries `status: "visited"`. Contains: title, subtitle, and long-form body text. Note: a Substack stop's `date` represents the article's publication date and is typically later than the actual visit; it is therefore excluded from region date-range computation (see FR-033). Sourced from the backend API.
+- **Planned Post**: A stop post type representing a planned itinerary entry with no published content. Always carries `status: "planned"`. Contains: location, date, and an optional caption. Has no photo and no detail pop-up. Sourced from the backend API.
+- **Region**: A grouping of stops sharing the same `region_code` as returned by the backend API. The frontend groups stops by their API-provided `region_code` and enriches each group with display details (name, country, reference coordinates) from the backend's region reference data. Not stored as an explicit entity in the frontend. Characterized by an airport code, region name, country, and reference coordinates. Date range is derived from the region's stops and the subsequent region's start date (see FR-014). A region's overall status is one of visited, planned, mixed, or abandoned (see FR-029).
+
 ## UI Design
 
 **Wireframe reference**: [specs/001-world-travelogue/wireframes/travelogue-wireframes.svg](specs/001-world-travelogue/wireframes/travelogue-wireframes.svg)
 
-The interface has three distinct views. Views 1 and 2 share a persistent split layout (map canvas + sidebar). View 3 is a modal pop-up overlay over whichever view is current.
+The interface has three distinct views plus a landing modal. Views 1 and 2 share a persistent split layout (map canvas + sidebar). View 3 is a modal pop-up overlay over whichever view is current.
+
+### Landing Modal (First Visit)
+
+Displayed as a full-screen or centered overlay on the first visit before any map interaction is possible (see FR-047). Contains:
+- **Site headline**: The name and one-sentence purpose of the travelogue.
+- **Trip context block**: A short description of the current trip (lorem ipsum placeholder acceptable initially).
+- **How-to-browse guidance**: A brief explanation of the map + sidebar interaction model.
+- **Follow-along callout**: How friends and family can keep tabs on the travelers.
+- **Dismiss button**: A clearly labeled button (e.g., "Start Exploring" or "Enter") that closes the modal and stores the dismissed state in the browser so it does not reappear.
 
 ### View 1: Trip Overview (Continent-Level Map)
 
 The main landing page. Screen splits into a map canvas (~72% width) on the left and a trip feed sidebar (~28% width) on the right.
 
 **Map canvas**:
-- Shows the trip route as a line connecting region markers. Visited segments render as a solid line; planned segments render as a dashed line (see FR-012).
-- Each region uses a large filled dot as its marker. The active region uses a teardrop location pin in red.
+- Shows the trip route as a line connecting region markers. Visited segments render as a solid line; planned segments render as a dashed line (see FR-012). Route lines bear directional arrowheads (see FR-049).
+- The map uses a postcard-inspired tile style with no country text labels and no road/terrain detail at global zoom (see FR-050). The map MUST NOT wrap around for globe-spanning trips (see FR-048).
+- Each region uses a **flag pin** marker (see FR-046). The active region's flag pin is visually highlighted (e.g., accent color). Region pins for qualifying countries are clustered when multiple pins are nearby (see FR-051).
 - Floating card top-left: trip title and hamburger icon. Clicking the hamburger opens a trip selector list.
 - Zoom controls anchored bottom-right.
-- At this zoom level the map shows city labels and geopolitical boundaries only; road and terrain detail is hidden.
+- A "Play" control anchored to the map canvas (exact final placement determined at implementation time) initiates Play Trip mode (see FR-052). While Play Trip is active, a Pause control replaces it and a visible exit affordance is available.
 
 **Trip feed sidebar**:
 - Two collapsible sections with headers: "Visited" (above) and "Planned" (below). Sections irrelevant to the current trip are hidden (see FR-002).
 - Within each section, region tiles are listed in reverse-chronological order with no border between tiles.
 - Each region tile contains:
-  - Marker icon matching the map dot, connected to adjacent tiles by a vertical line (solid or dashed, mirroring the route logic).
+  - Flag pin icon matching the map marker, connected to adjacent tiles by a vertical line (solid or dashed, mirroring the route logic).
   - Region name, country, start date, and end date.
   - A horizontal row of up to four Instagram photo thumbnails; if more than four exist, a "+X" overlay appears on the fourth.
   - Up to four Substack post tiles, each showing a small Substack icon, post title, and a 3-line text preview; if more than four exist, a "+X" overlay appears on the fourth.
@@ -200,8 +257,8 @@ Accessed by selecting "Expand Region →" from the trip overview. Same split lay
 
 **Map canvas**:
 - Shows full map detail: roads, terrain, waterways, and parks.
-- Each stop in the region is shown as a standard dot marker.
-- A dashed light-blue route line connects stops in chronological order.
+- Each stop in the region is shown as a **pushpin** marker (see FR-046).
+- A dashed light-blue route line connects stops in chronological order, with directional arrowheads indicating direction of travel (see FR-049).
 - Floating card top-left: back arrow and "BACK TO TRIP" label.
 
 **Region sidebar**:
@@ -241,22 +298,38 @@ Opens as a modal overlay that dims the background and occupies approximately 80%
 - **SC-005**: The site handles stops with missing optional content without layout failure.
 - **SC-006**: The map remains legible at trip level by showing region markers rather than individual stop markers.
 - **SC-007**: Visitors can switch between multiple trip itineraries without a page reload.
-- **SC-008**: All 82 Earth Sandwich 2015 stops and all 30 Earth Club Sandwich 2027 stops are present in the data and render on the map without errors.
+- **SC-008**: All stops returned by the backend API render on the map and in the sidebar without errors.
 - **SC-009**: In any region that mixes Planned stops with Instagram or Substack stops, zero Planned stop tiles appear in the region sidebar.
+- **SC-010**: Trip data loads and renders within 3 seconds under normal network conditions. A loading indicator is visible throughout the loading period.
+- **SC-011**: A clear error message appears within 5 seconds when the backend service is unavailable, and no part of the UI crashes or renders blank.
+- **SC-012**: All Acceptance Scenarios across US1–US6 have corresponding automated tests that pass before any feature is considered releasable.
+- **SC-013**: On the first visit, the landing modal appears before any map interaction; returning visitors (same browser) are not shown the modal again.
+- **SC-014**: At the trip overview zoom level, no country name text labels are visible on the map.
+- **SC-015**: For a trip that spans the antimeridian (e.g., Earth Sandwich 2015), the route line renders as a continuous path without jumping to the opposite map edge.
+- **SC-016**: Every route segment (trip view and region view) displays at least one arrowhead indicating the chronological direction of travel.
+- **SC-017**: At the global zoom level, regions in qualifying countries with multiple nearby pins are replaced by cluster indicators; pins in the United States, Canada, and China always render individually.
+- **SC-018**: In Play Trip mode, the map advances through all non-abandoned regions in chronological order without requiring visitor input; pause and resume controls respond within one interaction.
 
 ## Assumptions
 
 - The initial release is read-only; content editing and posting workflows are out of scope.
-- All itinerary and travel content is hard-coded into the site at build time.
-- The site is delivered as a static web application without server-side dynamic content.
-- Region membership is pre-computed from stop coordinates at build time; no runtime geocoding is performed.
+- All trip, stop, and post data is served by the backend API defined in `specs/002-database-backend`. The frontend holds no local copy of the data.
+- Region grouping is performed by the frontend by grouping stops according to their API-provided `region_code` field; no coordinate-based computation is performed in the frontend. Region display details (name, country, coordinates) are looked up from the region reference data returned by the backend (`GET /regions`).
+- The site is delivered as a static web application (a single-page app) that requires the backend API to be reachable at runtime.
 - Content sources are Instagram (photo posts), Substack (article posts), and Planned (itinerary entries with no rich content). Other content platforms are out of scope for this version.
-- The Earth Sandwich 2015 trip (July 2015 – August 2016) is a completed trip represented entirely with Planned stops, as no Instagram or Substack content has been attached to those itinerary entries.
-- The Earth Club Sandwich 2027 trip (March 2027 – May 2028) is a future trip represented entirely with Planned stops.
-- Planned stop coordinates are pre-geocoded at build time using well-known city coordinates; no runtime geocoding is performed.
-- The "Sofia, Belarus" entry in the Earth Sandwich 2015 CSV is a data error; the correct location is Sofia, Bulgaria.
+- Planned stop coordinates are pre-geocoded by the backend; the frontend does not perform any geocoding.
 - The target audience is travelers and their friends and family.
 - Mobile responsiveness is expected, but desktop and tablet are the primary target.
 - The map component is provided by a third-party mapping service; zoom behavior, map detail levels, and marker rendering are constrained by that service's capabilities.
 - The active region concept (FR-011) is only meaningful for trips with a mix of visited and planned regions.
+- The "abandoned" classification (FR-028) is derived at render time from the stop's stored `status: "planned"` and `date`; no API call is required for this derivation.
+- The `"Sofia, Belarus"` entry in the Earth Sandwich 2015 data is a data error; the correct location is Sofia, Bulgaria. This is corrected in the backend seed data.
 - Database, backend API, and containerization assumptions are documented in [specs/002-database-backend/spec.md](../002-database-backend/spec.md). Automated data ingestion assumptions live in [specs/003-ingestion-pipeline/spec.md](../003-ingestion-pipeline/spec.md).
+- New feature code follows test-driven development: tests are written and passing before a feature is considered releasable. Test coverage for existing shipped code is tracked and improved incrementally.
+- The landing modal (FR-047) uses browser local storage to track the dismissed state. No server-side session or tracking is required.
+- The postcard map style (FR-050) is achieved by selecting an appropriate map tile provider style or custom style configuration; the exact provider is determined at implementation time within the constraints of the chosen mapping service.
+- Anti-meridian wrap prevention (FR-048) relies on the mapping service's configuration options; the exact mechanism (e.g., `worldCopyJump`, coordinate normalization) is determined at implementation time.
+- Play Trip (FR-052) advances region-by-region at the trip overview level. The exact playback interval and animation easing are determined at implementation time, within the constraints of the mapping service. Stop-by-stop playback and region drill-down during playback are out of scope.
+- Country clustering (FR-051) uses the API-provided `region_code` country field to determine a marker's country for clustering purposes. The clustering threshold (distance/zoom level at which markers group) is determined at implementation time based on visual testing.
+- Arrowhead rendering (FR-049) is constrained by the capabilities of the chosen mapping/overlay library. If the library does not natively support arrowheads, a custom overlay approach (e.g., SVG arrows placed along polyline segments) is acceptable.
+- The site does not auto-refresh trip data during a session. Data is fetched once on page load and once per explicit trip switch. Visitors who want to see content added after their initial load must perform a full browser reload.

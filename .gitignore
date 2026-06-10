@@ -25,9 +25,8 @@ venv/
 # Alembic
 backend/alembic/versions/*.pyc
 
-# instagrapi session (active + backup variants)
-instagrapi_session.json
-instagrapi_session.json.bak
+# instagrapi session (active + backup variants — .bak, .stale-<timestamp>, etc.)
+instagrapi_session.json*
 
 # Media downloads
 public/media/
@@ -36,6 +35,7 @@ public/media/
 .coverage
 htmlcov/
 .pytest_cache/
+coverage/
 
 # IDE
 .vscode/
@@ -47,6 +47,11 @@ htmlcov/
 # whole team conforms to the same JIRA mappings.
 .specify/extensions/jira/jira-config.local.yml
 
-
-# SpecKit feature.json — per-dev pointer, never commit
+# SpecKit feature.json represents the source of truth for which feature is active.
+# Each branch should update this to point to the relevant feature directory,
+# but these changes should never be committed as they are specific to the local development environment and would cause problems when merging branches.
 .specify/feature.json
+
+# Claude Code per-developer settings. The shared allowlist lives in
+# .claude/settings.json (committed); local approvals land here and are personal.
+.claude/settings.local.json

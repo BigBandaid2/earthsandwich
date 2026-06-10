@@ -1,6 +1,6 @@
 # SDLC Workflow Guide
 
-> Source of truth for how this team uses Spec Kit, JIRA (OCS), and Claude Code together. Read before your first commit. Re-read whenever the workflow surprises you.
+> Source of truth for how this team uses Spec Kit, JIRA (OCS), and an AI Coding Assistant together. Read before your first commit. Re-read whenever the workflow surprises you.
 
 **Status**: Living document. Edit via PR; do not silently rewrite.
 
@@ -8,29 +8,42 @@
 
 ## Weekly Cadence
 
-Roughly once per week, the Team Lead is responsible for grasping the current state of the project, capturing all progress since the last sprint review, planning objectives for the sprint to come, and keeping the core spec readable and coherent. 
+Two rhythms operate here. **Per User Story** (the "After Each User Story" sub-section below) fires whenever a Story finishes — could happen twice in a week, or zero times — and is the gate between "operator marked all tasks done" and clearing the Story *to merge*; the manual JIRA Done flip follows once it's merged to master with the full suite green. **Weekly** (the three meeting-anchored sub-sections after it) is the team-meeting rhythm: drift scan, sync, attest, plan.
+
+### After Each User Story
+
+Triggered when an operator believes a User Story is complete (all its tasks `[x]`-marked). Required gate before flipping the JIRA Story to Done — but a **self-review satisfies it**. Peers already know the Story from planning and grooming; pull one in only when the Story genuinely warrants a second set of eyes, not as a standing tax. The point is to walk the Definition of Done before Done, not to add friction when nothing is broken.
+
+**Official DONE is stricter than the review.** The JIRA Story flips to Done only once the work is **merged to master with the full test suite green** — i.e., it has entered the master→production CICD cadence. The self-review clears a Story *to merge*; the merge + green suite is what actually marks it Done. A Story can pass review and still sit In Progress until it lands on master.
+
+1. **Build the DoD review playground** at `specs/<spec>/reviews/phase-NN-usN.html` (see [§Definition of Done Review](#definition-of-done-review) for table contents, carry-forward handling, and the prompt-back convention).
+2. **Fill the disposition fields** in the playground: reviewer name (the builder self-reviewing is fine), general comment, `DONE` / `Needs work`.
+3. **Paste the playground's copy-out prompt into the AI Coding Assistant.** It records the outcome and ends — DONE path — with the gated flip: merge to master + full suite green, *then* JIRA Done.
 
 ### Before Weekly Team Meeting
 
 1. **Merge open feature branches into the default branch** — get all shipped work onto a coherent base so the drift scan + JIRA sync read from a single source.
 2. **Reconcile Code to Tasks** — drift scan against previous drift reconciliation → HEAD (see [§Reconciliation](#reconciliation-claudespec-drift-scan)).
 3. **New Phase/Story for Code Drift** — bundle detected changes as a new Phase appended to the relevant `tasks.md`.
-4. **Sync Spec State to JIRA** — push new phases as Stories and flip completion statuses so the planning meeting reads off current JIRA state (see [§JIRA sync](#jira-sync)).
-5. **Log estimated hours** — append daily rows to `docs/planning/time-log.tsv` and add a person/story hours summary to the current sprint plan (see [§Time logging](#time-logging)).
-6. **Check Progress Against Previous Sprint Plan** — append sprint review notes.
+4. **Sync Spec State to JIRA** — push new phases as Stories, advance Stories with any task progress to **In Progress** (never directly to Done), and check each newly-created Story for `Duplicate` relationships with existing Stories (overhauled predecessors, user tickets) — link them when found (see [§JIRA sync](#jira-sync)).
+5. **Backfill sprint on Done items** — any Done Story missing a sprint goes into the currently-open sprint (see [§Sprint membership rule](#sprint-membership-rule)).
+6. **Log estimated hours** — append daily rows to `docs/planning/time-log.tsv`, regenerate `docs/planning/time-log.html` from the TSV so its embedded data matches, and add a person/story hours summary to the current sprint plan (see [§Time logging](#time-logging)).
+7. **Check Progress Against Previous Sprint Plan** — annotate the closing sprint's `docs/planning/YYYY-WW.md` against JIRA per [`sprint-review-template.md`](planning/sprint-review-template.md).
 
 ### During Weekly Team Meeting
 
-7. **Attest hours** — each team member confirms their estimated hours, adds meeting time, fills the `Hours Attested` column (see [§Time logging](#time-logging)).
-8. **Plan the week in JIRA's UI** — drag stories into the sprint, assign owners, set story points, write the Sprint goal.
+8. **Attest hours** — each team member confirms their estimated hours, adds meeting time, fills the `Hours Attested` column (see [§Time logging](#time-logging)).
+9. **Plan the week in JIRA's UI** — drag stories into the sprint, assign owners, set story points, write the Sprint goal, start the next sprint.
 
 ### After Weekly Team Meeting
 
-9. **Link related tickets** — `Duplicate` for 1-to-1 parallels with a spec-kit Story, `Blocks` for prerequisite dependencies between tickets, `Relates` for everything else (see [§JIRA sync](#jira-sync)).
-10. **Create New Sprint Plan** — via JIRA tickets or directly.
-11. **Push to JIRA** — any phases newly decided in the meeting become new Stories in OCS, placed in the current sprint for velocity attribution. (Drift-discovered phases were already synced in step 4.)
-12. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
-13. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
+10. **Pull current-sprint Stories from JIRA** — JQL: `project = OCS AND sprint = openSprints()`. List everything the team committed to this week, with owner and status. This is the baseline for steps 11–16: the planning doc and the link sweep read off the same set.
+11. **Link related tickets** — `Duplicate` for 1-to-1 parallels with a spec-kit Story, `Blocks` for prerequisite dependencies between tickets, `Relates` for everything else (see [§JIRA sync](#jira-sync)).
+12. **Create New Sprint Plan** — author `docs/planning/YYYY-WW.md` from the step-10 pull (canonical: only the people + items it returned), per [`sprint-review-template.md`](planning/sprint-review-template.md). Header `**Sprint**` + `**Goal**` verbatim from JIRA; one `### <Person>` sub-section per owner, tickets collapsed into ≤7 conceptual groups (see template).
+13. **Update time-log artifacts with attested hours** — fold each attendee's step-8 attestation into `docs/planning/time-log.tsv` (fill empty `Hours Attested` cells, add dedicated rows for meeting time), regenerate `docs/planning/time-log.html` from the TSV so its embedded data matches, and update the sprint-review file's Hours section with attested totals.
+14. **Merge master into your feature branch.** Project-level updates from steps 3–6 land on master; each team member merges master into their active feature branch so subsequent work reads off the current state.
+15. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
+16. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
 
 The weekly cadence is the contract. The per-feature ceremony (below) is the optional discipline for serious architectural work.
 
@@ -44,7 +57,7 @@ The weekly cadence is the contract. The per-feature ceremony (below) is the opti
 | **Code repo** (`src/`, `public/`, etc.) | Implementation. The *how*. |
 | **JIRA** (project `OCS`) | PM state: priority, owner, sprint, story points, status. The *who*, *when*, *in what order*. |
 | **Git** | Reviewable change events. Audit trail. |
-| **Memory** (`.claude/.../memory/`) | Durable preferences across Claude sessions. |
+| **Memory** (`.claude/.../memory/`) | Durable preferences across AI Coding Assistant sessions. |
 
 If unsure where a change belongs, match the question it answers to the table above.
 
@@ -87,8 +100,9 @@ When patches won't bridge the gap between the spec and reality.
 3. **Swap.** `rm -rf specs/<NNN>-<slug>/` → run `/speckit.specify` with the prompt → `mv _<NNN>-keep/* specs/<NNN>-<slug>/ && rmdir _<NNN>-keep`.
 4. **Iterate on the new spec.** An overhaul is the cheapest moment to capture latent decisions explicitly.
 5. **`/speckit.plan` and `/speckit.tasks` regeneration is OPTIONAL.** Phases with completed-or-in-progress tasks must stay at the top of `tasks.md` ([Cardinal Rule #1](../.specify/memory/constitution.md#cardinal-rules)); envisioned-but-not-started phases may be discarded. Merge by hand if needed.
-6. **Propagate** (see [§Project-Level Doc Propagation](#project-level-doc-propagation)).
-7. **Sync sibling specs** for stale cross-references: `grep -rn "<spec-slug>" specs/` and fix retired FRs, moved-FR attributions, etc.
+6. **Sync to JIRA + mark overhauled.** Push new Stories via `/speckit.jira.specstoissues`; suffix pre-overhaul Stories' titles with `(overhauled)` (leave at `Done`); add `Duplicate` / `Relates` links per [§Issue-link reconciliation](#issue-link-reconciliation).
+7. **Propagate** (see [§Project-Level Doc Propagation](#project-level-doc-propagation)).
+8. **Update cross-references in sibling specs.** Other specs may reference this one's FRs or concepts by number or name. `grep -rn "<spec-slug>" specs/` to find them; update or remove references that now point to retired or renumbered FRs.
 
 Worked example: `003-ingestion-pipeline` re-author on 2026-05-27 — the split-time spec assumed APScheduler-in-backend; reality was a standalone CLI App. Patches couldn't bridge that gap.
 
@@ -98,10 +112,10 @@ Standard ceremony for a feature with no prior history:
 
 1. `/speckit.specify "<description>"` (the `before_specify` hook handles the feature branch).
 2. `/speckit.clarify` if needed.
-3. `/speckit.plan` → `/speckit.tasks` → `/speckit.implement`.
-4. `/speckit.jira.specstoissues <slug>` — Epic + Stories + active-phase Subtasks.
+3. `/speckit.plan` → `/speckit.tasks` → `/speckit.analyze`.
+4. `/speckit.jira.specstoissues <slug>` — Epic + Stories. Subtasks are **not** synced by default (`tasks.md` is their source of truth); break them out only for genuinely active-sprint work that needs JIRA triage (see [§JIRA sync](#jira-sync)).
 5. PR to default branch — review, merge, delete branch.
-6. `/speckit.jira.sync-status <slug>` — flip JIRA tickets to Done.
+6. `/speckit.jira.sync-status <slug>` — Stories advance to In Progress automatically (any synced Subtasks flip per task state; by default there are none). Flip each Story to Done manually in JIRA only once it's merged to master (step 5) with the full suite green and its Independent Test verified — official DONE (see [§Definition of Done Review](#definition-of-done-review)).
 7. **Propagate** (see [§Project-Level Doc Propagation](#project-level-doc-propagation)).
 
 ### Project-Level Doc Propagation
@@ -120,15 +134,15 @@ Per [Cardinal Rule #5](../.specify/memory/constitution.md#cardinal-rules), prefe
 
 ---
 
-## Reconciliation: Claude/spec drift scan
+## Reconciliation: spec drift scan
 
-Between Monday meetings, Claude makes small changes that don't always make it into `tasks.md`. The drift scan catches them.
+Between Monday meetings, agent-assisted changes land that don't always make it into `tasks.md`. The drift scan catches them.
 
-Ask Claude: *"Run a spec drift scan. For each commit touching `src/`, `public/`, or `package.json`, list whether it has a corresponding line in any `tasks.md`. Flag everything that doesn't, grouped by spec."*
+Drift-scan prompt: *"Run a spec drift scan. For each commit touching an App's code (e.g. `frontend/`, `backend/`, `pile-app/`, `bridge-builder-toolkit/`) rather than specs or docs, list whether it has a corresponding line in any `tasks.md`. Flag everything that doesn't, grouped by spec."*
 
-**Starting point.** Claude derives `<last_known_good_commit>` itself — never pass a date. The most recent `## Phase N: Drift Reconciliation (YYYY-MM-DD …)` heading across all `specs/**/tasks.md` defines the baseline; scan `<that-commit>..HEAD`. Fall back to last Monday 00:00 if no such phase exists. Scans are idempotent across re-runs and consecutive weeks chain without overlap.
+**Starting point.** Derive `<last_known_good_commit>` from the repo — never pass a date. The most recent `## Phase N: Drift Reconciliation (YYYY-MM-DD …)` heading across all `specs/**/tasks.md` defines the baseline; scan `<that-commit>..HEAD`. Fall back to last Monday 00:00 if no such phase exists. Scans are idempotent across re-runs and consecutive weeks chain without overlap.
 
-Claude enumerates changed files per commit, buckets them by spec, greps `tasks.md` for matches, and outputs unmatched commits as a proposed Phase N+1. Always *propose* — never append directly ([Cardinal Rule #1](../.specify/memory/constitution.md#cardinal-rules)).
+Enumerate changed files per commit, bucket them by spec, grep `tasks.md` for matches, and **append** the unmatched commits as a new `## Phase N+1: Drift Reconciliation (YYYY-MM-DD weekly scan)` at the bottom of each affected `tasks.md` — completed `[x]`, as historical record. Appending a new phase is exactly what [Cardinal Rule #1](../.specify/memory/constitution.md#cardinal-rules) sanctions ("new work appends new phases to the bottom"); its only prohibition is restructuring or rewriting *existing* completed or in-progress phases. The diff is the review — surface the phase before appending only when explicitly asked.
 
 Cadence: per-commit is too noisy; per-push (lightweight drift check via `after_implement` hook) and the weekly Monday scan together are the right catch-up rhythm.
 
@@ -139,29 +153,81 @@ Cadence: per-commit is too noisy; per-push (lightweight drift check via `after_i
 Two commands keep JIRA aligned with the spec state:
 
 - `/speckit.jira.specstoissues <spec>` — creates an Epic for the spec and a Story for each `## Phase N: ...` in its `tasks.md`. Existing Stories are left alone; only new phases are pushed. Subtasks are *not* created by default — sync at the Story level unless there's a clear reason to break out individual tasks (e.g. active forward-sprint work that needs triage in JIRA).
-- `/speckit.jira.sync-status <spec>` — reads `[ ]` / `[~]` / `[x]` task flips in `tasks.md` and transitions the corresponding JIRA issues to `To Do` / `In Progress` / `Done`.
+- `/speckit.jira.sync-status <spec>` — reads `[ ]` / `[~]` / `[x]` task flips in `tasks.md` and transitions the corresponding JIRA issues. **Subtasks** map straight through: `[ ]` → `To Do`, `[~]` → `In Progress`, `[x]` → `Done`. **Stories** advance only as far as `In Progress` (any `[~]` or `[x]` task → `In Progress`); the final flip to `Done` is **manual in JIRA**, done only once the Story is **merged to master with the full test suite green** (official DONE; see [§Definition of Done Review](#definition-of-done-review)) and its Independent Test verified. Sync never advances a Story to Done, even when all its tasks are `[x]`.
+
+> **Why Stories don't auto-flip to Done.** Task-IDs in commit messages prove a commit *touched* the task, not that the *Story* is shippable. The Story's Independent Test (in its description) is the acceptance bar — and the sync agent has no way to run it. Manual Done flip = "I (a human) verified this Story actually works end-to-end." This rule was added 2026-06-01 after OCS-108 was auto-flipped Done off [T056]–[T062] commits while the frontend↔backend wiring wasn't actually live. Official DONE tightens this further (2026-06-05): not just verified, but **merged to master with the full suite green and in the release cadence** — a passing Independent Test on a feature branch is necessary but doesn't ship the Story.
 
 ### Sprint membership rule
 
 Any Story flipped to **Done** must belong to a sprint — default to the currently-open sprint unless the work demonstrably happened in a different one (in which case set that sprint explicitly). This keeps velocity attribution accurate at sprint-review time.
 
+**Operationalised as step 5 of the weekly cadence.** After step 4's status-flip pass, query JIRA for Done-without-sprint Stories and assign each to the open sprint:
+
+- JQL: `project = OCS AND status = Done AND sprint is EMPTY AND issuetype not in (Subtask, Epic)` — Subtasks inherit their parent's sprint and can't be set directly; Epics never belong to a sprint in JIRA Cloud's next-gen projects. The filter keeps the result list to items the rule can actually act on.
+- For each result: set the `sprint` field to the currently-open sprint ID (via JIRA UI drag-into-sprint, or the MCP `editJiraIssue` with `customfield_10020` = sprint ID).
+- Override the default only when the work demonstrably shipped in a prior sprint — e.g. a Story flipped Done late but the commits land in last sprint's window. In that case set the historical sprint explicitly.
+
 In-progress stories are *not* automatically added to the current sprint. Add one case-by-case when partial work has shipped this sprint and the team wants velocity credit for it.
 
-### User-created tickets — reconciliation
+### Issue-link reconciliation
 
-JIRA accumulates two kinds of issues: those produced by `/speckit.jira.specstoissues` (labeled `spec-kit`) and those created ad-hoc in the JIRA UI (typically during weekly meetings or stakeholder discussions). When the two describe the same work, the spec-kit Story is the canonical record and the user ticket gets linked to it rather than left orphaned.
+JIRA accumulates parallel issues that describe the same or related work — typically: (a) user-created tickets vs. spec-kit Stories, and (b) pre-overhaul spec-kit Stories vs. their post-overhaul replacements. When two issues describe the same work, the *current canonical* one (post-overhaul Story, or the spec-kit Story over a user ticket) is the record of truth and the older / informal one gets linked to it rather than left orphaned.
 
 | Link | When | Direction (`inwardIssue` / `outwardIssue`) |
 |---|---|---|
-| `Duplicate` | User ticket and spec-kit Story describe the same work 1-to-1 | spec-kit Story / user ticket |
+| `Duplicate` | Two issues describe the same work 1-to-1 (user ticket ↔ spec-kit Story; pre-overhaul Story ↔ post-overhaul Story) | duplicate / canonical |
 | `Blocks` | One ticket must finish before another can start | blocker / blocked |
-| `Relates` | Tangential — spike, follow-on, historical context | either |
+| `Relates` | Tangential or non-1-to-1 overlap — spike, follow-on, historical context, **or a pre-overhaul Story whose scope was split across multiple post-overhaul Stories** | either |
 
-Don't touch the Subtasks under spec-kit Stories — those are managed by the speckit-jira agents; link at the Story level only. Surface `Blocks` chains at planning. OCS has no `Blocked` status; the `Blocks` link IS the dependency record. True close-cascade requires Parent-Subtask conversion (out of scope) — manually close duplicates when the spec-kit Story closes.
+> **Direction.** In `createIssueLink`, the `inwardIssue` performs the link's *outward* verb on the `outwardIssue` — a `Duplicate` renders "`inwardIssue` duplicates `outwardIssue`", and `Blocks` renders "`inwardIssue` blocks `outwardIssue`". So the **ignorable duplicate is the `inwardIssue`** and the **canonical keeper is the `outwardIssue`** (the JIRA UI lets you pick the verb directly, so this only bites API/MCP-driven linking).
+
+**Duplicate-check is step 4 of the weekly cadence** (`Sync Spec State to JIRA`). For each Story `/speckit.jira.specstoissues` just created, scan: (1) user-created tickets describing the same work; (2) pre-overhaul Stories the new one supersedes. Auto-link on a clean 1-to-1; use `Relates` when scope diverges. Surface candidates in the sprint review when judgement is needed.
+
+**Mark the ignorable side `Dismissed`.** OCS has a `Dismissed` status for tickets that can be ignored. After creating the `Duplicate` link, transition the ignorable ticket to `Dismissed`: the **non-spec-kit** ticket when it duplicates a spec-kit Story, or the **older** (by created date) when both duplicates are non-spec-kit. `Dismissed` is also applied manually to any ticket deemed no longer relevant during planning or grooming. Creating the status itself is a JIRA-admin UI action — the MCP/API cannot add workflow statuses.
+
+Don't touch the Subtasks under spec-kit Stories — those are managed by the speckit-jira agents; link at the Story level only. Surface `Blocks` chains at planning. OCS has no `Blocked` status; the `Blocks` link IS the dependency record. True close-cascade requires Parent-Subtask conversion (out of scope) — `Dismiss` duplicates at reconciliation time, and close them when the spec-kit Story closes.
 
 ### What never goes into the sync
 
-Per [Cardinal Rule #2](../.specify/memory/constitution.md#cardinal-rules), `specs/<spec>/jira-mapping.json` must not record sprint, owner, status, story points, or priority. Those PM fields live in JIRA's UI; the mapping file carries only identity (key, summary, URL, parent/child structure). Two writers (this file + JIRA's UI) on the same field guarantees drift. Narrative artefacts that humans read but tools don't sync (`docs/planning/YYYY-WW.md`, this guide) are exempt.
+Per [Cardinal Rule #2](../.specify/memory/constitution.md#cardinal-rules), `specs/<spec>/jira-mapping.json` must not record sprint, owner, status, story points, or priority — **including derived counters like `completed_stories` / `pending_stories` / `completed_tasks`** that summarize status. Those PM fields live in JIRA's UI; the mapping file carries only identity (key, summary, URL, parent/child structure) plus a `total_stories` / `total_tasks` count. Two writers (this file + JIRA's UI) on the same field guarantees drift. Narrative artefacts that humans read but tools don't sync (`docs/planning/YYYY-WW.md`, this guide) are exempt.
+
+---
+
+## Definition of Done Review
+
+Each User Story closes with a Definition-of-Done walkthrough — the [§After Each User Story](#after-each-user-story) gate referenced in the weekly cadence. **Self-review is the default**; the builder can run it alone. Purpose: sanity-check, gap-finding, and capturing criteria that can't be fully satisfied (the `forward` items). Pull in a peer only when the Story warrants it — a second opinion is a tool to reach for when something feels unsettled, not a mandatory hop for every Story.
+
+### The playground
+
+Each Story gets a single-file HTML playground at `specs/<spec>/reviews/phase-NN-usN.html`. Hand-curated for now; the template will likely evolve before it's worth scripting. Layout follows the `playground:playground` conventions: single file, vanilla HTML/CSS/JS, no external deps, dark theme, live state, copy-out-a-prompt.
+
+The playground's table aggregates the Story's Definition of Done from `spec.md` and `tasks.md`:
+
+| Source | Rows |
+|---|---|
+| spec.md User Story `Independent Test` | one per sub-clause (a, b, ...) |
+| spec.md User Story `Acceptance Scenarios` | one per AS |
+| tasks.md phase `Checkpoint` | one row |
+| spec.md `Success Criteria` tied to the Story | one per SC |
+
+Each row carries: builder's pre-review AI assessment (`satisfied` / `partial` / `forward` / `needs review`), supporting evidence (commits, test names, file paths), an editable peer-comment textarea, and a satisfied checkbox. The reviewer can add new rows for criteria the spec missed, delete rows for criteria deemed irrelevant, and edit existing item text — all of which the prompt records as spec amendments.
+
+### Carry-forward items
+
+Items that can only be tested in another App (typical case: a constraint the consuming App must honour but which the producing App cannot self-verify) get a `forward` assessment in the playground. The review is responsible for **routing the forward item to the spec that will eventually test it** — leaving forward items in the playground alone is not enough.
+
+Two-step protocol per forward item:
+
+1. **Mark the playground row's evidence** with `carried forward to specs/<spec>/...` so the trail is visible at review time.
+2. **Open the receiving spec and capture the constraint there as an editorial pickup** — naming the originating spec + Story, recording the verbatim constraint text, and letting the receiving spec's authors decide where it best lands (a new FR, an Edge Case, a Key Entity note). Each such pickup is a one-off — not a systemic relay between specs.
+
+Worked example: 003 Phase 22 / US3 has two bridge-app-side Acceptance Scenarios (AS#1, AS#2) that can't be verified until bridge-app exists. They live as `forward` in `specs/003-ingestion-pipeline/reviews/phase-22-us3.html` and as a one-time editorial pickup at FR-092 in `specs/004-bridge-builder-toolkit/spec.md`, so the bundle that toolkit eventually produces seeds the bridge-app spec with them intact.
+
+### Disposition + prompt
+
+The reviewer's binary `DONE` / `Needs work` disposition drives the copy-out prompt's tail. DONE-path lists 7 follow-up actions (Checkpoint attestation in `tasks.md`, carry-forward routing, spec amendments if any, recording the review's input state back into the playground, commit + push on the feature branch, merge to master + full-suite verification, and — gated on that being green — the JIRA Story flip In Progress → Done). Needs-work-path lists 5 (address unsatisfied items, amend spec if any, schedule second pass, record the input state into the playground, commit + push; Story stays In Progress).
+
+Without the DoD review prompt being executed, no Story → Done — but the review is necessary, not sufficient. **Official DONE = merged to master + full test suite green + in the master→production CICD cadence.** The review clears a Story to merge; the merge and green suite are the final hop. The In-Progress-only sync rule (see [§JIRA sync](#jira-sync)) reflects this: a Story stays In Progress through review and merge prep, and flips to Done only once it's on master and releasing.
 
 ---
 
@@ -186,6 +252,8 @@ Per [Cardinal Rule #2](../.specify/memory/constitution.md#cardinal-rules), `spec
 ### Before the weekly team meeting
 
 After the drift scan and JIRA sync, the team lead enumerates commits since the last sync, groups them by Story + person + day, and writes one row each with `Hours Estimated`. Add a person/story summary block at the bottom of `docs/planning/YYYY-WW.md` so the meeting has a quick read of where effort went.
+
+Then **regenerate `docs/planning/time-log.html` from the TSV** so the playground's inline `TSV_TEXT` block matches the new rows — the explorer embeds a copy of the ledger, and stale embedded data is a silent drift source. (Same regeneration step runs again post-attestation in step 13, once `Hours Attested` is filled.)
 
 ### After the weekly team meeting (attestation)
 
@@ -224,7 +292,7 @@ Capture the week's intent in two places: the JIRA Sprint goal (one sentence) and
 > Good: "Ship the scheduled Instagram pull and a draft SDLC workflow guide; explore the legacy comment-bot integration."
 > Bad: "Do all the things from the planning meeting."
 
-**Planning notes**: each Monday produces `docs/planning/YYYY-WW.md` (ISO week number). Header: `**Sprint**` (`OCS Sprint N` + date range) and `**Goal**` (matches the JIRA Sprint goal). Body: one `### <Person>` sub-section per team member, each listing that person's stories for the sprint.
+**Planning notes**: each Monday produces `docs/planning/YYYY-WW.md` (ISO week number) from [`sprint-review-template.md`](planning/sprint-review-template.md) — the same file is later annotated at review-time (step 7). Header: `**Sprint**` (`OCS Sprint N` + date range) and `**Goal**` (matches the JIRA Sprint goal). Body: one `### <Person>` sub-section per team member, each listing that person's stories for the sprint.
 
 ---
 
@@ -256,7 +324,7 @@ The `before_implement` onboard hook is already enabled in `.specify/extensions.y
 
 **Weekly review** (Monday cadence **Knowledge refresh** step) — two parts, ~5 min per developer:
 
-1. **Digest** — ask Claude: *"Give me a weekly review since last Monday — what shipped, what's active, what's blocked."* Claude composes a `git log` summary plus an Atlassian MCP query for active sprint state. Three sections expected: shipped commits mapped to phases, active sprint issues with owners, items with no movement in 7+ days.
+1. **Digest** — ask the AI Coding Assistant: *"Give me a weekly review since last Monday — what shipped, what's active, what's blocked."* The AI Coding Assistant composes a `git log` summary plus an Atlassian MCP query for active sprint state. Three sections expected: shipped commits mapped to phases, active sprint issues with owners, items with no movement in 7+ days.
 2. **Quiz** — run `/speckit.onboard.quiz`. Generates 5 questions calibrated to your profile level (`junior` / `mid` / `senior`), grounded in real project artifacts, and persisted in `.onboard/profiles/<name>.json` so questions never repeat.
 
 No enforcement, no scoring, no surveillance — just a structured nudge for context refresh. If a quiz reveals confusion, that's a signal to update the spec or the docs.

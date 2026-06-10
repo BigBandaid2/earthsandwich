@@ -1,5 +1,4 @@
 import type { EffectiveStopStatus, Stop, Region, Trip } from '../data/types';
-import { REGIONS } from '../data/regions';
 
 export interface RegionGroup {
   region: Region;
@@ -29,7 +28,7 @@ export function equirectangularProject(coords: { lat: number; lng: number }) {
   return { x, y };
 }
 
-export function groupStopsByRegion(trip: Trip): RegionGroup[] {
+export function groupStopsByRegion(trip: Trip, regions: Region[]): RegionGroup[] {
   const groupMap = new Map<string, Stop[]>();
 
   for (const stop of trip.stops) {
@@ -42,7 +41,7 @@ export function groupStopsByRegion(trip: Trip): RegionGroup[] {
   const groups: RegionGroup[] = [];
 
   for (const [code, stops] of groupMap) {
-    const region = REGIONS.find((r) => r.code === code);
+    const region = regions.find((r) => r.code === code);
     if (!region) continue;
 
     const sorted = [...stops].sort((a, b) => a.date.localeCompare(b.date));
@@ -152,4 +151,3 @@ export function formatDate(date: string): string {
   });
 }
 
-export { REGIONS };

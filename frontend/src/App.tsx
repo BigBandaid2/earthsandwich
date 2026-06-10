@@ -4,11 +4,13 @@ import { groupStopsByRegion } from './utils/regionUtils';
 import type { Trip } from './data/types';
 import { useTrips } from './hooks/useTrips';
 import { useTrip } from './hooks/useTrip';
+import { useRegions } from './hooks/useRegions';
 import { ErrorBoundary } from 'react-error-boundary';
 import WorldMap from './components/MapView';
 import TripFeed from './components/Sidebar';
 import RegionSidebar from './components/RegionSidebar';
 import StopModal from './components/StopDetail';
+import LandingModal from './components/LandingModal';
 
 export type ViewMode = 'trip' | 'region';
 
@@ -25,13 +27,17 @@ function tripIdFromHash(hash: string, trips: Trip[]): string | null {
 }
 
 function App() {
-  const { trips, loading: tripsLoading } = useTrips();
+  const { trips, loading: tripsLoading, error: tripsError } = useTrips();
+  const { regions, loading: regionsLoading, error: regionsError } = useRegions();
   const [activeTripId, setActiveTripId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('trip');
   const [activeRegionCode, setActiveRegionCode] = useState<string | null>(null);
   const [openStopId, setOpenStopId] = useState<string | null>(null);
   const [modalStopList, setModalStopList] = useState<string[]>([]);
   const [tripSelectorOpen, setTripSelectorOpen] = useState(false);
+  const [showLandingModal, setShowLandingModal] = useState(
+    !localStorage.getItem('travelogue:landing-dismissed'),
+  );
 
   // Resolve the active trip from the URL hash once the trips list loads.
   useEffect(() => {
@@ -48,8 +54,8 @@ function App() {
   const { trip: activeTrip } = useTrip(activeTripId);
 
   const regionGroups = useMemo(
-    () => (activeTrip ? groupStopsByRegion(activeTrip) : []),
-    [activeTrip]
+    () => (activeTrip ? groupStopsByRegion(activeTrip, regions) : []),
+    [activeTrip, regions]
   );
 
   const openStop = useMemo(
@@ -69,6 +75,13 @@ function App() {
 
   const handleSelectRegion = (regionCode: string) => {
     setActiveRegionCode(regionCode);
+  };
+
+  // FR-051: primary cluster-click behavior (fitBounds) is handled inside CountryClusterer.
+  // This handler exists for future App-level responses (e.g. highlighting clustered regions).
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleClusterClick = (_regionCodes: string[]) => {
+    // no-op: zoom-to-separate is handled imperatively by CountryClusterer
   };
 
   const handleOpenStop = (stopId: string, contextStopIds: string[]) => {
@@ -119,7 +132,31 @@ function App() {
     };
   }, [trips, activeTripId]);
 
-  if (tripsLoading || !activeTrip) {
+  if (tripsLoading || regionsLoading) {
+    return (
+      <div className="app-shell app-loading">
+        <p>Loading…</p>
+      </div>
+    );
+  }
+
+  if (tripsError || regionsError) {
+    return (
+      <div className="app-shell app-error">
+        <p>{tripsError ?? regionsError}</p>
+      </div>
+    );
+  }
+
+  if (trips.length === 0) {
+    return (
+      <div className="app-shell app-empty">
+        <p>No trips are currently available.</p>
+      </div>
+    );
+  }
+
+  if (!activeTrip) {
     return (
       <div className="app-shell app-loading">
         <p>Loading…</p>
@@ -172,6 +209,7 @@ function App() {
                 openStopId={openStopId}
                 onSelectRegion={handleExpandRegion}
                 onOpenStop={handleOpenStop}
+                onClusterClick={handleClusterClick}
               />
             </ErrorBoundary>
           </div>
@@ -208,6 +246,15 @@ function App() {
               onNav={handleModalNav}
             />
           </ErrorBoundary>
+        )}
+
+        {showLandingModal && (
+          <LandingModal
+            onDismiss={() => {
+              localStorage.setItem('travelogue:landing-dismissed', '1');
+              setShowLandingModal(false);
+            }}
+          />
         )}
       </div>
     </APIProvider>

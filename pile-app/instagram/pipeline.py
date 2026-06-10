@@ -21,6 +21,7 @@ from __future__ import annotations
 import csv
 import os
 import time
+import traceback
 from datetime import datetime, timedelta, timezone
 from typing import Iterator, Optional
 
@@ -31,13 +32,15 @@ from common.inference import InferenceHardBlockError
 from common.pile import (
     RECENT_LOCATION_COUNT,
     TSV_COLUMNS,
+    RunSnapshot,
     apply_tombstones,
     download_media,
     normalize_media_url_for_tsv,
     read_tsv_rows,
     resort_tsv_and_sweep_media,
+    truncate_tsv_to_timestamp,
 )
-from common.run_logging import prune_scrape_logs
+from common.run_logging import prune_scrape_logs, write_failure_record
 from instagram.deletion_detection import find_tombstones_in_page
 from instagram.inferred_location import extract_city_heuristic, infer_post_location
 from instagram.instagrapi_client import resolve_target_user_id
@@ -48,12 +51,20 @@ def parse_unix_timestamp(ts_str: str) -> int:
     """Convert an ISO timestamp string to a Unix timestamp integer.
 
     Python equivalent of PHP's strtotime(). Handles formats like
-    "2024-02-20 02:27:16+00" or "2024-02-20T02:27:16+0000".
+    "2024-02-20 02:27:16+00", "2024-02-20T02:27:16+0000", and bare dates
+    like "2024-02-20" (treated as UTC midnight).
+
+    Naive datetimes (no timezone offset) are interpreted as UTC. This is
+    safe for the existing TSV-row callsite (those always carry `+0000`)
+    and correct for the CLI `--newer-than` callsite where operators may
+    type a bare date and expect UTC, not local-machine-time.
     """
     ts_str = ts_str.strip().replace(" ", "T")
     if ts_str.endswith("+00"):
         ts_str += ":00"
     dt = datetime.fromisoformat(ts_str)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
     return int(dt.timestamp())
 
 
@@ -81,6 +92,61 @@ PER_POST_WORK_SEC = 4.0
 """Per-post processing budget: ~1s media download + ~3s LLM round-trip
 (canonicalize for tagged path, full inference for inferred path). Observed
 average across the @ourearthsandwich + @welawen corpora."""
+
+
+def _rollback_run(
+    *,
+    snapshot: "RunSnapshot",
+    target: str,
+    output_path: str,
+    failure_type: str,
+    failure_detail: str,
+    operator_hint: str,
+    run_started_at_iso: str,
+    run_started_at_mono: float,
+    attempted_rows: int,
+    log_dir: str,
+    traceback_text: str = "",
+) -> None:
+    """Roll back the pile to its pre-scrape state and write a structured
+    failure record. Called from every failure branch in `run_for_target`.
+
+    Always prints a human-readable failure banner to stdout AND appends a
+    JSON-Lines record to `<log_dir>/scrape-failures.jsonl` so an admin can
+    grep the failure history after the scheduler reports a bad run.
+    """
+    summary = snapshot.rollback()
+    elapsed = time.monotonic() - run_started_at_mono
+
+    banner = "=" * 80
+    print(f"\n{banner}")
+    print(f"FAILURE — @{target} scrape rolled back ({failure_type})")
+    print(banner)
+    print(f"  Run started at: {run_started_at_iso}")
+    print(f"  Elapsed:        {fmt_duration(elapsed)}")
+    print(f"  Failure detail: {failure_detail}")
+    print(f"  Atomicity rollback:")
+    print(f"    Rows discarded:        {attempted_rows}")
+    print(f"    Media files deleted:   {summary['files_deleted']}")
+    print(f"  Pile state: restored to pre-run snapshot — no corruption.")
+    print(f"  Operator action: {operator_hint}")
+    print(banner)
+
+    record = {
+        "target": target,
+        "service": "instagram",
+        "failure_type": failure_type,
+        "failure_detail": failure_detail,
+        "run_started_at": run_started_at_iso,
+        "elapsed_seconds": round(elapsed, 2),
+        "rows_discarded": attempted_rows,
+        "files_deleted": summary["files_deleted"],
+        "output_path": output_path,
+        "operator_hint": operator_hint,
+    }
+    if traceback_text:
+        record["traceback"] = traceback_text
+    write_failure_record(log_dir, record)
 
 
 def estimate_scrape_seconds(num_posts: int, rate_config: dict) -> float:
@@ -125,6 +191,23 @@ class FetchInterruptedError(Exception):
     """
 
 
+TRANSIENT_RETRY_BACKOFFS_SEC: tuple[tuple[float, float], ...] = (
+    (120.0, 240.0),   # ~2-4 min
+    (360.0, 600.0),   # ~6-10 min
+    (720.0, 1080.0),  # ~12-18 min
+)
+"""Escalating (min, max) backoff windows for transient page-fetch failures.
+
+Instagram's short-window private-API throttle — the `PrivateAccount: Not
+authorized to view user, user is null` response that ends a long marathon —
+is transient: it typically clears after a multi-minute rest. The pre-2026-06-04
+code retried exactly once after a 1-3 min pause, which was too impatient and
+discarded hours of marathon progress on a single blip (the @welawen page-28
+stall). We now retry once per entry here, sleeping progressively longer, so a
+short-window throttle gets several increasingly-patient chances to clear before
+we give up and roll back. len() == number of retries after the initial attempt."""
+
+
 def _fetch_page_with_retry(
     cl: "object",
     user_id: int,
@@ -132,36 +215,48 @@ def _fetch_page_with_retry(
     page_size: int,
     page_num: int,
 ) -> tuple[list, str]:
-    """Fetch one page from instagrapi with single retry on transient errors.
+    """Fetch one page from instagrapi, retrying transient failures on an
+    escalating backoff ladder (TRANSIENT_RETRY_BACKOFFS_SEC).
 
     Returns (medias, new_end_cursor) on success. Raises FetchInterruptedError
-    when no retry will help — either a hard block (challenge / checkpoint /
-    login_required) or a transient error whose single retry also failed.
+    only when no further retry will help: a hard block (challenge / checkpoint
+    / login_required) short-circuits the ladder immediately because re-
+    requesting is pointless until the operator verifies the account; a
+    transient error (throttle / null-user / network) is retried until the
+    ladder is exhausted.
     """
-    try:
-        return cl.user_medias_paginated_v1(user_id, page_size, end_cursor=end_cursor)
-    except Exception as exc:
-        if is_challenge_error(exc):
-            print(
-                f"\n  ! page {page_num} blocked by Instagram challenge — {exc}\n"
-                f"  ! the crawler account needs manual verification: open the "
-                f"Instagram app, complete any 'Was this you?' / 2FA prompt, "
-                f"then re-run."
-            )
-            raise FetchInterruptedError(f"page {page_num} hard-blocked: {exc}") from exc
-        # Transient — back off then retry once.
-        print(f"\n  ! page {page_num} fetch failed transiently ({type(exc).__name__}: {exc})")
-        jittered_sleep(60.0, 180.0, label=f"backoff before retry of page {page_num}")
+    max_retries = len(TRANSIENT_RETRY_BACKOFFS_SEC)
+    attempt = 0
+    while True:
         try:
             return cl.user_medias_paginated_v1(user_id, page_size, end_cursor=end_cursor)
-        except Exception as exc2:
-            if is_challenge_error(exc2):
-                print(f"  ! retry of page {page_num} hit a challenge — {exc2}")
-            else:
-                print(f"  ! retry of page {page_num} also failed — {exc2}; giving up.")
-            raise FetchInterruptedError(
-                f"page {page_num} retry failed: {exc2}"
-            ) from exc2
+        except Exception as exc:
+            if is_challenge_error(exc):
+                print(
+                    f"\n  ! page {page_num} blocked by Instagram challenge — {exc}\n"
+                    f"  ! the crawler account needs manual verification: open the "
+                    f"Instagram app, complete any 'Was this you?' / 2FA prompt, "
+                    f"then re-run."
+                )
+                raise FetchInterruptedError(f"page {page_num} hard-blocked: {exc}") from exc
+            if attempt >= max_retries:
+                print(
+                    f"  ! page {page_num} still failing after {max_retries} "
+                    f"retries — {exc}; giving up."
+                )
+                raise FetchInterruptedError(
+                    f"page {page_num} failed after {max_retries} retries: {exc}"
+                ) from exc
+            low, high = TRANSIENT_RETRY_BACKOFFS_SEC[attempt]
+            print(
+                f"\n  ! page {page_num} fetch failed transiently "
+                f"({type(exc).__name__}: {exc}) — retry {attempt + 1}/{max_retries}"
+            )
+            jittered_sleep(
+                low, high,
+                label=f"backoff before retry {attempt + 1} of page {page_num}",
+            )
+            attempt += 1
 
 
 def iter_new_media(
@@ -183,6 +278,18 @@ def iter_new_media(
     the yield order is still newest-page first — the caller must re-sort the
     final TSV by timestamp ASC to restore the canonical oldest-first
     convention (see `resort_tsv_and_rename_media`).
+
+    The newest-first-across-pages ordering is a deliberate anti-detection
+    choice: interleaving each page fetch with the caller's per-post media
+    downloads and LLM calls produces a network fingerprint (pagination +
+    *.cdninstagram.com GETs in tight alternation) that matches a real user
+    scrolling Instagram. A two-phase model that paginated everything first
+    and then bulk-downloaded media would produce a starkly bot-shaped
+    fingerprint — pagination-only requests followed by a burst of media GETs
+    against shortcodes the IP hasn't referenced in any recent media-info
+    call. The chronological-correctness cost of newest-first-across-pages
+    is that `previous_row` jumps back at most one page (page_size posts) at
+    each page boundary; that's accepted as the smaller harm.
 
     Stops on: a post at-or-before `since_ts`, `max_total` cap, end-of-feed,
     or an unrecoverable fetch error (challenge or transient that failed retry).
@@ -399,6 +506,7 @@ def run_for_target(
     media_dir: str,
     rate_config: dict,
     log_dir: str = "",
+    newer_than_ts: Optional[int] = None,
 ) -> None:
     """Run the incremental scrape for a single target account.
 
@@ -406,6 +514,13 @@ def run_for_target(
     fetches everything newer than the most-recent existing row, and appends.
     Failures for one target are logged and don't stop other targets. `rate_config`
     controls the anti-throttle delays — see RATE_PRESETS.
+
+    If `newer_than_ts` is supplied (Unix timestamp from the `--newer-than` CLI
+    flag), the run truncates the existing TSV in place to rows with
+    `timestamp <= newer_than_ts` and uses `newer_than_ts` as the fetch cutoff.
+    This is the integration-test "rebuild from a chosen point" workflow in one
+    call. Truncation happens AFTER `snapshot.take()` so a failed run rolls back
+    to the pre-truncation state atomically.
     """
     output_path = output_template.format(target=target)
     print(f"\n=== Target: @{target} → {output_path} ===")
@@ -419,6 +534,47 @@ def run_for_target(
     if resolved is None:
         return
     user_id, media_count = resolved
+
+    # ===== Self-healing recovery BEFORE we read the (possibly corrupt) TSV =====
+    # If a previous run was killed before commit/rollback, the .snapshot file
+    # holds the last-known-good state and the live TSV may be corrupt (the
+    # crashed run wrote rows up until the kill point). Recover first; trying
+    # to read a corrupt TSV before recovery would crash on a bad timestamp
+    # in the since_ts computation below.
+    snapshot = RunSnapshot(output_path, media_dir, target)
+    if snapshot.exists():
+        recovery = snapshot.rollback()
+        print(
+            f"  · detected leftover snapshot from prior killed run; auto-rollback complete "
+            f"(files_deleted={recovery['files_deleted']})"
+        )
+        write_failure_record(log_dir, {
+            "target": target,
+            "service": "instagram",
+            "failure_type": "leftover_snapshot_recovered",
+            "files_deleted": recovery["files_deleted"],
+        })
+
+    # ===== Take the pre-scrape snapshot BEFORE any pile mutation =====
+    # This captures the post-recovery state so any failure during THIS run —
+    # including failures during the optional --newer-than truncation below or
+    # during streaming — can roll back atomically.
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    snapshot.take()
+
+    # ===== --newer-than truncation =====
+    # If the operator passed --newer-than, drop rows with timestamp > cutoff
+    # so the subsequent fetch rebuilds from that point. Snapshot captures the
+    # pre-truncation TSV, so rollback restores everything. Media-file cleanup
+    # for the truncated rows is deferred to the success-path orphan sweep.
+    truncation_removed = 0
+    if newer_than_ts is not None:
+        cutoff_iso = datetime.fromtimestamp(newer_than_ts, tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%S%z")
+        truncation_removed = truncate_tsv_to_timestamp(output_path, newer_than_ts)
+        print(
+            f"  · --newer-than cutoff {cutoff_iso}: removed {truncation_removed} row(s) "
+            f"with timestamp > cutoff"
+        )
 
     existing_rows = read_tsv_rows(output_path)
     timestamped = [r for r in existing_rows if r.get("timestamp")]
@@ -435,7 +591,19 @@ def run_for_target(
     }
     pending_tombstones: set[str] = set()
 
-    if timestamped:
+    if newer_than_ts is not None:
+        # CLI override — fetch strictly newer than the cutoff regardless of
+        # what the (possibly-truncated) TSV's max timestamp is.
+        since_ts = newer_than_ts
+        last_timestamp_str = (
+            datetime.fromtimestamp(newer_than_ts, tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%S%z")
+            + " (CLI --newer-than)"
+        )
+        try:
+            next_id = max(int(r["id"]) for r in existing_rows if r.get("id")) + 1
+        except (ValueError, KeyError):
+            next_id = len(existing_rows) + 1
+    elif timestamped:
         last_timestamp_str = max(r["timestamp"] for r in timestamped)
         since_ts = parse_unix_timestamp(last_timestamp_str)
         try:
@@ -476,17 +644,11 @@ def run_for_target(
     total_written = 0
     media_delay = rate_config["media_delay"]
 
-    # Tracks whether the streaming loop exited via clean termination (end of
-    # feed or hit-since-ts boundary) vs an exception. Only a clean run is
-    # safe for the post-pass orphan sweep — interrupted runs leave older
-    # posts un-re-pulled, and their valid media files would be mis-classified
-    # as orphans by a sweep that assumes the TSV is complete (the 2026-05-29
-    # DNS-hiccup incident: 179 valid media files were deleted before this
-    # guard was added).
-    scrape_completed_cleanly = True
-
-    # Ensure the parent dir exists (e.g., pile-app/pile/ on first scrape).
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    # Parent dir exists and snapshot was already taken above (BEFORE the
+    # --newer-than truncation), so any failure during streaming rolls back
+    # truncation + new rows together.
+    run_started_at_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S%z")
+    run_started_at_mono = time.monotonic()
 
     try:
         with open(output_path, "a", newline="", encoding="utf-8") as out_file:
@@ -533,47 +695,72 @@ def run_for_target(
 
                 jittered_sleep(*media_delay, label="inter-post pause")
     except FetchInterruptedError as exc:
-        # Hard-block or transient-after-retry from instagrapi. Halt cleanly,
-        # preserve partial pile state, and (critically) skip the orphan
-        # sweep so we don't delete media for posts the scrape never reached.
-        scrape_completed_cleanly = False
-        print(
-            f"\n  ! Pagination interrupted: {exc}\n"
-            f"  ! {total_written} row(s) already persisted to {output_path} are preserved.\n"
-            f"  ! Orphan media-file sweep SKIPPED — older posts' files stay on disk."
+        _rollback_run(
+            snapshot=snapshot, target=target, output_path=output_path,
+            failure_type="fetch_interrupted",
+            failure_detail=str(exc),
+            operator_hint=(
+                "Investigate connectivity (DNS, network) and instagrapi session "
+                "health. If Instagram raised a challenge, complete verification in "
+                "the Instagram app before re-running."
+            ),
+            run_started_at_iso=run_started_at_iso,
+            run_started_at_mono=run_started_at_mono,
+            attempted_rows=total_written,
+            log_dir=log_dir,
         )
+        return
     except InferenceHardBlockError as exc:
-        # FR-052 edge case: inference rate-limit / auth failure / credit
-        # exhaustion. Treated as a hard block — same handling as an
-        # Instagram challenge. No retry, partial pile preserved, operator
-        # must intervene before re-running.
-        scrape_completed_cleanly = False
-        print(
-            f"\n  ! HARD BLOCK from inference provider: {exc}\n"
-            f"  ! Halting @{target} scrape. {total_written} row(s) already "
-            f"persisted to {output_path} are preserved.\n"
-            f"  ! Orphan media-file sweep SKIPPED — older posts' files stay on disk.\n"
-            f"  ! Operator action required: check ANTHROPIC_API_KEY validity "
-            f"and account credit balance, then re-run."
+        _rollback_run(
+            snapshot=snapshot, target=target, output_path=output_path,
+            failure_type="inference_hard_block",
+            failure_detail=str(exc),
+            operator_hint=(
+                "Check ANTHROPIC_API_KEY validity and account credit balance. "
+                "FR-052: inference exhaustion is treated as a hard block per the spec."
+            ),
+            run_started_at_iso=run_started_at_iso,
+            run_started_at_mono=run_started_at_mono,
+            attempted_rows=total_written,
+            log_dir=log_dir,
         )
+        return
     except Exception as exc:
-        scrape_completed_cleanly = False
-        print(f"\nERROR during streaming for @{target}: {exc}")
-        print(f"  ! {total_written} row(s) persisted before failure; partial TSV will still be re-sorted "
-              f"but orphan sweep SKIPPED.")
+        _rollback_run(
+            snapshot=snapshot, target=target, output_path=output_path,
+            failure_type="unexpected_error",
+            failure_detail=f"{type(exc).__name__}: {exc}",
+            operator_hint=(
+                "Unexpected exception during streaming — inspect the run log for "
+                "the full traceback. Pile state was restored; safe to re-run."
+            ),
+            run_started_at_iso=run_started_at_iso,
+            run_started_at_mono=run_started_at_mono,
+            attempted_rows=total_written,
+            log_dir=log_dir,
+            traceback_text=traceback.format_exc(),
+        )
+        return
 
+    # ===== Success path =====
     if pending_tombstones:
         tombstoned = apply_tombstones(output_path, pending_tombstones)
         print(f"  FR-106: tombstoned {tombstoned} row(s) absent from fetched pages: "
               f"{sorted(pending_tombstones)[:5]}"
               + (f" (+{len(pending_tombstones) - 5} more)" if len(pending_tombstones) > 5 else ""))
 
-    if total_written == 0:
+    if total_written == 0 and truncation_removed == 0:
+        snapshot.commit()
         print(f"No new posts found for @{target}.")
         return
 
-    print(f"\nStreaming done — re-sorting {output_path} by timestamp ASC + renumbering ids.")
-    resort_tsv_and_sweep_media(
-        output_path, target, media_dir, sweep_orphans=scrape_completed_cleanly
-    )
-    print(f"Done. {total_written} new post(s) written to {output_path}.")
+    if total_written > 0:
+        print(f"\nStreaming done — re-sorting {output_path} by timestamp ASC + renumbering ids.")
+    else:
+        print(f"\n--newer-than truncation applied; no new posts to add. Sweeping orphan media.")
+    resort_tsv_and_sweep_media(output_path, target, media_dir, sweep_orphans=True)
+    snapshot.commit()
+    if total_written > 0:
+        print(f"Done. {total_written} new post(s) written to {output_path}.")
+    else:
+        print(f"Done. {truncation_removed} row(s) removed by --newer-than truncation; orphan media swept.")
