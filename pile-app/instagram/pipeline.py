@@ -191,6 +191,23 @@ class FetchInterruptedError(Exception):
     """
 
 
+TRANSIENT_RETRY_BACKOFFS_SEC: tuple[tuple[float, float], ...] = (
+    (120.0, 240.0),   # ~2-4 min
+    (360.0, 600.0),   # ~6-10 min
+    (720.0, 1080.0),  # ~12-18 min
+)
+"""Escalating (min, max) backoff windows for transient page-fetch failures.
+
+Instagram's short-window private-API throttle — the `PrivateAccount: Not
+authorized to view user, user is null` response that ends a long marathon —
+is transient: it typically clears after a multi-minute rest. The pre-2026-06-04
+code retried exactly once after a 1-3 min pause, which was too impatient and
+discarded hours of marathon progress on a single blip (the @welawen page-28
+stall). We now retry once per entry here, sleeping progressively longer, so a
+short-window throttle gets several increasingly-patient chances to clear before
+we give up and roll back. len() == number of retries after the initial attempt."""
+
+
 def _fetch_page_with_retry(
     cl: "object",
     user_id: int,
@@ -198,36 +215,48 @@ def _fetch_page_with_retry(
     page_size: int,
     page_num: int,
 ) -> tuple[list, str]:
-    """Fetch one page from instagrapi with single retry on transient errors.
+    """Fetch one page from instagrapi, retrying transient failures on an
+    escalating backoff ladder (TRANSIENT_RETRY_BACKOFFS_SEC).
 
     Returns (medias, new_end_cursor) on success. Raises FetchInterruptedError
-    when no retry will help — either a hard block (challenge / checkpoint /
-    login_required) or a transient error whose single retry also failed.
+    only when no further retry will help: a hard block (challenge / checkpoint
+    / login_required) short-circuits the ladder immediately because re-
+    requesting is pointless until the operator verifies the account; a
+    transient error (throttle / null-user / network) is retried until the
+    ladder is exhausted.
     """
-    try:
-        return cl.user_medias_paginated_v1(user_id, page_size, end_cursor=end_cursor)
-    except Exception as exc:
-        if is_challenge_error(exc):
-            print(
-                f"\n  ! page {page_num} blocked by Instagram challenge — {exc}\n"
-                f"  ! the crawler account needs manual verification: open the "
-                f"Instagram app, complete any 'Was this you?' / 2FA prompt, "
-                f"then re-run."
-            )
-            raise FetchInterruptedError(f"page {page_num} hard-blocked: {exc}") from exc
-        # Transient — back off then retry once.
-        print(f"\n  ! page {page_num} fetch failed transiently ({type(exc).__name__}: {exc})")
-        jittered_sleep(60.0, 180.0, label=f"backoff before retry of page {page_num}")
+    max_retries = len(TRANSIENT_RETRY_BACKOFFS_SEC)
+    attempt = 0
+    while True:
         try:
             return cl.user_medias_paginated_v1(user_id, page_size, end_cursor=end_cursor)
-        except Exception as exc2:
-            if is_challenge_error(exc2):
-                print(f"  ! retry of page {page_num} hit a challenge — {exc2}")
-            else:
-                print(f"  ! retry of page {page_num} also failed — {exc2}; giving up.")
-            raise FetchInterruptedError(
-                f"page {page_num} retry failed: {exc2}"
-            ) from exc2
+        except Exception as exc:
+            if is_challenge_error(exc):
+                print(
+                    f"\n  ! page {page_num} blocked by Instagram challenge — {exc}\n"
+                    f"  ! the crawler account needs manual verification: open the "
+                    f"Instagram app, complete any 'Was this you?' / 2FA prompt, "
+                    f"then re-run."
+                )
+                raise FetchInterruptedError(f"page {page_num} hard-blocked: {exc}") from exc
+            if attempt >= max_retries:
+                print(
+                    f"  ! page {page_num} still failing after {max_retries} "
+                    f"retries — {exc}; giving up."
+                )
+                raise FetchInterruptedError(
+                    f"page {page_num} failed after {max_retries} retries: {exc}"
+                ) from exc
+            low, high = TRANSIENT_RETRY_BACKOFFS_SEC[attempt]
+            print(
+                f"\n  ! page {page_num} fetch failed transiently "
+                f"({type(exc).__name__}: {exc}) — retry {attempt + 1}/{max_retries}"
+            )
+            jittered_sleep(
+                low, high,
+                label=f"backoff before retry {attempt + 1} of page {page_num}",
+            )
+            attempt += 1
 
 
 def iter_new_media(

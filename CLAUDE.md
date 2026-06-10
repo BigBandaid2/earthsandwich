@@ -1,5 +1,5 @@
 <!-- SPECKIT START -->
-Three active specs:
+Four active specs:
 
 **`001-world-travelogue`** — the front-end Travelogue App (Vite + React). Read-only map UX with itinerary stops, city drilldown, and detail panels. Reads from 002's REST API. TDD mandate (FR-045).
 - Spec: `specs/001-world-travelogue/spec.md`
@@ -29,11 +29,21 @@ Three active specs:
 - Tasks: `specs/003-ingestion-pipeline/tasks.md` (historical phases preserved per Cardinal Rule #1; new phases pending `/speckit.tasks`)
 - Specify-prompt draft: `specs/003-ingestion-pipeline/specify-prompt-draft.md`
 
+**`004-bridge-builder-toolkit`** — the far-future **bridge-builder-app**. A self-contained Python CLI App that produces **validated bridge _specifications_** (Final Bundles that seed a bridge-app spec via `/speckit.specify`) — NOT a running bridge — by wrapping prior-art tools (`ydata-profiling`, `eralchemy2`, `dbt`/`dbt-duckdb`, `Valentine`/`Magneto` matchers) in an LLM-analyst layer surfaced through copy-out-a-prompt playgrounds. Spec at Draft; **planned 2026-06-08** (pending `/speckit.tasks`).
+- Spec: `specs/004-bridge-builder-toolkit/spec.md` (with Clarifications)
+- Plan: `specs/004-bridge-builder-toolkit/plan.md`
+- Research: `specs/004-bridge-builder-toolkit/research.md`
+- Data model: `specs/004-bridge-builder-toolkit/data-model.md`
+- CLI contract: `specs/004-bridge-builder-toolkit/contracts/cli.md`
+- Quickstart: `specs/004-bridge-builder-toolkit/quickstart.md`
+- Specify-prompt draft: `specs/004-bridge-builder-toolkit/specify-prompt-draft.md`
+- Tasks: pending `/speckit.tasks`
+
 **Apps and architectural relationships** (see [`docs/roadmap.md`](docs/roadmap.md) for the canonical Apps catalogue):
 - The project's Apps are **pile-app**, **bridge-app**, **useful-app**, **bridge-builder-app**. Specs do NOT map 1:1 to Apps.
 - 003 is the current **pile-app**. 001 + 002 + future MCP/user-input spec are **useful-app**.
 - **bridge-app** is planned (no spec yet) — the hand-crafted ETL/EDM that consumes 003's pile and writes into 002's schema via the backend's write paths. Owns stop linkage, normalization, cross-source mapping. Required before ingested content can flow into the Travelogue.
-- **bridge-builder-app** is the far-future Data Unification ambition. *Not* a bridge — software whose job is to *produce* bridges automatically from a pile + target schema. Validated against our hand-crafted bridge-app once it exists.
+- **bridge-builder-app** is the far-future Data Unification ambition (spec 004). *Not* a bridge — software whose job is to *produce validated bridge **specifications*** (Final Bundles that seed a bridge-app spec) from a pile + target schema, NOT to build the running bridge itself. Validated against our hand-crafted bridge-app once it exists.
 - 001 reads from 002's REST API; 002 owns the production Travelogue schema. 002 does NOT receive direct writes from 003 — the bridge-app is the eventual intermediary.
 - 003 is fully decoupled — no shared tables, no shared file paths. Per FR-110 / FR-111 / SC-010 / SC-011 in 003's spec, the App's root directory is meant to be movable to a separate repo without affecting either side.
 <!-- SPECKIT END -->

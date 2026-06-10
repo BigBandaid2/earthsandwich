@@ -145,7 +145,7 @@ Substack v1 has no LLM inference step, so the verbatim-input columns from the In
 
 ### Substack-specific notes
 
-- Substack RSS feeds are typically capped at the most-recent ~20 entries; the App MUST NOT assume the feed covers the full publication history. A first-time pull captures only what RSS exposes; older posts are out of scope for v1.
+- Substack RSS feeds are typically capped at the most-recent ~20 entries; the App MUST NOT assume the feed covers the full publication history. The default RSS path captures only what RSS exposes. Posts older than the RSS window are reachable via the **full-archive backfill mode** (FR-028…FR-031): it enumerates the complete archive via the publication's archive API (`/api/v1/archive`, offset/limit pagination — stepping by the actual item count, since the first page can be short) and fetches each post's body (`/api/v1/posts/<slug>`). Backfill rows share the same `substack_id` (= archive `canonical_url` = RSS `<guid>`), so the two paths merge without duplicates.
 - The first article body in the RSS often includes a `<![CDATA[...]]>` wrapper; the `feedparser` library strips this automatically.
 - No media file artifact for Substack v1: article images stay as `<img>` tags in the HTML body. A future enhancement may extract them, but the bridge-app can render the HTML directly without that step.
 

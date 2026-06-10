@@ -196,6 +196,10 @@ These principles overrule any contradicting requirement detail below:
 - **FR-024**: For each RSS entry not already represented in the pile, the service MUST persist a record containing title, subtitle, body, and publication date. Dedup is keyed on the canonical Substack post identifier (`<guid>`); `<link>` MUST be retained alongside in each pile record for traceability.
 - **FR-025**: The service MUST be idempotent — re-running on a stable pile state MUST NOT create duplicate records.
 - **FR-026**: If an RSS feed URL is unreachable or returns an invalid feed, the service MUST log the error and exit cleanly for that feed without affecting existing pile artifacts or other configured feeds.
+- **FR-028**: The Substack service MUST support a **full-archive backfill** mode that enumerates ALL of a publication's posts via the publication's archive API (offset/limit pagination), not only the most-recent subset the RSS feed exposes. This is an explicit operator-invoked mode that lifts the RSS-window cap (data-model.md § "Substack-specific notes"); the default RSS path remains the cheap incremental poll.
+- **FR-029**: For each archived post, the backfill MUST fetch the full HTML body (the archive listing returns metadata only) and persist the same pile-record shape as the RSS path, keyed on the same canonical post identifier (the archive `canonical_url`, which equals the RSS `<guid>`), so backfilled records dedup against RSS-pulled records.
+- **FR-030**: Backfill MUST be idempotent and mergeable with the RSS path — running a backfill after an RSS pull (or re-running a backfill) MUST NOT create duplicate records (dedup keyed on `substack_id`).
+- **FR-031**: Backfill MUST be polite to the upstream (a bounded inter-request rate) and resilient to a single post-body fetch failure (log and skip that post, continue the run); on a wholesale archive-API failure it MUST log the error and exit cleanly with existing pile artifacts intact, like the RSS path (FR-026).
 
 #### Operations & Observability
 
@@ -242,6 +246,8 @@ The following FR numbers are reserved and intentionally retired so historical `t
 - **SC-009**: Per-service log retention is enforced at 5 most recent runs; older logs are auto-removed (log hygiene).
 - **SC-010**: Copying the App's root directory to a fresh empty project (no speckit artifacts, no other App code) produces a working, runnable codebase. All tests pass; an Instagram scrape against a public target completes successfully (physical-segregation portability).
 - **SC-011**: A grep across the App's root directory finds zero file-system references to paths outside the App (no `../`, no absolute paths into the parent project's other directories) other than (a) standard system locations like `/tmp` or `os.path.expanduser`, and (b) network endpoints. (Self-containment property.)
+- **SC-012**: A full-archive backfill of a Substack publication with M posts (M may far exceed the ~20-entry RSS window) produces M pile records — including every post older than the RSS window — deduped against any records a prior RSS pull already wrote (archive completeness, FR-028/FR-029).
+- **SC-013**: Running a backfill after an RSS pull, or re-running a backfill, yields the union of articles with zero duplicates (cross-mode idempotency, FR-030).
 
 ## Assumptions
 

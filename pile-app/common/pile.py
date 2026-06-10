@@ -28,6 +28,7 @@ from common import APP_ROOT
 PILE_DIR = APP_ROOT / "pile"
 MEDIA_DIR = PILE_DIR / "media" / "instagram"
 DEFAULT_OUTPUT_TEMPLATE = str(PILE_DIR / "posts.{target}.local.tsv")
+DEFAULT_SUBSTACK_OUTPUT_TEMPLATE = str(PILE_DIR / "articles.{publication}.local.tsv")
 DEFAULT_MEDIA_DIR = str(MEDIA_DIR)
 RECENT_LOCATION_COUNT = 5
 
@@ -49,6 +50,72 @@ TSV_COLUMNS = [
     "deleted_upstream",      # FR-106 — set-once tombstone; "true" or empty
     "deleted_upstream_at",   # FR-106 — ISO 8601 UTC of first detection; never overwritten
 ]
+
+# Substack pile artifact (data-model.md § "Pile artifact: Substack TSV",
+# contracts/pile-artifact-substack.md). 9 flat string columns; no media,
+# no verbatim-input columns (Substack v1 has no LLM inference step).
+SUBSTACK_TSV_COLUMNS = [
+    "id",                    # post-pass sort+reid; sequential 1..N after sort by published_at ASC
+    "substack_id",           # FR-024 — RSS <guid>; canonical dedup key
+    "link",                  # RSS <link>; retained for traceability (FR-024)
+    "title",                 # RSS <title>
+    "subtitle",              # RSS <description> (the article deck); optional
+    "body",                  # RSS <content:encoded>; full HTML, never truncated
+    "published_at",          # RSS <pubDate>, normalized to ISO 8601 UTC
+    "deleted_upstream",      # FR-106 — set-once tombstone; "true" or empty
+    "deleted_upstream_at",   # FR-106 — ISO 8601 UTC of first detection; never overwritten
+]
+
+# Columns where embedded newlines are preserved (body carries HTML structure).
+# Everywhere else, newlines collapse to a space so each row stays single-line.
+_SUBSTACK_NEWLINE_OK = frozenset({"body"})
+
+
+def _tsv_clean(column: str, value: object) -> str:
+    """Make a value safe for a TAB-delimited cell (Substack contract §2).
+
+    Tabs become single spaces in every column. Newlines collapse to spaces
+    too, EXCEPT in `body`, where HTML structure is preserved (the csv writer
+    quotes the field so the embedded newlines round-trip). This keeps non-body
+    cells single-line and greppable while honouring the "no body truncation /
+    structure preserved" guarantee.
+    """
+    s = "" if value is None else str(value)
+    s = s.replace("\t", " ")
+    if column not in _SUBSTACK_NEWLINE_OK:
+        s = s.replace("\r", " ").replace("\n", " ")
+    return s
+
+
+def write_substack_tsv(path: str, rows: list[dict]) -> None:
+    """Write the full Substack pile for one publication, atomically.
+
+    Reuses the Instagram post-pass shape: sort by `published_at` ASC, re-number
+    local `id` 1..N, then write header + rows. Tabs/newlines are escaped per
+    `_tsv_clean`. The write goes to a temp file and is swapped in with
+    `os.replace`, so a crash mid-write leaves the prior pile intact — the
+    "atomicity of a row" guarantee from the contract, achieved here by building
+    the whole file in memory first (the RSS feed is bounded, unlike paginated
+    Instagram scrapes, so no streaming snapshot is needed).
+    """
+    ordered = sorted(rows, key=lambda r: r.get("published_at", ""))
+    for new_id, row in enumerate(ordered, start=1):
+        row["id"] = str(new_id)
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp_path = path + ".tmp"
+    # lineterminator="\n" honours the contract's LF-newline requirement; the
+    # csv writer still quotes the body field (which contains newlines) so those
+    # are preserved inside the quoted cell and round-trip on read.
+    with open(tmp_path, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(
+            f, fieldnames=SUBSTACK_TSV_COLUMNS, delimiter="\t",
+            lineterminator="\n", extrasaction="ignore",
+        )
+        writer.writeheader()
+        for row in ordered:
+            writer.writerow({c: _tsv_clean(c, row.get(c, "")) for c in SUBSTACK_TSV_COLUMNS})
+    os.replace(tmp_path, path)
 
 
 def read_tsv_rows(tsv_path: str) -> list[dict]:
