@@ -28,11 +28,11 @@
 
 **⚠️ Every user story depends on this phase.**
 
-- [ ] T005 [P] Implement `bridge-builder-toolkit/common/config.py` — `project.yml` load/save + `BridgeProject` and `ConnectionValidationResult` models per data-model.md (paths relative/env-referenced for movability)
-- [ ] T006 [P] Implement `bridge-builder-toolkit/common/locking.py` — per-project PID lockfile acquire/release, reclaimable if the holding PID is dead (FR-110)
-- [ ] T007 [P] Implement `bridge-builder-toolkit/common/run_logging.py` — per-run log files under the project folder
-- [ ] T008 Implement `bridge-builder-toolkit/common/inference.py` — Anthropic SDK wrapper with **role-based** names (`analyst_layer`, `inferred_columns`, `rationale` — never `claude_*`, Rule #3), input-preserving (persists inputs alongside outputs, Principle V), and a mock-friendly seam for tests
-- [ ] T009 Implement `bridge-builder-toolkit/common/playground.py` — single-file HTML builder: inline-data embedding, per-section provenance labels, and a copy-out-a-prompt affordance with clipboard→selectable-textarea fallback (FR-050–054). Shared by US2/US3/US6 playgrounds
+- [x] T005 [P] Implement `bridge-builder-toolkit/common/config.py` — `project.yml` load/save + `BridgeProject` and `ConnectionValidationResult` models per data-model.md (paths relative/env-referenced for movability)
+- [x] T006 [P] Implement `bridge-builder-toolkit/common/locking.py` — per-project PID lockfile acquire/release, reclaimable if the holding PID is dead (FR-110)
+- [x] T007 [P] Implement `bridge-builder-toolkit/common/run_logging.py` — per-run log files under the project folder
+- [x] T008 Implement `bridge-builder-toolkit/common/inference.py` — Anthropic SDK wrapper with **role-based** names (`analyst_layer`, `inferred_columns`, `rationale` — never `claude_*`, Rule #3), input-preserving (persists inputs alongside outputs, Principle V), and a mock-friendly seam for tests
+- [x] T009 Implement `bridge-builder-toolkit/common/playground.py` — single-file HTML builder: inline-data embedding, per-section provenance labels, and a copy-out-a-prompt affordance with clipboard→selectable-textarea fallback (FR-050–054). Shared by US2/US3/US6 playgrounds
 
 **Checkpoint**: config round-trips a project.yml; a project folder can be locked/unlocked; the inference wrapper returns a mocked response in tests; `playground.build()` emits a valid standalone HTML with a working copy button.
 
