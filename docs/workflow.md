@@ -37,14 +37,13 @@ Triggered when an operator believes a User Story is complete (all its tasks `[x]
 
 ### After Weekly Team Meeting
 
-10. **Pull current-sprint Stories from JIRA** — JQL: `project = OCS AND sprint = openSprints()`. List everything the team committed to this week, with owner and status. This is the baseline for steps 11–17: the planning doc, the link sweep, and the post-meeting push all read off the same set.
+10. **Pull current-sprint Stories from JIRA** — JQL: `project = OCS AND sprint = openSprints()`. List everything the team committed to this week, with owner and status. This is the baseline for steps 11–16: the planning doc and the link sweep read off the same set.
 11. **Link related tickets** — `Duplicate` for 1-to-1 parallels with a spec-kit Story, `Blocks` for prerequisite dependencies between tickets, `Relates` for everything else (see [§JIRA sync](#jira-sync)).
 12. **Create New Sprint Plan** — author `docs/planning/YYYY-WW.md` from the step-10 pull (canonical: only the people + items it returned), per [`sprint-review-template.md`](planning/sprint-review-template.md). Header `**Sprint**` + `**Goal**` verbatim from JIRA; one `### <Person>` sub-section per owner, tickets collapsed into ≤7 conceptual groups (see template).
-13. **Push to JIRA** — any phases newly decided in the meeting become new Stories in OCS, placed in the current sprint for velocity attribution. (Drift-discovered phases were already synced + sprint-attributed in steps 4–5.)
-14. **Update time-log artifacts with attested hours** — fold each attendee's step-8 attestation into `docs/planning/time-log.tsv` (fill empty `Hours Attested` cells, add dedicated rows for meeting time), regenerate `docs/planning/time-log.html` from the TSV so its embedded data matches, and update the sprint-review file's Hours section with attested totals.
-15. **Merge master into your feature branch.** Project-level updates from steps 3–6 land on master; each team member merges master into their active feature branch so subsequent work reads off the current state.
-16. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
-17. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
+13. **Update time-log artifacts with attested hours** — fold each attendee's step-8 attestation into `docs/planning/time-log.tsv` (fill empty `Hours Attested` cells, add dedicated rows for meeting time), regenerate `docs/planning/time-log.html` from the TSV so its embedded data matches, and update the sprint-review file's Hours section with attested totals.
+14. **Merge master into your feature branch.** Project-level updates from steps 3–6 land on master; each team member merges master into their active feature branch so subsequent work reads off the current state.
+15. **Knowledge refresh** — git-log digest + `/speckit.onboard.quiz` (~5 min per dev; see [§Knowledge refresh](#knowledge-refresh-monday-quiz)).
+16. **Diagrams** — `/speckit.learn.review` to refresh component diagrams.
 
 The weekly cadence is the contract. The per-feature ceremony (below) is the optional discipline for serious architectural work.
 
@@ -254,7 +253,7 @@ Without the DoD review prompt being executed, no Story → Done — but the revi
 
 After the drift scan and JIRA sync, the team lead enumerates commits since the last sync, groups them by Story + person + day, and writes one row each with `Hours Estimated`. Add a person/story summary block at the bottom of `docs/planning/YYYY-WW.md` so the meeting has a quick read of where effort went.
 
-Then **regenerate `docs/planning/time-log.html` from the TSV** so the playground's inline `TSV_TEXT` block matches the new rows — the explorer embeds a copy of the ledger, and stale embedded data is a silent drift source. (Same regeneration step runs again post-attestation in step 14, once `Hours Attested` is filled.)
+Then **regenerate `docs/planning/time-log.html` from the TSV** so the playground's inline `TSV_TEXT` block matches the new rows — the explorer embeds a copy of the ledger, and stale embedded data is a silent drift source. (Same regeneration step runs again post-attestation in step 13, once `Hours Attested` is filled.)
 
 ### After the weekly team meeting (attestation)
 
