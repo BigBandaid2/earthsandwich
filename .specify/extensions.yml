@@ -136,6 +136,13 @@ hooks:
     prompt: Commit implementation changes?
     description: Auto-commit after implementation
     condition: null
+  - extension: jira
+    command: speckit.jira.sync-status
+    enabled: true
+    optional: true
+    prompt: Sync task status to Jira (advance Stories to In Progress)?
+    description: After implementation, transition the spec's Jira Stories to In Progress based on tasks.md completion. Never advances a Story to Done (official DONE stays manual).
+    condition: null
   - extension: learn
     command: speckit.learn.review
     enabled: true
