@@ -1,5 +1,8 @@
 # Runtime dependencies (canonical source; pyproject reads this via dynamic deps).
 typer
+fastapi
+uvicorn
+python-multipart
 ydata-profiling
 eralchemy2
 dbt-core

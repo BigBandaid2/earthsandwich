@@ -64,6 +64,48 @@ def project_list() -> None:
     typer.echo(format_project_lines(list_projects()))
 
 
+@project_app.command("update")
+def project_update(
+    name: str = typer.Argument(..., help="Project to update (the name itself is immutable)."),
+    pile: str = typer.Option(None, "--pile", help="New pile path."),
+    pile_sample: str = typer.Option(None, "--pile-sample", help="New sampling spec '<strategy>:<size>'."),
+    target_cred_env: str = typer.Option(None, "--target-cred-env", help="New ENV VAR NAME holding the target DSN."),
+) -> None:
+    """Edit a project and re-validate before persisting (US7)."""
+    from project.create import OperatorError, format_validation_report
+    from project.update import update_project
+
+    try:
+        project, _ = update_project(name, pile=pile, pile_sample=pile_sample, target_cred_env=target_cred_env)
+    except OperatorError as exc:
+        typer.echo(f"[bridge_builder] error: {exc}")
+        raise typer.Exit(code=1)
+    typer.echo(format_validation_report(project))
+    typer.echo("updated.")
+
+
+@project_app.command("delete")
+def project_delete(
+    name: str = typer.Argument(..., help="Project to delete (irreversible)."),
+    yes: bool = typer.Option(False, "--yes", help="Skip the confirmation prompt."),
+) -> None:
+    """Delete a project folder entirely - irreversible (US7)."""
+    from project.create import OperatorError
+    from project.delete import delete_project
+
+    if not yes:
+        typer.confirm(
+            f"Delete project {name!r} and ALL its history (iterations, truth baseline, bundle)?",
+            abort=True,
+        )
+    try:
+        removed = delete_project(name)
+    except OperatorError as exc:
+        typer.echo(f"[bridge_builder] error: {exc}")
+        raise typer.Exit(code=1)
+    typer.echo(f"deleted: {removed}")
+
+
 @analyze_app.command("pile")
 def analyze_pile() -> None:
     """Profile the pile: ydata baseline + enhanced playground (US2)."""
@@ -80,6 +122,23 @@ def analyze_target() -> None:
 def synthesize_bridge() -> None:
     """Synthesize the pile-to-target mapping + dbt project + output (US3)."""
     _stub("synthesize bridge")
+
+
+@app.command("ui")
+def ui(
+    host: str = typer.Option("127.0.0.1", "--host", help="Bind address (localhost by default; FR-170)."),
+    port: int = typer.Option(8765, "--port", help="Port for the local UI server."),
+) -> None:
+    """Launch the guided local Web UI for project CRUD + dashboards (US7)."""
+    from project.create import OperatorError
+    from ui.server import run
+
+    typer.echo(f"[bridge_builder] ui: http://{host}:{port}  (Ctrl+C to stop)")
+    try:
+        run(host=host, port=port)
+    except OperatorError as exc:
+        typer.echo(f"[bridge_builder] error: {exc}")
+        raise typer.Exit(code=1)
 
 
 @app.command("iterate")

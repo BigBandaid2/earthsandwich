@@ -16,7 +16,7 @@ bridge_builder = "cli:app"
 
 [tool.setuptools]
 py-modules = ["cli"]
-packages = ["common", "project", "analyze", "synthesize", "oracle", "iterate", "review"]
+packages = ["common", "project", "analyze", "synthesize", "oracle", "iterate", "review", "ui"]
 
 [tool.setuptools.dynamic]
 # requirements.txt is the single source of truth for runtime deps.

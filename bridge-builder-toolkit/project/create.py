@@ -69,7 +69,7 @@ def _normalize_dsn(dsn: str) -> str:
     return dsn
 
 
-def _probe_pile(pile_path: Path) -> bool:
+def probe_pile(pile_path: Path) -> bool:
     try:
         with pile_path.open("r", encoding="utf-8", errors="replace") as fh:
             fh.readline()
@@ -78,7 +78,7 @@ def _probe_pile(pile_path: Path) -> bool:
         return False
 
 
-def _probe_target(dsn: str) -> tuple[bool, bool, bool, bool, str]:
+def probe_target(dsn: str) -> tuple[bool, bool, bool, bool, str]:
     """Return (reachable, read, insert, delete, note).
 
     Read probe: ``SELECT 1``. Insert/delete probes: DML on a session-scoped
@@ -161,11 +161,11 @@ def create_project(
         )
 
     pile_path = Path(pile)
-    pile_readable = _probe_pile(pile_path)
+    pile_readable = probe_pile(pile_path)
     if not pile_readable:
         raise OperatorError(f"pile not readable: {pile_path} (FR-008 — no project created)")
 
-    reachable, read, insert, delete, note = _probe_target(dsn)
+    reachable, read, insert, delete, note = probe_target(dsn)
     if not reachable:
         raise OperatorError(f"{note or 'target unreachable'} (FR-008 — no project created)")
 

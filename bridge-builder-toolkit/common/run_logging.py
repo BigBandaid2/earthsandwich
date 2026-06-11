@@ -16,6 +16,23 @@ def _timestamp() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 
+def close_run_loggers(project_dir: str | Path) -> None:
+    """Close + detach any run-log file handlers under ``project_dir``.
+
+    Loggers are process-cached and keep their logfiles open; on Windows an open
+    file blocks ``rmtree``, so project deletion must release them first.
+    """
+    root = Path(project_dir).resolve()
+    for logger_obj in list(logging.Logger.manager.loggerDict.values()):
+        if not isinstance(logger_obj, logging.Logger) or not logger_obj.name.startswith("bridge_builder."):
+            continue
+        for handler in list(logger_obj.handlers):
+            base = getattr(handler, "baseFilename", None)
+            if base and root in Path(base).resolve().parents:
+                handler.close()
+                logger_obj.removeHandler(handler)
+
+
 def get_run_logger(project_dir: str | Path, stage: str) -> tuple[logging.Logger, Path]:
     """Return a logger writing to ``<project>/logs/<stage>-<ts>.log`` (+ console)."""
     logs_dir = Path(project_dir) / LOGS_DIR

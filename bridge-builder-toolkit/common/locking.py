@@ -45,6 +45,19 @@ def _pid_alive(pid: int) -> bool:
     return True
 
 
+def live_owner(project_dir: str | Path) -> int | None:
+    """PID of a LIVE process holding the project's lock, or None.
+
+    Returns None for an unheld, stale, or self-held lock — i.e. anything the
+    caller could safely acquire/reclaim.
+    """
+    lock = ProjectLock(project_dir)
+    owner = lock._read_owner()
+    if owner is None or owner == os.getpid() or not _pid_alive(owner):
+        return None
+    return owner
+
+
 class ProjectLock:
     """Acquire/release a per-project lock; usable as a context manager."""
 

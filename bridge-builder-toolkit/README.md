@@ -6,11 +6,10 @@ The toolkit wraps prior-art tools (`ydata-profiling`, `eralchemy2`, `dbt`/`dbt-d
 
 See [`specs/004-bridge-builder-toolkit/`](../specs/004-bridge-builder-toolkit/) for the spec and plan; `quickstart.md` there walks one concrete example pairing end-to-end.
 
-## Stages (one CLI subcommand each)
+## Two operator surfaces, one core
 
-`project` → `analyze` → `synthesize` → (`oracle`) → `iterate` → `review` → `accept-bundle`
-
-Run `bridge_builder --help` for the full command surface.
+- **CLI** — one subcommand per stage: `project` → `analyze` → `synthesize` → (`oracle`) → `iterate` → `review` → `accept-bundle`. The automation/scripting surface, and the only surface that launches stages. Run `bridge_builder --help` for the full command surface.
+- **Guided local Web UI** — `bridge_builder ui` serves `http://127.0.0.1:8765`: project CRUD with inline validation reports, plus a per-project dashboard (stage progress across both loops, artifact browser, suggested next CLI step). Localhost-bound and single-operator by design — no authentication in v1; locality is the access control. Both surfaces call the same `project/` core modules, so their effects are identical on disk.
 
 ## Prerequisites
 
