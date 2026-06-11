@@ -30,11 +30,13 @@ function FlagPin({
   isActive,
   isPlanned,
   isAbandoned,
+  label,
 }: {
   country: string;
   isActive: boolean;
   isPlanned: boolean;
   isAbandoned: boolean;
+  label?: string;
 }) {
   const iso2 = getCountryIso2(country)?.toLowerCase();
 
@@ -61,7 +63,10 @@ function FlagPin({
           </span>
         )}
       </span>
-      {isActive && <span className="tg-flag-name">{country}</span>}
+      {label
+        ? <span className="tg-flag-name">{label}</span>
+        : isActive && <span className="tg-flag-name">{country}</span>
+      }
     </span>
   );
 }
@@ -72,6 +77,7 @@ function createFlagPinElement(
   isActive: boolean,
   isPlanned: boolean,
   isAbandoned: boolean,
+  label?: string,
 ): HTMLElement {
   const iso2 = getCountryIso2(country)?.toLowerCase();
 
@@ -104,6 +110,12 @@ function createFlagPinElement(
   root.appendChild(pole);
   root.appendChild(base);
   root.appendChild(banner);
+  if (label) {
+    const nameEl = document.createElement('span');
+    nameEl.className = 'tg-flag-name';
+    nameEl.textContent = label;
+    root.appendChild(nameEl);
+  }
   return root;
 }
 
@@ -311,12 +323,14 @@ function CountryClusterer({
   onSelectRegion,
   onClusterClick,
   onClustersChanged,
+  routeLabels,
 }: {
   groups: RegionGroup[];
   activeRegion: RegionGroup | null;
   onSelectRegion: (code: string) => void;
   onClusterClick: (regionCodes: string[]) => void;
   onClustersChanged: (groupCodes: string[], positions: Map<string, { lat: number; lng: number }>) => void;
+  routeLabels: globalThis.Map<string, string>;
 }) {
   const map = useMap();
   const markerLib = useMapsLibrary('marker');
@@ -339,7 +353,7 @@ function CountryClusterer({
       const marker = new markerLib.AdvancedMarkerElement({
         position: group.region.coords,
         title: group.region.name,
-        content: createFlagPinElement(group.region.country, isActive, isPlanned, isAbandoned),
+        content: createFlagPinElement(group.region.country, isActive, isPlanned, isAbandoned, routeLabels.get(group.region.code)),
         gmpClickable: true,
       });
       marker.addEventListener('gmp-click', () => onSelectRef.current(group.region.code));
@@ -413,6 +427,13 @@ function TripMap({
     [regionGroups],
   );
   const routedGroups = useMemo(() => getRoutedGroups(regionGroups), [regionGroups]);
+
+  const routeLabels = useMemo(() => {
+    const m = new globalThis.Map<string, string>();
+    if (routedGroups.length > 0) m.set(routedGroups[0].region.code, 'Start');
+    if (routedGroups.length > 1) m.set(routedGroups[routedGroups.length - 1].region.code, 'Finish');
+    return m;
+  }, [routedGroups]);
 
   const clusterPositionsRef = useRef(new globalThis.Map<string, { lat: number; lng: number }>());
   const [clusterPositions, setClusterPositions] = useState(
@@ -495,6 +516,7 @@ function TripMap({
                 isActive={isActive}
                 isPlanned={isPlanned}
                 isAbandoned={isAbandoned}
+                label={routeLabels.get(group.region.code)}
               />
             </AdvancedMarker>
           );
@@ -508,6 +530,7 @@ function TripMap({
             onSelectRegion={onSelectRegion}
             onClusterClick={onClusterClick}
             onClustersChanged={handleClustersChanged}
+            routeLabels={routeLabels}
           />
         ))}
       </Map>

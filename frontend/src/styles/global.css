@@ -361,7 +361,7 @@ button { font: inherit; cursor: pointer; }
 .tg-flag.abandoned { opacity: 0.42; }
 .tg-flag-name {
   position: absolute;
-  left: 26px; top: -2px;
+  left: 0px; top: 18px;
   white-space: nowrap;
   font-family: var(--font-mono);
   font-size: 10px; font-weight: 600; letter-spacing: 0.02em;
