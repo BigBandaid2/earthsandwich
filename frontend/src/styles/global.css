@@ -742,7 +742,7 @@ button { font: inherit; cursor: pointer; }
 .pd-card.is-top {
   grid-template-columns: 1fr;
   grid-template-rows: auto minmax(0, 1fr);
-  max-width: 660px;
+  /* max-width: 660px; */
 }
 .pd-card.is-top::after { display: none; }
 

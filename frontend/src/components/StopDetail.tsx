@@ -44,7 +44,7 @@ export default function StopModal({ stop, stopList, regionGroups, onClose, onNav
 
   const isInstagram = stop.post.type === 'instagram';
   const isSubstack = stop.post.type === 'substack';
-  const topLayout = false; // default side layout
+  const topLayout = isSubstack;
 
   return (
     <div className="pd-overlay" role="dialog" aria-modal="true" aria-label="Post detail">
@@ -82,7 +82,7 @@ export default function StopModal({ stop, stopList, regionGroups, onClose, onNav
 
         {isSubstack && (
           <>
-            <DispatchCover
+            <DispatchBanner
               stop={stop}
               regionName={regionName}
               dateStr={dateStr}
@@ -93,6 +93,7 @@ export default function StopModal({ stop, stopList, regionGroups, onClose, onNav
               tripName={tripName}
               regionName={regionName}
               dateStr={dateStr}
+              hideTitle
             />
           </>
         )}
@@ -205,8 +206,8 @@ function InstaBody({
   );
 }
 
-// ── Substack side cover ──
-function DispatchCover({
+// ── Substack top banner (alt layout) ──
+function DispatchBanner({
   stop, regionName, dateStr,
 }: {
   stop: Stop; regionName: string; dateStr: string;
@@ -215,10 +216,9 @@ function DispatchCover({
   if (!post) return null;
 
   const year = dateStr.match(/\d{4}/)?.[0] ?? '';
-  const noCover = true; // real data has no cover image yet → typographic fallback
 
   return (
-    <div className={`pd-cover${noCover ? ' is-empty' : ''}`}>
+    <div className="pd-banner is-empty">
       <div className="masthead">
         <span>The Dispatch</span>
         <span className="ln" />
@@ -229,22 +229,16 @@ function DispatchCover({
         <span className="big">{regionName.slice(0, 3).toUpperCase()}</span>
         <span className="s2">{year}</span>
       </div>
-      {!noCover && (
-        <span className="pd-cover-slot" aria-hidden="true">
-          <span className="ic">⌖</span>
-          <span>cover photo loads here</span>
-        </span>
-      )}
-      <div className="cover-title">{post.title}</div>
+      <h2 className="pd-banner-title">{post.title}</h2>
     </div>
   );
 }
 
 // ── Substack body panel ──
 function DispatchBody({
-  stop, iso, tripName, regionName, dateStr,
+  stop, iso, tripName, regionName, dateStr, hideTitle,
 }: {
-  stop: Stop; iso?: string; tripName: string; regionName: string; dateStr: string;
+  stop: Stop; iso?: string; tripName: string; regionName: string; dateStr: string; hideTitle?: boolean;
 }) {
   const post = stop.post.type === 'substack' ? stop.post : null;
   if (!post) return null;
@@ -269,7 +263,7 @@ function DispatchBody({
         <span className="pd-meta">{stop.location.split(',')[0]}</span>
       </div>
 
-      <h2 className="pd-title">{post.title}</h2>
+      {!hideTitle && <h2 className="pd-title">{post.title}</h2>}
       {post.subtitle && <p className="pd-dek">{post.subtitle}</p>}
 
       <div className="pd-divider" />
