@@ -110,16 +110,54 @@ def project_delete(
     typer.echo(f"deleted: {removed}")
 
 
+def _run_analysis(project_name: str, side: str) -> None:
+    """Shared lock-acquire + error-mapping shell for the analyze commands."""
+    from analyze import PriorArtError
+    from common.config import load_project
+    from common.locking import LockHeldError, ProjectLock
+    from project.create import OperatorError, default_projects_dir
+
+    project_dir = default_projects_dir() / project_name
+    if not (project_dir / "project.yml").is_file():
+        typer.echo(f"[bridge_builder] error: no project named {project_name!r}")
+        raise typer.Exit(code=1)
+    try:
+        with ProjectLock(project_dir):
+            project = load_project(project_dir)
+            if side == "pile":
+                from analyze.pile import run_pile_analysis as run
+            else:
+                from analyze.target import run_target_analysis as run
+            artifacts = run(project, project_dir)
+    except LockHeldError as exc:
+        typer.echo(f"[bridge_builder] error: {exc}")
+        raise typer.Exit(code=1)
+    except OperatorError as exc:
+        typer.echo(f"[bridge_builder] error: {exc}")
+        raise typer.Exit(code=1)
+    except PriorArtError as exc:
+        typer.echo(f"[bridge_builder] prior-art failure: {exc}")
+        raise typer.Exit(code=2)
+    typer.echo(f"analyze {side}: {artifacts['iteration']}")
+    for key, path in artifacts.items():
+        if key != "iteration":
+            typer.echo(f"  {key}: {path.name}")
+
+
 @analyze_app.command("pile")
-def analyze_pile() -> None:
+def analyze_pile(
+    project: str = typer.Option(..., "--project", help="Project name."),
+) -> None:
     """Profile the pile: ydata baseline + enhanced playground (US2)."""
-    _stub("analyze pile")
+    _run_analysis(project, "pile")
 
 
 @analyze_app.command("target")
-def analyze_target() -> None:
+def analyze_target(
+    project: str = typer.Option(..., "--project", help="Project name."),
+) -> None:
     """Profile the target: ydata + ER diagram + enhanced playground (US2)."""
-    _stub("analyze target")
+    _run_analysis(project, "target")
 
 
 @synthesize_app.command("bridge")

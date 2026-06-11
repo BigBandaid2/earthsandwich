@@ -59,11 +59,11 @@
 
 **Independent Test**: `analyze pile` + `analyze target` on the validated project produce `pile.ydata-profile.html`, `pile.enhanced.html`, `target.ydata-profile.html`, `target.er-diagram.svg`, `target.enhanced.html` in `data-profiling/iteration-1/`. Raw artifacts are canonical; enhanced sections are labeled baseline/LLM-extended/toolkit-novel.
 
-- [ ] T014 [P] [US2] Implement `bridge-builder-toolkit/analyze/introspect.py` — SQLAlchemy 2.x reflection of the target schema (tables, columns, types, PK/FK, NOT-NULL constraints)
-- [ ] T015 [US2] Implement `bridge-builder-toolkit/analyze/pile.py` — run `ydata-profiling` on a sampled pile → `pile.ydata-profile.html` (raw, FR-021); build `pile.enhanced.html` covering ID-candidates, entity classification, pipeline-metadata-vs-source, likely-inferred fields, AI-workflow evidence, public-knowledge enrichment w/ citations, sampled linked-media (FR-023/024) with per-section labels; hard-error (exit 2) if ydata fails (FR-105)
-- [ ] T016 [US2] Implement `bridge-builder-toolkit/analyze/target.py` — `ydata-profiling` on the introspected schema → `target.ydata-profile.html`; `eralchemy2` → `target.er-diagram.svg` (raw, FR-101; skipped + label-absent for a non-relational side, FR-027); `target.enhanced.html` with ranked candidate-table reasoning (FR-025/026); missing-GraphViz → clear exit-1 with install guidance
-- [ ] T017 [US2] Wire `analyze pile` + `analyze target` into `cli.py`
-- [ ] T018 [US2] Integration test `bridge-builder-toolkit/tests/integration/test_analyze.py` — IG→Travelogue analyses produce all artifacts; raw artifacts canonical; ER skipped for the TSV pile; enhanced sections carry valid provenance labels (SC-003/004/006)
+- [x] T014 [P] [US2] Implement `bridge-builder-toolkit/analyze/introspect.py` — SQLAlchemy 2.x reflection of the target schema (tables, columns, types, PK/FK, NOT-NULL constraints)
+- [x] T015 [US2] Implement `bridge-builder-toolkit/analyze/pile.py` — run `ydata-profiling` on a sampled pile → `pile.ydata-profile.html` (raw, FR-021); build `pile.enhanced.html` covering ID-candidates, entity classification, pipeline-metadata-vs-source, likely-inferred fields, AI-workflow evidence, public-knowledge enrichment w/ citations, sampled linked-media (FR-023/024) with per-section labels; hard-error (exit 2) if ydata fails (FR-105)
+- [x] T016 [US2] Implement `bridge-builder-toolkit/analyze/target.py` — `ydata-profiling` on the introspected schema → `target.ydata-profile.html`; `eralchemy2` → `target.er-diagram.svg` (raw, FR-101; skipped + label-absent for a non-relational side, FR-027); `target.enhanced.html` with ranked candidate-table reasoning (FR-025/026); missing-GraphViz → clear exit-1 with install guidance
+- [x] T017 [US2] Wire `analyze pile` + `analyze target` into `cli.py`
+- [x] T018 [US2] Integration test `bridge-builder-toolkit/tests/integration/test_analyze.py` — IG→Travelogue analyses produce all artifacts; raw artifacts canonical; ER skipped for the TSV pile; enhanced sections carry valid provenance labels (SC-003/004/006)
 
 **Checkpoint**: US2 independently testable — both sides profiled; labels readable; raw baselines recognizable.
 

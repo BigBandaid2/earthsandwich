@@ -3,7 +3,11 @@ typer
 fastapi
 uvicorn
 python-multipart
+pandas
 ydata-profiling
+setuptools<81           # ydata-profiling 4.18.x still imports pkg_resources (removed in setuptools 81)
+# eralchemy2 is used via its pure-Python schema->dot path; install with --no-deps to
+# avoid its pygraphviz C-extension dep (rendering goes through the system GraphViz dot binary).
 eralchemy2
 dbt-core
 dbt-duckdb
