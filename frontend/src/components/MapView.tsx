@@ -225,6 +225,30 @@ function FitBounds({
   return null;
 }
 
+function MapIdleSaver({
+  onViewportChange,
+}: {
+  onViewportChange: (center: { lat: number; lng: number }, zoom: number) => void;
+}) {
+  const map = useMap();
+  const onViewportChangeRef = useRef(onViewportChange);
+  onViewportChangeRef.current = onViewportChange;
+
+  useEffect(() => {
+    if (!map) return;
+    const listener = map.addListener('idle', () => {
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+      if (center && typeof zoom === 'number') {
+        onViewportChangeRef.current({ lat: center.lat(), lng: center.lng() }, zoom);
+      }
+    });
+    return () => google.maps.event.removeListener(listener);
+  }, [map]);
+
+  return null;
+}
+
 function getStopImages(stop: Stop): string[] {
   if (stop.post.type === 'instagram' && stop.post.image) return [stop.post.image];
   return [];
@@ -301,6 +325,11 @@ function WorldMap({
   const activeRegion = getActiveRegion(regionGroups);
   const activeGroup = regionGroups.find((g) => g.region.code === activeRegionCode) ?? null;
 
+  const savedTripViewportRef = useRef<{ center: { lat: number; lng: number }; zoom: number } | null>(null);
+  const saveTripViewport = useCallback((center: { lat: number; lng: number }, zoom: number) => {
+    savedTripViewportRef.current = { center, zoom };
+  }, []);
+
   if (viewMode === 'region' && activeGroup) {
     return (
       <RegionMap group={activeGroup} openStopId={openStopId} onOpenStop={onOpenStop} />
@@ -313,6 +342,8 @@ function WorldMap({
       activeRegion={activeRegion}
       onSelectRegion={onSelectRegion}
       onClusterClick={onClusterClick}
+      savedViewport={savedTripViewportRef.current}
+      onViewportChange={saveTripViewport}
     />
   );
 }
@@ -416,11 +447,15 @@ function TripMap({
   activeRegion,
   onSelectRegion,
   onClusterClick,
+  savedViewport,
+  onViewportChange,
 }: {
   regionGroups: RegionGroup[];
   activeRegion: RegionGroup | null;
   onSelectRegion: (code: string) => void;
   onClusterClick: (regionCodes: string[]) => void;
+  savedViewport: { center: { lat: number; lng: number }; zoom: number } | null;
+  onViewportChange: (center: { lat: number; lng: number }, zoom: number) => void;
 }) {
   const regionCoords = useMemo(
     () => regionGroups.map((g) => g.region.coords),
@@ -475,15 +510,16 @@ function TripMap({
     <div className="map-canvas map-canvas-trip" aria-label="World trip overview map">
       <Map
         mapId={TRIP_MAP_ID}
-        defaultCenter={{ lat: 20, lng: -30 }}
-        defaultZoom={2}
+        defaultCenter={savedViewport?.center ?? { lat: 20, lng: -30 }}
+        defaultZoom={savedViewport?.zoom ?? 2}
         gestureHandling="greedy"
         zoomControl={true}
         disableDefaultUI={true}
         restriction={{ latLngBounds: { north: 85, south: -85, west: -180, east: 180 }, strictBounds: true }}
         style={{ width: '100%', height: '100%' }}
       >
-        <FitBounds coords={regionCoords} padding={80} />
+        {!savedViewport && <FitBounds coords={regionCoords} padding={80} />}
+        <MapIdleSaver onViewportChange={onViewportChange} />
 
         {routedGroups.slice(0, -1).map((from, i) => {
           const to = routedGroups[i + 1];
