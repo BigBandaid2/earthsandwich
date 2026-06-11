@@ -5,7 +5,7 @@
 
 ## Summary
 
-The **bridge-builder-toolkit** is a self-contained Python CLI App that produces **validated bridge _specifications_ — not the running bridge itself.** For a given pile + target it explores, proposes, and mechanically validates a pile→target mapping, then emits a **Final Bundle** suitable as `/speckit.specify` input for authoring the downstream **bridge-app** spec. The actual functioning bridge — the ETL that loads the pile into the target in production — is built *later, from that spec*, as a separate App.
+The **bridge-builder-toolkit** is a self-contained Python App — a CLI plus a guided local Web UI over one shared core (FR-004) — that produces **validated bridge _specifications_ — not the running bridge itself.** For a given pile + target it explores, proposes, and mechanically validates a pile→target mapping, then emits a **Final Bundle** suitable as `/speckit.specify` input for authoring the downstream **bridge-app** spec. The actual functioning bridge — the ETL that loads the pile into the target in production — is built *later, from that spec*, as a separate App.
 
 > **Produces vs. doesn't.** The dbt project, the materialized `bridge.output.tsv`, and the oracle insert/delete round-trip are **validation evidence** that a proposed mapping works mechanically; they ship inside the Final Bundle to justify the spec it seeds. The toolkit does NOT deploy or operate a production bridge, and does NOT bulk-load the target (target stays read-only except the transactional oracle probe).
 
@@ -16,14 +16,14 @@ The toolkit wraps established prior-art tools (`ydata-profiling`, `eralchemy2`, 
 ## Technical Context
 
 **Language/Version**: Python 3.12+
-**Primary Dependencies**: Typer (CLI); `ydata-profiling` ≥4.18 (data profiling); `eralchemy2` + system GraphViz (ER diagrams); `dbt-core` + `dbt-duckdb` + `duckdb` (declarative mapping, run locally); SQLAlchemy 2.x + `psycopg[binary]` (Postgres reflection + oracle); `anthropic` (LLM analyst + bridge inference); `PyYAML` (project config); `filelock` (per-project lock); `pytest` (tests)
+**Primary Dependencies**: Typer (CLI); `fastapi` + `uvicorn` (guided local Web UI server, US7); `ydata-profiling` ≥4.18 (data profiling); `eralchemy2` + system GraphViz (ER diagrams); `dbt-core` + `dbt-duckdb` + `duckdb` (declarative mapping, run locally); SQLAlchemy 2.x + `psycopg[binary]` (Postgres reflection + oracle); `anthropic` (LLM analyst + bridge inference); `PyYAML` (project config); `filelock` (per-project lock); `pytest` (tests)
 **Storage**: Filesystem — per-project folders (`project.yml`, `data-profiling/iteration-<N>/`, `bridge-mapping/iteration-<N>/`, `truth-baseline/`, `final-bundle/`) — two independent iteration loops; per-bridge-iteration DuckDB file; raw prior-art artifacts + enhanced playground HTML; truth-baseline TSV + edit-history sidecar. No toolkit-owned database server.
 **Testing**: pytest — unit (mapping/transform/inference helpers, with mocked LLM + DuckDB fixtures), integration (oracle round-trip against the 002 Docker Postgres; full IG→Travelogue stage walkthrough), synthetic oracle cases (SC-007/008/009/010)
 **Target Platform**: Local developer machine (Linux/macOS/Windows) with Python venv, Docker (for the 002 Postgres target), GraphViz, and an Anthropic API key
-**Project Type**: Single-project CLI tool (one new App root `bridge-builder-toolkit/`)
+**Project Type**: Single-project CLI tool + guided local Web UI (one new App root `bridge-builder-toolkit/`)
 **Performance Goals**: Human-time gates — project+validate < 5 min (SC-001); one profile pass < 30 min human (SC-002); all three enhanced playgrounds render < 3 s in a stock browser (SC-014). Oracle loop converges ≤ 3 automatic iterations for ≥ 80% synthetic cases (SC-007)
 **Constraints**: Target DB read-only except the transactional oracle round-trip; enhanced playgrounds single-file/offline/≤ ~5 MB embedded (FR-050/FR-028); raw prior-art artifacts byte-for-byte canonical (FR-021/SC-003–005); inference inputs preserved (Constitution Principle V)
-**Scale/Scope**: 6 user stories (P1–P6), 73 FRs, 23 SCs; first concrete run = IG→Travelogue (003 pile + 002 schema, ~322 rows); ≥ 5 coexisting projects (SC-016)
+**Scale/Scope**: 7 user stories (P1–P7), 82 FRs, 27 SCs; first concrete run = IG→Travelogue (003 pile + 002 schema, ~322 rows); ≥ 5 coexisting projects (SC-016)
 
 ## Constitution Check
 
@@ -36,6 +36,7 @@ The toolkit wraps established prior-art tools (`ydata-profiling`, `eralchemy2`, 
 | **V / Rule #4 — inference preserves inputs** | ✅ PASS (design constraint) | The FR-047 inference step persists its pile inputs alongside each inferred value in the output artifact (FR-048) and bundle (FR-090). Enforced in data-model.md. |
 | **Foundational tech** (Python · Postgres · Docker · Spec Kit) | ✅ PASS | Python App; Postgres target via the 002 Docker stack; output is `/speckit.specify` input. dbt/duckdb/ydata/eralchemy2 are allowed App-local additions. |
 | **Cardinal Rule #1 — tasks.md historical record** | ✅ N/A yet | First tasks.md is authored fresh by `/speckit.tasks`. |
+| **II — self-containment (Web UI, US7)** | ✅ PASS | UI server is App-local (`fastapi`/`uvicorn` in the App venv), binds localhost by default, serves files only from inside `projects/<name>/` (FR-175), holds no state of its own (FR-173), zero host-project knowledge. |
 
 **No violations → Complexity Tracking is empty.**
 
@@ -68,7 +69,10 @@ bridge-builder-toolkit/                 # the new self-contained App root (FR-00
 ├── .env.example                        # ANTHROPIC_API_KEY, target cred env-var names
 ├── .gitignore                          # projects/, venv/, .env, *.duckdb
 ├── README.md
-├── cli.py                              # Typer app; one subcommand per stage (FR-004)
+├── cli.py                              # Typer app; one subcommand per stage (FR-004a)
+├── ui/
+│   ├── server.py                       # FastAPI app factory + routes; uvicorn launcher (US7, FR-170-179)
+│   └── pages.py                        # server-rendered HTML layer (playground visual idiom) (US7)
 ├── common/
 │   ├── config.py                       # project.yml load/save, validation-status model
 │   ├── inference.py                    # Anthropic wrapper (role-named, swappable); input-preserving
@@ -77,7 +81,10 @@ bridge-builder-toolkit/                 # the new self-contained App root (FR-00
 │   └── run_logging.py                  # per-run logs
 ├── project/
 │   ├── create.py                       # project create + connection validation (US1)
-│   └── registry.py                     # project list / status (US1)
+│   ├── registry.py                     # project list / status (US1)
+│   ├── update.py                       # edit + re-validate-then-persist (US7, FR-172)
+│   ├── delete.py                       # lock-aware project removal (US7, FR-176/177)
+│   └── status.py                       # stage detection + suggested-next-step (US7, FR-173/174)
 ├── analyze/
 │   ├── pile.py                         # ydata raw + pile enhanced playground (US2)
 │   ├── target.py                       # ydata raw + eralchemy2 ER + target enhanced (US2)
@@ -114,6 +121,7 @@ Each phase = one user story = independently testable + shippable, in priority or
 - **Phase US4 (P4)** — automatic oracle loop: sampled transactional round-trip, feedback synthesis, 5-fail ceiling, skip-when-no-permissions.
 - **Phase US5 (P5)** — manual `iterate` + `accept-bundle` (Final Bundle, FR-090/091/092).
 - **Phase US6 (P6)** — truth-baseline `review` playground, verdict tagging, baseline edit-history, three-way compare, summary → `iterate` payload.
+- **Phase US7 (P7)** — guided local Web UI (project CRUD + dashboard + suggested-next-step) + `project update`/`project delete` CLI parity. **Build order: pulled ahead of US2** (decision 2026-06-10 — the project-CRUD core it wraps is complete; the dashboard's guidance rails pay off while the long stages land). Priority ranks value, not build order.
 - **Polish** — the FR-091 IG→Travelogue end-to-end run as the integration acceptance; docs; prior-art-failure hard-error paths (FR-105).
 
 ## Complexity Tracking

@@ -140,6 +140,28 @@
 
 ---
 
+## Phase 10: User Story 7 — Guided Web UI for project lifecycle (Priority: P7)
+
+**Goal**: A localhost web front door for project CRUD + a guided per-project dashboard (stage progress across both loops, artifact links, suggested next CLI step), capability-equivalent with the CLI (FR-170–179). **Built ahead of US2 by decision 2026-06-10** — priority ranks value, not build order.
+
+**Independent Test**: `bridge_builder ui` → create / edit / delete a project at `http://127.0.0.1:8765` with inline validation reports; dashboard suggests `analyze pile` as the primary next step; on-disk results identical to the CLI's (SC-026).
+
+- [ ] T041 [US7] Implement `bridge-builder-toolkit/project/update.py` — load project, apply pile-path/sample/target-cred-env edits (name immutable — no rename), re-run connection validation (promote create.py's probes to public `probe_pile`/`probe_target` and reuse), persist only on successful re-validation, prior config untouched on failure; under ProjectLock (FR-172/176)
+- [ ] T042 [P] [US7] Implement `bridge-builder-toolkit/project/delete.py` — refuse while the lock is held by a live PID (FR-177), else remove the project folder (FR-176; irreversible)
+- [ ] T043 [P] [US7] Implement `bridge-builder-toolkit/project/status.py` — stage detection by scanning `data-profiling/iteration-*/` + `bridge-mapping/iteration-*/` + `final-bundle/` per data-model.md (+ lock liveness); `ProjectStageStatus` + `suggest_next_step()` → ONE primary copyable CLI command + labeled alternates (FR-173/174, SC-027)
+- [ ] T044 [US7] Wire `project update` + `project delete` (y/N confirmation prompt / `--yes`) into `cli.py` (FR-176)
+- [ ] T045 [US7] Implement `bridge-builder-toolkit/ui/pages.py` — server-rendered HTML layer: shared dark-theme layout echoing common/playground.py's visual idiom (own CSS constants; playground.py NOT imported), renderers for list/create/edit/dashboard/delete-confirm/errors; no external assets (FR-179)
+- [ ] T046 [US7] Implement `bridge-builder-toolkit/ui/server.py` — FastAPI `create_app()` + routes per contracts/web-ui.md (list/create/dashboard/edit/update/delete/artifacts) calling project/ core modules only (FR-171); per-request ProjectLock on mutations with LockHeldError → inline refusal (FR-177); typed-name delete confirmation; OperatorError + missing-env-var → inline form errors, secret values never rendered (FR-178); artifact containment check + minimal directory listing (FR-175); dashboard auto-poll while locked (FR-173); uvicorn runner with port-in-use → clean operator error (FR-170)
+- [ ] T047 [US7] Wire `ui` subcommand (`--host 127.0.0.1`, `--port 8765`) into `cli.py`; add `fastapi` + `uvicorn` to requirements.txt and `"ui"` to pyproject.toml packages
+- [ ] T048 [P] [US7] Unit tests `bridge-builder-toolkit/tests/unit/test_project_lifecycle.py` — update re-validates before persisting / aborts with prior config intact; delete refuses on a live lock; status + suggested-next-step over fixture project trees covering the SC-027 progression (fresh → profiled → synthesized → oracle-validated → bundled)
+- [ ] T049 [P] [US7] Unit tests `bridge-builder-toolkit/tests/unit/test_ui_routes.py` — FastAPI TestClient against a tmp projects dir: all routes; inline error for a missing env var; no DSN value in any response body (FR-178); artifact path-traversal rejected + directory listing contained (FR-175); typed-name delete mismatch rejected; lock-held mutation refused (FR-177)
+- [ ] T050 [US7] Integration test `bridge-builder-toolkit/tests/integration/test_ui_crud.py` — full create→dashboard→update→delete pass via TestClient against a live disposable target (BRIDGE_TEST_TARGET_DSN skip-pattern); CLI-vs-UI divergence check: identical inputs → identical project.yml (SC-026); dashboard response under the SC-025 render bound against a seeded 10-iteration fixture tree
+- [ ] T051 [P] [US7] Update `bridge-builder-toolkit/README.md` — two-surface model ("CLI + guided local Web UI"), `ui` command, localhost / no-auth-in-v1 note
+
+**Checkpoint**: US7 independently testable — `bridge_builder ui` serves localhost project CRUD + guided dashboards; CLI gains `project update`/`project delete`; UI and CLI effects are indistinguishable on disk.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase dependencies
@@ -150,6 +172,7 @@
 - **US4 (P4)** depends on US3 (oracle validates a produced mapping) + US1's permission status.
 - **US5 (P5)** depends on US3 (and US4 if perms) — iteration re-runs synthesis/oracle.
 - **US6 (P6)** depends on US3–US5 having produced output to review.
+- **US7 (P7)** depends only on Setup + Foundational + US1 — the dashboard renders "not yet run" for absent stages (exactly SC-027's fresh state). Implemented ahead of US2 by decision 2026-06-10.
 - **Polish** depends on the stories in scope for the increment.
 
 ### Within a story
@@ -159,12 +182,14 @@
 - US4: T025 → T026 → T027.
 - US5: T028 → T029 → T030 → T031.
 - US6: T032 → T033 → T034 → T035 → T036.
+- US7: T041 → T044 ; T042 + T043 [P] alongside T041 ; T045 → T046 → T047 ; T048/T049 [P] after their subjects ; T050 after T047 ; T051 [P] anytime after T047.
 
 ### Parallel opportunities
 - Setup: T002 + T003 [P] (different files).
 - Foundational: T005 + T006 + T007 [P] (config/locking/logging are independent). T008/T009 follow.
 - US1: T011 [P] alongside T010.
 - US2: T014 + T015 [P].
+- US7: T042 + T043 [P] ; T048 + T049 + T051 [P].
 - Polish: T037 + T038 + T040 [P].
 
 ---
@@ -177,6 +202,7 @@
 
 ### Incremental delivery
 1. US1 → projects exist and validate.
+1.5. **US7 (Phase 10) — pulled ahead of US2 by decision 2026-06-10**: the guided Web UI ships on top of US1's core; priority ranks value, not build order.
 2. US2 → both sides profiled with labeled enhanced playgrounds.
 3. US3 → a proposed mapping + dbt artifact + materialized output + bridge playground.
 4. US4 → the oracle auto-refines mechanically-broken mappings.

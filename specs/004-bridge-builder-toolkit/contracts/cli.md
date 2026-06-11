@@ -2,7 +2,7 @@
 
 **Date**: 2026-06-08 · **Spec**: [../spec.md](../spec.md) · **Plan**: [../plan.md](../plan.md)
 
-The toolkit's sole external interface is its CLI (FR-004), one subcommand per stage, mirroring the pile-app pattern. Entry point: `bridge_builder` (after `pip install -e .`) or `python cli.py` (dev). Every command operates on a named project under `bridge-builder-toolkit/projects/<name>/`, acquires the per-project lock (FR-110) for the duration, and writes a per-run log.
+The toolkit exposes two operator surfaces over one shared core (FR-004): this CLI — the automation/scripting surface and the only surface that launches stages — and the guided local Web UI ([web-ui.md](web-ui.md), FR-170–179). The CLI has one subcommand per stage, mirroring the pile-app pattern. Entry point: `bridge_builder` (after `pip install -e .`) or `python cli.py` (dev). Every *stage* command operates on a named project under `bridge-builder-toolkit/projects/<name>/`, acquires the per-project lock (FR-110) for the duration, and writes a per-run log; `project list` and `ui` are exceptions — `ui` locks per mutating request only (FR-177).
 
 **Global conventions**
 - Project selected by `--project <name>` (or positional `<name>` where natural).
@@ -31,6 +31,24 @@ bridge_builder project create <name> \
 bridge_builder project list
 ```
 - **US1 / FR-010.** Prints each project's name, pile path, target endpoint, and current validation status.
+
+## `project update`
+```
+bridge_builder project update <name> [--pile <path>] [--pile-sample <spec>] [--target-cred-env <ENV_VAR_NAME>]
+```
+- **US7 / FR-172, FR-176.** Applies the supplied edits and re-runs connection validation against the edited inputs BEFORE persisting; on failure the prior config is untouched. Acquires the project lock for the operation.
+
+## `project delete`
+```
+bridge_builder project delete <name> [--yes]
+```
+- **US7 / FR-176, FR-177.** Interactive confirmation unless `--yes`. Refuses (exit 1) while the project's lock is held by a live process; otherwise removes the project folder.
+
+## `ui`
+```
+bridge_builder ui [--host 127.0.0.1] [--port 8765]
+```
+- **US7 / FR-170–179.** Launches the guided local Web UI — see [web-ui.md](web-ui.md) for the route contract. Localhost-bound by default; port-in-use is a clear exit-1 operator error. Holds no standing project lock (FR-177).
 
 ## `analyze pile`
 ```

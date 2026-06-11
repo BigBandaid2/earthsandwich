@@ -15,6 +15,14 @@
 - Q: Does the oracle validate one pile row or a sample? → A: A small sample (3–5) of real pile rows, deterministically chosen to include constraint-stressing rows (most empty/null fields, longest values); the oracle passes only if ALL sampled rows insert+delete cleanly.
 - Q: Are the data-profiling and bridge-mapping (synthesis→oracle→review) loops one iteration sequence? → A: No — two INDEPENDENT loops. The **data-profiling** loop (pile + target profiling) has its own iteration sequence (re-profile without re-synthesizing); the **bridge-mapping** loop (synthesis→oracle→review) has its own. A bridge-mapping iteration records a reference to the LATEST data-profiling iteration it was built against, but the loops are not locked: re-profiling neither invalidates nor advances bridge-mapping iterations, and a bridge-mapping iteration does not force a new data-profiling pass. Each loop keeps its OWN preserved iteration history; each data-profiling iteration records a fingerprint of the pile state it profiled (row count + content hash + timestamp) so pile evolution (re-scrapes, new data) is auditable over time.
 
+### Session 2026-06-10
+
+- Q: Does the US7 suggested-next-step panel show one command or several when multiple actions are valid? → A: One **primary** command, deterministic per stage state, plus a small labeled "also available" list of alternates where the state genuinely permits several actions (e.g. oracle-validated → primary `review`, alternates `iterate`, `accept-bundle`).
+- Q: How strong is the US7 delete confirmation? → A: The UI requires typing the project name to confirm (the deletion is irreversible — iteration histories, truth baseline, bundle all go); the CLI prompts y/N unless `--yes`.
+- Q: How does an open US7 dashboard reflect changes while a CLI stage runs? → A: Lightweight auto-poll — while the project's lock is held the dashboard re-fetches its snapshot every few seconds (~5 s); once the lock clears it returns to a static page (manual refresh). No SSE/WebSocket push, no UI-side state.
+- Q: Can US7's update rename a project? → A: No — the project name is immutable identity (it is the folder path); update covers pile path / sample spec / credential env-var name only. A rename is delete + recreate.
+- Q: How does the US7 artifact route handle directory-shaped artifacts (e.g. `bridge.dbt-project/`, the dbt docs site)? → A: A directory URL renders a minimal containment-checked listing of its entries as links; files serve normally, so multi-file artifacts like the dbt docs site work without special-casing.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 — Create a new bridge project and validate connections (Priority: P1)
@@ -152,6 +160,30 @@ The baseline is **deliberately editable**, not frozen, for two reasons: (a) the 
 
 ---
 
+### User Story 7 — Guided Web UI for project lifecycle (Priority: P7)
+
+The operator launches `bridge_builder ui` and opens a local browser page instead of memorizing CLI flags. From the Web UI they create a project through a form (the same inputs as `project create`, with the connection-validation report rendered inline), see all projects at a glance, edit a project's pile path / sample spec / credential env-var name (with automatic re-validation before anything persists), and delete a project behind an explicit confirmation. Each project gets a **guided dashboard**: which stages have run in each of the two independent loops, how many iterations exist, the latest oracle status, links that open every artifact (enhanced playgrounds, raw baselines) directly from the project folder, the current validation status, and a **"suggested next step"** panel showing the exact ready-to-copy CLI command for whatever comes next.
+
+The UI is a *second front door over the same core*, not a second implementation: every operation calls the same project modules the CLI calls, and the CLI gains `project update` and `project delete` so the two surfaces stay capability-equivalent. Stages (analyze / synthesize / iterate / review / accept-bundle) are NOT launched from the UI in this story — the dashboard guides the operator to the CLI command instead; launching stages from the UI is a possible future story. The server binds localhost only and is single-operator by design.
+
+**Why this priority**: P7 because every capability it exposes already exists (or is added in parity) on the CLI — the UI adds guidance and ergonomics, not new pipeline capability; the toolkit is fully usable without it. It is deliberately *built* ahead of User Story 2 (recorded in tasks.md's Implementation Strategy) because the project-CRUD core it wraps is complete and the dashboard's guidance rails pay off most while the long profiling/synthesis stages land — priority ranks independent value, not build order.
+
+**Independent Test**: With only User Story 1 implemented, the operator runs `bridge_builder ui`, opens `http://127.0.0.1:8765`, creates a project via the form against a disposable relational target, and sees the same per-endpoint validation report the CLI prints. The dashboard shows no stages run and suggests `analyze pile` as a copyable command. They edit the sample size (re-validation runs), then delete the project through the confirmation step. A project created via the UI is identical on disk to one created via the CLI with the same inputs.
+
+**Acceptance Scenarios**:
+
+1. **Given** the UI is running, **When** the operator submits the create-project form with a name, pile path, target descriptor, and credential env-var name, **Then** the toolkit runs the same validate-then-materialize flow as `project create` and renders the full per-endpoint validation report (pile readable; target reachable + read / insert / delete; oracle run-vs-skip) inline on the resulting project page — and the on-disk result (`project.yml`, folder) is identical to the CLI's for the same inputs.
+2. **Given** the create form names a credential env var that is not set in the server's environment, **When** the form is submitted, **Then** the UI shows a clear inline validation error naming the missing variable, no project state is created, and at no point is a credential *value* requested, rendered, or persisted (FR-012).
+3. **Given** multiple projects exist, **When** the operator opens the projects page, **Then** every project is listed with name, pile path, target env-var name, and validation status, and each links to a per-project dashboard showing stage-flow progress for BOTH loops (data-profiling and bridge-mapping), iteration counts, latest oracle status, and final-bundle presence.
+4. **Given** a project dashboard is open, **When** the operator inspects the suggested-next-step panel, **Then** it shows ONE primary next CLI command, deterministic for the project's stage state (e.g. `analyze pile` for a freshly validated project; `synthesize bridge` once both sides are profiled; `review` once a bridge is oracle-validated), plus a small labeled "also available" list of alternates where the state genuinely permits several actions (e.g. `iterate`, `accept-bundle` alongside `review`) — all as ready-to-copy text — and the UI does NOT offer to launch the stage itself.
+5. **Given** a project dashboard is open, **When** the operator clicks an artifact link, **Then** the artifact (enhanced playground HTML, raw ydata/ER/dbt artifact, oracle result) is served from inside that project's folder, and no file outside the project folder is reachable through the artifact route.
+6. **Given** the operator edits a project (pile path, sample spec, or credential env-var name) via the update form, **When** they submit, **Then** connection validation re-runs against the edited inputs BEFORE anything persists; on success the updated config + fresh validation report are saved, on failure an inline error is shown and the prior config is untouched. The same behavior is available via `bridge_builder project update`.
+7. **Given** the operator requests deletion of a project, **When** the UI requires them to type the project's name to confirm (deletion is irreversible — both iteration histories, the truth baseline + edit history, and any final bundle are removed) and they do, **Then** the project folder is removed; **Given** another live process holds the project's lock (FR-110), **Then** the deletion is refused with a message naming the live owner and nothing is removed. The same behavior (with a y/N confirmation prompt or `--yes`) is available via `bridge_builder project delete`.
+8. **Given** the operator runs `bridge_builder ui` with no flags, **When** the server starts, **Then** it binds `127.0.0.1:8765` only (not reachable from other machines); `--port` / `--host` override the defaults; a port already in use produces a clear operator error, not a stack trace.
+9. **Given** a CLI operation holds a project's lock mid-run, **When** the operator views that project's dashboard, **Then** the dashboard renders read-only state with an "operation in progress" indicator and auto-refreshes its snapshot every few seconds while the lock is held (returning to a static page once it clears), and mutating actions (update / delete) are refused until the lock clears.
+
+---
+
 ### Edge Cases
 
 - **Empty or malformed pile**: The toolkit must produce a meaningful Stage 1 report even with zero rows or some malformed rows. ydata-profiling has its own degraded-mode output for these; the enhanced playground must surface them readably rather than crash.
@@ -169,6 +201,10 @@ The baseline is **deliberately editable**, not frozen, for two reasons: (a) the 
 - **Browser without clipboard API**: The "copy out a prompt" button must degrade to a selectable textarea so the prompt is always extractable.
 - **Prior-art tool unavailable or errors** (ydata-profiling, eralchemy/schemaspy, dbt): If a pinned prior-art tool fails to run, the toolkit MUST surface that as a hard error and refuse to produce a "fake" enhanced playground for the affected stage.
 - **Credentials change between runs**: If the target's credentials change between iterations, the next iteration's validation/oracle step must detect this and surface it.
+- **UI mutation while a CLI run holds the project lock**: update / delete are refused with a message naming the live lock owner; the dashboard still renders read-only state with an in-progress indicator.
+- **Project folder deleted on disk while the UI is open**: the project list silently drops it; its dashboard returns a clear not-found page with guidance — never a server crash.
+- **Env var named in a UI form is missing from the server's environment**: inline validation error naming the variable; nothing persisted; the UI never prompts for the secret value itself.
+- **UI port already in use**: `bridge_builder ui` exits 1 with a message naming the port and the `--port` override.
 
 ## Requirements *(mandatory)*
 
@@ -179,7 +215,7 @@ The baseline is **deliberately editable**, not frozen, for two reasons: (a) the 
 - **FR-001**: Toolkit MUST be a physically self-contained App at the repository root in `bridge-builder-toolkit/`, with its own venv, `.env`, `pyproject.toml`/`requirements.txt`, CLI entry point, tests, run logs, and a top-level projects directory.
 - **FR-002**: Toolkit MUST share no source code with `pile-app`, `backend`, or `frontend`. The only coupling to other Apps is via operator-supplied paths/URLs at invocation time.
 - **FR-003**: Toolkit MUST be movable to a separate Git repository without breaking either side.
-- **FR-004**: Toolkit MUST expose a CLI surface mirrored on the pile-app pattern: one subcommand per stage / orchestration step (e.g. `project create`, `project list`, `analyze pile`, `analyze target`, `synthesize bridge`, `iterate`, `accept-bundle`).
+- **FR-004**: Toolkit MUST expose two equivalent operator surfaces over one shared core. (a) A **CLI** mirrored on the pile-app pattern: one subcommand per stage / orchestration step (e.g. `project create`, `project list`, `project update`, `project delete`, `analyze pile`, `analyze target`, `synthesize bridge`, `iterate`, `accept-bundle`, `review`, `ui`) — the CLI remains the automation/scripting surface and the only surface that launches stages. (b) A **guided local Web UI** (User Story 7, FR-170–179) for project lifecycle CRUD and stage-progress navigation. Neither surface implements project-lifecycle logic the other cannot reach (FR-171).
 
 **Project lifecycle (User Story 1)**
 
@@ -260,6 +296,19 @@ The baseline is **deliberately editable**, not frozen, for two reasons: (a) the 
 - **FR-160**: A review-session summary MUST be acceptable as a feedback payload to the `iterate` CLI (FR-080), so the operator can drive a fresh bridge iteration informed by the review's findings.
 - **FR-161**: A brand-new domain MUST be allowed to start with an empty truth baseline. The first review session bootstraps the baseline: every pair appears as `only-bridge`; `bridge-improved` tags become the baseline's seed entries.
 
+**Guided Web UI (User Story 7)**
+
+- **FR-170**: Toolkit MUST provide a `ui` CLI subcommand that launches a local web server bound to `127.0.0.1:8765` by default, overridable via `--host` / `--port`; a port already in use MUST produce a clear operator error (exit 1), never a stack trace.
+- **FR-171**: Every UI operation MUST execute through the same core project modules the CLI uses — no project-lifecycle logic may be forked into or implemented only in the UI layer, so CLI and UI remain equivalent front doors with no capability divergence.
+- **FR-172**: The UI MUST support full project CRUD: create (a form mirroring `project create` inputs, rendering the FR-007 validation report inline, with FR-008 abort-cleanly parity), list, update (edit pile path / sample spec / credential env-var name with mandatory re-validation before persisting; prior config untouched on failure; the project NAME is immutable identity — no rename), and delete (the UI requires typing the project name to confirm; the CLI prompts y/N unless `--yes` — deletion is irreversible).
+- **FR-173**: The UI MUST provide a per-project dashboard surfacing: stage-flow progress for both independent loops (which stages have run, iteration counts per loop), the latest bridge-mapping iteration's oracle status, current connection-validation status, and final-bundle presence — derived by reading the existing on-disk iteration structures, never by maintaining parallel UI-side state. While the project's lock is held the dashboard auto-refreshes its snapshot on a short interval (~5 s); once the lock clears it is a static page (manual refresh).
+- **FR-174**: The dashboard MUST show a "suggested next step" panel containing ONE primary ready-to-copy CLI command, deterministic for the project's stage state, plus a labeled "also available" list of alternates when the state genuinely permits several actions. The UI MUST NOT launch stages itself in this story (stage launching is deferred to a possible future story).
+- **FR-175**: Artifact links MUST serve files only from within the owning project's folder; any requested path resolving outside the project folder MUST be refused. A directory-shaped artifact path renders a minimal listing of its entries (same containment rule); files serve normally, so multi-file artifacts (e.g. the dbt project and its generated docs site) are browsable without special-casing.
+- **FR-176**: The CLI MUST gain `project update` and `project delete` subcommands with the same semantics as the UI's update / delete (FR-172), keeping the two surfaces capability-equivalent (FR-171).
+- **FR-177**: Mutating UI operations (create / update / delete) MUST acquire the per-project lock (FR-110) for the duration of the request only; the UI server MUST NOT hold any project lock across requests, and MUST refuse update / delete with a clear message while another live process holds the lock.
+- **FR-178**: The UI MUST honor FR-012 strictly: forms accept credential env-var NAMES only; an env-var name not set in the server's environment is an inline validation error; credential values are never rendered in any page, logged, or persisted.
+- **FR-179**: The UI MUST work fully offline — server-rendered vanilla HTML/CSS/JS, no external assets or CDNs, visually consistent with the enhanced-playground idiom. UI pages are server-rendered documents, NOT single-file artifact playgrounds: FR-050's single-file rule remains scoped to the Stage 1–3 / US6 artifact playgrounds and does not apply to UI pages.
+
 **Outputs**
 
 - **FR-090**: The final accepted bundle MUST be a directory of files inside the project — all iteration artifacts (raw ydata + raw ER + raw dbt + enhanced playgrounds), the final mappings, sample-record validation results, full iteration history (automatic and manual), and captured prompt payloads — suitable for direct use as input to `/speckit.specify` (or equivalent spec-authoring step).
@@ -333,6 +382,10 @@ The baseline is **deliberately editable**, not frozen, for two reasons: (a) the 
 - **SC-021**: The review playground correctly identifies AI-inferred columns vs direct-copy / deterministic-transform columns from the bridge mapping in **100%** of test cases (FR-153 honored).
 - **SC-022**: In three-way mode (truth + iteration N + iteration M), an operator can identify which iteration's AI inference improved overall (more `bridge-improved` tags, fewer `bridge-regressed`) for the AI-inferred column subset in **under 5 minutes** for representative test cases.
 - **SC-023**: A review-session summary, passed as a feedback payload to the `iterate` CLI (FR-160), drives a new bridge iteration whose AI-inference outputs measurably improve on the prior iteration's `bridge-regressed` tags in at least **70%** of test cases (early-loop refinement metric).
+- **SC-024**: An operator unfamiliar with the toolkit completes project creation + connection validation **via the Web UI** in **under 5 minutes** (the User Story 7 mirror of SC-001).
+- **SC-025**: A project dashboard **renders within 2 seconds** for a project with at least 10 iterations across the two loops, on a typical operator machine.
+- **SC-026**: **No capability divergence**: performing project create / update / delete via the UI and via the CLI with identical inputs produces **identical on-disk results** (`project.yml` content and folder state) in **100%** of test cases (FR-171 honored).
+- **SC-027**: The suggested-next-step panel names the correct PRIMARY next CLI command (and, where applicable, the correct alternate set) in **100%** of test cases across a scripted progression of stage states (fresh → profiled → synthesized → oracle-validated → bundled).
 
 ## Assumptions
 
@@ -348,3 +401,5 @@ The baseline is **deliberately editable**, not frozen, for two reasons: (a) the 
 - One operator runs the toolkit at a time against a given project. Concurrent runs against the same project are blocked by per-project locking (FR-110). Runs against *different* projects in the same installation can proceed concurrently.
 - The toolkit produces spec input but does NOT itself author or commit downstream spec files. Handoff to `/speckit.specify` (or equivalent) is the operator's responsibility.
 - The toolkit is the foundational predecessor of a future `bridge-builder-app` spec. Automation of the orchestrator end and generalization to arbitrary pile+target pairs is explicitly deferred to that future spec.
+- The Web UI (User Story 7) is a **single-operator, local tool**: it runs on the operator's machine, binds localhost by default, is never deployed or multi-user, and therefore has **no authentication in v1** — locality is the access control. (The modern-browser assumption above covers the UI as well as the playgrounds.)
+- Operating the UI and the CLI against the same project concurrently is safe via the per-project lock (FR-110 / FR-177); the UI holds no state of its own — the filesystem remains the single source of truth.

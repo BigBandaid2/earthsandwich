@@ -71,3 +71,9 @@ Resolves the "deferred to planning" items from the [Clarifications](spec.md#clar
 - **Principle V / Cardinal Rule #4 (inference preserves inputs)**: the FR-047 toolkit-side inference step MUST persist, in the materialized output artifact (FR-048) and the final bundle (FR-090), the pile inputs it fed to each inference alongside the inferred value — so an inference can be re-run/audited with a different model. Carried into data-model.md as a column-provenance requirement.
 - **Principle II (Apps via contracts, not shared code)**: the toolkit couples to 003/002 only through operator-supplied paths/URLs at runtime (FR-002) — no imports from `pile-app`/`backend`.
 - **No NEEDS CLARIFICATION remain** for v1 scope: target = relational DB (Postgres), pile = filesystem TSV, single operator per project.
+
+## 9. Web UI stack (US7, added 2026-06-10)
+
+- **Decision**: `fastapi` + `uvicorn` serving **server-rendered vanilla HTML** (string templates in `ui/pages.py`, no jinja2, no Node/React), launched by `bridge_builder ui`, localhost-bound by default. Pages echo the enhanced-playground dark idiom; the UI calls the same `project/` core modules as the CLI (FR-171).
+- **Rationale**: two small pure-Python deps in the one App venv keep the App movable (FR-003) and offline (FR-179); FastAPI's TestClient gives free route tests in the existing pytest patterns; no build step.
+- **Alternatives**: Flask (equivalent; FastAPI's typing + TestClient fit the test suite better); stdlib `http.server` (too bare for forms/routing); any SPA stack (adds a Node toolchain inside a Python App and violates the offline/no-external-assets discipline).

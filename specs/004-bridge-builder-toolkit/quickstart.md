@@ -38,6 +38,13 @@ Expect a validation report: pile **readable**, target **reachable + read + inser
 bridge_builder project list      # confirms name, pile, target, validation status
 ```
 
+### 2.5 …or use the Web UI (US7)
+
+```pwsh
+bridge_builder ui                # guided local UI at http://127.0.0.1:8765
+```
+Create / list / edit / delete projects from the browser with the same inline validation report; each project's dashboard shows stage progress across both loops and the suggested next CLI command. The stages themselves still run via the CLI commands in steps 3–7.
+
 ## 3. Profile both sides (US2)
 
 ```pwsh
