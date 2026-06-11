@@ -85,8 +85,12 @@ def _probe_target(dsn: str) -> tuple[bool, bool, bool, bool, str]:
     temporary table inside a rolled-back transaction — proves DML is permitted
     without touching real tables (the per-table oracle probe is US4's job).
     """
+    normalized = _normalize_dsn(dsn)
+    connect_args: dict = {}
+    if normalized.startswith(("postgresql", "mysql", "mariadb")):
+        connect_args["connect_timeout"] = 10   # an unreachable host fails in seconds, not minutes
     try:
-        engine = create_engine(_normalize_dsn(dsn))
+        engine = create_engine(normalized, connect_args=connect_args)
     except Exception as exc:  # malformed DSN, missing driver
         return False, False, False, False, f"target DSN rejected: {exc}"
 
