@@ -1,0 +1,4 @@
+record_id	captured_at	note	place	lat	lng	attachment
+r0001	2024-03-01T12:00:00Z	Calibration pass complete	Station A	51.5007	-0.1246	files/r0001.jpg
+r0002	2024-03-03T15:30:00Z	Sensor swap at north mast	Station B	48.8584	2.2945	files/r0002.jpg
+r0003	2024-03-05T09:10:00Z	No location recorded for this entry		 	 	files/r0003.jpg

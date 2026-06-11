@@ -33,15 +33,35 @@ def _stub(stage: str) -> None:
 
 
 @project_app.command("create")
-def project_create() -> None:
+def project_create(
+    name: str = typer.Argument(..., help="Project name (unique per installation)."),
+    pile: str = typer.Option(..., "--pile", help="Path to the pile (a local file-based data deposit, e.g. a TSV)."),
+    target: str = typer.Option(..., "--target", help="Target endpoint descriptor (relational DSN shape; never persisted)."),
+    target_cred_env: str = typer.Option(..., "--target-cred-env", help="ENV VAR NAME holding the target DSN (FR-012)."),
+    pile_sample: str = typer.Option("head+random:200", "--pile-sample", help="Pile sampling spec '<strategy>:<size>'."),
+    force: bool = typer.Option(False, "--force", help="Overwrite an existing project (FR-011)."),
+) -> None:
     """Create a named project and validate its pile + target connections (US1)."""
-    _stub("project create")
+    from project.create import OperatorError, create_project, format_validation_report
+
+    try:
+        project, project_dir = create_project(
+            name, pile=pile, target=target, target_cred_env=target_cred_env,
+            pile_sample=pile_sample, force=force,
+        )
+    except OperatorError as exc:
+        typer.echo(f"[bridge_builder] error: {exc}")
+        raise typer.Exit(code=1)
+    typer.echo(format_validation_report(project))
+    typer.echo(f"created: {project_dir}")
 
 
 @project_app.command("list")
 def project_list() -> None:
     """List projects with their pile, target, and validation status (US1)."""
-    _stub("project list")
+    from project.registry import format_project_lines, list_projects
+
+    typer.echo(format_project_lines(list_projects()))
 
 
 @analyze_app.command("pile")

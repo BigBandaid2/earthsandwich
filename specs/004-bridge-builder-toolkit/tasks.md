@@ -44,10 +44,10 @@
 
 **Independent Test**: Run `project create` with valid IG→Travelogue inputs → project folder + `project.yml` + a validation report (both endpoints reachable, per-endpoint read/insert/delete). Re-run with wrong inputs → clear errors, no project state mutated.
 
-- [ ] T010 [US1] Implement `bridge-builder-toolkit/project/create.py` — create `projects/<name>/`, write `project.yml`, run the connection-validation step (pile readable; target reachable + read/insert/delete probes via SQLAlchemy), record per-endpoint status; abort cleanly (no folder) on pile-unreadable / target-unreachable (FR-007/008); reject a non-relational target with a "deferred" message (FR-005 v1 scope); honor `--force` (FR-011); credentials by env-var name only (FR-012)
-- [ ] T011 [P] [US1] Implement `bridge-builder-toolkit/project/registry.py` — `project list` printing each project's name, pile path, target endpoint, validation status (FR-010)
-- [ ] T012 [US1] Wire `project create` (`--pile`, `--target`, `--target-cred-env`, `--pile-sample`, `--force`) and `project list` into `cli.py`
-- [ ] T013 [US1] Integration test `bridge-builder-toolkit/tests/integration/test_project_create.py` — valid IG→Travelogue create against the 002 Docker Postgres → folder + config + validation report; deliberately-wrong inputs → clean abort with no folder (US1 Independent Test; SC-001, SC-017)
+- [x] T010 [US1] Implement `bridge-builder-toolkit/project/create.py` — create `projects/<name>/`, write `project.yml`, run the connection-validation step (pile readable; target reachable + read/insert/delete probes via SQLAlchemy), record per-endpoint status; abort cleanly (no folder) on pile-unreadable / target-unreachable (FR-007/008); reject a non-relational target with a "deferred" message (FR-005 v1 scope); honor `--force` (FR-011); credentials by env-var name only (FR-012)
+- [x] T011 [P] [US1] Implement `bridge-builder-toolkit/project/registry.py` — `project list` printing each project's name, pile path, target endpoint, validation status (FR-010)
+- [x] T012 [US1] Wire `project create` (`--pile`, `--target`, `--target-cred-env`, `--pile-sample`, `--force`) and `project list` into `cli.py`
+- [~] T013 [US1] Integration test `bridge-builder-toolkit/tests/integration/test_project_create.py` — generic acceptance against any disposable relational target via `BRIDGE_TEST_TARGET_DSN` (no host-project fore-knowledge; the 002 Docker Postgres is one valid instance) → folder + config + validation report + FR-012 no-secret-persisted; deliberately-wrong inputs → clean abort with no folder (US1 Independent Test; SC-001, SC-017). *Authored + skip-path verified; awaiting a live-Postgres green run to flip `[x]`.*
 
 **Checkpoint**: US1 independently testable — a validated project exists; the oracle-run-vs-skip decision is recorded.
 

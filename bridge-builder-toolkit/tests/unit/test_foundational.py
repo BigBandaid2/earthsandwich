@@ -8,10 +8,10 @@ from common import config, inference, locking, playground
 
 def test_config_round_trip(tmp_path):
     proj = config.BridgeProject(
-        name="IG to Travelogue",
+        name="sample-project",
         created_at="2026-06-10T00:00:00+0000",
         pile=config.PileConfig(
-            path="../../pile-app/pile/posts.tsv",
+            path="./data/sample-pile.tsv",
             kind="tsv",
             sample=config.PileSample(strategy="head+random", size=200),
         ),
