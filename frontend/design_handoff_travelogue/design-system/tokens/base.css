@@ -1,0 +1,44 @@
+/* Travelogue — base element defaults (kept minimal; tokens do the work) */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  margin: 0;
+  color: var(--ink);
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-hover); }
+
+button { font: inherit; cursor: pointer; }
+
+/* Mono eyebrow / label helper */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  font-weight: var(--weight-semibold);
+  color: var(--accent);
+}
+
+/* Handwritten accent helper */
+.script {
+  font-family: var(--font-script);
+  font-weight: var(--weight-semibold);
+  color: var(--accent);
+}

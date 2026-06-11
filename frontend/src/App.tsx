@@ -169,32 +169,34 @@ function App() {
       <div className="app-shell">
         <div className="view-layout">
           <div className="map-pane">
-            <div className="map-trip-card">
+            <div className="tg-tripbar">
               <button
                 type="button"
-                className="hamburger-btn"
+                className="tg-burger"
                 aria-label="Open trip selector"
                 onClick={() => setTripSelectorOpen((v) => !v)}
               >
-                ☰
+                ≡
               </button>
               {viewMode === 'region' ? (
-                <button type="button" className="back-btn" onClick={handleBackToTrip}>
-                  ← BACK TO TRIP
+                <button type="button" className="tg-back" onClick={handleBackToTrip}>
+                  ← TRIP
                 </button>
               ) : (
-                <span className="trip-title-card">{activeTrip.title}</span>
+                <span className="tg-tripbar-title">{activeTrip.title}</span>
               )}
+              <span className="tg-tripbar-count">{activeTrip.stops.length} stops</span>
               {tripSelectorOpen && (
-                <div className="trip-selector-dropdown">
+                <div className="tg-tripmenu">
                   {trips.map((t) => (
                     <button
                       key={t.id}
                       type="button"
-                      className={`trip-option ${t.id === activeTripId ? 'active' : ''}`}
+                      className={`tg-tripmenu-item${t.id === activeTripId ? ' active' : ''}`}
                       onClick={() => handleSelectTrip(t)}
                     >
-                      {t.title}
+                      <span className="tg-tripmenu-name">{t.title}</span>
+                      <span className="tg-tripmenu-meta">{t.stops.length} stops</span>
                     </button>
                   ))}
                 </div>

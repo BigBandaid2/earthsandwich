@@ -1,0 +1,101 @@
+<!-- @dsCard group="App" viewport="980x640" name="Post Detail — Instagram & Substack" subtitle="The postcard spread that opens when you tap a stop" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Travelogue — Post Detail</title>
+<link rel="stylesheet" href="../../styles.css" />
+<link rel="stylesheet" href="detail.css" />
+<style>
+  body { background: var(--paper); margin: 0; }
+  .stage {
+    min-height: 100vh; padding: 48px 24px 64px; display: flex; flex-direction: column; align-items: center; gap: 14px;
+    background:
+      radial-gradient(120% 80% at 50% 0%, var(--surface-tint), transparent 60%), var(--paper);
+  }
+  .stage-head { text-align: center; max-width: 640px; margin-bottom: 12px; }
+  .stage-head .eyebrow { justify-content: center; }
+  .stage-head h1 { font-family: var(--font-display); font-style: italic; font-size: 40px; margin: 10px 0 8px; }
+  .stage-head p { font-family: var(--font-display); font-style: italic; color: var(--ink-soft); font-size: 17px; line-height: 1.5; margin: 0; }
+  .variant-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); font-weight: 600; margin-top: 30px; display: flex; align-items: center; gap: 10px; }
+  .variant-label::before, .variant-label::after { content: ""; width: 40px; height: 1px; background: var(--line-strong); }
+  /* embedded card: drop fixed positioning, sit in flow */
+  .holder { position: relative; width: 100%; max-width: 920px; }
+  .holder#subtop, .holder#subempty { max-width: 920px; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="stage-head">
+    <div class="eyebrow">Post Detail</div>
+    <h1>One stop, told properly</h1>
+    <p>Tap a photo or a flag and the trip opens to a postcard. Two kinds of post share the same frame — a quick Instagram snapshot, or a longer Substack dispatch.</p>
+  </div>
+
+  <div class="variant-label">Instagram snapshot — photo carousel + caption</div>
+  <div class="holder" id="insta"></div>
+
+  <div class="variant-label">Substack dispatch — a longer write-up</div>
+  <div class="holder" id="sub"></div>
+
+  <div class="variant-label">Substack dispatch — cover on top (alt layout)</div>
+  <div class="holder" id="subtop"></div>
+
+  <div class="variant-label">Substack dispatch — no cover image (typographic fallback)</div>
+  <div class="holder" id="subempty"></div>
+</div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="detail.jsx"></script>
+<script type="text/babel">
+  const instaPost = {
+    kind: 'instagram', trip: 'Miscellaneous Adventures', region: 'Mexico City', iso: 'mx',
+    date: 'Nov 2019', stampDate: '14 · 11 · 2019', handle: '@earthsandwich',
+    location: 'Biblioteca José Vasconcelos',
+    caption: 'The magical floating stacks blur a library visit with a trip through the Matrix.',
+    images: [198, 214, 176],
+  };
+  const subPost = {
+    kind: 'substack', trip: 'Miscellaneous Adventures', region: 'Oaxaca', iso: 'mx',
+    date: 'Feb 2024', no: 7, readMins: 5, handle: '@earthsandwich', hue: 188,
+    stampCode: 'OAX', stampYear: '2024',
+    location: 'Hierve el Agua',
+    title: 'On the abyss at Hierve el Agua',
+    coverLine: 'On the abyss at Hierve el Agua',
+    dek: 'A petrified waterfall, a hand-painted warning sign, and a long argument with myself about whether the most honest travel advice is just “do not approach.”',
+    body: [
+      'The sign at the top is hand-painted and entirely sincere. Naturally, everyone is at the abyss — leaning over it, photographing it, daring each other a half-step closer.',
+      { quote: '“For your safety, do not approach the abyss.”' },
+      'The water here has turned the cliff to stone mid-fall, frozen the way a story freezes the moment you start telling it to other people. From the right angle it pours forever and never moves an inch.',
+      { sub: 'The joy in everything' },
+      'Some places can find the joy in anything — even a thousand-foot drop gets a cheerful coat of paint and an orderly queue for photos. We left sunburned, slightly terrified, and completely charmed.',
+    ],
+  };
+
+  ReactDOM.createRoot(document.getElementById('insta')).render(
+    <PostDetail post={instaPost} embedded />
+  );
+  ReactDOM.createRoot(document.getElementById('sub')).render(
+    <PostDetail post={subPost} embedded />
+  );
+  ReactDOM.createRoot(document.getElementById('subtop')).render(
+    <PostDetail post={{ ...subPost, layout: 'top' }} embedded />
+  );
+  ReactDOM.createRoot(document.getElementById('subempty')).render(
+    <PostDetail post={{ ...subPost, noCover: true, no: 8, region: 'Medellín', iso: 'co', date: 'May 2019',
+      stampCode: 'MDE', stampYear: '2019', location: 'Plaza Botero',
+      title: 'Mom, casually fabulous, in the Plaza Botero',
+      dek: 'No cover shot survived the day — so the dispatch leads with its own stamp instead.',
+      body: [
+        'The plaza is full of round bronze giants and one woman entirely unbothered by all of them. She has the posture of someone who has decided the sculptures are lucky to share the square with her.',
+        { quote: 'Some places find the joy in anything; some people bring it with them.' },
+        'We only overlapped a couple of days before the parenting baton passed onward — but a couple of days in this plaza was plenty to refill the tank for the long way south.',
+      ] }} embedded />
+  );
+</script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+/* Travelogue App — UI kit layout & components.
+   POSTMARK direction, driven entirely by design-system tokens (styles.css). */
+
+.tg-app {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* ════════════════ Map pane ════════════════ */
+.tg-map {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(135% 110% at 32% 30%, var(--map-water) 0%, transparent 62%),
+    var(--map-land);
+}
+.tg-map-grid {
+  position: absolute; inset: -2px;
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 71px, var(--map-grid) 71px 72px),
+    repeating-linear-gradient(90deg, transparent 0 71px, var(--map-grid) 71px 72px);
+  -webkit-mask-image: radial-gradient(125% 100% at 50% 48%, #000 58%, transparent 100%);
+          mask-image: radial-gradient(125% 100% at 50% 48%, #000 58%, transparent 100%);
+}
+.tg-map-coord {
+  position: absolute; left: var(--space-4); bottom: var(--space-3);
+  font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.03em;
+  color: var(--ink-faint);
+}
+.tg-scale {
+  position: absolute; right: var(--space-4); bottom: var(--space-3);
+  display: flex; align-items: center; gap: 7px;
+  font-family: var(--font-mono); font-size: 10px; color: var(--ink-soft);
+}
+.tg-scale-bar { width: 46px; height: 5px; border: 1px solid var(--ink-soft); border-top: none; }
+
+/* ── Postmark motif (par-avion cancellation, top-right of map) ── */
+.tg-postmark { position: absolute; right: 30px; top: 26px; z-index: 4; width: 96px; height: 96px; transform: rotate(-12deg); pointer-events: none; }
+.tg-postmark-ring {
+  position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  box-shadow: inset 0 0 0 2px var(--accent); opacity: 0.78;
+}
+.tg-postmark-ring::before { content: ""; position: absolute; inset: 8px; border-radius: 50%; border: 1px dashed var(--accent); opacity: 0.7; }
+.tg-postmark-top, .tg-postmark-bot { font-family: var(--font-mono); font-size: 7.5px; letter-spacing: 0.16em; font-weight: 600; }
+.tg-postmark-star { font-size: 13px; line-height: 1; }
+.tg-cancel { position: absolute; right: -30px; width: 80px; height: 2px; background: var(--accent); opacity: 0.6; border-radius: 2px; transform: rotate(-12deg); }
+.tg-cancel:nth-of-type(1) { top: 30%; } .tg-cancel:nth-of-type(2) { top: 46%; } .tg-cancel:nth-of-type(3) { top: 62%; }
+
+/* ── Route: solid directional line + arrowheads ── */
+.tg-routelayer { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.tg-route { position: absolute; inset: 0; width: 100%; height: 100%; }
+.tg-route-main {
+  fill: none; stroke: var(--route); stroke-width: var(--route-width);
+  stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke;
+}
+.tg-route-planned {
+  fill: none; stroke: var(--route); stroke-width: var(--route-width); opacity: 0.45;
+  stroke-dasharray: var(--route-dash-planned); stroke-linecap: round; vector-effect: non-scaling-stroke;
+}
+.tg-arrow { position: absolute; transform: translate(-50%, -50%) rotate(var(--a)); }
+.tg-arrow-head {
+  display: block; width: 0; height: 0;
+  border-left: var(--arrow-size) solid var(--route);
+  border-top: 5.5px solid transparent; border-bottom: 5.5px solid transparent;
+  filter: drop-shadow(0 1px 1px rgba(28,40,34,.18));
+}
+
+/* ── Flag pins on poles (trimmed: flag fills the banner) ── */
+.tg-flag { position: absolute; width: 1.5px; height: var(--flag-pole-h); transform: translate(0, -100%); z-index: 3; }
+.tg-flag-pole { position: absolute; left: 0; top: 0; width: 1.5px; height: 100%; background: var(--flag-pole); border-radius: 1px; }
+.tg-flag-base {
+  position: absolute; left: -2px; bottom: -3px; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--flag-pole); box-shadow: 0 0 0 1.5px var(--map-land);
+}
+.tg-flag-banner {
+  position: absolute; left: 1.5px; top: 0; width: 21px; height: var(--flag-banner-h); padding: 0; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--flag-frame); border: 1px solid rgba(60,42,20,.22); border-radius: 2px;
+  box-shadow: var(--shadow-pin);
+  font-family: var(--font-mono); font-size: 8px; font-weight: 600; color: var(--ink-soft);
+  cursor: pointer; transition: transform var(--dur-fast) var(--ease-out);
+}
+/* trimmed flags: fill the banner edge-to-edge (slight crop acceptable) */
+.tg-flag-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tg-flag:hover .tg-flag-banner { transform: scale(1.12); transform-origin: bottom left; }
+.tg-flag.is-open { z-index: 5; }
+.tg-flag.is-open .tg-flag-banner {
+  border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent), var(--shadow-md);
+  transform: scale(1.2); transform-origin: bottom left;
+}
+.tg-flag.planned { opacity: 0.62; }
+.tg-flag.planned .tg-flag-pole, .tg-flag.planned .tg-flag-base { background: var(--ink-faint); }
+.tg-flag-name {
+  position: absolute; left: 26px; top: -2px; white-space: nowrap;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.02em;
+  color: var(--ink); background: var(--chip); border: 1px solid var(--line);
+  padding: 2px 7px; border-radius: var(--radius-pill); backdrop-filter: blur(4px);
+}
+
+/* ── Trip bar ── */
+.tg-tripbar {
+  position: absolute; top: var(--space-4); left: var(--space-4); z-index: 6;
+  display: flex; align-items: center; gap: var(--space-3);
+  background: var(--chip); border: 1px solid var(--line);
+  border-radius: var(--radius-lg); padding: 8px 14px 8px 10px;
+  box-shadow: var(--shadow-md); backdrop-filter: blur(8px);
+}
+.tg-burger { background: none; border: none; color: var(--ink); font-size: 17px; line-height: 1; padding: 2px 4px; border-radius: var(--radius-sm); }
+.tg-burger:hover { background: var(--surface-sunk); }
+.tg-tripbar-title { font-family: var(--font-display); font-weight: 600; font-size: var(--text-base); color: var(--ink); white-space: nowrap; }
+.tg-tripbar-count {
+  font-family: var(--font-mono); font-size: 10px; color: var(--ink-faint);
+  border-left: 1px solid var(--line); padding-left: var(--space-3); letter-spacing: 0.03em;
+}
+.tg-tripmenu {
+  position: absolute; top: calc(100% + 6px); left: 0; min-width: 230px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg); padding: 6px; display: flex; flex-direction: column; gap: 2px;
+}
+.tg-tripmenu-item {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+  background: none; border: none; text-align: left; padding: 9px 11px; border-radius: var(--radius-sm); color: var(--ink);
+}
+.tg-tripmenu-item:hover { background: var(--surface-sunk); }
+.tg-tripmenu-item.active { background: var(--accent-tint); }
+.tg-tripmenu-name { font-weight: 600; font-size: var(--text-sm); }
+.tg-tripmenu-meta { font-family: var(--font-mono); font-size: 10px; color: var(--ink-faint); }
+
+/* Back-to-trip pill (region view) */
+.tg-back {
+  background: none; border: none; color: var(--accent); font-family: var(--font-mono);
+  font-size: 11px; font-weight: 600; letter-spacing: 0.06em; padding: 2px 2px;
+}
+
+/* ════════════════ Sidebar ════════════════ */
+.tg-feed {
+  width: 380px; flex: 0 0 380px; background: var(--surface);
+  border-left: 1px solid var(--line); display: flex; flex-direction: column; overflow: hidden;
+}
+.tg-feed-head { padding: 26px 26px 20px; border-bottom: 1px solid var(--line); }
+.tg-feed-title { font-size: var(--text-2xl); margin-top: 8px; line-height: 1.04; font-style: italic; font-weight: 600; }
+.tg-feed-sub { font-size: var(--text-sm); color: var(--ink-soft); margin-top: 8px; }
+.tg-feed-sub .script { font-size: var(--text-lg); }
+.tg-feed-meta {
+  display: flex; align-items: center; gap: 9px; margin-top: 16px;
+  font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft);
+}
+.tg-feed-meta b { color: var(--ink); font-weight: 600; }
+.tg-feed-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--ink-faint); }
+
+.tg-feed-scroll { flex: 1; overflow-y: auto; padding: 18px 24px 28px; }
+.tg-feed-section {
+  font-family: var(--font-mono); text-transform: uppercase; letter-spacing: var(--tracking-label);
+  font-size: 9.5px; color: var(--ink-faint); font-weight: 600; margin-bottom: 16px;
+}
+
+/* ── Region tile (timeline) ── */
+.tg-tile { display: flex; gap: 14px; }
+.tg-tile-rail { display: flex; flex-direction: column; align-items: center; padding-top: 4px; flex: none; }
+.tg-dot { width: 13px; height: 13px; border-radius: 50%; border: 2px solid; flex: none; }
+.tg-dot.visited { background: var(--status-visited); border-color: var(--status-visited); }
+.tg-dot.planned { background: transparent; border-color: var(--status-planned); border-style: dashed; }
+.tg-dot.abandoned { background: transparent; border-color: var(--status-abandoned); border-style: dashed; }
+.tg-rail-line { width: 2px; flex: 1; background: var(--line); margin-top: 5px; min-height: 26px; }
+.tg-tile-body { flex: 1; min-width: 0; padding-bottom: 24px; }
+.tg-tile-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.tg-tile-name { font-size: var(--text-lg); line-height: 1.1; }
+.tg-tile.abandoned .tg-tile-name { color: var(--ink-faint); text-decoration: line-through; text-decoration-color: rgba(153,160,154,.6); }
+.tg-tile-date { font-family: var(--font-script); font-size: var(--text-lg); color: var(--accent); flex: none; white-space: nowrap; }
+.tg-tile-country {
+  font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em;
+  font-size: 10.5px; color: var(--ink-faint); margin-top: 3px; margin-bottom: 12px;
+}
+.tg-strip { display: flex; gap: 5px; margin-bottom: 12px; align-items: flex-start; flex-wrap: wrap; }
+/* photos framed like little prints — cream border + alternating tilt */
+.tg-photo {
+  width: 58px; height: 58px; position: relative; flex: none; padding: 3px 3px 3px; background: var(--flag-frame);
+  border: 1px solid var(--line); border-radius: 2px; cursor: pointer; box-shadow: 0 2px 6px rgba(60,40,20,.18);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.tg-photo-img { position: absolute; inset: 3px; display: block; border-radius: 1px; }
+.tg-strip .tg-photo:nth-child(odd) { transform: rotate(-2.2deg); }
+.tg-strip .tg-photo:nth-child(even) { transform: rotate(1.8deg); }
+.tg-photo:hover { transform: rotate(0) scale(1.05); z-index: 2; box-shadow: 0 4px 12px rgba(60,40,20,.26); }
+.tg-strip-more { align-self: center; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--ink-soft); padding-left: 3px; }
+.tg-note { font-family: var(--font-display); font-style: italic; font-size: var(--text-md); line-height: 1.45; color: var(--ink-soft); margin: 0 0 12px; }
+.tg-note.planned { color: var(--ink-faint); }
+
+/* ── Dispatch chip (links to the Substack post detail) ── */
+.tg-dispatch {
+  display: flex; align-items: center; gap: 9px; width: 100%; margin-bottom: 12px;
+  background: var(--surface-tint); border: 1px solid var(--line); border-radius: var(--radius-md);
+  padding: 8px 11px; color: var(--ink); text-align: left;
+  transition: background var(--dur-fast), border-color var(--dur-fast);
+}
+.tg-dispatch:hover { background: var(--accent-tint); border-color: var(--accent); }
+.tg-dispatch-badge { width: 20px; height: 20px; border-radius: 5px; background: var(--ink); color: #fff; font-family: var(--font-mono); font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: none; }
+.tg-dispatch-txt { flex: 1; font-size: 12.5px; color: var(--ink-soft); }
+.tg-dispatch-txt b { color: var(--ink); font-weight: 600; }
+.tg-dispatch-arr { color: var(--accent); font-weight: 700; }
+
+/* ── Buttons / pills ── */
+.tg-btn {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  font-family: var(--font-body); font-size: var(--text-sm); font-weight: 600;
+  border-radius: var(--radius-pill); padding: 7px 15px; border: 1px solid transparent;
+  transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast);
+}
+.tg-btn-ghost { background: none; border-color: var(--line-strong); color: var(--accent); }
+.tg-btn-ghost:hover { background: var(--accent-tint); border-color: var(--accent); }
+.tg-btn-primary { background: var(--accent); color: #fff; }
+.tg-btn-primary:hover { background: var(--accent-hover); }
+
+/* ════════════════ Stop detail modal ════════════════ */
+.tg-modal-overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; }
+.tg-modal-dim { position: absolute; inset: 0; background: rgba(28,32,30,.46); backdrop-filter: blur(3px); }
+.tg-modal {
+  position: relative; z-index: 1; width: 80%; max-width: 660px; max-height: 92vh;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg); padding: 30px 34px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.tg-modal-close {
+  position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: var(--radius-pill);
+  background: var(--surface-sunk); border: none; color: var(--ink-soft); font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+.tg-modal-close:hover { background: var(--line); color: var(--ink); }
+.tg-modal-crumb { font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.02em; }
+.tg-modal-crumb .sep { color: var(--line-strong); margin: 0 4px; }
+.tg-modal-crumb a { color: var(--accent); }
+.tg-modal-title { font-size: var(--text-xl); line-height: 1.18; font-style: italic; font-weight: 600; }
+.tg-modal-sub { font-size: var(--text-md); color: var(--ink-soft); line-height: var(--leading-snug); margin: 0; }
+.tg-modal-photo { width: 100%; aspect-ratio: 4 / 3; border-radius: var(--radius-lg); display: block; position: relative; overflow: hidden; }
+.tg-modal-photo .label {
+  position: absolute; left: 12px; bottom: 12px; font-family: var(--font-mono); font-size: 10px;
+  color: rgba(255,255,255,.92); background: rgba(28,32,30,.4); padding: 3px 8px; border-radius: var(--radius-pill);
+  backdrop-filter: blur(3px);
+}
+.tg-modal-nav {
+  position: absolute; z-index: 2; top: 50%; transform: translateY(-50%);
+  width: 44px; height: 44px; border-radius: var(--radius-pill);
+  background: var(--surface); border: 1px solid var(--line); color: var(--ink);
+  font-size: 22px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md);
+}
+.tg-modal-nav:hover:not(:disabled) { background: var(--surface-tint); }
+.tg-modal-nav:disabled { opacity: 0.32; cursor: default; }
+.tg-modal-prev { left: max(16px, calc(50% - 400px)); }
+.tg-modal-next { right: max(16px, calc(50% - 400px)); }
+
+/* scrollbars */
+.tg-feed-scroll, .tg-modal { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+.tg-feed-scroll::-webkit-scrollbar, .tg-modal::-webkit-scrollbar { width: 9px; }
+.tg-feed-scroll::-webkit-scrollbar-thumb, .tg-modal::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 5px; border: 2px solid var(--surface); }

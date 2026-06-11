@@ -1,0 +1,53 @@
+/* Travelogue — Color
+   "One bold accent on warm neutrals." Direction: POSTMARK.
+   Accent = postal red. Warm cream paper, warm near-black ink,
+   red for brand + visited status. */
+:root {
+  /* ── Paper & surfaces ── */
+  --paper: #F4EDDF;          /* app canvas / page background (warm cream) */
+  --surface: #FBF7EE;        /* sidebar, raised cards, modal (lifted cream) */
+  --surface-sunk: #EAE0CC;   /* wells, inputs */
+  --surface-tint: #F0E7D5;   /* subtle banded sections */
+
+  /* ── Ink (text) ── */
+  --ink: #2B2620;            /* primary text, headlines */
+  --ink-soft: #6C6253;       /* secondary text, body */
+  --ink-faint: #A99B82;      /* meta, captions, disabled */
+
+  /* ── Postal-red accent ramp ── */
+  --red-700: #9A2D1B;        /* pressed / strong */
+  --red-600: #C5402A;        /* PRIMARY accent */
+  --red-500: #D6543D;        /* hover lift */
+  --red-100: #F2DDD3;        /* soft tint fills */
+
+  --accent: var(--red-600);
+  --accent-strong: var(--red-700);
+  --accent-hover: var(--red-500);
+  --accent-tint: var(--red-100);
+
+  /* ── Journey status ── */
+  --status-visited: var(--red-600);   /* been there — postal red */
+  --status-planned: #B6AC95;          /* upcoming — warm neutral, hollow */
+  --status-abandoned: #9E9072;        /* skipped — faded sepia, struck out */
+
+  /* ── Lines & borders ── */
+  --line: #E3D8C2;
+  --line-strong: #D2C4A8;
+
+  /* ── Map (Postmark sepia style) ── */
+  --map-land: #E7DCC4;
+  --map-water: #F4ECD9;
+  --map-border: #D8CBAE;
+  --map-grid: rgba(120, 92, 52, 0.13);
+  --route: var(--red-600);
+  --flag-frame: #FBF7EE;
+  --flag-pole: #8A7A5C;
+  --chip: rgba(251, 247, 238, 0.86);   /* translucent cream for map overlays */
+
+  /* ── Semantic aliases ── */
+  --text-strong: var(--ink);
+  --text-body: var(--ink-soft);
+  --text-muted: var(--ink-faint);
+  --surface-card: var(--surface);
+  --bg-canvas: var(--paper);
+}

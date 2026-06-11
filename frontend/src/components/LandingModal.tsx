@@ -7,7 +7,7 @@ export default function LandingModal({ onDismiss }: LandingModalProps) {
     <div className="landing-overlay" role="dialog" aria-modal="true" aria-label="Welcome">
       <div className="landing-dim" />
       <div className="landing-card">
-        <h1 className="landing-headline">Earth Club Sandwich</h1>
+        <h1 className="landing-headline" style={{ fontStyle: 'italic' }}>Earth Club Sandwich</h1>
         <p className="landing-purpose">
           A round-the-world travelogue — following the route, stop by stop.
         </p>

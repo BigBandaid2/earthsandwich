@@ -1,0 +1,37 @@
+/* Travelogue — Typography. Direction: POSTMARK.
+   Newsreader (characterful serif) does display — italic for titles, like a
+   journal masthead. Hanken Grotesk carries body/UI. Caveat is reserved for
+   handwritten asides (dates, one-line notes). JetBrains Mono carries labels,
+   coordinates, counts — the "postal / cartographic" voice. */
+:root {
+  --font-display: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-body: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+  --font-script: 'Caveat', 'Segoe Script', cursive;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* ── Type scale ── */
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-md: 17px;
+  --text-lg: 20px;
+  --text-xl: 26px;
+  --text-2xl: 34px;
+  --text-3xl: 46px;
+
+  /* ── Line height ── */
+  --leading-tight: 1.08;
+  --leading-snug: 1.4;
+  --leading-body: 1.62;
+
+  /* ── Weight ── */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* ── Tracking ── */
+  --tracking-tight: -0.01em;   /* large serif display */
+  --tracking-normal: 0;
+  --tracking-label: 0.14em;    /* mono uppercase eyebrows/labels */
+}

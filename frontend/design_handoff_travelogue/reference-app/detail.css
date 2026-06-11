@@ -1,0 +1,259 @@
+/* Travelogue — Post Detail ("postcard spread"). Postmark direction.
+   Two variants share one frame: .pd-card[data-kind="instagram"] / [data-kind="substack"].
+   Token-driven (styles.css). */
+
+/* ── Overlay & frame ── */
+.pd-overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 28px; }
+.pd-dim { position: absolute; inset: 0; background: rgba(43,38,32,.5); backdrop-filter: blur(3px); }
+
+.pd-card {
+  position: relative; z-index: 1; width: 920px; max-width: 100%; max-height: 92vh;
+  display: grid; grid-template-columns: 1.32fr 1fr;
+  background: var(--surface); border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+.pd-card[data-kind="substack"] { grid-template-columns: 0.92fr 1.08fr; }
+
+/* embedded (showcase) cards grow to content instead of scrolling internally */
+.pd-card.is-embedded { max-height: none; }
+.pd-card.is-embedded .pd-body { overflow: visible; }
+
+/* perforated seam between the two panels, like a torn postcard */
+.pd-card::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: calc(1.32 / 2.32 * 100%);
+  width: 0; border-left: 2px dotted var(--line-strong); opacity: .8; pointer-events: none;
+}
+.pd-card[data-kind="substack"]::after { left: calc(0.92 / 2.0 * 100%); }
+
+/* ── Left: image panel ── */
+.pd-media {
+  position: relative; background: var(--surface-sunk); min-height: 420px;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.pd-photo { position: absolute; inset: 0; }
+.pd-photo .frame {
+  position: absolute; inset: 22px; border-radius: 2px; border: 6px solid var(--flag-frame);
+  box-shadow: 0 8px 22px rgba(43,38,32,.28); background-size: cover;
+}
+.pd-media .count {
+  position: absolute; top: 16px; left: 16px; z-index: 3;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .04em;
+  color: var(--ink); background: var(--chip); border: 1px solid var(--line);
+  padding: 3px 9px; border-radius: var(--radius-pill); backdrop-filter: blur(4px);
+}
+.pd-media .loc {
+  position: absolute; bottom: 34px; left: 34px; z-index: 3; max-width: 70%;
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .03em;
+  color: #fff; background: rgba(43,38,32,.52); padding: 4px 10px; border-radius: var(--radius-pill);
+  backdrop-filter: blur(3px);
+}
+.pd-dots { position: absolute; bottom: 16px; left: 0; right: 0; z-index: 3; display: flex; justify-content: center; gap: 6px; }
+.pd-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.55); transition: all var(--dur-fast); }
+.pd-dots i.on { background: #fff; width: 18px; border-radius: 3px; }
+.pd-arrow {
+  position: absolute; z-index: 4; top: 50%; transform: translateY(-50%);
+  width: 38px; height: 38px; border-radius: var(--radius-pill);
+  background: var(--chip); border: 1px solid var(--line); color: var(--ink);
+  font-size: 19px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm);
+}
+.pd-arrow:hover { background: var(--surface); }
+.pd-arrow.prev { left: 14px; } .pd-arrow.next { right: 14px; }
+
+/* substack cover */
+.pd-cover { position: relative; width: 100%; height: 100%; min-height: 420px; display: flex; flex-direction: column; justify-content: flex-end; padding: 26px; overflow: hidden; }
+/* legibility gradients so masthead + title read over any photo */
+.pd-cover::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgba(43,38,32,.42) 0%, transparent 22%),
+    linear-gradient(to top, rgba(43,38,32,.5) 0%, transparent 34%);
+}
+/* labeled photo slot (image state) */
+.pd-cover-slot {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase;
+  color: rgba(255,255,255,.82); padding: 16px 20px; border: 1px dashed rgba(255,255,255,.5); border-radius: var(--radius-md);
+}
+.pd-cover-slot .ic { font-size: 20px; letter-spacing: 0; }
+.pd-cover .masthead {
+  position: absolute; top: 24px; left: 26px; right: 26px; display: flex; align-items: center; gap: 10px; z-index: 1;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; font-weight: 600;
+  color: #fff;
+}
+.pd-cover .masthead .ln { flex: 1; height: 1px; background: rgba(255,255,255,.5); }
+.pd-cover .cover-title {
+  font-family: var(--font-display); font-style: italic; font-weight: 600; color: #fff;
+  font-size: 22px; line-height: 1.12; text-shadow: 0 1px 12px rgba(43,38,32,.4); position: relative; z-index: 1;
+}
+
+/* ── No-cover fallback: a designed typographic cover ── */
+.pd-cover.is-empty {
+  background: linear-gradient(158deg, var(--surface-tint), var(--surface-sunk));
+}
+.pd-cover.is-empty::before {
+  background-image: radial-gradient(circle at 1px 1px, rgba(120,92,52,.16) 1px, transparent 1.5px);
+  background-size: 13px 13px; opacity: .55;
+}
+.pd-cover.is-empty .masthead { color: var(--ink-soft); }
+.pd-cover.is-empty .masthead .ln { background: var(--line-strong); }
+.pd-cover.is-empty .cover-title { color: var(--ink); text-shadow: none; }
+.pd-cover.is-empty .cover-stamp {
+  top: 50%; left: 50%; right: auto; bottom: auto; transform: translate(-50%, -50%) rotate(-8deg);
+  width: 128px; height: 128px; border-color: var(--accent); color: var(--accent);
+  box-shadow: inset 0 0 0 2px var(--accent); opacity: .9;
+}
+.pd-cover.is-empty .cover-stamp::before { border-color: var(--accent); }
+.pd-cover.is-empty .cover-stamp .big { font-size: 30px; }
+.pd-cover .cover-stamp {
+  position: absolute; top: 64px; right: 24px; width: 78px; height: 78px; transform: rotate(-12deg); z-index: 1;
+  border-radius: 50%; border: 2px solid #fff; color: #fff; box-shadow: inset 0 0 0 2px #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; opacity: .9;
+}
+.pd-cover .cover-stamp::before { content: ""; position: absolute; inset: 7px; border-radius: 50%; border: 1px dashed #fff; opacity: .8; }
+.pd-cover .cover-stamp .s1, .pd-cover .cover-stamp .s2 { font-family: var(--font-mono); font-size: 7px; letter-spacing: .14em; font-weight: 600; }
+.pd-cover .cover-stamp .big { font-family: var(--font-display); font-style: italic; font-weight: 600; font-size: 17px; }
+
+/* ── Alt layout: cover as a horizontal top banner ── */
+.pd-card.is-top { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); max-width: 660px; }
+.pd-card.is-top::after { display: none; }
+
+.pd-banner { position: relative; min-height: 186px; display: flex; flex-direction: column; justify-content: space-between; padding: 22px 26px; overflow: hidden; }
+.pd-banner::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgba(43,38,32,.4) 0%, transparent 30%),
+    linear-gradient(to top, rgba(43,38,32,.58) 0%, transparent 46%);
+}
+.pd-banner .masthead {
+  position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; color: #fff;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; font-weight: 600;
+}
+.pd-banner .masthead .ln { flex: 1; height: 1px; background: rgba(255,255,255,.5); }
+.pd-banner-title {
+  position: relative; z-index: 1; max-width: 76%; margin: 0;
+  font-family: var(--font-display); font-style: italic; font-weight: 600; color: #fff;
+  font-size: 27px; line-height: 1.1; text-wrap: balance; text-shadow: 0 1px 12px rgba(43,38,32,.4);
+}
+.pd-banner .cover-stamp {
+  position: absolute; top: 50%; right: 26px; transform: translateY(-50%) rotate(-10deg); z-index: 1;
+  width: 74px; height: 74px; border-radius: 50%; border: 2px solid #fff; color: #fff; box-shadow: inset 0 0 0 2px #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; opacity: .92;
+}
+.pd-banner .cover-stamp::before { content: ""; position: absolute; inset: 7px; border-radius: 50%; border: 1px dashed #fff; opacity: .8; }
+.pd-banner .cover-stamp .s1, .pd-banner .cover-stamp .s2 { font-family: var(--font-mono); font-size: 7px; letter-spacing: .14em; font-weight: 600; }
+.pd-banner .cover-stamp .big { font-family: var(--font-display); font-style: italic; font-weight: 600; font-size: 16px; }
+
+/* no-cover banner → paper texture + ink */
+.pd-banner.is-empty { background: linear-gradient(120deg, var(--surface-tint), var(--surface-sunk)); }
+.pd-banner.is-empty::before { background: none; background-image: radial-gradient(circle at 1px 1px, rgba(120,92,52,.16) 1px, transparent 1.5px); background-size: 13px 13px; opacity: .55; }
+.pd-banner.is-empty .masthead { color: var(--ink-soft); }
+.pd-banner.is-empty .masthead .ln { background: var(--line-strong); }
+.pd-banner.is-empty .pd-banner-title { color: var(--ink); text-shadow: none; }
+.pd-banner.is-empty .cover-stamp { border-color: var(--accent); color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+.pd-banner.is-empty .cover-stamp::before { border-color: var(--accent); }
+/* in top layout the body starts straight into the read */
+.pd-card.is-top .pd-body { padding-top: 24px; }
+/* keep the masthead's "No." clear of the close button */
+.pd-card.is-top .pd-banner .masthead { padding-right: 40px; }
+
+/* ── Right: body panel ── */
+.pd-body { position: relative; padding: 30px 32px 28px; display: flex; flex-direction: column; overflow-y: auto; }
+.pd-crumb { display: flex; align-items: center; gap: 9px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); font-weight: 600; }
+.pd-crumb .flag { width: 18px; height: 12px; border-radius: 1px; object-fit: cover; border: 1px solid var(--line); }
+.pd-crumb .sep { color: var(--line-strong); }
+.pd-crumb .region { color: var(--ink-soft); }
+
+.pd-daterow { display: flex; align-items: baseline; gap: 20px; margin-top: 16px; justify-content: space-between; }
+.pd-date { font-family: var(--font-script); font-size: 28px; color: var(--accent); line-height: 1; white-space: nowrap; padding-right: 8px; }
+.pd-meta { font-family: var(--font-mono); font-size: 10px; color: var(--ink-faint); letter-spacing: .04em; }
+
+.pd-kicker { font-family: var(--font-mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-top: 18px; }
+.pd-title { font-family: var(--font-display); font-style: italic; font-weight: 600; color: var(--ink); margin-top: 8px; line-height: 1.12; }
+.pd-card[data-kind="instagram"] .pd-title { font-size: 25px; }
+.pd-card[data-kind="substack"] .pd-title { font-size: 24px; letter-spacing: -0.01em; margin: 14px 0 0; line-height: 1.16; text-wrap: balance; }
+
+.pd-caption { font-family: var(--font-display); font-style: italic; font-size: 18px; line-height: 1.5; color: var(--ink-soft); margin-top: 16px; }
+.pd-dek { font-size: 14.5px; line-height: 1.55; color: var(--ink-soft); margin-top: 12px; font-style: italic; font-family: var(--font-display); }
+.pd-prose { margin-top: 16px; }
+.pd-prose p { font-size: 14.5px; line-height: 1.68; color: var(--ink-soft); margin: 0 0 12px; }
+.pd-prose p:first-of-type::first-letter {
+  font-family: var(--font-display); font-style: italic; font-weight: 600; color: var(--accent);
+  font-size: 50px; line-height: .8; float: left; margin: 4px 8px 0 0;
+}
+.pd-sub { font-family: var(--font-display); font-style: italic; font-weight: 600; font-size: 18px; color: var(--ink); margin: 18px 0 8px; }
+.pd-quote {
+  margin: 18px 0; padding: 4px 0 4px 16px; border-left: 2px solid var(--accent);
+  font-family: var(--font-display); font-style: italic; font-size: 18px; line-height: 1.42; color: var(--ink);
+}
+
+/* end-of-article byline + subtle external link */
+.pd-end { margin-top: 22px; }
+.pd-end-rule { display: block; height: 1px; background: var(--line); margin-bottom: 14px; }
+.pd-end-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.pd-byline { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint); }
+.pd-byline .badge-s { width: 18px; height: 18px; border-radius: 5px; background: var(--ink); color: #fff; font-weight: 600; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+.pd-extlink {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .02em;
+  color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; padding-bottom: 1px;
+}
+.pd-extlink:hover { border-bottom-color: var(--accent); }
+.pd-extlink.is-soon { color: var(--ink-faint); cursor: default; }
+
+.pd-divider { height: 1px; background: var(--line); margin: 20px 0 16px; position: relative; }
+.pd-divider::before { content: "✶"; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); background: var(--surface); padding: 0 10px; color: var(--line-strong); font-size: 11px; }
+
+.pd-foot { margin-top: auto; padding-top: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.pd-card[data-kind="instagram"] .pd-body { justify-content: flex-start; }
+.pd-source { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint); }
+.pd-source .badge { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; }
+.pd-source .badge.ig { background: var(--accent); border-radius: 7px; }
+.pd-source .handle { color: var(--ink-soft); font-weight: 600; }
+
+.pd-read {
+  display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
+  font-family: var(--font-body); font-size: 13px; font-weight: 600;
+  background: var(--accent); color: #fff; border: none;
+  border-radius: var(--radius-pill); padding: 10px 18px;
+}
+.pd-read:hover { background: var(--accent-hover); }
+
+/* passport stamp flourish on instagram body */
+.pd-stamp {
+  position: absolute; right: 26px; bottom: 78px; transform: rotate(-9deg); pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 12px;
+  border: 2px solid var(--accent); border-radius: 3px; color: var(--accent);
+  box-shadow: inset 0 0 0 2px var(--accent); opacity: .42;
+}
+.pd-stamp .r { font-family: var(--font-mono); font-size: 7px; letter-spacing: .16em; font-weight: 600; }
+.pd-stamp .p { font-family: var(--font-display); font-style: italic; font-weight: 600; font-size: 14px; letter-spacing: .03em; }
+
+/* close + stop nav */
+.pd-close {
+  position: absolute; top: 14px; right: 14px; z-index: 6; width: 32px; height: 32px; border-radius: var(--radius-pill);
+  background: var(--chip); border: 1px solid var(--line); color: var(--ink-soft); font-size: 13px;
+  display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);
+}
+.pd-close:hover { background: var(--surface); color: var(--ink); }
+.pd-stopnav {
+  position: absolute; z-index: 2; top: 50%; transform: translateY(-50%);
+  width: 46px; height: 46px; border-radius: var(--radius-pill);
+  background: var(--surface); border: 1px solid var(--line); color: var(--ink);
+  font-size: 23px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md);
+}
+.pd-stopnav:hover:not(:disabled) { background: var(--surface-tint); }
+.pd-stopnav:disabled { opacity: .3; cursor: default; }
+.pd-stopnav.prev { left: max(10px, calc(50% - 520px)); }
+.pd-stopnav.next { right: max(10px, calc(50% - 520px)); }
+
+.pd-body::-webkit-scrollbar { width: 8px; }
+.pd-body::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 5px; border: 2px solid var(--surface); }
+
+/* responsive: stack on narrow */
+@media (max-width: 760px) {
+  .pd-card, .pd-card[data-kind="substack"] { grid-template-columns: 1fr; grid-template-rows: auto auto; max-height: 94vh; }
+  .pd-card::after { display: none; }
+  .pd-media, .pd-cover { min-height: 260px; }
+  .pd-stopnav { display: none; }
+}
