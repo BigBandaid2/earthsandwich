@@ -717,7 +717,7 @@ button { font: inherit; cursor: pointer; }
 
 .pd-card {
   position: relative; z-index: 1;
-  width: 920px; max-width: 100%; max-height: 92vh;
+  width: 60vw; max-width: 100%; max-height: calc(100vh - 56px);
   display: grid; grid-template-columns: 1.32fr 1fr;
   background: var(--surface);
   border: 1px solid var(--line-strong);
@@ -750,7 +750,7 @@ button { font: inherit; cursor: pointer; }
 .pd-media {
   position: relative;
   background: var(--surface-sunk);
-  min-height: 420px;
+  aspect-ratio: 1;
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
 }
@@ -1010,8 +1010,8 @@ button { font: inherit; cursor: pointer; }
 }
 .pd-stopnav:hover:not(:disabled) { background: var(--surface-tint); }
 .pd-stopnav:disabled { opacity: 0.3; cursor: default; }
-.pd-stopnav.prev { left: max(10px, calc(50% - 520px)); }
-.pd-stopnav.next { right: max(10px, calc(50% - 520px)); }
+.pd-stopnav.prev { left: max(10px, calc(50% - 30vw - 60px)); }
+.pd-stopnav.next { right: max(10px, calc(50% - 30vw - 60px)); }
 
 .pd-body::-webkit-scrollbar { width: 8px; }
 .pd-body::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 5px; border: 2px solid var(--surface); }
@@ -1094,7 +1094,8 @@ button { font: inherit; cursor: pointer; }
     max-height: 94vh;
   }
   .pd-card::after { display: none; }
-  .pd-media, .pd-cover { min-height: 260px; }
+  .pd-media { aspect-ratio: auto; min-height: 260px; }
+  .pd-cover { min-height: 260px; }
   .pd-stopnav { display: none; }
 }
 
