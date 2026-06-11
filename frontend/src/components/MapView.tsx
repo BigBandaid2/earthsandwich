@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { Map, AdvancedMarker, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
 import isoCountries from 'i18n-iso-countries';
@@ -128,6 +128,19 @@ function MapPolyline({
   const map = useMap();
   const mapsLib = useMapsLibrary('maps');
   const ROUTE_COLOR = '#C5402A';
+  const isZeroLength = path.length === 2 && path[0].lat === path[1].lat && path[0].lng === path[1].lng;
+  const arrowIcon = isZeroLength ? [] : [
+    {
+      icon: {
+        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+        scale: 3,
+        fillColor: ROUTE_COLOR,
+        fillOpacity: solid ? 1.0 : 0.45,
+        strokeWeight: 0,
+      },
+      offset: '50%',
+    },
+  ];
 
   useEffect(() => {
     if (!map || !mapsLib) return;
@@ -142,16 +155,7 @@ function MapPolyline({
             strokeOpacity: 1.0,
             strokeWeight: 2.4,
             icons: [
-              {
-                icon: {
-                  path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                  scale: 3,
-                  fillColor: ROUTE_COLOR,
-                  fillOpacity: 1,
-                  strokeWeight: 0,
-                },
-                offset: '50%',
-              },
+              ...arrowIcon
             ],
           }
         : {
@@ -168,6 +172,7 @@ function MapPolyline({
                 offset: '0',
                 repeat: '10px',
               },
+              ...arrowIcon
             ],
           }),
     });
@@ -305,22 +310,27 @@ function CountryClusterer({
   activeRegion,
   onSelectRegion,
   onClusterClick,
+  onClustersChanged,
 }: {
   groups: RegionGroup[];
   activeRegion: RegionGroup | null;
   onSelectRegion: (code: string) => void;
   onClusterClick: (regionCodes: string[]) => void;
+  onClustersChanged: (groupCodes: string[], positions: Map<string, { lat: number; lng: number }>) => void;
 }) {
   const map = useMap();
   const markerLib = useMapsLibrary('marker');
   const onSelectRef = useRef(onSelectRegion);
   const onClusterRef = useRef(onClusterClick);
+  const onClustersChangedRef = useRef(onClustersChanged);
   onSelectRef.current = onSelectRegion;
   onClusterRef.current = onClusterClick;
+  onClustersChangedRef.current = onClustersChanged;
 
   useEffect(() => {
     if (!map || !markerLib) return;
 
+    const groupCodes = groups.map((g) => g.region.code);
     const markerToCode = new WeakMap<object, string>();
     const markerEls = groups.map((group) => {
       const isActive = activeRegion?.region.code === group.region.code;
@@ -359,7 +369,25 @@ function CountryClusterer({
       },
     });
 
+    const reportClusters = () => {
+      const positions = new globalThis.Map<string, { lat: number; lng: number }>();
+      // clusters is protected in the type definition but is a real JS property
+      const clusters = (clusterer as unknown as { clusters: Array<{ markers?: object[]; position: google.maps.LatLng }> }).clusters;
+      clusters.forEach((cluster) => {
+        if ((cluster.markers?.length ?? 0) > 1) {
+          cluster.markers!.forEach((m) => {
+            const code = markerToCode.get(m);
+            if (code) positions.set(code, { lat: cluster.position.lat(), lng: cluster.position.lng() });
+          });
+        }
+      });
+      onClustersChangedRef.current(groupCodes, positions);
+    };
+
+    const clusteringEndListener = google.maps.event.addListener(clusterer, 'clusteringend', reportClusters);
+
     return () => {
+      google.maps.event.removeListener(clusteringEndListener);
       markerEls.forEach((m) => { m.map = null; });
       clusterer.setMap(null);
     };
@@ -385,6 +413,21 @@ function TripMap({
     [regionGroups],
   );
   const routedGroups = useMemo(() => getRoutedGroups(regionGroups), [regionGroups]);
+
+  const clusterPositionsRef = useRef(new globalThis.Map<string, { lat: number; lng: number }>());
+  const [clusterPositions, setClusterPositions] = useState(
+    () => new globalThis.Map<string, { lat: number; lng: number }>(),
+  );
+  const handleClustersChanged = useCallback(
+    (groupCodes: string[], positions: globalThis.Map<string, { lat: number; lng: number }>) => {
+      const next = new globalThis.Map(clusterPositionsRef.current);
+      groupCodes.forEach((code) => next.delete(code));
+      positions.forEach((pos, code) => next.set(code, pos));
+      clusterPositionsRef.current = next;
+      setClusterPositions(new globalThis.Map(next));
+    },
+    [],
+  );
 
   const { indivGroups, countryGroups } = useMemo(() => {
     const byCountry = new globalThis.Map<string, RegionGroup[]>();
@@ -427,7 +470,10 @@ function TripMap({
           return (
             <MapPolyline
               key={`${from.region.code}-${to.region.code}`}
-              path={[from.region.coords, to.region.coords]}
+              path={[
+                clusterPositions.get(from.region.code) ?? from.region.coords,
+                clusterPositions.get(to.region.code) ?? to.region.coords,
+              ]}
               solid={solid}
             />
           );
@@ -461,6 +507,7 @@ function TripMap({
             activeRegion={activeRegion}
             onSelectRegion={onSelectRegion}
             onClusterClick={onClusterClick}
+            onClustersChanged={handleClustersChanged}
           />
         ))}
       </Map>
