@@ -80,7 +80,7 @@
   background: var(--flag-pole); box-shadow: 0 0 0 1.5px var(--map-land);
 }
 .tg-flag-banner {
-  position: absolute; left: 1.5px; top: 0; width: 21px; height: var(--flag-banner-h); padding: 0; overflow: hidden;
+  position: absolute; left: 1.5px; top: 0; width: max-content; height: var(--flag-banner-h); padding: 0; overflow: hidden;
   display: flex; align-items: center; justify-content: center;
   background: var(--flag-frame); border: 1px solid rgba(60,42,20,.22); border-radius: 2px;
   box-shadow: var(--shadow-pin);
@@ -97,6 +97,7 @@
 }
 .tg-flag.planned { opacity: 0.62; }
 .tg-flag.planned .tg-flag-pole, .tg-flag.planned .tg-flag-base { background: var(--ink-faint); }
+.tg-flag.abandoned { opacity: 0.42; }
 .tg-flag-name {
   position: absolute; left: 26px; top: -2px; white-space: nowrap;
   font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.02em;

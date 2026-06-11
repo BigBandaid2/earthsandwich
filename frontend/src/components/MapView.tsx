@@ -12,6 +12,7 @@ import postmarkMapStyle from '../styles/postmark-map-style';
 isoCountries.registerLocale(enLocale);
 
 const MAP_ID = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID as string | undefined;
+const TRIP_MAP_ID = (import.meta.env.VITE_GOOGLE_MAPS_TRIP_MAP_ID as string | undefined) ?? MAP_ID;
 
 const COUNTRY_ALIASES: Record<string, string> = {
   'Micronesia': 'FM',
@@ -28,16 +29,18 @@ function FlagPin({
   country,
   isActive,
   isPlanned,
+  isAbandoned,
 }: {
   country: string;
   isActive: boolean;
   isPlanned: boolean;
+  isAbandoned: boolean;
 }) {
   const iso2 = getCountryIso2(country)?.toLowerCase();
 
   return (
     <span
-      className={`tg-flag${isActive ? ' is-open' : ''}${isPlanned ? ' planned' : ''}`}
+      className={`tg-flag${isActive ? ' is-open' : ''}${isPlanned ? ' planned' : ''}${isAbandoned ? ' abandoned' : ''}`}
       style={{ position: 'relative', display: 'inline-block' }}
     >
       <span className="tg-flag-pole" aria-hidden="true" />
@@ -68,11 +71,12 @@ function createFlagPinElement(
   country: string,
   isActive: boolean,
   isPlanned: boolean,
+  isAbandoned: boolean,
 ): HTMLElement {
   const iso2 = getCountryIso2(country)?.toLowerCase();
 
   const root = document.createElement('span');
-  root.className = `tg-flag${isActive ? ' is-open' : ''}${isPlanned ? ' planned' : ''}`;
+  root.className = `tg-flag${isActive ? ' is-open' : ''}${isPlanned ? ' planned' : ''}${isAbandoned ? ' abandoned' : ''}`;
   root.style.cssText = 'position:relative;display:inline-block';
 
   const pole = document.createElement('span');
@@ -321,10 +325,11 @@ function CountryClusterer({
     const markerEls = groups.map((group) => {
       const isActive = activeRegion?.region.code === group.region.code;
       const isPlanned = group.overallStatus === 'planned';
+      const isAbandoned = group.overallStatus === 'abandoned';
       const marker = new markerLib.AdvancedMarkerElement({
         position: group.region.coords,
         title: group.region.name,
-        content: createFlagPinElement(group.region.country, isActive, isPlanned),
+        content: createFlagPinElement(group.region.country, isActive, isPlanned, isAbandoned),
         gmpClickable: true,
       });
       marker.addEventListener('gmp-click', () => onSelectRef.current(group.region.code));
@@ -340,7 +345,7 @@ function CountryClusterer({
         render({ position }) {
           return new markerLib.AdvancedMarkerElement({
             position,
-            content: createFlagPinElement(country, false, false),
+            content: createFlagPinElement(country, false, false, false),
             gmpClickable: true,
           });
         },
@@ -405,7 +410,7 @@ function TripMap({
   return (
     <div className="map-canvas map-canvas-trip" aria-label="World trip overview map">
       <Map
-        mapId={MAP_ID}
+        mapId={TRIP_MAP_ID}
         defaultCenter={{ lat: 20, lng: -30 }}
         defaultZoom={2}
         gestureHandling="greedy"
@@ -413,7 +418,6 @@ function TripMap({
         disableDefaultUI={true}
         restriction={{ latLngBounds: { north: 85, south: -85, west: -180, east: 180 }, strictBounds: true }}
         style={{ width: '100%', height: '100%' }}
-        styles={postmarkMapStyle}
       >
         <FitBounds coords={regionCoords} padding={80} />
 
@@ -432,6 +436,7 @@ function TripMap({
         {indivGroups.map((group) => {
           const isActive = activeRegion?.region.code === group.region.code;
           const isPlanned = group.overallStatus === 'planned';
+          const isAbandoned = group.overallStatus === 'abandoned';
           return (
             <AdvancedMarker
               key={group.region.code}
@@ -443,6 +448,7 @@ function TripMap({
                 country={group.region.country}
                 isActive={isActive}
                 isPlanned={isPlanned}
+                isAbandoned={isAbandoned}
               />
             </AdvancedMarker>
           );

@@ -31,8 +31,6 @@ function TripFeed({ regionGroups, trip, onExpandRegion, onOpenStop }: TripFeedPr
         <div className="tg-feed-meta">
           <span><b>{stats.visited}</b> visited</span>
           <span className="tg-feed-meta-dot" />
-          <span><b>{stats.planned}</b> planned</span>
-          <span className="tg-feed-meta-dot" />
           <span><b>{stats.countries}</b> countries</span>
         </div>
       </div>

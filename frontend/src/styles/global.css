@@ -308,10 +308,10 @@ button { font: inherit; cursor: pointer; }
    ═══════════════════════════════════════════════ */
 
 .tg-flag {
-  position: absolute;
+  position: relative;
+  display: inline-block;
   width: 1.5px;
   height: var(--flag-pole-h);
-  transform: translate(0, -100%);
   z-index: 3;
 }
 .tg-flag-pole {
@@ -332,7 +332,9 @@ button { font: inherit; cursor: pointer; }
 .tg-flag-banner {
   position: absolute;
   left: 1.5px; top: 0;
-  width: 21px; height: var(--flag-banner-h);
+  width: max-content;
+  max-width: 24px;
+  height: var(--flag-banner-h);
   padding: 0; overflow: hidden;
   display: flex; align-items: center; justify-content: center;
   background: var(--flag-frame);
@@ -356,6 +358,7 @@ button { font: inherit; cursor: pointer; }
 .tg-flag.planned { opacity: 0.62; }
 .tg-flag.planned .tg-flag-pole,
 .tg-flag.planned .tg-flag-base { background: var(--ink-faint); }
+.tg-flag.abandoned { opacity: 0.42; }
 .tg-flag-name {
   position: absolute;
   left: 26px; top: -2px;
