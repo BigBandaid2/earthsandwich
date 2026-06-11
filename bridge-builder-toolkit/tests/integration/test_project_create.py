@@ -14,7 +14,7 @@ from typer.testing import CliRunner
 
 import cli
 
-FIXTURE_PILE = Path(__file__).parent.parent / "fixtures" / "pile.sample.tsv"
+FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
 TEST_DSN = os.environ.get("BRIDGE_TEST_TARGET_DSN", "")
 runner = CliRunner()
 
@@ -54,7 +54,7 @@ def test_valid_create_against_real_target(env):
     """US1 Independent Test, happy path: folder + config + validation report."""
     result = runner.invoke(cli.app, [
         "project", "create", "sample-pile-to-target",
-        "--pile", str(FIXTURE_PILE),
+        "--pile", str(FIXTURES_DIR),
         "--target", _descriptor(TEST_DSN),
         "--target-cred-env", "SAMPLE_PROJECT_TARGET_DSN",
     ])
@@ -75,20 +75,21 @@ def test_valid_create_against_real_target(env):
 
 def test_wrong_inputs_abort_cleanly_no_state(env, monkeypatch):
     """US1 Independent Test, failure path: clear errors, no project state (SC-017)."""
-    # Unreadable pile
+    # Missing named pile file
     r1 = runner.invoke(cli.app, [
         "project", "create", "broken-pile",
-        "--pile", str(env / "nope.tsv"),
+        "--pile", str(FIXTURES_DIR),
+        "--pile-files", "nope.tsv",
         "--target", _descriptor(TEST_DSN),
         "--target-cred-env", "SAMPLE_PROJECT_TARGET_DSN",
     ])
-    assert r1.exit_code == 1 and "pile not readable" in r1.output
+    assert r1.exit_code == 1 and "not found" in r1.output
 
     # Unreachable target (dead port)
     monkeypatch.setenv("DEAD_TARGET_DSN", "postgresql+psycopg://nobody:nope@localhost:59999/nodb")
     r2 = runner.invoke(cli.app, [
         "project", "create", "broken-target",
-        "--pile", str(FIXTURE_PILE),
+        "--pile", str(FIXTURES_DIR),
         "--target", "postgresql://dead-target",
         "--target-cred-env", "DEAD_TARGET_DSN",
     ])

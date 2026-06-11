@@ -160,6 +160,15 @@
 
 **Checkpoint**: US7 independently testable — `bridge_builder ui` serves localhost project CRUD + guided dashboards; CLI gains `project update`/`project delete`; UI and CLI effects are indistinguishable on disk.
 
+*Multi-file pile amendment (2026-06-11 clarification — a pile is a directory + frozen file selection):*
+
+- [x] T052 [US7] `common/config.py`: `PileConfig` becomes `dir` + `files[]` (frozen selection) with legacy single-`path` read compatibility; `project/create.py`: `--pile` is the directory, new selection resolver (`all` expands + freezes, named files must exist), per-file readability validation naming failures (FR-005/007)
+- [x] T053 [US7] `project/update.py` + `project/registry.py`: update accepts `--pile-files` (re-expands `all` against current dir contents), list shows dir + file count; `cli.py` gains `--pile-files` on create/update
+- [x] T054 [US7] UI: create form gains a "List files" step rendering the directory's files as checkboxes (all pre-checked; no listing yet ⇒ all); edit form shows current files pre-checked; server passes the checked set as the frozen selection
+- [x] T055 [US7] Tests: second fixture TSV; unit coverage for all-expansion freezing, named-missing-file error, per-file validation, UI list-files step + checkbox selection; existing suites updated to the dir+files shape
+
+**Checkpoint (amendment)**: a two-TSV pile (e.g. IG→Travelogue's `posts.ourearthsandwich.local.tsv` + `posts.welawen.local.tsv`) is selectable via CLI and UI; the stored selection is explicit; validation names unreadable files.
+
 ---
 
 ## Dependencies & Execution Order

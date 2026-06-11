@@ -28,10 +28,12 @@ $env:BRIDGE_TARGET_DSN = "postgresql://earthsandwich:earthsandwich@localhost:543
 
 ```pwsh
 bridge_builder project create "IG post scrape to Travelogue" `
-    --pile ../pile-app/pile/posts.ourearthsandwich.local.tsv `
+    --pile ../pile-app/pile `
+    --pile-files "posts.ourearthsandwich.local.tsv,posts.welawen.local.tsv" `
     --target $env:BRIDGE_TARGET_DSN `
     --target-cred-env BRIDGE_TARGET_DSN
 ```
+The pile is a **directory plus a frozen file selection** (`--pile-files all` selects everything currently there).
 Expect a validation report: pile **readable**, target **reachable + read + insert + delete** (the 002 stack grants all → the oracle loop will run). Folder `projects/IG post scrape to Travelogue/` is created with `project.yml`. **SC-001: under 5 minutes.**
 
 ```pwsh

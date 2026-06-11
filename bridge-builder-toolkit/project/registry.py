@@ -31,5 +31,8 @@ def format_project_lines(projects: list[BridgeProject]) -> str:
             status = "invalid"
         else:
             status = "valid (oracle: run)" if v.oracle_can_run else "valid (oracle: skip)"
-        lines.append(f"{p.name}  |  pile: {p.pile.path}  |  target env: {p.target.connection_env}  |  {status}")
+        lines.append(
+            f"{p.name}  |  pile: {p.pile.dir} ({len(p.pile.files)} files)  |  "
+            f"target env: {p.target.connection_env}  |  {status}"
+        )
     return "\n".join(lines)

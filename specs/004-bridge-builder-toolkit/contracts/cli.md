@@ -16,12 +16,13 @@ The toolkit exposes two operator surfaces over one shared core (FR-004): this CL
 
 ```
 bridge_builder project create <name> \
-    --pile <path> \
+    --pile <dir> \
+    [--pile-files <a.tsv,b.tsv | all>] \
     --target <dsn-or-schema-file-or-url> \
     --target-cred-env <ENV_VAR_NAME> \
     [--pile-sample head+random:200] [--force]
 ```
-- **US1 / FR-005–008, FR-011–012.** Creates `projects/<name>/`, writes `project.yml`, runs the **connection-validation step** (pile readable; target reachable + read/insert/delete probes) and records per-endpoint status.
+- **US1 / FR-005–008, FR-011–012.** `--pile` is the pile DIRECTORY; `--pile-files` selects one, multiple (comma-separated), or `all` of its files (default `all`). The selection is **frozen to an explicit file list** at creation — later-arriving files join only via `project update`. Creates `projects/<name>/`, writes `project.yml`, runs the **connection-validation step** (every selected pile file readable; target reachable + read/insert/delete probes) and records per-endpoint status.
 - v1 rejects a non-relational `--target` with a "deferred to a future version" message (FR-005 v1 scope).
 - Aborts cleanly with **no folder** if pile unreadable or target unreachable (FR-008). Refuses to overwrite an existing project without `--force` (FR-011).
 - **Output**: `project.yml` + a printed validation report (per-endpoint yes/no; whether the oracle loop will run or be skipped).
@@ -34,9 +35,9 @@ bridge_builder project list
 
 ## `project update`
 ```
-bridge_builder project update <name> [--pile <path>] [--pile-sample <spec>] [--target-cred-env <ENV_VAR_NAME>]
+bridge_builder project update <name> [--pile <dir>] [--pile-files <a.tsv,b.tsv | all>] [--pile-sample <spec>] [--target-cred-env <ENV_VAR_NAME>]
 ```
-- **US7 / FR-172, FR-176.** Applies the supplied edits and re-runs connection validation against the edited inputs BEFORE persisting; on failure the prior config is untouched. Acquires the project lock for the operation.
+- **US7 / FR-172, FR-176.** Applies the supplied edits (`--pile-files all` re-expands against the directory's CURRENT contents and freezes the new list) and re-runs connection validation against the edited inputs BEFORE persisting; on failure the prior config is untouched. Acquires the project lock for the operation.
 
 ## `project delete`
 ```

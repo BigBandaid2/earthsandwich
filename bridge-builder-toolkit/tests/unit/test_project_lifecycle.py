@@ -10,7 +10,7 @@ from project.delete import delete_project
 from project.status import stage_status, suggest_next_step
 from project.update import update_project
 
-FIXTURE_PILE = Path(__file__).parent.parent / "fixtures" / "pile.sample.tsv"
+FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
 
 
 @pytest.fixture
@@ -22,7 +22,7 @@ def env(tmp_path, monkeypatch):
 
 
 def _create(name="proj", **overrides):
-    kwargs = dict(pile=str(FIXTURE_PILE), target="sqlite://local", target_cred_env="LIFECYCLE_TEST_DSN")
+    kwargs = dict(pile=str(FIXTURES_DIR), pile_files="pile.sample.tsv", target="sqlite://local", target_cred_env="LIFECYCLE_TEST_DSN")
     kwargs.update(overrides)
     return create_project(name, **kwargs)
 
@@ -37,10 +37,16 @@ def test_update_revalidates_and_persists(env):
 def test_update_failure_leaves_prior_config(env):
     _create()
     before = (env / "projects" / "proj" / "project.yml").read_text(encoding="utf-8")
-    with pytest.raises(OperatorError, match="pile not readable"):
-        update_project("proj", pile=str(env / "missing.tsv"))
+    with pytest.raises(OperatorError, match="prior config left untouched"):
+        update_project("proj", pile=str(env / "missing-dir"))
     after = (env / "projects" / "proj" / "project.yml").read_text(encoding="utf-8")
     assert before == after                               # FR-172: untouched on failure
+
+
+def test_update_all_reexpands_and_freezes(env):
+    _create()
+    project, _ = update_project("proj", pile_files="all")
+    assert project.pile.files == ["pile.sample.tsv", "pile.sample2.tsv"]
 
 
 def test_update_requires_an_edit(env):

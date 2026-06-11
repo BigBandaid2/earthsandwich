@@ -1,0 +1,3 @@
+record_id	captured_at	note	place	lat	lng	attachment
+s0001	2024-04-02T08:15:00Z	Secondary feed first entry	Station C	40.6892	-74.0445	files/s0001.jpg
+s0002	2024-04-04T17:45:00Z	Maintenance window logged	Station D	35.6586	139.7454	files/s0002.jpg

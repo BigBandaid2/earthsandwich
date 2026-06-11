@@ -11,7 +11,8 @@ def test_config_round_trip(tmp_path):
         name="sample-project",
         created_at="2026-06-10T00:00:00+0000",
         pile=config.PileConfig(
-            path="./data/sample-pile.tsv",
+            dir="./data",
+            files=["sample-pile.tsv", "sample-pile2.tsv"],
             kind="tsv",
             sample=config.PileSample(strategy="head+random", size=200),
         ),

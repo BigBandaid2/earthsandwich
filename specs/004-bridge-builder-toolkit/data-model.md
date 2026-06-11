@@ -52,7 +52,10 @@ The **two loops are independent** (see spec Clarifications): the **data-profilin
 name: "IG post scrape to Travelogue"
 created_at: "2026-06-08T14:00:00+0000"
 pile:
-  path: "../../pile-app/pile/posts.ourearthsandwich.local.tsv"   # operator-supplied (FR-005)
+  dir: "../../pile-app/pile"           # operator-supplied pile directory (FR-005)
+  files:                               # frozen selection — "all" expands to this list at create/update
+    - "posts.ourearthsandwich.local.tsv"
+    - "posts.welawen.local.tsv"
   kind: "tsv"                          # tsv | relational (future)
   sample: { strategy: "head+random", size: 200 }                  # FR-028/FR-029
 target:

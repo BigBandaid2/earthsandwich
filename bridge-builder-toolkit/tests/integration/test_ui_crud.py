@@ -15,7 +15,7 @@ from typer.testing import CliRunner
 import cli
 from ui.server import create_app
 
-FIXTURE_PILE = Path(__file__).parent.parent / "fixtures" / "pile.sample.tsv"
+FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
 TEST_DSN = os.environ.get("BRIDGE_TEST_TARGET_DSN", "")
 
 
@@ -54,7 +54,7 @@ def test_full_ui_crud_pass_and_cli_parity(ctx):
     client, projects = ctx
     form = {
         "name": "ui-crud",
-        "pile": str(FIXTURE_PILE),
+        "pile": str(FIXTURES_DIR),
         "target": _descriptor(TEST_DSN),
         "target_cred_env": "UI_CRUD_TARGET_DSN",
         "pile_sample": "head+random:200",

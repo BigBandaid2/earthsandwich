@@ -78,6 +78,40 @@ def probe_pile(pile_path: Path) -> bool:
         return False
 
 
+def resolve_pile_selection(pile_dir: Path, spec: str) -> list[str]:
+    """Expand a file-selection spec against the pile directory (FR-005).
+
+    ``all`` freezes to the directory's CURRENT files, sorted; a comma-separated
+    list names files that must exist. Raises :class:`OperatorError` for a
+    missing/non-directory pile dir, an empty directory, or a missing named file.
+    """
+    if not pile_dir.is_dir():
+        raise OperatorError(f"pile directory not found (or not a directory): {pile_dir}")
+    if spec.strip().lower() == "all":
+        files = sorted(
+            entry.name
+            for entry in pile_dir.iterdir()
+            if entry.is_file() and not entry.name.startswith(".")   # dotfiles never join "all"
+        )
+        if not files:
+            raise OperatorError(f"pile directory contains no files: {pile_dir}")
+        return files
+    files = [part.strip() for part in spec.split(",") if part.strip()]
+    if not files:
+        raise OperatorError("empty pile-file selection; name files or use 'all'")
+    missing = [f for f in files if not (pile_dir / f).is_file()]
+    if missing:
+        raise OperatorError(f"pile file(s) not found in {pile_dir}: {', '.join(missing)}")
+    return files
+
+
+def validate_pile_files(pile_dir: Path, files: list[str]) -> None:
+    """Per-file readability gate (FR-007): every selected file must be readable."""
+    unreadable = [f for f in files if not probe_pile(pile_dir / f)]
+    if unreadable:
+        raise OperatorError(f"pile not readable: {', '.join(unreadable)} (in {pile_dir})")
+
+
 def probe_target(dsn: str) -> tuple[bool, bool, bool, bool, str]:
     """Return (reachable, read, insert, delete, note).
 
@@ -130,6 +164,7 @@ def create_project(
     pile: str,
     target: str,
     target_cred_env: str,
+    pile_files: str = "all",
     pile_sample: str = "head+random:200",
     force: bool = False,
     projects_dir: Path | None = None,
@@ -160,10 +195,9 @@ def create_project(
             "(credentials are never stored or passed on the CLI, FR-012)"
         )
 
-    pile_path = Path(pile)
-    pile_readable = probe_pile(pile_path)
-    if not pile_readable:
-        raise OperatorError(f"pile not readable: {pile_path} (FR-008 — no project created)")
+    pile_dir = Path(pile)
+    selection = resolve_pile_selection(pile_dir, pile_files)   # "all" freezes to an explicit list here
+    validate_pile_files(pile_dir, selection)
 
     reachable, read, insert, delete, note = probe_target(dsn)
     if not reachable:
@@ -183,7 +217,7 @@ def create_project(
     project = BridgeProject(
         name=name,
         created_at=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S%z"),
-        pile=PileConfig(path=str(pile), kind="tsv", sample=sample),
+        pile=PileConfig(dir=str(pile), files=selection, kind="tsv", sample=sample),
         target=TargetConfig(connection_env=target_cred_env, kind="relational"),
         validation=validation,
     )
@@ -202,7 +236,7 @@ def format_validation_report(project: BridgeProject) -> str:
     yn = lambda b: "yes" if b else "NO"  # noqa: E731
     lines = [
         f"Project: {project.name}",
-        f"  pile readable:    {yn(v.pile_readable)}  ({project.pile.path})",
+        f"  pile readable:    {yn(v.pile_readable)}  ({project.pile.describe()})",
         f"  target reachable: {yn(v.target_reachable)}  (env: {project.target.connection_env})",
         f"  target read:      {yn(v.target_read)}",
         f"  target insert:    {yn(v.target_insert)}",

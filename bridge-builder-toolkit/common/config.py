@@ -22,9 +22,14 @@ class PileSample:
 
 @dataclass
 class PileConfig:
-    path: str                              # operator-supplied, relative for movability (FR-005)
+    dir: str                               # operator-supplied pile DIRECTORY, relative for movability (FR-005)
+    files: list[str] = field(default_factory=list)   # frozen selection — "all" expands at create/update
     kind: str = "tsv"                      # tsv | relational (future)
     sample: PileSample = field(default_factory=PileSample)
+
+    def describe(self) -> str:
+        count = len(self.files)
+        return f"{self.dir} ({count} file{'s' if count != 1 else ''}: {', '.join(self.files)})"
 
 
 @dataclass
@@ -71,7 +76,8 @@ class BridgeProject:
             "name": self.name,
             "created_at": self.created_at,
             "pile": {
-                "path": self.pile.path,
+                "dir": self.pile.dir,
+                "files": list(self.pile.files),
                 "kind": self.pile.kind,
                 "sample": {"strategy": self.pile.sample.strategy, "size": self.pile.sample.size},
             },
@@ -87,11 +93,20 @@ class BridgeProject:
         val_raw = data.get("validation") or {}
         known = ConnectionValidationResult.__dataclass_fields__
         validation = ConnectionValidationResult(**{k: v for k, v in val_raw.items() if k in known})
+        pile_dir = pile_raw.get("dir", "")
+        pile_files = list(pile_raw.get("files") or [])
+        legacy_path = pile_raw.get("path")
+        if legacy_path and not pile_dir:                 # pre-multi-file project.yml compatibility
+            from pathlib import PurePath
+
+            parsed = PurePath(legacy_path)
+            pile_dir, pile_files = str(parsed.parent), [parsed.name]
         return cls(
             name=data["name"],
             created_at=data.get("created_at"),
             pile=PileConfig(
-                path=pile_raw.get("path", ""),
+                dir=pile_dir,
+                files=pile_files,
                 kind=pile_raw.get("kind", "tsv"),
                 sample=PileSample(
                     strategy=sample_raw.get("strategy", "head+random"),

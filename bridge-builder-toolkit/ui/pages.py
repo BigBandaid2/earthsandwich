@@ -104,7 +104,7 @@ def render_project_list(projects: list[BridgeProject]) -> str:
     if projects:
         rows = "".join(
             f'<tr><td><a href="{project_url(p.name)}">{_e(p.name)}</a></td>'
-            f"<td>{_e(p.pile.path)}</td><td><code>{_e(p.target.connection_env)}</code></td>"
+            f"<td>{_e(p.pile.dir)} ({len(p.pile.files)} files)</td><td><code>{_e(p.target.connection_env)}</code></td>"
             f"<td>{_validation_badge(p)}</td></tr>"
             for p in projects
         )
@@ -126,7 +126,32 @@ def _form_field(label: str, name: str, value: str = "", placeholder: str = "") -
     )
 
 
-def render_create_form(error: str | None = None, values: dict[str, str] | None = None) -> str:
+def _file_selection_html(file_choices: list[tuple[str, bool]] | None, *, list_label: str) -> str:
+    """Checkbox block for the pile-file selection (FR-172), plus the list/re-list action."""
+    list_button = f'<button type="submit" name="action" value="list_files">{_e(list_label)}</button>'
+    if file_choices is None:
+        return (
+            list_button
+            + '<small class="note">No file selection made yet - creating now selects ALL files '
+            "currently in the directory (frozen to an explicit list).</small>"
+        )
+    boxes = "".join(
+        f'<label><span><input type="checkbox" name="files" value="{_e(fname)}"{" checked" if checked else ""}> '
+        f"{_e(fname)}</span></label>"
+        for fname, checked in file_choices
+    )
+    return (
+        '<input type="hidden" name="files_listed" value="1">'
+        f'<div class="card-body" style="padding:0">{boxes or "<p>(directory has no files)</p>"}</div>'
+        + list_button
+    )
+
+
+def render_create_form(
+    error: str | None = None,
+    values: dict[str, str] | None = None,
+    file_choices: list[tuple[str, bool]] | None = None,
+) -> str:
     v = values or {}
     err = f'<div class="error">{_e(error)}</div>' if error else ""
     body = (
@@ -134,19 +159,24 @@ def render_create_form(error: str | None = None, values: dict[str, str] | None =
         + '<section class="card"><div class="card-head"><h2>New bridge project</h2></div><div class="card-body">'
         '<form class="stack" method="post" action="/projects">'
         + _form_field("Project name", "name", v.get("name", ""))
-        + _form_field("Pile path (file-based data deposit, e.g. a TSV)", "pile", v.get("pile", ""))
+        + _form_field("Pile DIRECTORY (deposit of extracted source files)", "pile", v.get("pile", ""))
+        + _file_selection_html(file_choices, list_label="List files in this directory")
         + _form_field("Target descriptor (relational DSN shape; never persisted)", "target", v.get("target", ""), "postgresql://host/db")
         + _form_field("Credential env-var NAME holding the target DSN (FR-012)", "target_cred_env", v.get("target_cred_env", ""), "MY_PROJECT_TARGET_DSN")
         + _form_field("Pile sample spec", "pile_sample", v.get("pile_sample", "head+random:200"))
         + '<label><span><input type="checkbox" name="force" value="1"> overwrite an existing project (--force)</span></label>'
-        + "<button type=submit>Create + validate</button>"
+        + '<button type="submit" name="action" value="create">Create + validate</button>'
         + '<small class="note">The credential VALUE is read from the named env var in the server\'s environment - it is never entered here, rendered, or persisted.</small>'
         + "</form></div></section>"
     )
     return layout("new project", body)
 
 
-def render_edit_form(project: BridgeProject, error: str | None = None) -> str:
+def render_edit_form(
+    project: BridgeProject,
+    error: str | None = None,
+    file_choices: list[tuple[str, bool]] | None = None,
+) -> str:
     err = f'<div class="error">{_e(error)}</div>' if error else ""
     name = project.name
     body = (
@@ -154,10 +184,11 @@ def render_edit_form(project: BridgeProject, error: str | None = None) -> str:
         + f'<section class="card"><div class="card-head"><h2>Edit: {_e(name)}</h2>'
         f'<span class="badge">name is immutable</span></div><div class="card-body">'
         f'<form class="stack" method="post" action="{project_url(name, "update")}">'
-        + _form_field("Pile path", "pile", project.pile.path)
+        + _form_field("Pile DIRECTORY", "pile", project.pile.dir)
+        + _file_selection_html(file_choices, list_label="Re-list files (after changing the directory)")
         + _form_field("Pile sample spec", "pile_sample", f"{project.pile.sample.strategy}:{project.pile.sample.size}")
         + _form_field("Credential env-var NAME", "target_cred_env", project.target.connection_env)
-        + "<button type=submit>Re-validate + save</button>"
+        + '<button type="submit" name="action" value="save">Re-validate + save</button>'
         + '<small class="note">Validation re-runs against these inputs BEFORE anything persists; on failure the prior config is untouched.</small>'
         + "</form></div></section>"
     )
@@ -191,7 +222,7 @@ def render_dashboard(
         )
 
     validation_html = (
-        f"<pre>pile readable:    {yn(v.pile_readable)}  ({_e(project.pile.path)})\n"
+        f"<pre>pile readable:    {yn(v.pile_readable)}  ({_e(project.pile.describe())})\n"
         f"target reachable: {yn(v.target_reachable)}  (env: {_e(project.target.connection_env)})\n"
         f"target read:      {yn(v.target_read)}\n"
         f"target insert:    {yn(v.target_insert)}\n"

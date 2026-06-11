@@ -18,8 +18,9 @@ from project.create import (
     OperatorError,
     _parse_sample,
     default_projects_dir,
-    probe_pile,
     probe_target,
+    resolve_pile_selection,
+    validate_pile_files,
 )
 
 
@@ -27,6 +28,7 @@ def update_project(
     name: str,
     *,
     pile: str | None = None,
+    pile_files: str | None = None,
     pile_sample: str | None = None,
     target_cred_env: str | None = None,
     projects_dir: Path | None = None,
@@ -37,8 +39,10 @@ def update_project(
     if not (project_dir / "project.yml").is_file():
         raise OperatorError(f"no project named {name!r} under {projects_root}")
 
-    if pile is None and pile_sample is None and target_cred_env is None:
-        raise OperatorError("nothing to update — pass at least one of --pile / --pile-sample / --target-cred-env")
+    if pile is None and pile_files is None and pile_sample is None and target_cred_env is None:
+        raise OperatorError(
+            "nothing to update — pass at least one of --pile / --pile-files / --pile-sample / --target-cred-env"
+        )
 
     lock = ProjectLock(project_dir)
     try:
@@ -50,11 +54,22 @@ def update_project(
 
         # Apply edits to an in-memory candidate; disk stays untouched until validation passes.
         if pile is not None:
-            project.pile.path = pile
+            project.pile.dir = pile
         if pile_sample is not None:
             project.pile.sample = _parse_sample(pile_sample)
         if target_cred_env is not None:
             project.target.connection_env = target_cred_env
+
+        # Re-resolve the file selection: an explicit/--pile-files "all" re-expands and
+        # freezes against the directory's CURRENT contents; otherwise the existing
+        # frozen selection is re-checked against the (possibly new) directory.
+        selection_spec = pile_files if pile_files is not None else ",".join(project.pile.files) or "all"
+        pile_dir = Path(project.pile.dir)
+        try:
+            project.pile.files = resolve_pile_selection(pile_dir, selection_spec)
+            validate_pile_files(pile_dir, project.pile.files)
+        except OperatorError as exc:
+            raise OperatorError(f"{exc} — prior config left untouched")
 
         dsn = os.environ.get(project.target.connection_env, "")
         if not dsn:
@@ -62,9 +77,6 @@ def update_project(
                 f"env var {project.target.connection_env!r} is not set; export the target DSN there "
                 "(credentials are never stored or passed on the CLI, FR-012)"
             )
-
-        if not probe_pile(Path(project.pile.path)):
-            raise OperatorError(f"pile not readable: {project.pile.path} — prior config left untouched")
 
         reachable, read, insert, delete, note = probe_target(dsn)
         if not reachable:

@@ -35,9 +35,10 @@ def _stub(stage: str) -> None:
 @project_app.command("create")
 def project_create(
     name: str = typer.Argument(..., help="Project name (unique per installation)."),
-    pile: str = typer.Option(..., "--pile", help="Path to the pile (a local file-based data deposit, e.g. a TSV)."),
+    pile: str = typer.Option(..., "--pile", help="Pile DIRECTORY (a local deposit of extracted source data)."),
     target: str = typer.Option(..., "--target", help="Target endpoint descriptor (relational DSN shape; never persisted)."),
     target_cred_env: str = typer.Option(..., "--target-cred-env", help="ENV VAR NAME holding the target DSN (FR-012)."),
+    pile_files: str = typer.Option("all", "--pile-files", help="File selection: comma-separated names, or 'all' (frozen to an explicit list at creation)."),
     pile_sample: str = typer.Option("head+random:200", "--pile-sample", help="Pile sampling spec '<strategy>:<size>'."),
     force: bool = typer.Option(False, "--force", help="Overwrite an existing project (FR-011)."),
 ) -> None:
@@ -47,7 +48,7 @@ def project_create(
     try:
         project, project_dir = create_project(
             name, pile=pile, target=target, target_cred_env=target_cred_env,
-            pile_sample=pile_sample, force=force,
+            pile_files=pile_files, pile_sample=pile_sample, force=force,
         )
     except OperatorError as exc:
         typer.echo(f"[bridge_builder] error: {exc}")
@@ -67,7 +68,8 @@ def project_list() -> None:
 @project_app.command("update")
 def project_update(
     name: str = typer.Argument(..., help="Project to update (the name itself is immutable)."),
-    pile: str = typer.Option(None, "--pile", help="New pile path."),
+    pile: str = typer.Option(None, "--pile", help="New pile DIRECTORY."),
+    pile_files: str = typer.Option(None, "--pile-files", help="New file selection: comma-separated names, or 'all' (re-expands + freezes against the current directory)."),
     pile_sample: str = typer.Option(None, "--pile-sample", help="New sampling spec '<strategy>:<size>'."),
     target_cred_env: str = typer.Option(None, "--target-cred-env", help="New ENV VAR NAME holding the target DSN."),
 ) -> None:
@@ -76,7 +78,9 @@ def project_update(
     from project.update import update_project
 
     try:
-        project, _ = update_project(name, pile=pile, pile_sample=pile_sample, target_cred_env=target_cred_env)
+        project, _ = update_project(
+            name, pile=pile, pile_files=pile_files, pile_sample=pile_sample, target_cred_env=target_cred_env
+        )
     except OperatorError as exc:
         typer.echo(f"[bridge_builder] error: {exc}")
         raise typer.Exit(code=1)

@@ -8,7 +8,7 @@ from common import locking
 from project.create import create_project
 from ui.server import create_app
 
-FIXTURE_PILE = Path(__file__).parent.parent / "fixtures" / "pile.sample.tsv"
+FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
 
 
 @pytest.fixture
@@ -23,13 +23,42 @@ def ctx(tmp_path, monkeypatch):
 def _create_form(name="ui-proj", **overrides):
     form = {
         "name": name,
-        "pile": str(FIXTURE_PILE),
+        "pile": str(FIXTURES_DIR),
         "target": "sqlite://local",
         "target_cred_env": "UI_TEST_DSN",
         "pile_sample": "head+random:200",
     }
     form.update(overrides)
     return form
+
+
+def test_list_files_step_then_partial_selection(ctx):
+    client, projects, _ = ctx
+    listing = client.post("/projects", data=dict(_create_form(name="multi"), action="list_files"))
+    assert listing.status_code == 200
+    assert "pile.sample.tsv" in listing.text and "pile.sample2.tsv" in listing.text   # checkboxes
+
+    form = dict(_create_form(name="multi"), action="create", files_listed="1")
+    response = client.post("/projects", data={**form, "files": ["pile.sample2.tsv"]}, follow_redirects=True)
+    assert response.status_code == 200
+    persisted = (projects / "multi" / "project.yml").read_text(encoding="utf-8")
+    assert "pile.sample2.tsv" in persisted and "pile.sample.tsv" not in persisted     # frozen partial selection
+
+
+def test_listed_but_nothing_selected_is_inline_error(ctx):
+    client, projects, _ = ctx
+    form = dict(_create_form(name="none-picked"), action="create", files_listed="1")
+    response = client.post("/projects", data=form)
+    assert response.status_code == 400 and "select at least one pile file" in response.text
+    assert not (projects / "none-picked").exists()
+
+
+def test_create_without_listing_freezes_all(ctx):
+    client, projects, _ = ctx
+    client.post("/projects", data=_create_form(name="all-proj"), follow_redirects=True)
+    persisted = (projects / "all-proj" / "project.yml").read_text(encoding="utf-8")
+    assert "pile.sample.tsv" in persisted and "pile.sample2.tsv" in persisted
+    assert "files: all" not in persisted
 
 
 def test_root_redirects_to_projects(ctx):
@@ -86,8 +115,8 @@ def test_update_failure_inline_prior_config_untouched(ctx):
     client, projects, _ = ctx
     client.post("/projects", data=_create_form())
     before = (projects / "ui-proj" / "project.yml").read_text(encoding="utf-8")
-    response = client.post("/projects/ui-proj/update", data={"pile": "C:/nope/missing.tsv"})
-    assert response.status_code == 400 and "pile not readable" in response.text
+    response = client.post("/projects/ui-proj/update", data={"pile": "C:/nope/missing-dir"})
+    assert response.status_code == 400 and "prior config left untouched" in response.text
     assert (projects / "ui-proj" / "project.yml").read_text(encoding="utf-8") == before
 
 
