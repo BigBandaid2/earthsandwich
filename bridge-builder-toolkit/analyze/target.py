@@ -109,9 +109,11 @@ def run_target_analysis(
 ) -> dict[str, Path]:
     """Produce target ydata profile + ER diagram + enhanced playground in the current iteration."""
     analyst = _require_analyst(analyst)
-    dsn = os.environ.get(project.target.connection_env, "")
+    from project.secrets import resolve_target_dsn
+
+    dsn = resolve_target_dsn(project, project_dir)
     if not dsn:
-        raise OperatorError(f"env var {project.target.connection_env!r} is not set (FR-012)")
+        raise OperatorError("target connection unavailable — re-validate the project (FR-012)")
 
     schema = reflect_schema(dsn)
     iteration_dir = allocate_iteration(project, project_dir, TARGET_RAW)

@@ -1,17 +1,31 @@
-"""Project configuration: project.yml load/save + the Bridge Project model (T005).
+"""Project configuration: project.yml load/save + the Bridge Project model.
 
-All paths inside a project are stored relative or as env-var *names* — never
-absolute, never secrets — so the App stays movable (FR-003, FR-012).
+Redesign (2026-06-13): a pile is one or more **directories** (data | media); a
+relational endpoint records its discrete connection (never the password — that
+lives only in the gitignored `.secrets`, FR-012). Identity is a **slug** derived
+from the name (FR-180). Endpoints are symmetric (pile or target may be file or
+relational). Pre-redesign `project.yml` shapes (single `dir`/`files`/`path`,
+`target.connection_env`) are still read.
 """
 from __future__ import annotations
 
+import re
 from dataclasses import asdict, dataclass, field
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import Any
 
 import yaml
 
 PROJECT_FILE = "project.yml"
+
+#: SQLAlchemy driver pinned per engine (psycopg 3 for postgres; others best-effort).
+_ENGINE_DRIVER = {"postgresql": "postgresql+psycopg", "postgres": "postgresql+psycopg"}
+
+
+def derive_slug(name: str) -> str:
+    """Lowercase, hyphen-separated, filesystem-safe identity from a name (FR-180)."""
+    slug = re.sub(r"[^a-z0-9]+", "-", name.strip().lower()).strip("-")
+    return slug or "project"
 
 
 @dataclass
@@ -21,21 +35,58 @@ class PileSample:
 
 
 @dataclass
+class PileDirectory:
+    path: str                              # operator-supplied, relative for movability
+    kind: str = "data"                     # data | media (FR-182)
+    files: list[str] = field(default_factory=list)   # data: frozen selection; media: empty
+    catalogue: dict[str, Any] | None = None          # media: {count, types: {ext: n}, bytes}
+
+
+@dataclass
 class PileConfig:
-    dir: str                               # operator-supplied pile DIRECTORY, relative for movability (FR-005)
-    files: list[str] = field(default_factory=list)   # frozen selection — "all" expands at create/update
-    kind: str = "tsv"                      # tsv | relational (future)
+    directories: list[PileDirectory] = field(default_factory=list)
+    kind: str = "file"                     # file | relational (endpoint symmetry)
     sample: PileSample = field(default_factory=PileSample)
 
+    def data_files(self) -> list[tuple[str, str]]:
+        """(directory_path, filename) for every selected data file across directories."""
+        return [(d.path, f) for d in self.directories if d.kind == "data" for f in d.files]
+
     def describe(self) -> str:
-        count = len(self.files)
-        return f"{self.dir} ({count} file{'s' if count != 1 else ''}: {', '.join(self.files)})"
+        n = len(self.data_files())
+        dirs = len(self.directories)
+        return f"{dirs} director{'y' if dirs == 1 else 'ies'}, {n} data file{'' if n == 1 else 's'}"
+
+
+@dataclass
+class TargetConnection:
+    engine: str
+    host: str
+    port: int
+    database: str
+    user: str
+
+    def dsn(self, password: str) -> str:
+        driver = _ENGINE_DRIVER.get(self.engine, self.engine)
+        return f"{driver}://{self.user}:{password}@{self.host}:{self.port}/{self.database}"
+
+    def descriptor(self) -> str:           # credential-free, for display
+        return f"{self.engine}://{self.host}:{self.port}/{self.database}"
 
 
 @dataclass
 class TargetConfig:
-    connection_env: str                    # env-var NAME, never the secret (FR-012)
-    kind: str = "relational"               # v1: relational only (FR-005 v1 scope)
+    kind: str = "relational"               # relational | file (endpoint symmetry; v1 target = relational)
+    connection: TargetConnection | None = None
+    secret_ref: str | None = None          # key under which the DSN lives in .secrets
+    connection_env: str | None = None      # legacy: env-var NAME (pre-redesign projects)
+
+    def describe(self) -> str:
+        if self.connection is not None:
+            return self.connection.descriptor()
+        if self.connection_env:
+            return f"env:{self.connection_env}"
+        return "(unconfigured)"
 
 
 @dataclass
@@ -52,73 +103,104 @@ class ConnectionValidationResult:
 
     @property
     def is_creatable(self) -> bool:
-        """FR-008: a project may be created only if pile + target are reachable."""
         return self.pile_readable and self.target_reachable
 
     @property
     def oracle_can_run(self) -> bool:
-        """FR-070 / FR-075: the oracle loop runs only with insert+delete permission."""
         return self.target_insert and self.target_delete
 
 
 @dataclass
 class BridgeProject:
-    name: str
+    name: str                              # display label
+    slug: str                              # identity = folder name (FR-180)
     pile: PileConfig
     target: TargetConfig
+    description: str = ""                  # markdown ≤4000 chars (FR-181)
     created_at: str | None = None
     validation: ConnectionValidationResult = field(default_factory=ConnectionValidationResult)
 
     # ---- serialization (explicit, to keep the project.yml shape stable) ----
 
     def to_dict(self) -> dict[str, Any]:
+        target: dict[str, Any] = {"kind": self.target.kind}
+        if self.target.connection is not None:
+            target["connection"] = asdict(self.target.connection)
+            target["secret_ref"] = self.target.secret_ref
+        elif self.target.connection_env:
+            target["connection_env"] = self.target.connection_env
         return {
             "name": self.name,
+            "slug": self.slug,
+            "description": self.description,
             "created_at": self.created_at,
             "pile": {
-                "dir": self.pile.dir,
-                "files": list(self.pile.files),
                 "kind": self.pile.kind,
+                "directories": [
+                    {k: v for k, v in {
+                        "path": d.path, "kind": d.kind,
+                        "files": list(d.files) if d.kind == "data" else None,
+                        "catalogue": d.catalogue,
+                    }.items() if v is not None}
+                    for d in self.pile.directories
+                ],
                 "sample": {"strategy": self.pile.sample.strategy, "size": self.pile.sample.size},
             },
-            "target": {"kind": self.target.kind, "connection_env": self.target.connection_env},
+            "target": target,
             "validation": asdict(self.validation),
         }
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "BridgeProject":
-        pile_raw = data.get("pile") or {}
-        sample_raw = pile_raw.get("sample") or {}
-        target_raw = data.get("target") or {}
-        val_raw = data.get("validation") or {}
+        name = data["name"]
+        slug = data.get("slug") or derive_slug(name)
+        pile = _pile_from_dict(data.get("pile") or {})
+        target = _target_from_dict(data.get("target") or {})
         known = ConnectionValidationResult.__dataclass_fields__
-        validation = ConnectionValidationResult(**{k: v for k, v in val_raw.items() if k in known})
-        pile_dir = pile_raw.get("dir", "")
-        pile_files = list(pile_raw.get("files") or [])
-        legacy_path = pile_raw.get("path")
-        if legacy_path and not pile_dir:                 # pre-multi-file project.yml compatibility
-            from pathlib import PurePath
-
-            parsed = PurePath(legacy_path)
-            pile_dir, pile_files = str(parsed.parent), [parsed.name]
-        return cls(
-            name=data["name"],
-            created_at=data.get("created_at"),
-            pile=PileConfig(
-                dir=pile_dir,
-                files=pile_files,
-                kind=pile_raw.get("kind", "tsv"),
-                sample=PileSample(
-                    strategy=sample_raw.get("strategy", "head+random"),
-                    size=int(sample_raw.get("size", 200)),
-                ),
-            ),
-            target=TargetConfig(
-                connection_env=target_raw.get("connection_env", ""),
-                kind=target_raw.get("kind", "relational"),
-            ),
-            validation=validation,
+        validation = ConnectionValidationResult(
+            **{k: v for k, v in (data.get("validation") or {}).items() if k in known}
         )
+        return cls(
+            name=name, slug=slug, pile=pile, target=target,
+            description=data.get("description", "") or "",
+            created_at=data.get("created_at"), validation=validation,
+        )
+
+
+def _pile_from_dict(raw: dict[str, Any]) -> PileConfig:
+    sample_raw = raw.get("sample") or {}
+    sample = PileSample(
+        strategy=sample_raw.get("strategy", "head+random"),
+        size=int(sample_raw.get("size", 200)),
+    )
+    directories: list[PileDirectory] = []
+    if raw.get("directories"):                            # new shape
+        for d in raw["directories"]:
+            directories.append(PileDirectory(
+                path=d.get("path", ""), kind=d.get("kind", "data"),
+                files=list(d.get("files") or []), catalogue=d.get("catalogue"),
+            ))
+    elif raw.get("dir"):                                  # legacy multi-file (dir + files)
+        directories.append(PileDirectory(path=raw["dir"], kind="data", files=list(raw.get("files") or [])))
+    elif raw.get("path"):                                 # legacy single-file (path)
+        parsed = PurePath(raw["path"])
+        directories.append(PileDirectory(path=str(parsed.parent), kind="data", files=[parsed.name]))
+    return PileConfig(directories=directories, kind=raw.get("kind", "file"), sample=sample)
+
+
+def _target_from_dict(raw: dict[str, Any]) -> TargetConfig:
+    conn_raw = raw.get("connection")
+    connection = None
+    if conn_raw:
+        connection = TargetConnection(
+            engine=conn_raw.get("engine", "postgresql"), host=conn_raw.get("host", ""),
+            port=int(conn_raw.get("port", 5432)), database=conn_raw.get("database", ""),
+            user=conn_raw.get("user", ""),
+        )
+    return TargetConfig(
+        kind=raw.get("kind", "relational"), connection=connection,
+        secret_ref=raw.get("secret_ref"), connection_env=raw.get("connection_env"),
+    )
 
 
 def project_yml_path(project_dir: str | Path) -> Path:

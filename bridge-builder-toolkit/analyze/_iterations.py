@@ -30,12 +30,11 @@ def _now() -> str:
 
 def pile_fingerprint(project: BridgeProject, project_dir: Path) -> dict:
     """Row count + content hash over the selected pile files (data-model.md)."""
-    pile_dir = Path(project.pile.dir)   # operator-supplied; resolved against CWD like create/update
     digest = hashlib.sha256()
     rows = 0
-    for fname in project.pile.files:
-        fpath = pile_dir / fname
-        digest.update(fname.encode("utf-8"))
+    for dpath, fname in project.pile.data_files():       # across all data directories
+        fpath = Path(dpath) / fname
+        digest.update(f"{dpath}/{fname}".encode("utf-8"))
         with fpath.open("rb") as fh:
             content = fh.read()
         digest.update(content)

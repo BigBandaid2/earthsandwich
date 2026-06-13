@@ -35,18 +35,18 @@ Be specific to the columns and values actually present."""
 
 
 def load_pile_frame(project: BridgeProject) -> pd.DataFrame:
-    """Concatenate the selected pile files; `source_file` records each row's origin."""
-    pile_dir = Path(project.pile.dir)
+    """Concatenate the selected data files across directories; `source_file` records origin."""
     frames = []
-    for fname in project.pile.files:
+    for dpath, fname in project.pile.data_files():
+        sep = "," if fname.lower().endswith(".csv") else "\t"
         try:
-            frame = pd.read_csv(pile_dir / fname, sep="\t", dtype=str, keep_default_na=False)
+            frame = pd.read_csv(Path(dpath) / fname, sep=sep, dtype=str, keep_default_na=False)
         except Exception as exc:
             raise OperatorError(f"could not parse pile file {fname!r}: {exc}")
         frame["source_file"] = fname
         frames.append(frame)
     if not frames:
-        raise OperatorError("project has no pile files selected")
+        raise OperatorError("project has no data files selected")
     return pd.concat(frames, ignore_index=True)
 
 
