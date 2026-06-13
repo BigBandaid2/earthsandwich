@@ -2,12 +2,12 @@
 
 **Date**: 2026-06-08 · **Spec**: [../spec.md](../spec.md) · **Plan**: [../plan.md](../plan.md)
 
-The toolkit exposes two operator surfaces over one shared core (FR-004): this CLI — the automation/scripting surface and the only surface that launches stages — and the guided local Web UI ([web-ui.md](web-ui.md), FR-170–179). The CLI has one subcommand per stage, mirroring the pile-app pattern. Entry point: `bridge_builder` (after `pip install -e .`) or `python cli.py` (dev). Every *stage* command operates on a named project under `bridge-builder-toolkit/projects/<name>/`, acquires the per-project lock (FR-110) for the duration, and writes a per-run log; `project list` and `ui` are exceptions — `ui` locks per mutating request only (FR-177).
+The toolkit exposes two operator surfaces over one shared core (FR-004): this CLI — the automation/scripting surface and the only surface that launches stages — and the guided local Web UI ([web-ui.md](web-ui.md), FR-170–179). The CLI has one subcommand per stage, mirroring the pile-app pattern. Entry point: `bridge_builder` (after `pip install -e .`) or `python cli.py` (dev). Every *stage* command operates on a named project under `bridge-builder-toolkit/projects/<slug>/`, acquires the per-project lock (FR-110) for the duration, and writes a per-run log; `project list` and `ui` are exceptions — `ui` locks per mutating request only (FR-177).
 
 **Global conventions**
 - Project selected by `--project <name>` (or positional `<name>` where natural).
 - Exit `0` success; `1` operator-correctable error (bad path, unreachable target, lock held) with a clear message; `2` prior-art tool hard-failure (FR-105). No stack traces on the `1`/`2` paths.
-- Credentials are NEVER passed on the command line — only env-var names in `project.yml` (FR-012).
+- Relational-endpoint passwords are NEVER passed as a plaintext flag — read from a hidden prompt (or `--password-stdin`) and stored only in the gitignored `projects/<slug>/.secrets`; `project.yml` never holds a password (FR-012).
 - Stdout is the human log; machine artifacts go to the project folder.
 
 ---
@@ -16,34 +16,37 @@ The toolkit exposes two operator surfaces over one shared core (FR-004): this CL
 
 ```
 bridge_builder project create <name> \
-    --pile <dir> \
-    [--pile-files <a.tsv,b.tsv | all>] \
-    --target <dsn-or-schema-file-or-url> \
-    --target-cred-env <ENV_VAR_NAME> \
-    [--pile-sample head+random:200] [--force]
+    [--description <markdown>] \
+    --directory <path> --kind <data|media>  [repeatable] \
+    [--pile-files <dir=a.tsv,b.tsv | dir=all>]  [repeatable] \
+    [--pile-sample head+random:200] \
+    --engine <postgresql|mysql|mssql> --host <h> --port <p> --database <db> --user <u> \
+    [--password-stdin]
 ```
-- **US1 / FR-005–008, FR-011–012.** `--pile` is the pile DIRECTORY; `--pile-files` selects one, multiple (comma-separated), or `all` of its files (default `all`). The selection is **frozen to an explicit file list** at creation — later-arriving files join only via `project update`. Creates `projects/<name>/`, writes `project.yml`, runs the **connection-validation step** (every selected pile file readable; target reachable + read/insert/delete probes) and records per-endpoint status.
-- v1 rejects a non-relational `--target` with a "deferred to a future version" message (FR-005 v1 scope).
-- Aborts cleanly with **no folder** if pile unreadable or target unreachable (FR-008). Refuses to overwrite an existing project without `--force` (FR-011).
-- **Output**: `project.yml` + a printed validation report (per-endpoint yes/no; whether the oracle loop will run or be skipped).
+- **US1 / FR-005–008, FR-011–012, FR-180–183.** `<name>` derives a unique immutable **slug** = the folder name (`projects/<slug>/`); a colliding slug is refused with **no overwrite path** (FR-011/FR-180 — delete the existing project first). A pile is **one or more `--directory` + `--kind`** pairs: `data` directories' files are listed with row×col + format and validated as tables (invalid files rejected by name); `--pile-files <dir>=…` freezes the per-directory selection (default `all`); `media` directories are catalogued, not selected. The target **relational connection** is given as discrete flags; the **password** is read from a hidden prompt (or `--password-stdin`) — never a plaintext flag — and on success the assembled DSN is written to gitignored `projects/<slug>/.secrets`, while `project.yml` records engine/host/port/database/user + a secret marker (never the password). (Either endpoint may be relational — endpoint symmetry; v1 ships file-pile + relational-target.)
+- Runs the **connection-validation step** (every selected data-file readable + a valid table; target reachable + read/insert/delete) and records per-endpoint status. v1 rejects a non-relational target with a "deferred" message.
+- Aborts cleanly with **no folder** on any failed gate (FR-008).
+- **Output**: `project.yml` (+ `.secrets`) + a printed validation report.
 
 ## `project list`
 ```
 bridge_builder project list
 ```
-- **US1 / FR-010.** Prints each project's name, pile path, target endpoint, and current validation status.
+- **US1 / FR-010.** Prints each project's slug, pile (directories + file count), target endpoint, and current validation status.
 
 ## `project update`
 ```
-bridge_builder project update <name> [--pile <dir>] [--pile-files <a.tsv,b.tsv | all>] [--pile-sample <spec>] [--target-cred-env <ENV_VAR_NAME>]
+bridge_builder project update <slug> [--description <md>] [--directory <path> --kind <data|media> …] \
+    [--pile-files <dir>=… …] [--pile-sample <spec>] \
+    [--engine … --host … --port … --database … --user … [--password-stdin]]
 ```
-- **US7 / FR-172, FR-176.** Applies the supplied edits (`--pile-files all` re-expands against the directory's CURRENT contents and freezes the new list) and re-runs connection validation against the edited inputs BEFORE persisting; on failure the prior config is untouched. Acquires the project lock for the operation.
+- **US7 / FR-172, FR-176.** Project name/slug is immutable. Applies the supplied edits and re-runs connection validation BEFORE persisting; on failure the prior config (and `.secrets`) is untouched. A re-entered password re-writes `.secrets`. Acquires the project lock.
 
 ## `project delete`
 ```
-bridge_builder project delete <name> [--yes]
+bridge_builder project delete <slug> [--yes]
 ```
-- **US7 / FR-176, FR-177.** Interactive confirmation unless `--yes`. Refuses (exit 1) while the project's lock is held by a live process; otherwise removes the project folder.
+- **US7 / FR-176, FR-177.** Interactive confirmation unless `--yes`. Refuses (exit 1) while the project's lock is held by a live process; otherwise removes the project folder (including `.secrets`).
 
 ## `ui`
 ```

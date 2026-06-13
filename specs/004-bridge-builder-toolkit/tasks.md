@@ -171,6 +171,29 @@
 
 ---
 
+## Phase 11: UI redesign — app-shell + pages from the Claude Design bundle (US1 + US7)
+
+**Goal**: Rebuild the Web UI shell + the five UI pages (projects, dashboard, project-details = new+edit, artifacts) to the b2-ledger design (`design-intake/bundle/project/directions/b2-ledger-full/`), with the redesign's model changes: **slug** identity (FR-180), **description & intent** (FR-181), **pile of one-or-more data/media directories** with table-validation (FR-182), **discrete DB connection + Test Connection** stored in a gitignored `.secrets` (FR-012 reversal / FR-183), **app-shell + dashboard restructure** (FR-184/185), all endpoint-agnostic (endpoint symmetry). UI stays **guidance-only** (FR-174 unchanged — auto-profile deferred). One page at a time; **data-profile views + HTML playgrounds are deferred to a future Phase 12**; bridge-synthesis + final-bundle pages ignored.
+
+**Independent Test**: `bridge_builder ui` → create a project through the four-part form (Identity → Pile sources with list-&-validate → Target with Test Connection → gated Create), see the new dashboard (collapsed connection, suggested-next-step tracker, rail nav), edit + typed-slug delete on Project details; `projects/<slug>/project.yml` holds no password (DSN only in `.secrets`); pages match the comps.
+
+- [ ] T056 `common/config.py` + `project/secrets.py`: `PileConfig` → `kind` + `directories[{path, kind: data|media, files[]}]`; `BridgeProject` gains `slug`, `description`, a `TargetConnection` (engine/host/port/database/user) + `secret_ref`; **legacy read-compat** for the old `dir/files` + `connection_env` shape. `project/secrets.py` reads/writes the gitignored `.secrets` DSN map (FR-012). Slug derivation + uniqueness (FR-180). Thread through create/update/delete/registry/status.
+- [ ] T057 `project/pile_scan.py`: per data-file **row×col + format detection + table-validation** (invalid files rejected by name); per media-dir **catalogue** (count/types/size). Reused by create/edit + FR-007 validation (FR-182).
+- [ ] T058 `project/create.py`: assemble a DSN from the discrete connection; `test_connection(fields)` (reachability + read/insert/delete, no persist) reused by the CLI gate and the UI `POST /projects/test-connection`; on a successful create/save write the DSN to `.secrets` (never `project.yml`); slug-collision refusal with no overwrite (FR-011/183).
+- [ ] T059 Rebuild `ui/pages.py` `layout()` + `_STYLE` to the **b2-ledger** tokens/components (left-rail app-shell + per-project nav, numbered `.sheet` sections, `.status`, `.confirms`, `.track`, `table.list`, form fields, `.tree`, `.modal`, `details.fold.danger`, theme toggle) — read `…/b2-ledger-full/style.css` + page HTML and recreate faithfully; replaces the current dark-theme `_STYLE` (FR-179/184).
+- [ ] T060 Page — **Projects list**: re-skin `render_project_list` to `table.list` in the shell (slug link, pile dirs + file count, target, status; "+ New project").
+- [ ] T061 Page — **Dashboard**: per-project rail nav; collapsed Pile-valid/Target-valid (→ Project details); suggested-next-step `.track` from `suggest_next_step` (re-skinned); Artifacts section; **no delete** (FR-185). `GET /projects/{slug}`.
+- [ ] T062 Page — **Project details (New)**: four-part form (Identity name→slug+desc, Pile sources data/media dirs + list-&-validate + frozen selection + sample spec, Target discrete connection + Test Connection, gated Create) + routes `GET /projects/new`, `POST /projects/list-files`, `POST /projects/test-connection`, `POST /projects` (FR-172/183).
+- [ ] T063 Page — **Project details (Edit)**: mirror New with name read-only, values pre-filled, connection shown "tested/stored" (password write-only; reuse stored `.secrets` while connection unchanged, re-test on change), collapsed typed-slug **Delete**. Routes `GET /projects/{slug}/edit`, `POST /projects/{slug}/update`, `POST /projects/{slug}/delete` (FR-172/178).
+- [ ] T064 Page — **Artifacts browser**: re-skin to `.tree` (raw vs playground meta; contained listing) — `GET /projects/{slug}/artifacts/{relpath}` behavior unchanged (FR-175).
+- [ ] T065 CLI parity (`cli.py`): `project create`/`update` gain `--description`, repeatable `--directory/--kind`, per-dir `--pile-files`, discrete connection flags + hidden password prompt (`--password-stdin`); slug; **drop `--force`** (FR-011/012/176/180).
+- [ ] T066 Tests: migrate `tests/unit/test_project_*`, `test_ui_routes`, `tests/integration/test_project_create`/`test_ui_crud` to the slug + directories + secrets model; re-skin text assertions to the new copy; **keep** the contract tests (now stronger: SC-029 no-password-in-`project.yml`; lock states; FR-178 write-only; path-traversal). Add slug-uniqueness (SC-031), table-validation reject (SC-030), Test-Connection, media catalogue, gated-create (SC-028), edit-reuses-secret-while-unchanged. Run vs live Postgres.
+- [ ] T067 Live verify: `bridge_builder ui` headless screenshots of each rebuilt page vs the b2-ledger comps; re-create the demo project through the new form; confirm `.secrets` holds the DSN and `project.yml` does not.
+
+**Checkpoint**: the redesigned UI shell + five pages match the comps; create flows through the four-part gated form writing the DSN to `.secrets`; CLI parity holds; suites green. Data-profile views + playgrounds remain on the current (Phase-4) design pending Phase 12.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase dependencies

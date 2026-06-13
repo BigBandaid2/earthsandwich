@@ -20,24 +20,23 @@ pip install -e .
 
 copy .env.example .env
 # Edit .env: ANTHROPIC_API_KEY=...
-# Set the target DSN as an ENV VAR (never in project.yml):
-$env:BRIDGE_TARGET_DSN = "postgresql://earthsandwich:earthsandwich@localhost:5432/earthsandwich"
 ```
 
 ## 2. Create the project + validate connections (US1)
 
 ```pwsh
-bridge_builder project create "IG post scrape to Travelogue" `
-    --pile ../pile-app/pile `
-    --pile-files "posts.ourearthsandwich.local.tsv,posts.welawen.local.tsv" `
-    --target $env:BRIDGE_TARGET_DSN `
-    --target-cred-env BRIDGE_TARGET_DSN
+bridge_builder project create "IG pile → travelogue" `
+    --directory ../pile-app/pile --kind data `
+    --pile-files "../pile-app/pile=posts.ourearthsandwich.local.tsv,posts.welawen.local.tsv" `
+    --engine postgresql --host localhost --port 5432 `
+    --database earthsandwich --user earthsandwich
+    # password read from a hidden prompt (or --password-stdin); stored only in projects/<slug>/.secrets
 ```
-The pile is a **directory plus a frozen file selection** (`--pile-files all` selects everything currently there).
-Expect a validation report: pile **readable**, target **reachable + read + insert + delete** (the 002 stack grants all → the oracle loop will run). Folder `projects/IG post scrape to Travelogue/` is created with `project.yml`. **SC-001: under 5 minutes.**
+The name derives a unique **slug** (`ig-pile-to-travelogue`) = the folder name; a pile is **one or more `--directory`/`--kind` pairs** (add a `--kind media` directory for the IG media folder), data files frozen by `--pile-files`. The target connection is entered as discrete fields; the password is prompted and the assembled DSN is written to gitignored `projects/<slug>/.secrets` — **never to `project.yml`**.
+Expect a validation report: pile **readable**, target **reachable + read + insert + delete** (the 002 stack grants all → the oracle loop will run). **SC-001: under 5 minutes.**
 
 ```pwsh
-bridge_builder project list      # confirms name, pile, target, validation status
+bridge_builder project list      # confirms slug, pile, target, validation status
 ```
 
 ### 2.5 …or use the Web UI (US7)
@@ -45,13 +44,13 @@ bridge_builder project list      # confirms name, pile, target, validation statu
 ```pwsh
 bridge_builder ui                # guided local UI at http://127.0.0.1:8765
 ```
-Create / list / edit / delete projects from the browser with the same inline validation report; each project's dashboard shows stage progress across both loops and the suggested next CLI command. The stages themselves still run via the CLI commands in steps 3–7.
+The guided form walks Identity (name → slug, description & intent) → Pile sources (add data/media directories, "list & validate files", frozen selection, sample spec) → Target (discrete DB connection + **Test connection**) → gated Create. Edit / delete on Project details; each dashboard shows collapsed Pile/Target-valid status, stage progress across both loops, and the suggested next CLI command. The stages themselves still run via the CLI commands in steps 3–7.
 
 ## 3. Profile both sides (US2)
 
 ```pwsh
-bridge_builder analyze pile   --project "IG post scrape to Travelogue"
-bridge_builder analyze target --project "IG post scrape to Travelogue"
+bridge_builder analyze pile   --project "ig-pile-to-travelogue"
+bridge_builder analyze target --project "ig-pile-to-travelogue"
 ```
 Produces in `data-profiling/iteration-1/`:
 - `pile.ydata-profile.html` (canonical ydata — recognizable; SC-003), `pile.enhanced.html` (no ER — non-relational pile, FR-027).
@@ -62,7 +61,7 @@ Open the enhanced playgrounds: every section is labeled **ydata baseline / ER-di
 ## 4. Synthesize the bridge mapping (US3 → auto oracle US4)
 
 ```pwsh
-bridge_builder synthesize bridge --project "IG post scrape to Travelogue"
+bridge_builder synthesize bridge --project "ig-pile-to-travelogue"
 ```
 - Emits `mapping.yml` (Magneto-style matcher, cited), a stock-runnable `bridge.dbt-project/` (try `dbt parse` / `dbt docs serve` — SC-005), and materializes `bridge.output.tsv` (the full local transform; the target is NOT bulk-loaded).
 - AI-inferred columns (e.g. `region_code` from caption+location) come from the toolkit-side LLM step (FR-047); each ships with its preserved inputs.
@@ -75,14 +74,14 @@ Open `bridge.enhanced.html`: pile ↔ target side-by-side, proposed mappings, co
 In `bridge.enhanced.html`, fix a semantic mis-map the oracle can't catch (right type, wrong column), leave comments, click **copy out a prompt**, then:
 
 ```pwsh
-bridge_builder iterate --project "IG post scrape to Travelogue" --feedback feedback.txt
+bridge_builder iterate --project "ig-pile-to-travelogue" --feedback feedback.txt
 ```
 A new `iteration-2/` is produced (re-synthesized, re-oracled). Prior iterations stay readable for side-by-side compare.
 
 ## 6. Review AI-inference quality vs. a truth baseline (US6)
 
 ```pwsh
-bridge_builder review --project "IG post scrape to Travelogue" `
+bridge_builder review --project "ig-pile-to-travelogue" `
     --baseline truth-baseline/baseline.tsv --join-key shortcode
 ```
 Walk paired (truth, bridge) rows with AI-inferred columns emphasized; tag each `exact-match` / `bridge-improved` / `bridge-regressed` / `truly-different`. `bridge-improved` tags update the baseline (with edit-history); a session summary is saved and can be fed back to `iterate` (FR-160). **SC-019: a 300-row pass under 90 minutes.** Use `--vs-iteration` for three-way compare of two iterations.
@@ -90,7 +89,7 @@ Walk paired (truth, bridge) rows with AI-inferred columns emphasized; tag each `
 ## 7. Accept → the Final Bundle (the deliverable)
 
 ```pwsh
-bridge_builder accept-bundle --project "IG post scrape to Travelogue"
+bridge_builder accept-bundle --project "ig-pile-to-travelogue"
 ```
 Materializes `final-bundle/` — all artifacts, final mapping, output, full iteration history, captured prompts, and the verbatim 003-US3 carry-forward items (FR-092). Hand this bundle to `/speckit.specify` to author the **bridge-app** spec (SC-011). The functioning bridge is built later, from that spec.
 

@@ -9,8 +9,9 @@ The toolkit is filesystem-backed (no toolkit-owned DB). This document maps the s
 ## On-disk layout (per project)
 
 ```text
-bridge-builder-toolkit/projects/<project-name>/
-├── project.yml                         # Bridge Project config + validation status
+bridge-builder-toolkit/projects/<slug>/
+├── project.yml                         # Bridge Project config + validation status (NO secrets)
+├── .secrets                            # gitignored DSN(s) per relational endpoint (FR-012); absent if none
 ├── .lock                               # per-project PID lockfile (FR-110); absent when idle
 ├── truth-baseline/
 │   ├── baseline.tsv                    # Truth Baseline (human-editable; FR-157)
@@ -48,21 +49,38 @@ The **two loops are independent** (see spec Clarifications): the **data-profilin
 ## Entities
 
 ### Bridge Project — `project.yml`
+
+**Endpoint symmetry** (Clarifications 2026-06-13): `pile` and `target` are symmetric endpoints; each carries a `kind` of **`file`** (one or more data/media directories) or **`relational`** (a DB connection + a `.secrets` DSN). The toolkit is indifferent to which side is which; v1's designed configuration is a file pile + a relational target, shown below.
+
 ```yaml
-name: "IG post scrape to Travelogue"
+name: "IG pile → travelogue"           # display label
+slug: "ig-pile-to-travelogue"          # derived identity = folder name (FR-180; unique, immutable)
+description: |                          # markdown ≤4000 chars; operator context for later stages (FR-181)
+  ## Goal
+  Bridge the scraped IG field-notes pile into the travelogue schema.
 created_at: "2026-06-08T14:00:00+0000"
 pile:
-  dir: "../../pile-app/pile"           # operator-supplied pile directory (FR-005)
-  files:                               # frozen selection — "all" expands to this list at create/update
-    - "posts.ourearthsandwich.local.tsv"
-    - "posts.welawen.local.tsv"
-  kind: "tsv"                          # tsv | relational (future)
-  sample: { strategy: "head+random", size: 200 }                  # FR-028/FR-029
+  kind: "file"                         # file | relational (endpoint symmetry)
+  directories:                         # one or more, each typed data | media (FR-182)
+    - path: "../../pile-app/pile"
+      kind: "data"
+      files:                           # frozen selection — "all" expands to this list at create/update
+        - "posts.ourearthsandwich.local.tsv"
+        - "posts.welawen.local.tsv"
+    - path: "../../pile-app/media"
+      kind: "media"                    # catalogued, not selected/ingested (count/types/size recorded in validation)
+  sample: { strategy: "head+random", size: 200 }                  # FR-028/FR-029; editable, per-run overridable
 target:
-  kind: "relational"                   # v1: relational only (FR-005 v1 scope)
-  connection_env: "BRIDGE_TARGET_DSN"  # env-var NAME, never the secret (FR-012)
+  kind: "relational"                   # v1: relational target (FR-005 v1 scope)
+  connection:                          # discrete fields — NEVER the password (FR-012)
+    engine: "postgresql"
+    host: "db.internal.local"
+    port: 5432
+    database: "travelogue"
+    user: "bridge_writer"
+  secret_ref: "target"                 # → the DSN under this key in .secrets; password lives only there
 validation:                            # Connection Validation Result (FR-007)
-  pile_readable: true
+  pile_readable: true                  # every selected data-file readable + a valid table
   target_reachable: true
   target_read: true
   target_insert: true                  # drives oracle run vs skip (FR-070/075)
@@ -70,8 +88,9 @@ validation:                            # Connection Validation Result (FR-007)
   validated_at: "2026-06-08T14:00:12+0000"
   notes: ""                            # e.g. "oracle loop will be skipped — no insert perm"
 ```
-- **Identity**: `name` (unique per installation; `--force` to overwrite, FR-011).
-- **Validation rules**: `project create` aborts cleanly (no folder) if `pile_readable` or `target_reachable` is false (FR-008). `target_insert && target_delete` gates the oracle loop.
+- **Identity**: `slug` (FR-180) — unique per installation, immutable; **no `--force`/overwrite** (FR-011): delete to free a slug. The legacy single-`dir`/`files` + `target.connection_env` shape (pre-redesign) is still read.
+- **Secrets** — `.secrets` (gitignored): a small map `{ <secret_ref>: "<dsn>" }` holding the assembled DSN(s) for the project's relational endpoint(s). Written on a successful Test Connection (FR-183); never echoed back; never in `project.yml`.
+- **Validation rules**: `project create` aborts cleanly (no folder) if any selected data-file is unreadable/non-table or the relational endpoint is unreachable (FR-008). `target_insert && target_delete` gates the oracle loop.
 
 ### Connection Validation Result
 The `validation:` block above. Per-endpoint booleans + timestamp + reason. Recorded at creation (FR-007); re-checked at each iteration's oracle/validation step and re-surfaced if credentials changed (Edge Case).

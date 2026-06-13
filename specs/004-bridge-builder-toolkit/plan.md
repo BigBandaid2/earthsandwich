@@ -11,7 +11,7 @@ The **bridge-builder-toolkit** is a self-contained Python App — a CLI plus a g
 
 The toolkit wraps established prior-art tools (`ydata-profiling`, `eralchemy2`, `dbt`, `Valentine`/`Magneto` matchers) in an LLM-analyst layer surfaced through self-contained copy-out-a-prompt playgrounds, and walks the operator through: project creation → pile/target data-profile analysis → bridge-**mapping** synthesis → an automatic **oracle** that validates the proposed mapping → manual refinement → truth-baseline inference-quality review.
 
-**Technical approach (from research.md):** Python 3.12+ / Typer CLI; per-project folders under `bridge-builder-toolkit/projects/<name>/`. The deterministic mapping is exercised **locally** via `dbt-core` + `dbt-duckdb` (pile TSV → DuckDB → a materialized local output artifact), keeping the target Postgres read-only except a transactional, rolled-back oracle round-trip. AI-inferred columns are produced by a **toolkit-side LLM step** (hybrid model, FR-047), separate from dbt. Target schema discovery via SQLAlchemy 2.x reflection. v1 scope is a **relational-DB target only**.
+**Technical approach (from research.md):** Python 3.12+ / Typer CLI; per-project folders under `bridge-builder-toolkit/projects/<slug>/`. The deterministic mapping is exercised **locally** via `dbt-core` + `dbt-duckdb` (pile TSV → DuckDB → a materialized local output artifact), keeping the target Postgres read-only except a transactional, rolled-back oracle round-trip. AI-inferred columns are produced by a **toolkit-side LLM step** (hybrid model, FR-047), separate from dbt. Target schema discovery via SQLAlchemy 2.x reflection. v1 scope is a **relational-DB target only**.
 
 ## Technical Context
 
@@ -23,7 +23,7 @@ The toolkit wraps established prior-art tools (`ydata-profiling`, `eralchemy2`, 
 **Project Type**: Single-project CLI tool + guided local Web UI (one new App root `bridge-builder-toolkit/`)
 **Performance Goals**: Human-time gates — project+validate < 5 min (SC-001); one profile pass < 30 min human (SC-002); all three enhanced playgrounds render < 3 s in a stock browser (SC-014). Oracle loop converges ≤ 3 automatic iterations for ≥ 80% synthetic cases (SC-007)
 **Constraints**: Target DB read-only except the transactional oracle round-trip; enhanced playgrounds single-file/offline/≤ ~5 MB embedded (FR-050/FR-028); raw prior-art artifacts byte-for-byte canonical (FR-021/SC-003–005); inference inputs preserved (Constitution Principle V)
-**Scale/Scope**: 7 user stories (P1–P7), 82 FRs, 27 SCs; first concrete run = IG→Travelogue (003 pile + 002 schema, ~322 rows); ≥ 5 coexisting projects (SC-016)
+**Scale/Scope**: 7 user stories (P1–P7), 88 FRs, 31 SCs; first concrete run = IG→Travelogue (003 pile + 002 schema, ~322 rows); ≥ 5 coexisting projects (SC-016)
 
 ## Constitution Check
 
@@ -36,7 +36,8 @@ The toolkit wraps established prior-art tools (`ydata-profiling`, `eralchemy2`, 
 | **V / Rule #4 — inference preserves inputs** | ✅ PASS (design constraint) | The FR-047 inference step persists its pile inputs alongside each inferred value in the output artifact (FR-048) and bundle (FR-090). Enforced in data-model.md. |
 | **Foundational tech** (Python · Postgres · Docker · Spec Kit) | ✅ PASS | Python App; Postgres target via the 002 Docker stack; output is `/speckit.specify` input. dbt/duckdb/ydata/eralchemy2 are allowed App-local additions. |
 | **Cardinal Rule #1 — tasks.md historical record** | ✅ N/A yet | First tasks.md is authored fresh by `/speckit.tasks`. |
-| **II — self-containment (Web UI, US7)** | ✅ PASS | UI server is App-local (`fastapi`/`uvicorn` in the App venv), binds localhost by default, serves files only from inside `projects/<name>/` (FR-175), holds no state of its own (FR-173), zero host-project knowledge. |
+| **II — self-containment (Web UI, US7)** | ✅ PASS | UI server is App-local (`fastapi`/`uvicorn` in the App venv), binds localhost by default, serves files only from inside `projects/<slug>/` (FR-175), holds no state of its own (FR-173), zero host-project knowledge. |
+| **Credential storage (FR-012 reversal, 2026-06-13)** | ✅ PASS | Reverses the env-var-name-only stance: relational-endpoint DSNs are stored in a gitignored `projects/<slug>/.secrets`, never in `project.yml`, never committed (`projects/` gitignored), never re-displayed. Acceptable under the single-operator-local-tool assumption; no cross-App coupling. |
 
 **No violations → Complexity Tracking is empty.**
 
@@ -84,7 +85,9 @@ bridge-builder-toolkit/                 # the new self-contained App root (FR-00
 │   ├── registry.py                     # project list / status (US1)
 │   ├── update.py                       # edit + re-validate-then-persist (US7, FR-172)
 │   ├── delete.py                       # lock-aware project removal (US7, FR-176/177)
-│   └── status.py                       # stage detection + suggested-next-step (US7, FR-173/174)
+│   ├── status.py                       # stage detection + suggested-next-step (US7, FR-173/174)
+│   ├── secrets.py                      # gitignored .secrets DSN read/write per endpoint (FR-012)
+│   └── pile_scan.py                    # data-file row×col/format/table-validation + media catalogue (FR-182)
 ├── analyze/
 │   ├── pile.py                         # ydata raw + pile enhanced playground (US2)
 │   ├── target.py                       # ydata raw + eralchemy2 ER + target enhanced (US2)
