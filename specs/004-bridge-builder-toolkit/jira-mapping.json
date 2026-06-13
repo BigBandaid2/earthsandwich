@@ -70,6 +70,12 @@
       "phase": "Phase 10: US7 — Guided Web UI for project lifecycle (P7)",
       "url": "https://datacommlab.atlassian.net/browse/OCS-151",
       "tasks": ["T041", "T042", "T043", "T044", "T045", "T046", "T047", "T048", "T049", "T050", "T051"]
+    },
+    {
+      "key": "OCS-152",
+      "phase": "Phase 11: UI redesign — app-shell + pages (US1+US7, Claude Design)",
+      "url": "https://datacommlab.atlassian.net/browse/OCS-152",
+      "tasks": ["T056", "T057", "T058", "T059", "T060", "T061", "T062", "T063", "T064", "T065", "T066", "T067"]
     }
   ]
 }
