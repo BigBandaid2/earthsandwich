@@ -6,6 +6,8 @@ in its own user-story phase. See ``specs/004-bridge-builder-toolkit/contracts/cl
 """
 from __future__ import annotations
 
+from typing import List, Optional
+
 import typer
 
 app = typer.Typer(
@@ -32,23 +34,59 @@ def _stub(stage: str) -> None:
     raise typer.Exit(code=1)
 
 
+def _prompt_password(label: str, engine: str) -> str:
+    """Hidden password prompt for a relational endpoint; file engines need none (FR-012)."""
+    from project.create import FILE_ENGINES
+
+    if engine in FILE_ENGINES:
+        return ""
+    return typer.prompt(label, hide_input=True, default="", show_default=False)
+
+
+def _pile_spec_cli(pile_kind, data_dir, media_dir, pile_files, conn) -> dict:
+    if pile_kind == "relational":
+        return {"kind": "relational", **conn}
+    directories = [(d, "data") for d in (data_dir or [])] + [(d, "media") for d in (media_dir or [])]
+    selections = {d: pile_files for d in (data_dir or [])}
+    return {"kind": "file", "directories": directories, "selections": selections}
+
+
 @project_app.command("create")
 def project_create(
-    name: str = typer.Argument(..., help="Project name (unique per installation)."),
-    pile: str = typer.Option(..., "--pile", help="Pile DIRECTORY (a local deposit of extracted source data)."),
-    target: str = typer.Option(..., "--target", help="Target endpoint descriptor (relational DSN shape; never persisted)."),
-    target_cred_env: str = typer.Option(..., "--target-cred-env", help="ENV VAR NAME holding the target DSN (FR-012)."),
-    pile_files: str = typer.Option("all", "--pile-files", help="File selection: comma-separated names, or 'all' (frozen to an explicit list at creation)."),
+    name: str = typer.Argument(..., help="Project name (its slug is the immutable identity, FR-180)."),
+    description: str = typer.Option("", "--description", help="Markdown intent (≤4000 chars, FR-181)."),
+    pile_kind: str = typer.Option("file", "--pile-kind", help="Pile endpoint kind: file | relational."),
+    data_dir: List[str] = typer.Option([], "--data-dir", help="Pile data directory (repeatable; file pile)."),
+    media_dir: List[str] = typer.Option([], "--media-dir", help="Pile media directory (repeatable; file pile)."),
+    pile_files: str = typer.Option("all", "--pile-files", help="Data-file selection per data dir: names, or 'all' (frozen)."),
     pile_sample: str = typer.Option("head+random:200", "--pile-sample", help="Pile sampling spec '<strategy>:<size>'."),
-    force: bool = typer.Option(False, "--force", help="Overwrite an existing project (FR-011)."),
+    pile_engine: str = typer.Option("postgresql", "--pile-engine", help="Relational pile engine."),
+    pile_host: str = typer.Option("", "--pile-host"),
+    pile_port: int = typer.Option(5432, "--pile-port"),
+    pile_database: str = typer.Option("", "--pile-database"),
+    pile_user: str = typer.Option("", "--pile-user"),
+    target_kind: str = typer.Option("relational", "--target-kind", help="Target endpoint kind: relational | file."),
+    engine: str = typer.Option("postgresql", "--engine", help="Relational target engine."),
+    host: str = typer.Option("", "--host"),
+    port: int = typer.Option(5432, "--port"),
+    database: str = typer.Option("", "--database"),
+    user: str = typer.Option("", "--user"),
+    target_path: str = typer.Option("", "--target-path", help="Output directory for a file target."),
 ) -> None:
-    """Create a named project and validate its pile + target connections (US1)."""
+    """Create a project and validate its pile + target endpoints (US1; either may be file or relational)."""
     from project.create import OperatorError, create_project, format_validation_report
 
+    pile_conn = {"engine": pile_engine, "host": pile_host, "port": pile_port, "database": pile_database,
+                 "user": pile_user, "password": _prompt_password("Pile database password", pile_engine) if pile_kind == "relational" else ""}
+    pile = _pile_spec_cli(pile_kind, data_dir, media_dir, pile_files, pile_conn)
+    if target_kind == "file":
+        target = {"kind": "file", "path": target_path}
+    else:
+        target = {"kind": "relational", "engine": engine, "host": host, "port": port, "database": database,
+                  "user": user, "password": _prompt_password("Target database password", engine)}
     try:
         project, project_dir = create_project(
-            name, pile=pile, target=target, target_cred_env=target_cred_env,
-            pile_files=pile_files, pile_sample=pile_sample, force=force,
+            name, pile=pile, target=target, sample=pile_sample, description=description,
         )
     except OperatorError as exc:
         typer.echo(f"[bridge_builder] error: {exc}")
@@ -67,19 +105,46 @@ def project_list() -> None:
 
 @project_app.command("update")
 def project_update(
-    name: str = typer.Argument(..., help="Project to update (the name itself is immutable)."),
-    pile: str = typer.Option(None, "--pile", help="New pile DIRECTORY."),
-    pile_files: str = typer.Option(None, "--pile-files", help="New file selection: comma-separated names, or 'all' (re-expands + freezes against the current directory)."),
-    pile_sample: str = typer.Option(None, "--pile-sample", help="New sampling spec '<strategy>:<size>'."),
-    target_cred_env: str = typer.Option(None, "--target-cred-env", help="New ENV VAR NAME holding the target DSN."),
+    slug: str = typer.Argument(..., help="Project slug to update (identity is immutable)."),
+    description: Optional[str] = typer.Option(None, "--description", help="Replace the intent text."),
+    pile_sample: Optional[str] = typer.Option(None, "--pile-sample", help="New sampling spec '<strategy>:<size>'."),
+    pile_kind: Optional[str] = typer.Option(None, "--pile-kind", help="Switch/restate the pile kind: file | relational."),
+    data_dir: List[str] = typer.Option([], "--data-dir", help="Replacement pile data directory (repeatable)."),
+    media_dir: List[str] = typer.Option([], "--media-dir", help="Replacement pile media directory (repeatable)."),
+    pile_files: str = typer.Option("all", "--pile-files", help="Data-file selection for the replacement dirs."),
+    pile_engine: str = typer.Option("postgresql", "--pile-engine"),
+    pile_host: str = typer.Option("", "--pile-host"),
+    pile_port: int = typer.Option(5432, "--pile-port"),
+    pile_database: str = typer.Option("", "--pile-database"),
+    pile_user: str = typer.Option("", "--pile-user"),
+    target_kind: Optional[str] = typer.Option(None, "--target-kind", help="Switch/restate the target kind: relational | file."),
+    engine: str = typer.Option("postgresql", "--engine"),
+    host: str = typer.Option("", "--host"),
+    port: int = typer.Option(5432, "--port"),
+    database: str = typer.Option("", "--database"),
+    user: str = typer.Option("", "--user"),
+    target_path: str = typer.Option("", "--target-path"),
 ) -> None:
-    """Edit a project and re-validate before persisting (US7)."""
+    """Edit a project and re-validate before persisting (US7). Omitted endpoints are re-validated unchanged."""
     from project.create import OperatorError, format_validation_report
     from project.update import update_project
 
+    pile = None
+    if pile_kind is not None or data_dir or media_dir:
+        kind = pile_kind or "file"
+        conn = {"engine": pile_engine, "host": pile_host, "port": pile_port, "database": pile_database,
+                "user": pile_user, "password": _prompt_password("Pile database password", pile_engine) if kind == "relational" else ""}
+        pile = _pile_spec_cli(kind, data_dir, media_dir, pile_files, conn)
+    target = None
+    if target_kind is not None:
+        if target_kind == "file":
+            target = {"kind": "file", "path": target_path}
+        else:
+            target = {"kind": "relational", "engine": engine, "host": host, "port": port, "database": database,
+                      "user": user, "password": _prompt_password("Target database password", engine)}
     try:
         project, _ = update_project(
-            name, pile=pile, pile_files=pile_files, pile_sample=pile_sample, target_cred_env=target_cred_env
+            slug, description=description, pile=pile, target=target, pile_sample=pile_sample,
         )
     except OperatorError as exc:
         typer.echo(f"[bridge_builder] error: {exc}")

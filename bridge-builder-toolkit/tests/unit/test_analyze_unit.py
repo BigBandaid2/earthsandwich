@@ -33,15 +33,16 @@ def env(tmp_path, monkeypatch):
     return tmp_path
 
 
-def _project(name="ana-proj"):
+def _project(env, name="ana-proj"):
     return create_project(
-        name, pile=str(FIXTURES_DIR), pile_files="all",
-        target="sqlite://local", target_cred_env="ANALYZE_TEST_DSN",
+        name,
+        pile={"kind": "file", "directories": [(str(FIXTURES_DIR), "data")], "selections": {str(FIXTURES_DIR): "all"}},
+        target={"kind": "relational", "engine": "sqlite", "database": (env / "target.db").as_posix()},
     )
 
 
 def test_load_pile_frame_concatenates_with_source_file(env):
-    project, _ = _project()
+    project, _ = _project(env)
     frame = load_pile_frame(project)
     assert "source_file" in frame.columns
     assert set(frame["source_file"]) == {"pile.sample.tsv", "pile.sample2.tsv"}
@@ -58,7 +59,7 @@ def test_sampling_is_deterministic():
 
 
 def test_iteration_allocation_shares_then_advances(env):
-    project, project_dir = _project()
+    project, project_dir = _project(env)
     first = allocate_iteration(project, project_dir, PILE_RAW)
     assert first.name == "iteration-1"
     (first / PILE_RAW).write_text("x", encoding="utf-8")
@@ -72,15 +73,15 @@ def test_iteration_allocation_shares_then_advances(env):
 
 
 def test_fingerprint_changes_with_pile_content(env, tmp_path):
-    project, project_dir = _project()
+    project, project_dir = _project(env)
     before = pile_fingerprint(project, project_dir)
     assert before["rows"] == 5 and before["content_sha256"]
 
     clone_dir = tmp_path / "pile-clone"
     clone_dir.mkdir()
-    for f in project.pile.files:
+    for f in project.pile.directories[0].files:
         (clone_dir / f).write_text((FIXTURES_DIR / f).read_text(encoding="utf-8") + "extra\trow\n", encoding="utf-8")
-    project.pile.dir = str(clone_dir)
+    project.pile.directories[0].path = str(clone_dir)
     after = pile_fingerprint(project, project_dir)
     assert after["content_sha256"] != before["content_sha256"]
 
@@ -98,7 +99,7 @@ def test_reflect_schema_reads_pk_fk_notnull(env):
 
 
 def test_ydata_failure_is_prior_art_error_no_enhanced(env, monkeypatch):
-    project, project_dir = _project()
+    project, project_dir = _project(env)
 
     import ydata_profiling
 
@@ -122,7 +123,7 @@ def test_missing_graphviz_is_operator_error(env, monkeypatch):
 
 
 def test_missing_api_key_is_operator_error(env, monkeypatch):
-    project, project_dir = _project("no-key")
+    project, project_dir = _project(env, "no-key")
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     with pytest.raises(OperatorError, match="ANTHROPIC_API_KEY"):
         run_pile_analysis(project, project_dir, analyst=None)

@@ -1,61 +1,69 @@
-"""T049 — UI route behavior via FastAPI TestClient (no live DB; sqlite DSN)."""
+"""T049 — UI route behavior via FastAPI TestClient (no live DB; SQLite target).
+
+Exercises the redesigned, endpoint-symmetric forms: pile via ``sources_json``,
+target via discrete connection fields (SQLite needs no host/credentials).
+"""
+import json
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 
 from common import locking
-from project.create import create_project
 from ui.server import create_app
 
 FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
+ALL_FILES = ["pile.sample.tsv", "pile.sample2.tsv"]
 
 
 @pytest.fixture
 def ctx(tmp_path, monkeypatch):
-    dsn = f"sqlite:///{(tmp_path / 'target.db').as_posix()}"
-    monkeypatch.setenv("UI_TEST_DSN", dsn)
     projects = tmp_path / "projects"
+    db = (tmp_path / "target.db").as_posix()
     client = TestClient(create_app(projects_dir=projects))
-    return client, projects, dsn
+    return client, projects, db
 
 
-def _create_form(name="ui-proj", **overrides):
+def _create_form(db, name="ui-proj", files=None, **overrides):
+    files = ALL_FILES if files is None else files
+    sources = [{"path": str(FIXTURES_DIR), "kind": "data", "files": files}]
     form = {
-        "name": name,
-        "pile": str(FIXTURES_DIR),
-        "target": "sqlite://local",
-        "target_cred_env": "UI_TEST_DSN",
-        "pile_sample": "head+random:200",
+        "name": name, "description": "", "sample": "head+random:200",
+        "pile_kind": "file", "sources_json": json.dumps(sources),
+        "target_kind": "relational", "engine": "sqlite", "host": "", "port": "5432",
+        "database": db, "user": "", "password": "",
     }
     form.update(overrides)
     return form
 
 
-def test_list_files_step_then_partial_selection(ctx):
-    client, projects, _ = ctx
-    listing = client.post("/projects", data=dict(_create_form(name="multi"), action="list_files"))
-    assert listing.status_code == 200
-    assert "pile.sample.tsv" in listing.text and "pile.sample2.tsv" in listing.text   # checkboxes
+def test_list_files_endpoint_validates_tables(ctx):
+    client, _, _ = ctx
+    sources = [{"path": str(FIXTURES_DIR), "kind": "data"}]
+    response = client.post("/projects/list-files", data={"sources_json": json.dumps(sources)})
+    assert response.status_code == 200
+    files = {f["name"]: f for f in response.json()[0]["files"]}
+    assert files["pile.sample.tsv"]["valid"] and files["pile.sample.tsv"]["fmt"] == "tsv"
 
-    form = dict(_create_form(name="multi"), action="create", files_listed="1")
-    response = client.post("/projects", data={**form, "files": ["pile.sample2.tsv"]}, follow_redirects=True)
+
+def test_partial_selection_is_frozen(ctx):
+    client, projects, db = ctx
+    response = client.post("/projects", data=_create_form(db, name="multi", files=["pile.sample2.tsv"]), follow_redirects=True)
     assert response.status_code == 200
     persisted = (projects / "multi" / "project.yml").read_text(encoding="utf-8")
-    assert "pile.sample2.tsv" in persisted and "pile.sample.tsv" not in persisted     # frozen partial selection
+    assert "pile.sample2.tsv" in persisted and "pile.sample.tsv" not in persisted   # frozen partial
 
 
-def test_listed_but_nothing_selected_is_inline_error(ctx):
-    client, projects, _ = ctx
-    form = dict(_create_form(name="none-picked"), action="create", files_listed="1")
-    response = client.post("/projects", data=form)
-    assert response.status_code == 400 and "select at least one pile file" in response.text
+def test_nothing_selected_is_inline_error(ctx):
+    client, projects, db = ctx
+    response = client.post("/projects", data=_create_form(db, name="none-picked", files=[]))
+    assert response.status_code == 400 and "valid data file" in response.text
     assert not (projects / "none-picked").exists()
 
 
-def test_create_without_listing_freezes_all(ctx):
-    client, projects, _ = ctx
-    client.post("/projects", data=_create_form(name="all-proj"), follow_redirects=True)
+def test_create_all_files_freezes_explicit_list(ctx):
+    client, projects, db = ctx
+    client.post("/projects", data=_create_form(db, name="all-proj"), follow_redirects=True)
     persisted = (projects / "all-proj" / "project.yml").read_text(encoding="utf-8")
     assert "pile.sample.tsv" in persisted and "pile.sample2.tsv" in persisted
     assert "files: all" not in persisted
@@ -67,64 +75,63 @@ def test_root_redirects_to_projects(ctx):
     assert response.status_code == 303 and response.headers["location"] == "/projects"
 
 
-def test_create_via_form_renders_validation_report(ctx):
-    client, projects, _ = ctx
-    response = client.post("/projects", data=_create_form(), follow_redirects=True)
+def test_create_redirects_to_dashboard_with_confirms(ctx):
+    client, projects, db = ctx
+    response = client.post("/projects", data=_create_form(db), follow_redirects=True)
     assert response.status_code == 200
-    assert "pile readable:    yes" in response.text       # FR-007 report inline
-    assert "oracle loop:" in response.text
+    assert "Pile valid" in response.text and "Target valid" in response.text       # collapsed confirms
+    assert "Suggested next step" in response.text
     assert (projects / "ui-proj" / "project.yml").exists()
 
 
-def test_missing_env_var_is_inline_error_no_state(ctx):
-    client, projects, _ = ctx
-    response = client.post("/projects", data=_create_form(name="bad", target_cred_env="UNSET_VAR_XYZ"))
-    assert response.status_code == 400
-    assert "UNSET_VAR_XYZ" in response.text                # names the variable
-    assert not (projects / "bad").exists()                 # FR-008 parity
+def test_unreachable_target_is_inline_error_no_state(ctx):
+    client, projects, db = ctx
+    form = _create_form(db, name="bad", engine="postgresql", host="localhost", port="59999",
+                        database="nodb", user="nobody", password="nope")
+    response = client.post("/projects", data=form)
+    assert response.status_code == 400 and "no project created" in response.text
+    assert not (projects / "bad").exists()                 # FR-008
 
 
-def test_no_dsn_value_in_any_response(ctx):
-    client, _, dsn = ctx
-    client.post("/projects", data=_create_form())
-    for path in ("/projects", "/projects/ui-proj", "/projects/ui-proj/edit"):
-        assert dsn not in client.get(path).text            # FR-178
+def test_no_password_persisted_in_project_yml(ctx):
+    client, projects, db = ctx
+    client.post("/projects", data=_create_form(db))
+    persisted = (projects / "ui-proj" / "project.yml").read_text(encoding="utf-8")
+    assert "password:" not in persisted                    # FR-012: no password key in project.yml
+    assert "secret_ref: target" in persisted               # only a secret marker
 
 
 def test_dashboard_suggests_analyze_pile(ctx):
-    client, _, _ = ctx
-    client.post("/projects", data=_create_form())
+    client, _, db = ctx
+    client.post("/projects", data=_create_form(db))
     response = client.get("/projects/ui-proj")
-    assert "analyze pile" in response.text                 # FR-174 primary
+    assert "analyze pile" in response.text                  # FR-174 primary CLI command
     assert "Suggested next step" in response.text
 
 
 def test_update_revalidates_and_redirects(ctx):
-    client, projects, _ = ctx
-    client.post("/projects", data=_create_form())
-    response = client.post(
-        "/projects/ui-proj/update",
-        data={"pile_sample": "head+random:50"},
-        follow_redirects=True,
-    )
+    client, projects, db = ctx
+    client.post("/projects", data=_create_form(db))
+    response = client.post("/projects/ui-proj/update", data={"sample": "head+random:50"}, follow_redirects=True)
     assert response.status_code == 200
     assert "size: 50" in (projects / "ui-proj" / "project.yml").read_text(encoding="utf-8")
 
 
 def test_update_failure_inline_prior_config_untouched(ctx):
-    client, projects, _ = ctx
-    client.post("/projects", data=_create_form())
+    client, projects, db = ctx
+    client.post("/projects", data=_create_form(db))
     before = (projects / "ui-proj" / "project.yml").read_text(encoding="utf-8")
-    response = client.post("/projects/ui-proj/update", data={"pile": "C:/nope/missing-dir"})
+    bad_sources = json.dumps([{"path": "C:/nope/missing-dir", "kind": "data", "files": ["pile.sample.tsv"]}])
+    response = client.post("/projects/ui-proj/update", data={"sources_json": bad_sources})
     assert response.status_code == 400 and "prior config left untouched" in response.text
     assert (projects / "ui-proj" / "project.yml").read_text(encoding="utf-8") == before
 
 
-def test_delete_requires_typed_name(ctx):
-    client, projects, _ = ctx
-    client.post("/projects", data=_create_form())
-    response = client.post("/projects/ui-proj/delete", data={"confirm_name": "wrong-name"})
-    assert "typed name does not match" in response.text
+def test_delete_requires_typed_slug(ctx):
+    client, projects, db = ctx
+    client.post("/projects", data=_create_form(db))
+    response = client.post("/projects/ui-proj/delete", data={"confirm_name": "wrong-slug"})
+    assert "typed slug does not match" in response.text
     assert (projects / "ui-proj").exists()
     response = client.post("/projects/ui-proj/delete", data={"confirm_name": "ui-proj"}, follow_redirects=False)
     assert response.status_code == 303
@@ -132,26 +139,26 @@ def test_delete_requires_typed_name(ctx):
 
 
 def test_locked_project_mutations_refused(ctx, monkeypatch):
-    client, projects, _ = ctx
-    client.post("/projects", data=_create_form())
+    client, projects, db = ctx
+    client.post("/projects", data=_create_form(db))
     (projects / "ui-proj" / locking.LOCK_FILE).write_text("4242", encoding="utf-8")
     monkeypatch.setattr(locking, "_pid_alive", lambda pid: True)
 
     dashboard = client.get("/projects/ui-proj")
-    assert "operation in progress" in dashboard.text       # FR-177 indicator + poll
+    assert "operation in progress" in dashboard.text       # FR-177 indicator
     assert "location.reload" in dashboard.text             # FR-173 auto-poll while locked
 
     response = client.post("/projects/ui-proj/delete", data={"confirm_name": "ui-proj"})
     assert "locked by live PID 4242" in response.text
     assert (projects / "ui-proj").exists()
 
-    response = client.post("/projects/ui-proj/update", data={"pile_sample": "head+random:9"})
+    response = client.post("/projects/ui-proj/update", data={"sample": "head+random:9"})
     assert response.status_code == 400                     # refused, inline
 
 
 def test_artifact_traversal_rejected_and_listing_contained(ctx, tmp_path):
-    client, projects, _ = ctx
-    client.post("/projects", data=_create_form())
+    client, projects, db = ctx
+    client.post("/projects", data=_create_form(db))
     (tmp_path / "outside.txt").write_text("secret", encoding="utf-8")
 
     response = client.get("/projects/ui-proj/artifacts/../../outside.txt")
@@ -163,8 +170,18 @@ def test_artifact_traversal_rejected_and_listing_contained(ctx, tmp_path):
     assert "project.yml" in listing.text                   # contained listing works
 
 
+def test_secrets_file_never_browsable(ctx):
+    client, projects, db = ctx
+    client.post("/projects", data=_create_form(db))
+    assert (projects / "ui-proj" / ".secrets").is_file()   # SQLite DSN stored here
+    listing = client.get("/projects/ui-proj/artifacts/")
+    assert ".secrets" not in listing.text                  # FR-012/FR-178: not listed
+    blocked = client.get("/projects/ui-proj/artifacts/.secrets")
+    assert blocked.status_code == 403                      # nor served
+
+
 def test_missing_project_dashboard_is_clean_404(ctx):
     client, _, _ = ctx
     response = client.get("/projects/ghost")
     assert response.status_code == 404
-    assert "no project named" in response.text             # edge case: vanished folder
+    assert "no project with slug" in response.text         # vanished folder

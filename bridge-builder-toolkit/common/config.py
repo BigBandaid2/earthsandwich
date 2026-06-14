@@ -20,6 +20,8 @@ PROJECT_FILE = "project.yml"
 
 #: SQLAlchemy driver pinned per engine (psycopg 3 for postgres; others best-effort).
 _ENGINE_DRIVER = {"postgresql": "postgresql+psycopg", "postgres": "postgresql+psycopg"}
+#: File-based relational engines — a database file path, no host/port/credentials.
+_FILE_ENGINES = {"sqlite", "duckdb"}
 
 
 def derive_slug(name: str) -> str:
@@ -47,12 +49,21 @@ class PileConfig:
     directories: list[PileDirectory] = field(default_factory=list)
     kind: str = "file"                     # file | relational (endpoint symmetry)
     sample: PileSample = field(default_factory=PileSample)
+    connection: "TargetConnection | None" = None   # relational pile (kind == relational)
+    secret_ref: str | None = None          # key under which the pile DSN lives in .secrets
+    connection_env: str | None = None      # legacy env-var name (read compat)
 
     def data_files(self) -> list[tuple[str, str]]:
         """(directory_path, filename) for every selected data file across directories."""
         return [(d.path, f) for d in self.directories if d.kind == "data" for f in d.files]
 
     def describe(self) -> str:
+        if self.kind == "relational":
+            if self.connection is not None:
+                return self.connection.descriptor()
+            if self.connection_env:
+                return f"env:{self.connection_env}"
+            return "(unconfigured db)"
         n = len(self.data_files())
         dirs = len(self.directories)
         return f"{dirs} director{'y' if dirs == 1 else 'ies'}, {n} data file{'' if n == 1 else 's'}"
@@ -67,21 +78,28 @@ class TargetConnection:
     user: str
 
     def dsn(self, password: str) -> str:
+        if self.engine in _FILE_ENGINES:               # sqlite/duckdb: file path, no host/creds
+            return f"{self.engine}:///{self.database}"
         driver = _ENGINE_DRIVER.get(self.engine, self.engine)
         return f"{driver}://{self.user}:{password}@{self.host}:{self.port}/{self.database}"
 
     def descriptor(self) -> str:           # credential-free, for display
+        if self.engine in _FILE_ENGINES:
+            return f"{self.engine}:///{self.database}"
         return f"{self.engine}://{self.host}:{self.port}/{self.database}"
 
 
 @dataclass
 class TargetConfig:
-    kind: str = "relational"               # relational | file (endpoint symmetry; v1 target = relational)
+    kind: str = "relational"               # relational | file (endpoint symmetry)
     connection: TargetConnection | None = None
     secret_ref: str | None = None          # key under which the DSN lives in .secrets
     connection_env: str | None = None      # legacy: env-var NAME (pre-redesign projects)
+    path: str | None = None                # file target: output directory (kind == file)
 
     def describe(self) -> str:
+        if self.kind == "file":
+            return f"dir:{self.path}" if self.path else "(unconfigured dir)"
         if self.connection is not None:
             return self.connection.descriptor()
         if self.connection_env:
@@ -124,28 +142,36 @@ class BridgeProject:
 
     def to_dict(self) -> dict[str, Any]:
         target: dict[str, Any] = {"kind": self.target.kind}
-        if self.target.connection is not None:
+        if self.target.kind == "file":
+            target["path"] = self.target.path
+        elif self.target.connection is not None:
             target["connection"] = asdict(self.target.connection)
             target["secret_ref"] = self.target.secret_ref
         elif self.target.connection_env:
             target["connection_env"] = self.target.connection_env
+
+        pile: dict[str, Any] = {
+            "kind": self.pile.kind,
+            "sample": {"strategy": self.pile.sample.strategy, "size": self.pile.sample.size},
+        }
+        if self.pile.kind == "relational" and self.pile.connection is not None:
+            pile["connection"] = asdict(self.pile.connection)
+            pile["secret_ref"] = self.pile.secret_ref
+        else:
+            pile["directories"] = [
+                {k: v for k, v in {
+                    "path": d.path, "kind": d.kind,
+                    "files": list(d.files) if d.kind == "data" else None,
+                    "catalogue": d.catalogue,
+                }.items() if v is not None}
+                for d in self.pile.directories
+            ]
         return {
             "name": self.name,
             "slug": self.slug,
             "description": self.description,
             "created_at": self.created_at,
-            "pile": {
-                "kind": self.pile.kind,
-                "directories": [
-                    {k: v for k, v in {
-                        "path": d.path, "kind": d.kind,
-                        "files": list(d.files) if d.kind == "data" else None,
-                        "catalogue": d.catalogue,
-                    }.items() if v is not None}
-                    for d in self.pile.directories
-                ],
-                "sample": {"strategy": self.pile.sample.strategy, "size": self.pile.sample.size},
-            },
+            "pile": pile,
             "target": target,
             "validation": asdict(self.validation),
         }
@@ -167,6 +193,16 @@ class BridgeProject:
         )
 
 
+def _connection_from(conn_raw: dict[str, Any] | None) -> TargetConnection | None:
+    if not conn_raw:
+        return None
+    return TargetConnection(
+        engine=conn_raw.get("engine", "postgresql"), host=conn_raw.get("host", ""),
+        port=int(conn_raw.get("port", 5432)), database=conn_raw.get("database", ""),
+        user=conn_raw.get("user", ""),
+    )
+
+
 def _pile_from_dict(raw: dict[str, Any]) -> PileConfig:
     sample_raw = raw.get("sample") or {}
     sample = PileSample(
@@ -182,24 +218,21 @@ def _pile_from_dict(raw: dict[str, Any]) -> PileConfig:
             ))
     elif raw.get("dir"):                                  # legacy multi-file (dir + files)
         directories.append(PileDirectory(path=raw["dir"], kind="data", files=list(raw.get("files") or [])))
-    elif raw.get("path"):                                 # legacy single-file (path)
+    elif raw.get("path") and not raw.get("connection"):  # legacy single-file (path)
         parsed = PurePath(raw["path"])
         directories.append(PileDirectory(path=str(parsed.parent), kind="data", files=[parsed.name]))
-    return PileConfig(directories=directories, kind=raw.get("kind", "file"), sample=sample)
+    return PileConfig(
+        directories=directories, kind=raw.get("kind", "file"), sample=sample,
+        connection=_connection_from(raw.get("connection")),
+        secret_ref=raw.get("secret_ref"), connection_env=raw.get("connection_env"),
+    )
 
 
 def _target_from_dict(raw: dict[str, Any]) -> TargetConfig:
-    conn_raw = raw.get("connection")
-    connection = None
-    if conn_raw:
-        connection = TargetConnection(
-            engine=conn_raw.get("engine", "postgresql"), host=conn_raw.get("host", ""),
-            port=int(conn_raw.get("port", 5432)), database=conn_raw.get("database", ""),
-            user=conn_raw.get("user", ""),
-        )
     return TargetConfig(
-        kind=raw.get("kind", "relational"), connection=connection,
+        kind=raw.get("kind", "relational"), connection=_connection_from(raw.get("connection")),
         secret_ref=raw.get("secret_ref"), connection_env=raw.get("connection_env"),
+        path=raw.get("path"),
     )
 
 

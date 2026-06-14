@@ -166,24 +166,101 @@ def build_pile(directories: list[tuple[str, str]], selections: dict[str, str], s
     return PileConfig(directories=pile_dirs, kind="file", sample=sample)
 
 
+# ---------------------------------------------------------------- endpoints (symmetric)
+
+#: File-based relational engines (a database file path; no host/port/credentials).
+FILE_ENGINES = {"sqlite", "duckdb"}
+
+
+def _connection_from_spec(spec: dict) -> TargetConnection:
+    engine = (spec.get("engine") or "").strip()
+    database = (spec.get("database") or "").strip()
+    if engine in FILE_ENGINES:
+        if not database:
+            raise OperatorError(f"{engine} endpoint requires a database file path")
+        return TargetConnection(engine=engine, host="", port=0, database=database, user="")
+    host = (spec.get("host") or "").strip()
+    user = (spec.get("user") or "").strip()
+    if not all([engine, host, database, user]):
+        raise OperatorError("relational endpoint requires engine, host, database and user")
+    return TargetConnection(engine=engine, host=host, port=int(spec.get("port") or 5432), database=database, user=user)
+
+
+def writable_dir(path: str) -> tuple[bool, bool, str]:
+    """Return (exists, writable, note) for a file endpoint's directory (created if absent)."""
+    p = Path(path)
+    if p.exists() and not p.is_dir():
+        return False, False, f"path exists but is not a directory: {p}"
+    try:
+        p.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        return False, False, f"cannot create directory {p}: {exc}"
+    probe = p / ".bridge_write_probe"
+    try:
+        probe.write_text("ok", encoding="utf-8")
+        probe.unlink()
+    except OSError as exc:
+        return True, False, f"directory not writable: {exc}"
+    return True, True, ""
+
+
+def build_pile_endpoint(spec: dict, sample: PileSample) -> tuple[PileConfig, dict[str, str], bool, str]:
+    """Validate the pile endpoint. Returns (PileConfig, secrets, pile_readable, note)."""
+    kind = spec.get("kind", "file")
+    if kind == "file":
+        return build_pile(spec.get("directories") or [], spec.get("selections") or {}, sample), {}, True, ""
+    if kind == "relational":
+        conn = _connection_from_spec(spec)
+        reachable, read, _insert, _delete, note, dsn = test_connection(conn, spec.get("password", ""))
+        if not (reachable and read):
+            raise OperatorError(f"pile database not readable: {note or 'unreachable'} — no project created (FR-008)")
+        pile = PileConfig(directories=[], kind="relational", sample=sample, connection=conn, secret_ref="pile")
+        return pile, {"pile": dsn}, True, note
+    raise OperatorError(f"unknown pile kind {kind!r} (expected file | relational)")
+
+
+def build_target_endpoint(spec: dict) -> tuple[TargetConfig, dict[str, str], dict]:
+    """Validate the target endpoint. Returns (TargetConfig, secrets, probe-result dict)."""
+    kind = spec.get("kind", "relational")
+    if kind == "relational":
+        conn = _connection_from_spec(spec)
+        reachable, read, insert, delete, note, dsn = test_connection(conn, spec.get("password", ""))
+        if not reachable:
+            raise OperatorError(f"{note or 'target unreachable'} — no project created (FR-008)")
+        target = TargetConfig(kind="relational", connection=conn, secret_ref="target")
+        return target, {"target": dsn}, {"reachable": True, "read": read, "insert": insert, "delete": delete, "note": note}
+    if kind == "file":
+        path = (spec.get("path") or "").strip()
+        if not path:
+            raise OperatorError("file target requires an output directory path")
+        exists, writable, note = writable_dir(path)
+        if not writable:
+            raise OperatorError(f"{note or 'target directory not writable'} — no project created (FR-008)")
+        target = TargetConfig(kind="file", path=path)
+        return target, {}, {"reachable": True, "read": exists, "insert": False, "delete": False,
+                            "note": "file target — oracle loop will be skipped (no DML)"}
+    raise OperatorError(f"unknown target kind {kind!r} (expected relational | file)")
+
+
 # ---------------------------------------------------------------- create
 
 def create_project(
     name: str,
     *,
-    directories: list[tuple[str, str]],
-    selections: dict[str, str] | None = None,
+    pile: dict,
+    target: dict,
     sample: str = "head+random:200",
     description: str = "",
-    engine: str,
-    host: str,
-    port: int | str = 5432,
-    database: str,
-    user: str,
-    password: str,
     projects_dir: Path | None = None,
 ) -> tuple[BridgeProject, Path]:
-    """Validate, then materialize ``projects/<slug>/`` with project.yml + .secrets."""
+    """Validate both endpoints, then materialize ``projects/<slug>/`` with project.yml + .secrets.
+
+    ``pile`` / ``target`` are endpoint specs: ``{"kind": "file", ...}`` or
+    ``{"kind": "relational", ...}`` — either endpoint may be either kind (FR-005,
+    endpoint symmetry). Relational endpoints are probed and their DSN stored in the
+    gitignored ``.secrets`` (never project.yml, FR-012); a file target is validated
+    as a writable directory. A failed gate leaves NO project state behind (FR-008).
+    """
     projects_root = projects_dir or default_projects_dir()
     slug = derive_slug(name)
     project_dir = projects_root / slug
@@ -195,24 +272,18 @@ def create_project(
     if description and len(description) > MAX_DESCRIPTION:
         raise OperatorError(f"description exceeds {MAX_DESCRIPTION} characters (FR-181)")
 
-    pile = build_pile(directories, selections or {}, _parse_sample(sample))
+    sample_obj = _parse_sample(sample)
+    pile_cfg, pile_secrets, pile_readable, pile_note = build_pile_endpoint(pile, sample_obj)
+    target_cfg, target_secrets, probe = build_target_endpoint(target)
 
-    if not all([engine, host, database, user]):
-        raise OperatorError("target connection requires engine, host, database and user")
-    connection = TargetConnection(engine=engine, host=host, port=int(port or 5432), database=database, user=user)
-    reachable, read, insert, delete, note, dsn = test_connection(connection, password)
-    if not reachable:
-        raise OperatorError(f"{note or 'target unreachable'} — no project created (FR-008)")
-
-    oracle_note = "" if (insert and delete) else "oracle loop will be skipped - no insert/delete permission (FR-075)"
+    oracle_note = "" if (probe["insert"] and probe["delete"]) else "oracle loop will be skipped - no insert/delete permission (FR-075)"
     validation = ConnectionValidationResult(
-        pile_readable=True, target_reachable=True, target_read=read,
-        target_insert=insert, target_delete=delete, validated_at=_now(),
-        notes="; ".join(filter(None, [note, oracle_note])),
+        pile_readable=pile_readable, target_reachable=probe["reachable"], target_read=probe["read"],
+        target_insert=probe["insert"], target_delete=probe["delete"], validated_at=_now(),
+        notes="; ".join(filter(None, [pile_note, probe["note"], oracle_note])),
     )
     project = BridgeProject(
-        name=name, slug=slug, pile=pile,
-        target=TargetConfig(kind="relational", connection=connection, secret_ref="target"),
+        name=name, slug=slug, pile=pile_cfg, target=target_cfg,
         description=description, created_at=_now(), validation=validation,
     )
 
@@ -220,7 +291,8 @@ def create_project(
     project_dir.mkdir(parents=True, exist_ok=True)
     with ProjectLock(project_dir):
         save_project(project, project_dir)
-        secrets_mod.write_secret(project_dir, "target", dsn)   # the password lives ONLY here
+        for ref, dsn in {**pile_secrets, **target_secrets}.items():
+            secrets_mod.write_secret(project_dir, ref, dsn)   # passwords live ONLY here
         logger, _ = get_run_logger(project_dir, "project-create")
         logger.info("project %r (slug %s) created; validation: %s", name, slug, validation)
     return project, project_dir

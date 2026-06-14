@@ -26,13 +26,16 @@ copy .env.example .env
 
 ```pwsh
 bridge_builder project create "IG pile → travelogue" `
-    --directory ../pile-app/pile --kind data `
-    --pile-files "../pile-app/pile=posts.ourearthsandwich.local.tsv,posts.welawen.local.tsv" `
+    --data-dir ../pile-app/pile --media-dir ../pile-app/pile/media `
+    --pile-files "posts.ourearthsandwich.local.tsv,posts.welawen.local.tsv" `
     --engine postgresql --host localhost --port 5432 `
     --database earthsandwich --user earthsandwich
-    # password read from a hidden prompt (or --password-stdin); stored only in projects/<slug>/.secrets
+    # target password read from a hidden prompt (never a plaintext flag);
+    # stored only in projects/<slug>/.secrets
 ```
-The name derives a unique **slug** (`ig-pile-to-travelogue`) = the folder name; a pile is **one or more `--directory`/`--kind` pairs** (add a `--kind media` directory for the IG media folder), data files frozen by `--pile-files`. The target connection is entered as discrete fields; the password is prompted and the assembled DSN is written to gitignored `projects/<slug>/.secrets` — **never to `project.yml`**.
+The name derives a unique **slug** (`ig-pile-to-travelogue`) = the folder name; freeing a taken slug requires an explicit `project delete` (no `--force`/overwrite). A file pile is **one or more `--data-dir` / `--media-dir` directories** (media is catalogued, not per-file-selected), with data files frozen by `--pile-files` (`all` or a comma-separated list). The target connection is entered as discrete fields; the password is prompted and the assembled DSN is written to gitignored `projects/<slug>/.secrets` — **never to `project.yml`** (FR-012).
+
+**Endpoint symmetry**: pile and target are each `file` or `relational`. The IG→Travelogue first run is the common file-pile → relational-target shape above. To flip either side, set `--pile-kind`/`--target-kind` and supply that side's inputs — a relational pile takes `--pile-engine/--pile-host/--pile-port/--pile-database/--pile-user` (+ hidden prompt); a file target takes `--target-path`. File-based relational engines (`sqlite`, `duckdb`) need only `--database` (the file path) and prompt for no password.
 Expect a validation report: pile **readable**, target **reachable + read + insert + delete** (the 002 stack grants all → the oracle loop will run). **SC-001: under 5 minutes.**
 
 ```pwsh

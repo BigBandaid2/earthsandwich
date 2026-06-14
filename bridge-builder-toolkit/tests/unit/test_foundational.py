@@ -9,14 +9,19 @@ from common import config, inference, locking, playground
 def test_config_round_trip(tmp_path):
     proj = config.BridgeProject(
         name="sample-project",
+        slug="sample-project",
+        description="## intent\nbridge it",
         created_at="2026-06-10T00:00:00+0000",
         pile=config.PileConfig(
-            dir="./data",
-            files=["sample-pile.tsv", "sample-pile2.tsv"],
-            kind="tsv",
+            directories=[config.PileDirectory(path="./data", kind="data", files=["sample-pile.tsv", "sample-pile2.tsv"])],
+            kind="file",
             sample=config.PileSample(strategy="head+random", size=200),
         ),
-        target=config.TargetConfig(connection_env="BRIDGE_TARGET_DSN", kind="relational"),
+        target=config.TargetConfig(
+            kind="relational",
+            connection=config.TargetConnection(engine="postgresql", host="db.local", port=5432, database="travelogue", user="writer"),
+            secret_ref="target",
+        ),
         validation=config.ConnectionValidationResult(
             pile_readable=True, target_reachable=True, target_read=True,
             target_insert=True, target_delete=True, validated_at="2026-06-10T00:00:01+0000",
@@ -27,6 +32,27 @@ def test_config_round_trip(tmp_path):
     assert loaded == proj
     assert loaded.validation.is_creatable
     assert loaded.validation.oracle_can_run
+    # the redesign keeps no password in project.yml (FR-012); only a secret marker
+    persisted = (tmp_path / config.PROJECT_FILE).read_text(encoding="utf-8")
+    assert "secret_ref: target" in persisted and "password" not in persisted
+
+
+def test_config_round_trips_symmetric_endpoints(tmp_path):
+    """A relational pile + a file target round-trip through project.yml (endpoint symmetry)."""
+    proj = config.BridgeProject(
+        name="db to dir", slug="db-to-dir",
+        pile=config.PileConfig(
+            kind="relational",
+            connection=config.TargetConnection(engine="postgresql", host="src.local", port=5432, database="src", user="reader"),
+            secret_ref="pile",
+        ),
+        target=config.TargetConfig(kind="file", path="../out"),
+    )
+    config.save_project(proj, tmp_path)
+    loaded = config.load_project(tmp_path)
+    assert loaded == proj
+    assert loaded.pile.kind == "relational" and loaded.pile.connection.database == "src"
+    assert loaded.target.kind == "file" and loaded.target.path == "../out"
 
 
 def test_lock_acquire_release_roundtrip(tmp_path):

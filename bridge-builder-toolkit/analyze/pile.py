@@ -80,6 +80,7 @@ def run_pile_analysis(
 ) -> dict[str, Path]:
     """Produce ``pile.ydata-profile.html`` + ``pile.enhanced.html`` in the current iteration."""
     analyst = _require_analyst(analyst)
+    data_files = [fname for _, fname in project.pile.data_files()]
     frame = load_pile_frame(project)
     sample = sample_frame(frame, project.pile.sample.strategy, project.pile.sample.size)
 
@@ -100,7 +101,7 @@ def run_pile_analysis(
         "columns": list(sample.columns),
         "row_count": int(len(frame)),
         "sampled_rows": sample_text,
-        "files": list(project.pile.files),
+        "files": data_files,
     }
     result = analyst.infer(
         "pile_profile_analysis",
@@ -118,7 +119,7 @@ def run_pile_analysis(
         .add_section(
             "ydata-profiling report",
             f"<p>Canonical raw baseline: <a href=\"{PILE_RAW}\">{PILE_RAW}</a> "
-            f"({int(len(frame))} rows across {len(project.pile.files)} files; sampled {len(sample)}).</p>",
+            f"({int(len(frame))} rows across {len(data_files)} files; sampled {len(sample)}).</p>",
             "ydata-profiling baseline",
         )
         .add_section(

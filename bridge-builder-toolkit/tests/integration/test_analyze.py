@@ -7,6 +7,7 @@ requires GraphViz; that single assertion skips with a reason when absent.
 """
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 
 import pytest
 import yaml
@@ -49,13 +50,21 @@ def _graphviz_available() -> bool:
         return False
 
 
+def _parts(dsn: str) -> dict:
+    u = urlparse(dsn)
+    return {
+        "engine": u.scheme.split("+")[0], "host": u.hostname or "", "port": u.port or 5432,
+        "database": (u.path or "/").lstrip("/"), "user": u.username or "", "password": u.password or "",
+    }
+
+
 @pytest.fixture
 def project_env(tmp_path, monkeypatch):
-    monkeypatch.setenv("ANALYZE_TARGET_DSN", TEST_DSN)
     monkeypatch.setenv("BRIDGE_PROJECTS_DIR", str(tmp_path / "projects"))
     project, project_dir = create_project(
-        "analysis-acceptance", pile=str(FIXTURES_DIR), pile_files="all",
-        target="postgresql://test-target", target_cred_env="ANALYZE_TARGET_DSN",
+        "analysis-acceptance",
+        pile={"kind": "file", "directories": [(str(FIXTURES_DIR), "data")], "selections": {str(FIXTURES_DIR): "all"}},
+        target={"kind": "relational", **_parts(TEST_DSN)},
     )
     return project, project_dir
 
