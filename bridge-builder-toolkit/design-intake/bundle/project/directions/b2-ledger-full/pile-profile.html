@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pile profile — ig-pile-to-travelogue — bridge_builder</title>
+<link rel="stylesheet" href="style.css">
+<script>if (new URLSearchParams(location.search).get('theme') === 'light') { document.documentElement.classList.add('light'); }</script>
+</head>
+<body class="locked" data-screen-label="B2 · Pile profile">
+<div class="shell">
+  <aside class="rail">
+    <a class="wordmark" href="projects.html">bridge<i>_builder</i></a>
+    <div class="navgroup">
+      <p class="gtitle">workspace</p>
+      <nav>
+        <a href="projects.html">Projects</a>
+      </nav>
+    </div>
+    <div class="navgroup">
+      <p class="gtitle proj">ig-pile-to-travelogue</p>
+      <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="edit.html">Project details</a>
+        <a class="here" href="pile-profile.html">Pile profile</a>
+        <div class="subnav">
+          <a class="subhere" href="pile-profile.html?iter=1">iteration-1 · Jun 11</a>
+          <a href="pile-profile.html?iter=0">iteration-0 · May 29</a>
+          <a class="subaction" href="#" data-modal="reprofile">＋ Re-profile…</a>
+        </div>
+        <a href="target-profile.html">Target profile</a>
+        <a href="bridge-synthesis.html">Bridge synthesis</a>
+        <a href="final-bundle.html">Final bundle</a>
+      </nav>
+    </div>
+    <div class="railfoot">The profile is a single self-contained file — open it from disk or share it as-is.</div>
+  </aside>
+
+  <main class="embedhost">
+    <header class="vhead">
+      <div class="vrow">
+        <h1>Pile profile</h1>
+        <span class="vstatus warn">◐ review pending</span>
+        <div class="hdr-actions">
+          <button class="hbtn" type="button" data-modal="download">↓ Download snapshot</button>
+          <button class="hbtn primary" type="button" data-modal="reprofile">↻ Re-profile</button>
+          <a class="hbtn" href="playground-pile.html" target="_blank" rel="noopener">↗ Open full window</a>
+        </div>
+      </div>
+      <div class="snapmeta">
+        <span><b>dataset ig-scrape-2026-06</b> · iteration-1 · 2026-06-11 04:38:53 +0000</span>
+        <span>fingerprint <span class="fp">sha256:a3f9c1e8</span></span>
+        <span>file dataset · 6 files · sampled 200 head+random · role: pile</span>
+      </div>
+    </header>
+    <div class="embed-fill">
+      <iframe src="playground-pile.html?embed=1" title="Pile profile playground"></iframe>
+    </div>
+  </main>
+</div>
+
+<!-- Re-profile modal -->
+<div class="modal-overlay" id="m-reprofile">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="rp-title">
+    <div class="m-head"><h3 id="rp-title">Re-profile the pile</h3><button class="mclose" type="button" data-close>×</button></div>
+    <div class="m-body">
+      <p class="lede">Runs the analyze stage from here — a new iteration is written each run; the current snapshot is never overwritten.</p>
+      <p class="mfp" id="rp-feedback">feedback included · <b>0 playground edits</b> from the current state</p>
+      <p class="note" style="margin:0 0 16px;">Your playground edits (objects, nodes, flags, sources, observations) are folded into the profiling prompt — the goal is that the next run one-shots a profile needing no further edits.</p>
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
+        <button class="hbtn primary" type="button" id="rp-run">▸ Run re-profile</button>
+        <span id="rp-status" style="font:12px/1.5 var(--mono); color:var(--ink-3);"></span>
+      </div>
+      <details class="fold" style="margin-top:8px;">
+        <summary style="border-top:1px solid var(--rule-soft); font-size:10px;"><span class="chev">▸</span>CLI equivalent</summary>
+        <div class="cmd" style="margin-top:10px;"><pre id="cmd-pile">bridge_builder analyze pile --project "ig-pile-to-travelogue" --feedback-from playground</pre><button class="copy" type="button" data-copy="cmd-pile">Copy</button></div>
+      </details>
+    </div>
+  </div>
+</div>
+
+<!-- Download snapshot modal -->
+<div class="modal-overlay" id="m-download">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dl-title">
+    <div class="m-head"><h3 id="dl-title">Download snapshot bundle</h3><button class="mclose" type="button" data-close>×</button></div>
+    <div class="m-body">
+      <p class="lede">iteration-1, captured 2026-06-11 04:38:53. Self-contained and context-free — the playground plus the exact sampled rows it was built from. Reusable in any bridge project, as pile or target.</p>
+      <p class="mfp">fingerprint <b>sha256:a3f9c1e8d2b7…</b> · verifies the sample is unchanged</p>
+      <ul class="manifest">
+        <li>ig-scrape-2026-06.profile.html<span class="mf-meta">playground · 38 KB</span></li>
+        <li>ig-scrape-2026-06.sample.tsv<span class="mf-meta">sampled rows · 6 files</span></li>
+        <li>ig-scrape-2026-06.ydata-profile.html<span class="mf-meta">raw baseline · 3.2 MB</span></li>
+        <li>snapshot.manifest.json<span class="mf-meta">fingerprint · spec · 1.2 KB</span></li>
+      </ul>
+      <div style="display:flex; gap:10px;">
+        <a class="hbtn primary" href="playground-pile.html" download>↓ Download bundle (.zip)</a>
+        <a class="hbtn" href="playground-pile.html" download>Playground only (.html)</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  function copyBtn(btn) {
+    btn.addEventListener('click', function () {
+      var src = document.getElementById(btn.getAttribute('data-copy'));
+      function ok() { btn.classList.add('copied'); btn.textContent = 'Copied'; setTimeout(function () { btn.classList.remove('copied'); btn.textContent = 'Copy'; }, 1600); }
+      function fb() { var r = document.createRange(); r.selectNodeContents(src); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Ctrl/Cmd+C'; }
+      if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(src.textContent).then(ok, fb); } else { fb(); }
+    });
+  }
+  document.querySelectorAll('button.copy[data-copy]').forEach(copyBtn);
+
+  function open(id) {
+    var m = document.getElementById('m-' + id); if (m) m.classList.add('open');
+    if (id === 'reprofile') {
+      try {
+        var fr = document.querySelector('.embed-fill iframe');
+        var n = fr.contentWindow.bbEditCount ? fr.contentWindow.bbEditCount() : 0;
+        document.getElementById('rp-feedback').innerHTML = 'feedback included · <b>' + n + ' playground edit' + (n !== 1 ? 's' : '') + '</b> from the current state';
+      } catch (e) {}
+    }
+  }
+  function closeAll() { document.querySelectorAll('.modal-overlay.open').forEach(function (m) { m.classList.remove('open'); }); }
+  document.querySelectorAll('[data-modal]').forEach(function (t) {
+    t.addEventListener('click', function (e) { e.preventDefault(); open(t.getAttribute('data-modal')); });
+  });
+  document.querySelectorAll('[data-close]').forEach(function (b) { b.addEventListener('click', closeAll); });
+  document.querySelectorAll('.modal-overlay').forEach(function (m) { m.addEventListener('click', function (e) { if (e.target === m) closeAll(); }); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAll(); });
+
+  /* run re-profile from the UI */
+  var rpRun = document.getElementById('rp-run'), rpStatus = document.getElementById('rp-status');
+  rpRun.addEventListener('click', function () {
+    if (rpRun.disabled) return;
+    rpRun.disabled = true; rpRun.style.opacity = '0.5';
+    var steps = ['queued…', 'sampling pile (1/3)…', 'ydata baseline (2/3)…', 'LLM analysis + feedback (3/3)…'];
+    var i = 0;
+    rpStatus.textContent = steps[0];
+    var t = setInterval(function () {
+      i++;
+      if (i < steps.length) { rpStatus.textContent = steps[i]; return; }
+      clearInterval(t);
+      rpStatus.innerHTML = '<span style="color:var(--ok);">● iteration-2 created — review pending</span>';
+      rpRun.textContent = 'Done';
+      var sub = document.querySelector('.subnav');
+      if (sub && !sub.querySelector('[data-new-iter]')) {
+        var a = document.createElement('a');
+        a.setAttribute('data-new-iter', '1'); a.href = '#'; a.className = 'subhere';
+        a.textContent = 'iteration-2 · Jun 12';
+        sub.querySelector('.subhere').className = '';
+        sub.insertBefore(a, sub.firstChild);
+      }
+    }, 900);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data profile — travelogue-db</title>
+<link rel="stylesheet" href="profile-playground.css">
+<script>
+(function(){ var p = new URLSearchParams(location.search);
+  if (p.get('theme') === 'light') document.documentElement.classList.add('light');
+  if (p.get('embed') === '1') document.documentElement.classList.add('embed');
+})();
+</script>
+</head>
+<body data-screen-label="B2 · Data profile (relational dataset)">
+
+<header class="pg-header">
+  <h1>Data profile · <i>travelogue-db</i></h1>
+  <div class="snap">
+    <span><b>iteration-1</b> · snapshot 2026-06-11 04:38:53 +0000</span>
+    <span>fingerprint <span class="fp">sha256:7be4d0a2</span></span>
+    <span>relational dataset · PostgreSQL · 3 tables · 2 foreign keys</span>
+    <a class="dl" href="playground-target.html" download="travelogue-db.profile.html">Download playground ↓</a>
+  </div>
+</header>
+
+<nav class="pg-toolbar">
+  <div class="pg-tabs">
+    <a href="#s1" class="on">Baselines</a>
+    <a href="#s2">Nodes &amp; objects</a>
+    <a href="#s3">Tables</a>
+    <a href="#s4">Sources</a>
+  </div>
+  <div class="pg-tool-right">
+    <span class="statepill" id="statepill">LLM original</span>
+    <div class="legend-inline">
+      <span class="lg"><span class="prov baseline">baseline</span></span>
+      <span class="lg"><span class="prov llm">LLM</span></span>
+      <span class="lg"><span class="prov novel">novel</span></span>
+    </div>
+    <div class="dd-wrap">
+      <button class="tbtn" id="save-btn" type="button">Save state</button>
+      <div class="dd" id="save-dd">
+        <div class="dd-title">Saved states — iteration-1</div>
+        <div id="save-items"></div>
+      </div>
+    </div>
+    <div class="dd-wrap">
+      <button class="tbtn amber" id="copy-btn" type="button">Copy out a prompt</button>
+      <div class="copy-pop" id="copy-pop">
+        <div class="cp-title">AI-actionable digest</div>
+        <p class="cp-desc">Every section plus your edits — feeding this into re-profile aims to one-shot a profile that needs no further edits.</p>
+        <textarea id="copy-payload" readonly></textarea>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="content">
+
+  <section class="sheet" id="s1">
+    <div class="sheet-head"><span class="no">i.</span><h2>Baselines — ER-diagram + ydata</h2><span class="prov baseline">baseline</span></div>
+    <p class="subhead">A relational dataset gets both raw baselines: the ER introspection (keys &amp; relationships) and the ydata profile (per-column statistics). Each opens in its own window.</p>
+    <div class="baseline-link">
+      <a class="doc" href="target.er-diagram.svg" target="_blank" rel="noopener">travelogue-db.er-diagram.svg <span class="ext">↗ new window</span></a>
+      <span class="meta">3 tables · 2 foreign keys · 14 KB</span>
+    </div>
+    <div class="baseline-link">
+      <a class="doc" href="pile.ydata-profile.html" target="_blank" rel="noopener">travelogue-db.ydata-profile.html <span class="ext">↗ new window</span></a>
+      <span class="meta">12 variables · 3 tables · 2.8 MB</span>
+    </div>
+  </section>
+
+  <section class="sheet" id="s2">
+    <div class="sheet-head"><span class="no">ii.</span><h2>Nodes &amp; objects</h2><span class="prov novel">toolkit-novel</span></div>
+    <p class="subhead">For a relational dataset, nodes are deterministic — every table in the schema is a node. Object grouping, descriptions and implied nodes are LLM-inferred and editable: rename objects inline, drag nodes between them, or open a node's detail. Implied nodes are entities the schema implies without a table of their own.</p>
+    <div class="lineage" id="lineage"></div>
+    <div id="objects"></div>
+    <button class="tbtn newobj" id="new-obj" type="button">＋ New object</button>
+
+    <p class="subhead" style="margin-top:28px;">Connections — solid edges are foreign keys; dashed means implied.</p>
+    <div class="graphwrap">
+      <svg viewBox="0 0 900 320" role="img" aria-label="Node graph: schema tables with foreign keys and implied nodes">
+        <g>
+          <path class="ng-edge" d="M214,180 L404,180"></path>
+          <path class="ng-edge" d="M496,180 L686,180"></path>
+          <path class="ng-edge impl" d="M150,142 L240,76"></path>
+        </g>
+        <g>
+          <rect class="elbg" x="262" y="162" width="92" height="20"></rect>
+          <text class="ng-elabel" x="268" y="177">fk <tspan class="kk">site_id</tspan></text>
+          <rect class="elbg" x="540" y="162" width="106" height="20"></rect>
+          <text class="ng-elabel" x="546" y="177">fk <tspan class="kk">reading_id</tspan></text>
+          <rect class="elbg" x="146" y="88" width="124" height="20"></rect>
+          <text class="ng-elabel" x="152" y="103">anchors <tspan class="kk">region_code</tspan></text>
+        </g>
+        <g class="ng-node hard" data-gnode="n-sites"><circle cx="170" cy="180" r="40"></circle><text class="nlabel" x="170" y="178">sites</text><text class="nsub" x="170" y="194">5 fields</text></g>
+        <g class="ng-node hard" data-gnode="n-readings"><circle cx="450" cy="180" r="48"></circle><text class="nlabel" x="450" y="178">readings</text><text class="nsub" x="450" y="194">4 fields</text></g>
+        <g class="ng-node hard" data-gnode="n-attachments"><circle cx="740" cy="180" r="40"></circle><text class="nlabel" x="740" y="178">attachments</text><text class="nsub" x="740" y="194">4 fields</text></g>
+        <g class="ng-node implied" data-gnode="n-region"><circle cx="280" cy="50" r="30"></circle><text class="nlabel" x="280" y="48">region</text><text class="nsub" x="280" y="63">implied</text></g>
+      </svg>
+      <p class="graph-caption"><b>readings</b> is the spine: <b>site_id</b> resolves the place into <b>sites</b>, <b>reading_id</b> hangs media off it in <b>attachments</b>. <b>region_code</b> implies a region entity with no table of its own.</p>
+    </div>
+
+    <p class="subhead" style="margin-top:28px;">Schema observations flagged for review — comment or dismiss.</p>
+    <ul class="reflist" id="flaglist"></ul>
+  </section>
+
+  <section class="sheet" id="s3">
+    <div class="sheet-head"><span class="no">iii.</span><h2>Tables</h2><span class="prov llm">LLM-extended over the baselines</span></div>
+    <p class="subhead">One table per node — profiled on its own terms: constraints, keys and data shape only. Pick a node, filter its fields, then open the table detail to manage keys, ignore fields, sort &amp; batch-edit, and download the raw sample.</p>
+    <div class="tbl-bar" id="tbl-bar"></div>
+    <div id="tbl-wrap"></div>
+    <p class="tbl-note" id="tbl-note"></p>
+  </section>
+
+  <section class="sheet" id="s4">
+    <div class="sheet-head"><span class="no">iv.</span><h2>Public-knowledge enrichment</h2><span class="prov llm">LLM-extended</span></div>
+    <p class="subhead">Public sources consulted for additional context. Exclude any you don't trust; add your own as links or file uploads — both carry into the next re-profile.</p>
+    <ul class="srclist2" id="srcrows"></ul>
+    <div class="addrow">
+      <input type="url" id="src-url" placeholder="https:// — add a reference source">
+      <button class="tbtn amber" id="src-add" type="button">Add link</button>
+      <button class="tbtn" id="src-upload" type="button">Upload file…</button>
+      <input type="file" id="src-file" style="display:none;">
+    </div>
+  </section>
+</main>
+
+<!-- node detail modal -->
+<div class="modal-overlay" id="m-node">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="m-head"><h3 id="nd-title">Node</h3><span class="prov" id="nd-prov"></span><button class="mclose" type="button" data-close>×</button></div>
+    <div class="m-body" id="nd-body"></div>
+    <div class="m-foot" id="nd-foot"></div>
+  </div>
+</div>
+
+<!-- table detail — full-view takeover -->
+<div class="takeover" id="tk" role="dialog" aria-modal="true">
+  <div class="tk-head">
+    <div class="tk-r1">
+      <h3 id="tk-title">Table</h3>
+      <span class="prov baseline">schema baseline + LLM</span>
+      <span class="tk-meta" id="tk-meta"></span>
+      <button class="tk-dl" id="tk-dl" type="button">↓ Sample data (.tsv)</button>
+      <button class="tbtn" id="tk-node" type="button" style="margin-left:14px;">Node detail</button>
+      <button class="tbtn" id="tk-close" type="button">✕ Close</button>
+    </div>
+    <div class="tk-r2">
+      <div class="tk-tabs">
+        <button type="button" data-tktab="overview">Overview</button>
+        <button type="button" data-tktab="fields" class="on">Fields</button>
+      </div>
+      <input id="tk-filter" placeholder="filter fields…">
+      <select id="tk-sort">
+        <option value="order">source order</option>
+        <option value="name">name A→Z</option>
+        <option value="distinct">distinct ↓</option>
+        <option value="missing">missing ↓</option>
+        <option value="keys">keys first</option>
+      </select>
+      <div class="tk-batch" id="tk-batch"></div>
+    </div>
+  </div>
+  <div class="tk-body">
+    <div id="tk-warn"></div>
+    <div id="tk-content"></div>
+  </div>
+</div>
+
+<script>
+window.DATASET = {
+  id: 'travelogue-db',
+  lsKey: 'target.iter1',
+  kind: 'relational',
+  unitsLabel: 'tables',
+  unitCount: 3,
+  snapshotLabel: '2026-06-11 04:38',
+  promptHeader: '# Data profile - travelogue-db (iteration-1, sha256:7be4d0a2)',
+  DEFAULT: {
+    objects: [
+      { id: 'o-observation', name: 'Observation', desc: 'A recorded event with its media. Reasoning: attachments hang one-to-many off readings via reading_id, so they describe the reading rather than a separate entity.', nodes: ['n-readings', 'n-attachments'] },
+      { id: 'o-place', name: 'Place', desc: 'A location referenced by many readings. Reasoning: sites is a lookup table keyed by id; region_code further implies a coarser region grouping with no table of its own.', nodes: ['n-sites', 'n-region'] }
+    ],
+    nodes: {
+      'n-readings': { kind: 'hard', name: 'readings', desc: 'The event spine — one row per recorded observation.', from: ['readings'], fields: ['id', 'site_id', 'captured_at', 'note'], keys: ['id', 'site_id'], hidden: false },
+      'n-sites': { kind: 'hard', name: 'sites', desc: 'Location lookup — one row per site.', from: ['sites'], fields: ['id', 'name', 'lat', 'lng', 'region_code'], keys: ['id'], hidden: false },
+      'n-attachments': { kind: 'hard', name: 'attachments', desc: 'Media hanging off a reading.', from: ['attachments'], fields: ['id', 'reading_id', 'kind', 'path'], keys: ['id', 'reading_id'], hidden: false },
+      'n-region': { kind: 'implied', name: 'region', desc: 'Implied coarser geography: region_code repeats across sites but has no table of its own.', base: 'n-sites', anchors: ['region_code'], hidden: false }
+    },
+    flags: [
+      { id: 'f1', ref: 'sites.name', chip: 'unconstrained unique', ext: true, why: 'Unique in practice but no UNIQUE index — duplicate site names would be accepted silently. Dedupe policy is open.', comment: '', dismissed: false },
+      { id: 'f2', ref: 'attachments.kind', chip: 'no CHECK constraint', ext: true, why: 'Holds image/video by convention only — nothing prevents arbitrary labels from being written.', comment: '', dismissed: false }
+    ],
+    sources: [
+      { id: 'p1', name: 'PostgreSQL information_schema', url: 'https://www.postgresql.org/docs/current/information-schema.html', use: 'Schema introspection source — tables, constraints, FK graph.', excluded: false, added: false },
+      { id: 'p2', name: 'ISO 3166-2', url: 'https://en.wikipedia.org/wiki/ISO_3166-2', use: 'region_code values match ISO 3166-2 subdivision codes — informs the implied region node.', excluded: false, added: false },
+      { id: 'p3', name: 'GeoNames', url: 'https://www.geonames.org', use: 'Validated lat/lng plausibility for existing site rows.', excluded: false, added: false }
+    ],
+    tables: {
+      'n-readings': [
+        { f: 'id', type: 'INTEGER', distinct: '212 · 100%', missing: '0', mem: '1.7 KB', top: 'monotonic sequence', obs: 'Integer surrogate primary key — generated sequence; the table has no natural key.', ev: 'PK constraint; monotonic in existing rows', edited: false, pk: true, skey: false, fk: null, llm: false, ign: false },
+        { f: 'site_id', type: 'INTEGER', distinct: '17 · 8%', missing: '26 · 12%', mem: '1.7 KB', top: 'site 3 · site 7', obs: 'FK → sites.id, nullable — a reading can exist without a resolved site.', ev: 'FK constraint; 12% null in existing rows', edited: false, pk: false, skey: false, fk: { node: 'n-sites', field: 'id' }, llm: false, ign: false },
+        { f: 'captured_at', type: 'TEXT', distinct: '212 · 100%', missing: '0', mem: '5.1 KB', top: 'ISO-8601', obs: 'Required text timestamp — existing rows are ISO-8601; no default, no CHECK.', ev: 'all rows match YYYY-MM-DDThh:mm:ssZ', edited: false, pk: false, skey: true, fk: null, llm: false, ign: false },
+        { f: 'note', type: 'TEXT', distinct: '131 · 62%', missing: '81 · 38%', mem: '11.8 KB', top: 'free text', obs: 'Nullable free text — no length constraint.', ev: '38% null in existing rows', edited: false, pk: false, skey: false, fk: null, llm: false, ign: false }
+      ],
+      'n-sites': [
+        { f: 'id', type: 'INTEGER', distinct: '17 · 100%', missing: '0', mem: '136.0 B', top: 'monotonic sequence', obs: 'Integer surrogate primary key.', ev: 'PK constraint', edited: false, pk: true, skey: false, fk: null, llm: false, ign: false },
+        { f: 'name', type: 'TEXT', distinct: '17 · 100%', missing: '0', mem: '420.0 B', top: 'Station A · Station B', obs: 'Required display name. Unique in practice but unconstrained — dedupe policy is open.', ev: 'NOT NULL constraint; no UNIQUE index', edited: false, pk: false, skey: true, fk: null, llm: false, ign: false },
+        { f: 'lat', type: 'REAL', distinct: '15 · 88%', missing: '2 · 12%', mem: '136.0 B', top: 'decimal degrees', obs: 'Nullable coordinate — decimal degrees.', ev: 'values within ±90', edited: false, pk: false, skey: false, fk: null, llm: false, ign: false },
+        { f: 'lng', type: 'REAL', distinct: '15 · 88%', missing: '2 · 12%', mem: '136.0 B', top: 'decimal degrees', obs: 'Pairs with lat — the coordinate pair is missing together.', ev: 'same rows null as lat', edited: false, pk: false, skey: false, fk: null, llm: false, ign: false },
+        { f: 'region_code', type: 'TEXT', distinct: '5 · 29%', missing: '4 · 24%', mem: '188.0 B', top: 'GB-LND 35% · FR-IDF 18%', obs: 'Low-cardinality grouping code — matches ISO 3166-2 subdivisions; implies a region entity with no table.', ev: '5 distinct codes across 17 sites; all match ISO 3166-2', edited: false, pk: false, skey: true, fk: null, llm: false, ign: false }
+      ],
+      'n-attachments': [
+        { f: 'id', type: 'INTEGER', distinct: '164 · 100%', missing: '0', mem: '1.3 KB', top: 'monotonic sequence', obs: 'Integer surrogate primary key.', ev: 'PK constraint', edited: false, pk: true, skey: false, fk: null, llm: false, ign: false },
+        { f: 'reading_id', type: 'INTEGER', distinct: '149 · 91%', missing: '0', mem: '1.3 KB', top: '1–2 per reading', obs: 'FK → readings.id, required — every attachment belongs to a reading.', ev: 'FK + NOT NULL constraints', edited: false, pk: false, skey: false, fk: { node: 'n-readings', field: 'id' }, llm: false, ign: false },
+        { f: 'kind', type: 'TEXT', distinct: '2 · 1%', missing: '0', mem: '1.0 KB', top: 'image 86% · video 14%', obs: 'Nullable class label — image/video by convention, no CHECK constraint.', ev: 'two values present: image, video', edited: false, pk: false, skey: false, fk: null, llm: false, ign: false },
+        { f: 'path', type: 'TEXT', distinct: '164 · 100%', missing: '0', mem: '6.2 KB', top: 'media/…', obs: 'Required relative media path; uniqueness unconstrained.', ev: 'NOT NULL; unique in existing rows', edited: false, pk: false, skey: false, fk: null, llm: false, ign: false }
+      ]
+    },
+    edits: []
+  },
+  SAMPLES: {
+    'n-readings': [
+      ['id', 'site_id', 'captured_at', 'note'],
+      ['1', '3', '2026-04-11T08:30:00Z', 'clear morning'],
+      ['2', '3', '2026-04-11T12:10:00Z', ''],
+      ['3', '7', '2026-04-12T18:44:00Z', 'heavy crowds'],
+      ['4', '', '2026-04-13T07:55:00Z', 'site unresolved']
+    ],
+    'n-sites': [
+      ['id', 'name', 'lat', 'lng', 'region_code'],
+      ['3', 'Station A', '51.5007', '-0.1246', 'GB-LND'],
+      ['7', 'Station B', '48.8584', '2.2945', 'FR-IDF'],
+      ['9', 'Station C', '41.9028', '12.4964', '']
+    ],
+    'n-attachments': [
+      ['id', 'reading_id', 'kind', 'path'],
+      ['11', '1', 'image', 'media/0001.jpg'],
+      ['12', '1', 'image', 'media/0002.jpg'],
+      ['13', '3', 'video', 'media/0003.mp4']
+    ]
+  },
+  OVERVIEW: {
+    'n-readings': { obs: 212, missing: 107, dup: 0, mem: '20.3 KB' },
+    'n-sites': { obs: 17, missing: 8, dup: 0, mem: '1.0 KB' },
+    'n-attachments': { obs: 164, missing: 0, dup: 0, mem: '9.8 KB' }
+  }
+};
+</script>
+<script src="profile-engine.js"></script>
+</body>
+</html>

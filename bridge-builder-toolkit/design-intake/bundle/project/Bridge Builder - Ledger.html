@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bridge Builder — Ledger (B2 Dark)</title>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+<style>
+  html, body { margin: 0; height: 100%; }
+  #root { height: 100%; }
+  .frame-clip { width: 100%; height: 100%; overflow: hidden; background: #171512; }
+  .frame-clip iframe { border: 0; transform-origin: top left; display: block; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { DesignCanvas, DCSection, DCArtboard, DCPostIt } = window;
+
+function Frame({ src, h, w = 1440, s = 0.5 }) {
+  return (
+    <div className="frame-clip">
+      <iframe src={src} style={{ width: w, height: h, transform: `scale(${s})` }} title={src}></iframe>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <DesignCanvas>
+      <DCSection
+        id="b2-webui"
+        title="Surface A — Web UI (server-rendered, multi-page)"
+        subtitle="Warm dark paper, hairline rules, Georgia display, one amber ink. Profile views are viewport-locked hosts: fixed rail (iterations as nav sub-items) + snapshot header (fingerprint · download bundle · Run re-profile from the UI, with playground edits fed back as the prompt) over a full-bleed playground iframe. Forms gain the slim sticky section toolbar, a directory browser, Data/Media source kinds, select all/none, and media-directory summary (catalogued, not listed)."
+      >
+        <DCArtboard id="b2-projects" label="Projects" width={720} height={330}><Frame src="directions/b2-ledger-full/projects.html" h={660} /></DCArtboard>
+        <DCArtboard id="b2-dash" label="Dashboard · two confirmations + review tracker" width={720} height={540}><Frame src="directions/b2-ledger-full/dashboard.html" h={1080} /></DCArtboard>
+        <DCArtboard id="b2-new" label="New project · two-up form" width={720} height={560}><Frame src="directions/b2-ledger-full/new.html" h={1120} /></DCArtboard>
+        <DCArtboard id="b2-edit" label="Project details · mirrors New + multi-dir pile + collapsed delete" width={720} height={900}><Frame src="directions/b2-ledger-full/edit.html" h={1800} /></DCArtboard>
+        <DCArtboard id="b2-pile" label="Pile profile · seamless full-bleed playground + snapshot header" width={720} height={750}><Frame src="directions/b2-ledger-full/pile-profile.html" h={1500} /></DCArtboard>
+        <DCArtboard id="b2-target" label="Target profile · seamless full-bleed playground" width={720} height={750}><Frame src="directions/b2-ledger-full/target-profile.html" h={1500} /></DCArtboard>
+        <DCArtboard id="b2-syn" label="Bridge synthesis · synthesize cmd + oracle/review loops" width={720} height={540}><Frame src="directions/b2-ledger-full/bridge-synthesis.html" h={1080} /></DCArtboard>
+        <DCArtboard id="b2-final" label="Final bundle" width={720} height={340}><Frame src="directions/b2-ledger-full/final-bundle.html" h={680} /></DCArtboard>
+        <DCArtboard id="b2-art" label="Artifacts" width={720} height={360}><Frame src="directions/b2-ledger-full/artifacts.html" h={720} /></DCArtboard>
+      </DCSection>
+      <DCSection
+        id="b2-playgrounds"
+        title="Surface B — Analysis playgrounds (one self-contained file each)"
+        subtitle="One ‘Data profile’ playground, two dataset variants — context-free (no pile/target/project references; the host header assigns the role). File variant: signature-derived nodes + ydata baseline. Relational variant: one node per table + ERD & ydata baselines. Shared everywhere: editable objects/nodes (drag, ignore, implied nodes), the Tables section, and a full-view table-detail takeover — Overview + Fields tabs, key checkboxes (PK w/ dedup warnings, FK w/ join targets, searchable, LLM-inferred, ignore), sort/filter, multi-select batch actions, raw-sample .tsv download, and a Node-detail hop. Every edit logs into save states and the re-profile prompt."
+      >
+        <DCArtboard id="b2-play-pile" label="Data profile · file dataset (ig-scrape-2026-06)" width={760} height={1000}><Frame src="directions/b2-ledger-full/playground-pile.html" h={2000} w={1520} /></DCArtboard>
+        <DCArtboard id="b2-play-target" label="Data profile · relational dataset (travelogue-db)" width={760} height={1000}><Frame src="directions/b2-ledger-full/playground-target.html" h={2000} w={1520} /></DCArtboard>
+        <DCArtboard id="b2-ydata" label="ydata baseline · restyled pop-out" width={720} height={760}><Frame src="directions/b2-ledger-full/pile.ydata-profile.html" h={1520} /></DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

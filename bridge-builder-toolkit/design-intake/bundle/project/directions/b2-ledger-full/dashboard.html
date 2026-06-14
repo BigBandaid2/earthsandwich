@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ig-pile-to-travelogue — bridge_builder</title>
+<link rel="stylesheet" href="style.css">
+<script>if (new URLSearchParams(location.search).get('theme') === 'light') { document.documentElement.classList.add('light'); }</script>
+</head>
+<body data-screen-label="B2 · Dashboard">
+<div class="shell">
+  <aside class="rail">
+    <a class="wordmark" href="projects.html">bridge<i>_builder</i></a>
+    <div class="navgroup">
+      <p class="gtitle">workspace</p>
+      <nav>
+        <a href="projects.html">Projects</a>
+      </nav>
+    </div>
+    <div class="navgroup">
+      <p class="gtitle proj">ig-pile-to-travelogue</p>
+      <nav>
+        <a class="here" href="dashboard.html">Dashboard</a>
+        <a href="edit.html">Project details</a>
+        <a href="pile-profile.html">Pile profile</a>
+        <a href="target-profile.html">Target profile</a>
+        <a href="bridge-synthesis.html">Bridge synthesis</a>
+        <a href="final-bundle.html">Final bundle</a>
+      </nav>
+    </div>
+    <div class="railfoot">Stages run via the CLI — the UI guides, it does not launch them.</div>
+  </aside>
+  <main class="content">
+    <div class="pagetitle">
+      <h1>ig-pile-to-travelogue</h1>
+      <span class="sub">../pile-app/pile → env IG_TRAVELOGUE_TARGET_DSN</span>
+      <span class="right"><span class="status ok"><span class="tick">●</span>valid · oracle run</span></span>
+    </div>
+
+    <section class="sheet first">
+      <div class="sheet-head"><span class="no">i.</span><h2>Connection</h2><a class="action" href="edit.html">Connection report</a></div>
+      <div class="confirms">
+        <div class="confirm ok"><span class="tick">●</span><span class="what">Pile valid</span><span class="where">6 files readable</span></div>
+        <div class="confirm ok"><span class="tick">●</span><span class="what">Target valid</span><span class="where">read · insert · delete confirmed</span></div>
+        <div class="confirm" style="color:var(--ink-3);"><span class="where">validated 2026-06-11T04:38:53+0000</span></div>
+      </div>
+    </section>
+
+    <section class="sheet">
+      <div class="sheet-head"><span class="no">ii.</span><h2>Suggested next step</h2></div>
+      <ol class="track">
+        <li class="done">
+          <span class="tn">1</span>
+          <div class="tbody">
+            <div class="tname">Project created</div>
+            <div class="tdesc">Connections validated · profiling triggered automatically on create</div>
+          </div>
+          <span class="tstate">Done</span>
+        </li>
+        <li class="review">
+          <span class="tn">2</span>
+          <div class="tbody">
+            <div class="tname"><a href="pile-profile.html">Review pile profiling</a></div>
+            <div class="tdesc"><span class="auto">analyzed automatically</span> · 6 files → 4 nodes, 3 objects inferred — your review is pending</div>
+            <a class="tcta" href="pile-profile.html">Open pile profile →</a>
+          </div>
+          <span class="tstate">Review</span>
+        </li>
+        <li class="review">
+          <span class="tn">3</span>
+          <div class="tbody">
+            <div class="tname"><a href="target-profile.html">Review target profiling</a></div>
+            <div class="tdesc"><span class="auto">analyzed automatically</span> · 3 tables from the ER baseline — your review is pending</div>
+            <a class="tcta" href="target-profile.html">Open target profile →</a>
+          </div>
+          <span class="tstate">Review</span>
+        </li>
+        <li class="pending">
+          <span class="tn">4</span>
+          <div class="tbody">
+            <div class="tname"><a href="bridge-synthesis.html">Synthesize bridge</a></div>
+            <div class="tdesc">runs after both profiles are reviewed · oracle + review loops live here</div>
+          </div>
+          <span class="tstate">Next</span>
+        </li>
+        <li class="pending">
+          <span class="tn">5</span>
+          <div class="tbody">
+            <div class="tname"><a href="final-bundle.html">Final bundle</a></div>
+            <div class="tdesc">packaged spec — available once synthesis passes the oracle</div>
+          </div>
+          <span class="tstate">—</span>
+        </li>
+      </ol>
+      <div class="toc-meta">
+        <span>data-profiling iterations <b>1</b></span>
+        <span>bridge-mapping iterations <b>0</b></span>
+      </div>
+    </section>
+
+    <section class="sheet">
+      <div class="sheet-head"><span class="no">iii.</span><h2>Artifacts</h2><a class="action" href="artifacts.html">Browse folder</a></div>
+      <p class="note">7 files in the latest data-profiling iteration, including both analysis playgrounds. Re-profiling commands live on each profile view; the synthesis command lives on Bridge synthesis.</p>
+    </section>
+  </main>
+</div>
+</body>
+</html>

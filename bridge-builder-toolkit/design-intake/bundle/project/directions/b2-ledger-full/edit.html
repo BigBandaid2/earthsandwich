@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project details — ig-pile-to-travelogue — bridge_builder</title>
+<link rel="stylesheet" href="style.css">
+<script>if (new URLSearchParams(location.search).get('theme') === 'light') { document.documentElement.classList.add('light'); }</script>
+</head>
+<body data-screen-label="B2 · Project details">
+<div class="shell">
+  <aside class="rail">
+    <a class="wordmark" href="projects.html">bridge<i>_builder</i></a>
+    <div class="navgroup">
+      <p class="gtitle">workspace</p>
+      <nav>
+        <a href="projects.html">Projects</a>
+      </nav>
+    </div>
+    <div class="navgroup">
+      <p class="gtitle proj">ig-pile-to-travelogue</p>
+      <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a class="here" href="edit.html">Project details</a>
+        <a href="pile-profile.html">Pile profile</a>
+        <a href="target-profile.html">Target profile</a>
+        <a href="bridge-synthesis.html">Bridge synthesis</a>
+        <a href="final-bundle.html">Final bundle</a>
+      </nav>
+    </div>
+    <div class="railfoot">Validation re-runs before anything persists; on failure the prior config is untouched.</div>
+  </aside>
+  <main class="content">
+    <div class="pagetitle">
+      <h1>Project details</h1>
+      <span class="sub">name is immutable · slug ig-pile-to-travelogue</span>
+      <span class="right"><span class="status ok"><span class="tick">●</span>valid · oracle run</span></span>
+    </div>
+    <nav class="view-toolbar" id="vt">
+      <a href="#sec-i" class="on">i. Identity</a>
+      <a href="#sec-ii">ii. Pile sources</a>
+      <a href="#sec-iii">iii. Target</a>
+      <a href="#sec-iv">iv. Save</a>
+    </nav>
+    <div class="flash ok">Saved — validation re-ran against the new inputs at 2026-06-11T04:38:53+0000.</div>
+
+    <form action="dashboard.html" method="get" novalidate>
+
+      <!-- ============ I · IDENTITY ============ -->
+      <section class="sheet first" id="sec-i" style="margin-top:24px;">
+        <div class="sheet-head"><span class="no">i.</span><h2>Identity</h2></div>
+        <div class="formgrid">
+          <div>
+            <div class="field" style="margin-bottom:18px;">
+              <label class="lbl" for="e-name">Project name <span class="hint">— immutable; delete &amp; recreate to rename</span></label>
+              <input type="text" id="e-name" value="IG pile → travelogue" readonly style="color:var(--ink-2);">
+              <div class="slug">slug: <b>ig-pile-to-travelogue</b></div>
+            </div>
+          </div>
+          <div>
+            <div class="field" style="margin-bottom:0;">
+              <label class="lbl" for="e-desc">Description &amp; intent <span class="hint">— markdown; carried into bridge synthesis</span></label>
+              <textarea class="block" id="e-desc" maxlength="4000">## Goal
+Bridge the scraped IG field-notes pile into the travelogue schema.
+
+- One row = one observation; preserve photo evidence via `attachment`.
+- `record_id` is the join key.
+- Reverse-geocode `place` only where coordinates exist.</textarea>
+              <div class="counter">
+                <span class="hintnote">Carried into bridge synthesis &amp; the final spec package.</span>
+                <span class="count" id="desc-count">214 / 4000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ II · PILE ============ -->
+      <section class="sheet" id="sec-ii">
+        <div class="sheet-head"><span class="no">ii.</span><h2>Pile sources</h2><span class="hint" style="font:400 12px/1.4 Georgia,serif; font-style:italic; color:var(--ink-3);">one or more directories — data files become nodes; media is referenced by them</span></div>
+        <div class="field">
+          <label class="lbl">Directories <span class="hint">— this project spans extracted tables plus a media folder</span></label>
+          <div class="srclist">
+            <div class="srcrow"><input class="spath" value="../pile-app/pile"><button class="hbtn" type="button">Browse…</button><span class="skind"><span class="kindtag data">data</span><button class="srcrm" type="button">remove</button></span></div>
+            <div class="srcrow"><input class="spath" value="../pile-app/media"><button class="hbtn" type="button">Browse…</button><span class="skind"><span class="kindtag media">media</span><button class="srcrm" type="button">remove</button></span></div>
+          </div>
+          <button class="btn secondary addsrc" type="button">+ Add directory</button>
+          <div class="testline" style="margin-top:14px;">
+            <button class="btn secondary" type="button">Re-list &amp; validate files</button>
+            <span class="muted" style="font:400 12px/1.5 Georgia,serif; font-style:italic;">New files need a re-list — selection is frozen to an explicit list.</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="lbl">Frozen file list <span class="hint">— selection is explicit, grouped by directory</span></label>
+          <div class="grouphead"><span class="gpath">../pile-app/pile</span><span class="kindtag data">data</span><span class="selall"><a href="#" id="sel-all">Select all</a><a href="#" id="sel-none">Unselect all</a></span></div>
+          <div class="filelist validated" id="pilefiles">
+            <label class="checkline" style="padding:10px 0;"><input type="checkbox" checked> <span class="name">posts.ourearthsandwich.local.tsv</span><span class="fmeta"><span class="dims">3 rows × 8 cols</span><span class="tbadge ok">valid TSV</span></span></label>
+            <label class="checkline" style="padding:10px 0;"><input type="checkbox" checked> <span class="name">posts.welawen.local.tsv</span><span class="fmeta"><span class="dims">2 rows × 8 cols</span><span class="tbadge ok">valid TSV</span></span></label>
+            <label class="checkline" style="padding:10px 0;"><input type="checkbox" checked> <span class="name">comments.ourearthsandwich.local.tsv</span><span class="fmeta"><span class="dims">14 rows × 5 cols</span><span class="tbadge ok">valid TSV</span></span></label>
+            <label class="checkline" style="padding:10px 0;"><input type="checkbox" checked> <span class="name">comments.welawen.local.tsv</span><span class="fmeta"><span class="dims">9 rows × 5 cols</span><span class="tbadge ok">valid TSV</span></span></label>
+            <label class="checkline" style="padding:10px 0;"><input type="checkbox" checked> <span class="name">authors.local.tsv</span><span class="fmeta"><span class="dims">4 rows × 4 cols</span><span class="tbadge ok">valid TSV</span></span></label>
+            <label class="checkline" style="padding:10px 0;"><input type="checkbox" checked> <span class="name">files.manifest.tsv</span><span class="fmeta"><span class="dims">5 rows × 4 cols</span><span class="tbadge ok">valid TSV</span></span></label>
+            <label class="checkline stale" style="padding:10px 0;"><input type="checkbox"> <span class="name">posts.ourearthsandwich.local.tsv.pre-rescrape-20260529-205953</span><span class="fmeta"><span class="dims">stale snapshot</span></span></label>
+          </div>
+          <div class="grouphead" style="margin-top:16px;"><span class="gpath">../pile-app/media</span><span class="kindtag media">media</span></div>
+          <div class="mediasum">
+            <span class="big">38 media files</span>
+            <span class="kv">jpg 29 · mp4 9 · 412 MB</span>
+            <span class="kv">referenced by post.attachment</span>
+            <span class="note">Media is catalogued, not ingested — no per-file selection. Only the 5 files correlated to sampled pile rows are fetched at profile time; remote stores (e.g. S3) are accessed on demand.</span>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label class="lbl">Pile sample spec <span class="hint">— how rows are drawn for profiling</span></label>
+          <div class="specrow">
+            <div class="seg" role="radiogroup" aria-label="Sample mode">
+              <label><input type="radio" name="specmode" value="head"><span>Head only</span></label>
+              <label><input type="radio" name="specmode" value="random"><span>Random only</span></label>
+              <label><input type="radio" name="specmode" value="head+random" checked><span>Head + random</span></label>
+            </div>
+            <div class="num">
+              <label class="lbl" for="e-spec-n" style="margin-bottom:4px;">Rows</label>
+              <input type="number" class="line" id="e-spec-n" value="200" min="1" max="100000" step="50">
+            </div>
+            <div class="slug" style="margin:0;">resolves to <b id="spec-resolved">head+random:200</b></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ III · TARGET ============ -->
+      <section class="sheet" id="sec-iii">
+        <div class="sheet-head"><span class="no">iii.</span><h2>Target database</h2><span class="hint" style="font:400 12px/1.4 Georgia,serif; font-style:italic; color:var(--ink-3);">relational destination the bridge writes into</span></div>
+        <div class="conngrid">
+          <div class="field span2" style="max-width:300px;">
+            <label class="lbl" for="e-engine">Engine</label>
+            <select class="line" id="e-engine">
+              <option value="postgresql">PostgreSQL</option>
+              <option value="mysql">MySQL / MariaDB</option>
+              <option value="sqlserver">SQL Server</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="lbl" for="e-host">Host</label>
+            <input type="text" id="e-host" value="db.internal.local">
+          </div>
+          <div class="field">
+            <label class="lbl" for="e-port">Port</label>
+            <input type="text" id="e-port" value="5432">
+          </div>
+          <div class="field span2">
+            <label class="lbl" for="e-db">Database</label>
+            <input type="text" id="e-db" value="travelogue">
+          </div>
+          <div class="field span2">
+            <label class="lbl" for="e-env">Credential env-var name <span class="hint">— values never stored or shown; only the variable name</span></label>
+            <input type="text" id="e-env" value="IG_TRAVELOGUE_TARGET_DSN">
+          </div>
+        </div>
+        <div class="testline">
+          <button class="btn secondary" type="button" id="test-btn">Test connection</button>
+          <span class="testresult ok" id="test-result"><span class="tick">●</span>Reachable · read + insert + delete confirmed</span>
+        </div>
+        <p class="note">Credentials resolve from the named environment variable at run time. They are write-scoped to this database and never displayed.</p>
+      </section>
+
+      <!-- ============ IV · SAVE ============ -->
+      <section class="sheet" id="sec-iv">
+        <div class="sheet-head"><span class="no">iv.</span><h2>Save</h2></div>
+        <button class="btn" type="submit">Re-validate + save</button>
+        <p class="note">Validation re-runs against these inputs before anything persists; on failure the prior config is untouched.</p>
+      </section>
+    </form>
+
+    <!-- ============ V · DANGER (collapsed by default) ============ -->
+    <details class="fold danger">
+      <summary><span class="chev">▸</span>Delete project<span class="sumnote">rarely needed — irreversible</span></summary>
+      <div class="foldbody">
+        <p class="lede" style="margin:0 0 14px;">Type the project name to confirm deletion. Irreversible — iteration histories, truth baseline and bundle are removed.</p>
+        <div class="field" style="max-width:380px; margin-bottom:18px;">
+          <input type="text" id="confirm-name" placeholder="ig-pile-to-travelogue" autocomplete="off">
+        </div>
+        <button class="btn danger" id="delete-btn" type="button" disabled>Delete project</button>
+      </div>
+    </details>
+  </main>
+</div>
+
+<!-- OS directory picker (hidden) -->
+<input type="file" id="dirpick" webkitdirectory directory multiple style="display:none;">
+
+<script>
+(function () {
+  var descEl = document.getElementById('e-desc');
+  var descCount = document.getElementById('desc-count');
+  if (descEl) descEl.addEventListener('input', function () {
+    var n = descEl.value.length;
+    descCount.textContent = n + ' / 4000';
+    descCount.classList.toggle('over', n >= 4000);
+  });
+  var specN = document.getElementById('e-spec-n');
+  var specResolved = document.getElementById('spec-resolved');
+  function refreshSpec() {
+    var mode = document.querySelector('input[name="specmode"]:checked').value;
+    specResolved.textContent = mode + ':' + (parseInt(specN.value, 10) || 0);
+  }
+  document.querySelectorAll('input[name="specmode"]').forEach(function (r) { r.addEventListener('change', refreshSpec); });
+  specN.addEventListener('input', refreshSpec);
+
+  var confirmInput = document.getElementById('confirm-name');
+  var deleteBtn = document.getElementById('delete-btn');
+  confirmInput.addEventListener('input', function () {
+    deleteBtn.disabled = confirmInput.value !== 'ig-pile-to-travelogue';
+  });
+
+  /* select all / none for the data directory */
+  function setAll(on) {
+    document.querySelectorAll('#pilefiles .checkline:not(.stale) input[type="checkbox"]').forEach(function (cb) { cb.checked = on; });
+  }
+  document.getElementById('sel-all').addEventListener('click', function (e) { e.preventDefault(); setAll(true); });
+  document.getElementById('sel-none').addEventListener('click', function (e) { e.preventDefault(); setAll(false); });
+
+  /* Browse… → OS directory picker */
+  var dirPick = document.getElementById('dirpick');
+  var browseInput = null;
+  document.querySelectorAll('.srcrow .hbtn').forEach(function (b) {
+    b.addEventListener('click', function () { browseInput = b.parentNode.querySelector('input.spath'); dirPick.click(); });
+  });
+  dirPick.addEventListener('change', function () {
+    var files = dirPick.files;
+    if (browseInput && files && files.length && files[0].webkitRelativePath) {
+      browseInput.value = '../' + files[0].webkitRelativePath.split('/')[0];
+    }
+    dirPick.value = ''; browseInput = null;
+  });
+
+  /* section toolbar scrollspy */
+  var vtLinks = Array.prototype.slice.call(document.querySelectorAll('#vt a'));
+  vtLinks.forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      var el = document.querySelector(a.getAttribute('href'));
+      if (el) document.scrollingElement.scrollTop = el.offsetTop - 64;
+    });
+  });
+  var vtSecs = ['sec-i', 'sec-ii', 'sec-iii', 'sec-iv'].map(function (id) { return document.getElementById(id); });
+  function vtSpy() {
+    var y = document.scrollingElement.scrollTop + 100, cur = 0;
+    vtSecs.forEach(function (s, i) { if (s && s.offsetTop <= y) cur = i; });
+    vtLinks.forEach(function (a, i) { a.classList.toggle('on', i === cur); });
+  }
+  document.addEventListener('scroll', vtSpy, { passive: true });
+  vtSpy();
+})();
+</script>
+</body>
+</html>

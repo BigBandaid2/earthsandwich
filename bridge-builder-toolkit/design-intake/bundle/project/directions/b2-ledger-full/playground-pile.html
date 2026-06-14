@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data profile — ig-scrape-2026-06</title>
+<link rel="stylesheet" href="profile-playground.css">
+<script>
+(function(){ var p = new URLSearchParams(location.search);
+  if (p.get('theme') === 'light') document.documentElement.classList.add('light');
+  if (p.get('embed') === '1') document.documentElement.classList.add('embed');
+})();
+</script>
+</head>
+<body data-screen-label="B2 · Data profile (file dataset)">
+
+<header class="pg-header">
+  <h1>Data profile · <i>ig-scrape-2026-06</i></h1>
+  <div class="snap">
+    <span><b>iteration-1</b> · snapshot 2026-06-11 04:38:53 +0000</span>
+    <span>fingerprint <span class="fp">sha256:a3f9c1e8</span></span>
+    <span>file dataset · 6 files · sampled 200 head+random</span>
+    <a class="dl" href="playground-pile.html" download="ig-scrape-2026-06.profile.html">Download playground ↓</a>
+  </div>
+</header>
+
+<nav class="pg-toolbar">
+  <div class="pg-tabs">
+    <a href="#s1" class="on">ydata</a>
+    <a href="#s2">Nodes &amp; objects</a>
+    <a href="#s3">Tables</a>
+    <a href="#s4">Sources</a>
+  </div>
+  <div class="pg-tool-right">
+    <span class="statepill" id="statepill">LLM original</span>
+    <div class="legend-inline">
+      <span class="lg"><span class="prov baseline">baseline</span></span>
+      <span class="lg"><span class="prov llm">LLM</span></span>
+      <span class="lg"><span class="prov novel">novel</span></span>
+    </div>
+    <div class="dd-wrap">
+      <button class="tbtn" id="save-btn" type="button">Save state</button>
+      <div class="dd" id="save-dd">
+        <div class="dd-title">Saved states — iteration-1</div>
+        <div id="save-items"></div>
+      </div>
+    </div>
+    <div class="dd-wrap">
+      <button class="tbtn amber" id="copy-btn" type="button">Copy out a prompt</button>
+      <div class="copy-pop" id="copy-pop">
+        <div class="cp-title">AI-actionable digest</div>
+        <p class="cp-desc">Every section plus your edits — feeding this into re-profile aims to one-shot a profile that needs no further edits.</p>
+        <textarea id="copy-payload" readonly></textarea>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="content">
+
+  <section class="sheet" id="s1">
+    <div class="sheet-head"><span class="no">i.</span><h2>ydata-profiling report</h2><span class="prov baseline">ydata-profiling baseline</span></div>
+    <p class="subhead">The canonical raw profile of the sampled rows. Opens in its own window, restyled to this surface so the hand-off is not jarring.</p>
+    <div class="baseline-link">
+      <a class="doc" href="pile.ydata-profile.html" target="_blank" rel="noopener">ig-scrape-2026-06.ydata-profile.html <span class="ext">↗ new window</span></a>
+      <span class="meta">8 variables · 5 observations · 7 alerts · 3.2 MB</span>
+    </div>
+  </section>
+
+  <section class="sheet" id="s2">
+    <div class="sheet-head"><span class="no">ii.</span><h2>Nodes &amp; objects</h2><span class="prov novel">toolkit-novel</span></div>
+    <p class="subhead">For a file dataset, nodes are deterministic — every unique field signature is a node, and referenced media is a node. Node <i>names</i>, object grouping and descriptions are LLM-inferred: rename inline, drag nodes between objects, or open a node's detail. Implied nodes are entities the data implies without a table of their own.</p>
+    <div class="lineage" id="lineage"></div>
+    <div id="objects"></div>
+    <button class="tbtn newobj" id="new-obj" type="button">＋ New object</button>
+
+    <p class="subhead" style="margin-top:28px;">Potential connections — every edge is a candidate join key; dashed means implied.</p>
+    <div class="graphwrap">
+      <svg viewBox="0 0 900 360" role="img" aria-label="Node graph showing potential join keys">
+        <g>
+          <path class="ng-edge" d="M250,200 L560,116"></path>
+          <path class="ng-edge" d="M250,200 L560,296"></path>
+          <path class="ng-edge" d="M620,116 L800,116"></path>
+          <path class="ng-edge impl" d="M210,160 L300,84"></path>
+        </g>
+        <g>
+          <rect class="elbg" x="372" y="138" width="86" height="20"></rect>
+          <text class="ng-elabel" x="378" y="153">join <tspan class="kk">record_id</tspan></text>
+          <rect class="elbg" x="372" y="240" width="86" height="20"></rect>
+          <text class="ng-elabel" x="378" y="255">join <tspan class="kk">record_id</tspan></text>
+          <rect class="elbg" x="676" y="98" width="68" height="20"></rect>
+          <text class="ng-elabel" x="682" y="113">join <tspan class="kk">author</tspan></text>
+          <rect class="elbg" x="216" y="96" width="120" height="20"></rect>
+          <text class="ng-elabel" x="222" y="111">anchors <tspan class="kk">place·lat·lng</tspan></text>
+        </g>
+        <g class="ng-node hard" data-gnode="n-post"><circle cx="180" cy="200" r="48"></circle><text class="nlabel" x="180" y="198">post</text><text class="nsub" x="180" y="214">8 fields</text></g>
+        <g class="ng-node hard" data-gnode="n-comment"><circle cx="590" cy="116" r="34"></circle><text class="nlabel" x="590" y="114">comment</text><text class="nsub" x="590" y="129">5 fields</text></g>
+        <g class="ng-node hard" data-gnode="n-attachment"><circle cx="590" cy="296" r="34"></circle><text class="nlabel" x="590" y="294">attachment</text><text class="nsub" x="590" y="309">4 fields</text></g>
+        <g class="ng-node hard" data-gnode="n-author"><circle cx="830" cy="116" r="30"></circle><text class="nlabel" x="830" y="114">author</text><text class="nsub" x="830" y="129">4 fields</text></g>
+        <g class="ng-node implied" data-gnode="n-place"><circle cx="330" cy="56" r="30"></circle><text class="nlabel" x="330" y="54">place</text><text class="nsub" x="330" y="69">implied</text></g>
+      </svg>
+      <p class="graph-caption"><b>record_id</b> is the hub join key — it threads post → comment and post → attachment. <b>author</b> links comment → account; <b>place·lat·lng</b> imply a location entity with no table of its own.</p>
+    </div>
+
+    <p class="subhead" style="margin-top:28px;">References reaching outside this dataset — comment or dismiss before downstream use.</p>
+    <ul class="reflist" id="flaglist"></ul>
+  </section>
+
+  <section class="sheet" id="s3">
+    <div class="sheet-head"><span class="no">iii.</span><h2>Tables</h2><span class="prov llm">LLM-extended over ydata baseline</span></div>
+    <p class="subhead">One table per node — baseline statistics with an AI observation &amp; evidence column. Pick a node, filter its fields, then open the table detail to manage keys, ignore fields, sort &amp; batch-edit, and download the raw sample. Implied nodes read through their base node's table.</p>
+    <div class="tbl-bar" id="tbl-bar"></div>
+    <div id="tbl-wrap"></div>
+    <p class="tbl-note" id="tbl-note"></p>
+  </section>
+
+  <section class="sheet" id="s4">
+    <div class="sheet-head"><span class="no">iv.</span><h2>Public-knowledge enrichment</h2><span class="prov llm">LLM-extended</span></div>
+    <p class="subhead">Public sources consulted for additional context. Exclude any you don't trust; add your own as links or file uploads — both carry into the next re-profile.</p>
+    <ul class="srclist2" id="srcrows"></ul>
+    <div class="addrow">
+      <input type="url" id="src-url" placeholder="https:// — add a reference source">
+      <button class="tbtn amber" id="src-add" type="button">Add link</button>
+      <button class="tbtn" id="src-upload" type="button">Upload file…</button>
+      <input type="file" id="src-file" style="display:none;">
+    </div>
+  </section>
+</main>
+
+<!-- node detail modal -->
+<div class="modal-overlay" id="m-node">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="m-head"><h3 id="nd-title">Node</h3><span class="prov" id="nd-prov"></span><button class="mclose" type="button" data-close>×</button></div>
+    <div class="m-body" id="nd-body"></div>
+    <div class="m-foot" id="nd-foot"></div>
+  </div>
+</div>
+
+<!-- table detail — full-view takeover -->
+<div class="takeover" id="tk" role="dialog" aria-modal="true">
+  <div class="tk-head">
+    <div class="tk-r1">
+      <h3 id="tk-title">Table</h3>
+      <span class="prov baseline">ydata baseline + LLM</span>
+      <span class="tk-meta" id="tk-meta"></span>
+      <button class="tk-dl" id="tk-dl" type="button">↓ Sample data (.tsv)</button>
+      <button class="tbtn" id="tk-node" type="button" style="margin-left:14px;">Node detail</button>
+      <button class="tbtn" id="tk-close" type="button">✕ Close</button>
+    </div>
+    <div class="tk-r2">
+      <div class="tk-tabs">
+        <button type="button" data-tktab="overview">Overview</button>
+        <button type="button" data-tktab="fields" class="on">Fields</button>
+      </div>
+      <input id="tk-filter" placeholder="filter fields…">
+      <select id="tk-sort">
+        <option value="order">source order</option>
+        <option value="name">name A→Z</option>
+        <option value="distinct">distinct ↓</option>
+        <option value="missing">missing ↓</option>
+        <option value="keys">keys first</option>
+      </select>
+      <div class="tk-batch" id="tk-batch"></div>
+    </div>
+  </div>
+  <div class="tk-body">
+    <div id="tk-warn"></div>
+    <div id="tk-content"></div>
+  </div>
+</div>
+
+<script>
+window.DATASET = {
+  id: 'ig-scrape-2026-06',
+  lsKey: 'pile.iter1',
+  kind: 'files',
+  unitsLabel: 'files',
+  unitCount: 6,
+  snapshotLabel: '2026-06-11 04:38',
+  promptHeader: '# Data profile - ig-scrape-2026-06 (iteration-1, sha256:a3f9c1e8)',
+  DEFAULT: {
+    objects: [
+      { id: 'o-post', name: 'Post', desc: 'A captured IG post — one observation with its media evidence. Reasoning: posts and the file manifest share record_id one-to-one, so the media manifest describes the post rather than a separate entity.', nodes: ['n-post', 'n-attachment'] },
+      { id: 'o-comment', name: 'Comment', desc: 'Reactions attached to a post. Reasoning: comment rows reference record_id many-to-one and carry their own author handle.', nodes: ['n-comment'] },
+      { id: 'o-account', name: 'Account', desc: 'The people writing posts and comments. Reasoning: authors.local.tsv is a lookup table; comment.author joins to it.', nodes: ['n-author'] },
+      { id: 'o-place', name: 'Place', desc: 'Where a post happened. Reasoning: place, lat and lng describe a location entity that repeats across posts, but no location table exists in the dataset — implied only.', nodes: ['n-place'] }
+    ],
+    nodes: {
+      'n-post': { kind: 'hard', name: 'post', desc: 'One row per captured post.', from: ['posts.ourearthsandwich.local.tsv', 'posts.welawen.local.tsv'], fields: ['record_id', 'captured_at', 'note', 'place', 'lat', 'lng', 'attachment', 'source_file'], keys: ['record_id'], hidden: false },
+      'n-attachment': { kind: 'hard', name: 'attachment', desc: 'Media manifest — one row per referenced file.', from: ['files.manifest.tsv'], fields: ['attachment', 'record_id', 'kind', 'bytes'], keys: ['attachment', 'record_id'], hidden: false },
+      'n-comment': { kind: 'hard', name: 'comment', desc: 'One row per comment on a post.', from: ['comments.ourearthsandwich.local.tsv', 'comments.welawen.local.tsv'], fields: ['comment_id', 'record_id', 'author', 'text', 'captured_at'], keys: ['comment_id', 'record_id', 'author'], hidden: false },
+      'n-author': { kind: 'hard', name: 'author', desc: 'Account lookup — one row per handle.', from: ['authors.local.tsv'], fields: ['author', 'handle', 'display_name', 'follower_count'], keys: ['author'], hidden: false },
+      'n-place': { kind: 'implied', name: 'place', desc: 'Implied location: place names repeat with stable coordinates across posts.', base: 'n-post', anchors: ['place', 'lat', 'lng'], hidden: false }
+    },
+    flags: [
+      { id: 'f1', ref: 'attachment.attachment → ../media', chip: 'external media', ext: true, why: '38 media objects (jpg/mp4) resolved by path — binary, not a profiled table. The media directory is a declared dataset source, so the reference resolves.', comment: '', dismissed: false },
+      { id: 'f2', ref: 'comment.record_id → post.record_id', chip: 'missing parents', ext: false, why: '2 of 23 comment rows reference record_ids absent from this dataset selection — likely posts from a feed not added. Add that directory or drop the rows.', comment: '', dismissed: false }
+    ],
+    sources: [
+      { id: 'p1', name: 'OpenStreetMap', url: 'https://www.openstreetmap.org', use: 'Cross-checked station coordinates against named OSM nodes to validate lat/lng plausibility.', excluded: false, added: false },
+      { id: 'p2', name: 'GeoNames', url: 'https://www.geonames.org', use: 'Matched place strings to canonical toponyms; informs the reverse-geocode suggestion for blank places.', excluded: false, added: false },
+      { id: 'p3', name: 'IG media filename conventions', url: 'https://en.wikipedia.org/wiki/Instagram', use: 'Used to recognise the r####/s#### record-id pattern and media path derivation.', excluded: false, added: false }
+    ],
+    tables: {
+      'n-post': [
+        { f: 'record_id', type: 'TEXT', distinct: '5 · 100%', missing: '0', mem: '172.0 B', top: 'r0001 20% · r0002 20% · r0003 20%', obs: 'Stable, prefix-coded (r####/s####). Unique across every file — the strongest identity key.', ev: 'distinct% = 100, shared by comment & attachment nodes', edited: false, pk: true, skey: false, fk: null, llm: false, ign: false },
+        { f: 'captured_at', type: 'TEXT', distinct: '5 · 100%', missing: '0', mem: '158.0 B', top: 'all ISO-8601', obs: 'ISO-8601 timestamps — a clean temporal axis for this node.', ev: 'all values match YYYY-MM-DDThh:mm:ssZ', edited: false, pk: false, skey: true, fk: null, llm: false, ign: false },
+        { f: 'note', type: 'TEXT', distinct: '5 · 100%', missing: '0', mem: '244.0 B', top: 'free text', obs: 'Free text, human-authored — no model-output signature.', ev: 'varied length & phrasing, no template markers', edited: false, pk: false, skey: false, fk: null, llm: false, ign: false },
+        { f: 'place', type: 'TEXT', distinct: '4 · 80%', missing: '1 · 20%', mem: '98.0 B', top: 'Station A 20% · Station B 20%', obs: 'Sparse. Reverse-geocode candidate from lat/lng where blank but coordinates exist.', ev: 'r0003 blank place but holds no coords either — leave null', edited: false, pk: false, skey: true, fk: null, llm: false, ign: false },
+        { f: 'lat', type: 'TEXT', distinct: '4 · 80%', missing: '1 · 20%', mem: '84.0 B', top: '51.5007 · 48.8584', obs: 'Numeric-as-text — decimal degrees; blanks stay null.', ev: '"51.5007", "48.8584" — decimal degrees', edited: false, pk: false, skey: false, fk: null, llm: false, ign: false },
+        { f: 'lng', type: 'TEXT', distinct: '4 · 80%', missing: '1 · 20%', mem: '84.0 B', top: '-0.1246 · 2.2945', obs: 'Pairs with lat — the coordinate pair is missing together.', ev: 'same rows missing as lat', edited: false, pk: false, skey: false, fk: null, llm: false, ign: false },
+        { f: 'attachment', type: 'TEXT', distinct: '5 · 100%', missing: '0', mem: '190.0 B', top: 'files/r0001.jpg …', obs: 'Media path derived from record_id; dependent, not identity. Joins the attachment node.', ev: 'files/r0001.jpg mirrors record_id stem · references ../media', edited: false, pk: false, skey: false, fk: { node: 'n-attachment', field: 'attachment' }, llm: false, ign: false },
+        { f: 'source_file', type: 'TEXT', distinct: '2 · 40%', missing: '0', mem: '210.0 B', top: '2 filenames', obs: 'Pipeline-added concat marker — not an original source field. Useful only for per-feed slicing.', ev: 'values equal the two ingested filenames', edited: false, pk: false, skey: false, fk: null, llm: true, ign: false }
+      ],
+      'n-attachment': [
+        { f: 'attachment', type: 'TEXT', distinct: '5 · 100%', missing: '0', mem: '190.0 B', top: 'files/…', obs: 'Primary media path; one row per file.', ev: 'unique, mirrors post.attachment', edited: false, pk: true, skey: false, fk: null, llm: false, ign: false },
+        { f: 'record_id', type: 'TEXT', distinct: '5 · 100%', missing: '0', mem: '172.0 B', top: 'r#### / s####', obs: 'Joins back to the post node — one-to-one in this sample.', ev: '5/5 resolve to a post row', edited: false, pk: false, skey: false, fk: { node: 'n-post', field: 'record_id' }, llm: false, ign: false },
+        { f: 'kind', type: 'TEXT', distinct: '2 · 40%', missing: '0', mem: '60.0 B', top: 'image 80% · video 20%', obs: 'Media class — populated by the profiler from the file extension; not present in the source manifest.', ev: 'derived: .jpg → image, .mp4 → video', edited: false, pk: false, skey: false, fk: null, llm: true, ign: false },
+        { f: 'bytes', type: 'TEXT', distinct: '5 · 100%', missing: '0', mem: '76.0 B', top: 'numeric', obs: 'Numeric-as-text size; useful for sanity checks only.', ev: 'all parse as integers', edited: false, pk: false, skey: false, fk: null, llm: false, ign: false }
+      ],
+      'n-comment': [
+        { f: 'comment_id', type: 'TEXT', distinct: '23 · 100%', missing: '0', mem: '402.0 B', top: 'c####', obs: 'Unique per comment — identity key.', ev: 'distinct% = 100', edited: false, pk: true, skey: false, fk: null, llm: false, ign: false },
+        { f: 'record_id', type: 'TEXT', distinct: '7 · 30%', missing: '0', mem: '388.0 B', top: 'r0001 26% · r0002 22%', obs: 'Many-to-one join to the post node. 2 rows reference record_ids outside this dataset selection.', ev: '21/23 resolve; 2 flagged as missing parents', edited: false, pk: false, skey: false, fk: { node: 'n-post', field: 'record_id' }, llm: false, ign: false },
+        { f: 'author', type: 'TEXT', distinct: '4 · 17%', missing: '0', mem: '310.0 B', top: '@wela 39% · @sandwich 30%', obs: 'Joins to the author lookup; low cardinality.', ev: '4/4 handles resolve in authors.local.tsv', edited: false, pk: false, skey: false, fk: { node: 'n-author', field: 'author' }, llm: false, ign: false },
+        { f: 'text', type: 'TEXT', distinct: '23 · 100%', missing: '0', mem: '1.2 KB', top: 'free text', obs: 'Free text — reactions; varied length and phrasing.', ev: 'human-authored, no template markers', edited: false, pk: false, skey: false, fk: null, llm: false, ign: false },
+        { f: 'captured_at', type: 'TEXT', distinct: '23 · 100%', missing: '0', mem: '724.0 B', top: 'ISO-8601', obs: 'Comment timestamp; always ≥ its post timestamp.', ev: 'monotonic vs post.captured_at', edited: false, pk: false, skey: true, fk: null, llm: false, ign: false }
+      ],
+      'n-author': [
+        { f: 'author', type: 'TEXT', distinct: '4 · 100%', missing: '0', mem: '96.0 B', top: '@wela · @sandwich', obs: 'Identity key for the lookup.', ev: 'unique', edited: false, pk: true, skey: false, fk: null, llm: false, ign: false },
+        { f: 'handle', type: 'TEXT', distinct: '4 · 100%', missing: '0', mem: '102.0 B', top: 'matches author', obs: 'Redundant with author in this sample — verify on a larger pull.', ev: '4/4 equal author minus @', edited: false, pk: false, skey: true, fk: null, llm: false, ign: false },
+        { f: 'display_name', type: 'TEXT', distinct: '4 · 100%', missing: '0', mem: '128.0 B', top: 'free text', obs: 'Human display name.', ev: 'title-cased strings', edited: false, pk: false, skey: false, fk: null, llm: false, ign: false },
+        { f: 'follower_count', type: 'TEXT', distinct: '4 · 100%', missing: '0', mem: '70.0 B', top: 'numeric', obs: 'Numeric-as-text; snapshot-time metric — drifts between scrapes.', ev: 'changes between scrapes', edited: false, pk: false, skey: false, fk: null, llm: false, ign: false }
+      ]
+    },
+    edits: []
+  },
+  SAMPLES: {
+    'n-post': [
+      ['record_id', 'captured_at', 'note', 'place', 'lat', 'lng', 'attachment', 'source_file'],
+      ['r0001', '2026-05-02T09:14:00Z', 'Morning at the platform', 'Station A', '51.5007', '-0.1246', 'files/r0001.jpg', 'posts.ourearthsandwich.local.tsv'],
+      ['r0002', '2026-05-03T16:40:00Z', 'Crowds thinning out', 'Station B', '48.8584', '2.2945', 'files/r0002.jpg', 'posts.ourearthsandwich.local.tsv'],
+      ['r0003', '2026-05-04T08:02:00Z', 'Fog rolled in early', '', '', '', 'files/r0003.jpg', 'posts.ourearthsandwich.local.tsv'],
+      ['s0001', '2026-05-05T11:05:00Z', 'First clip of the trip', 'Station C', '41.9028', '12.4964', 'files/s0001.mp4', 'posts.welawen.local.tsv'],
+      ['s0002', '2026-05-06T19:55:00Z', 'Last light over the yard', 'Station D', '40.4168', '-3.7038', 'files/s0002.jpg', 'posts.welawen.local.tsv']
+    ],
+    'n-attachment': [
+      ['attachment', 'record_id', 'kind', 'bytes'],
+      ['files/r0001.jpg', 'r0001', 'image', '253952'],
+      ['files/r0002.jpg', 'r0002', 'image', '200704'],
+      ['files/r0003.jpg', 'r0003', 'image', '217088'],
+      ['files/s0001.mp4', 's0001', 'video', '4299161'],
+      ['files/s0002.jpg', 's0002', 'image', '184320']
+    ],
+    'n-comment': [
+      ['comment_id', 'record_id', 'author', 'text', 'captured_at'],
+      ['c0001', 'r0001', '@wela', 'so jealous of this light', '2026-05-02T10:02:00Z'],
+      ['c0002', 'r0001', '@sandwich', 'platform 9?', '2026-05-02T11:30:00Z'],
+      ['c0003', 'r0090', '@wela', 'where is this??', '2026-05-04T08:21:00Z']
+    ],
+    'n-author': [
+      ['author', 'handle', 'display_name', 'follower_count'],
+      ['@wela', 'wela', 'Wela W.', '1204'],
+      ['@sandwich', 'sandwich', 'Earth Sandwich', '830']
+    ]
+  },
+  OVERVIEW: {
+    'n-post': { obs: 5, missing: 3, dup: 0, mem: '452.0 B' },
+    'n-attachment': { obs: 5, missing: 0, dup: 0, mem: '698.0 B' },
+    'n-comment': { obs: 23, missing: 0, dup: 0, mem: '3.0 KB' },
+    'n-author': { obs: 4, missing: 0, dup: 0, mem: '396.0 B' }
+  }
+};
+</script>
+<script src="profile-engine.js"></script>
+</body>
+</html>

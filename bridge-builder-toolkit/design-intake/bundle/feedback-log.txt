@@ -1,0 +1,129 @@
+- "New Project" view, "Identity and Pile" section: In addition to "Project Name", there should also be a long text block for "Description and Intent". This is meant for a few paragraphs of markdown (impose a character limit) that is meant to give the user a reminder of this bridge's goals and provide context to the LLM for later stages of bridge synthesis and final bridge spec package. 
+- "New Project" view: "Identity" should get it's own section, "Pile" should be another section. "Pile Sample Spec" should be part of the "Pile" section. 
+- "New Project" view, "Target" section: As this is a DB connection, I'd expect that I'm entering the entire DB connection details - host, db, user, pw. Once the credentials are entered, I'd expect a "Test Connection" button to verify that the DB credentials work. This violates some previous design assertion that credentials shouldn't be entered or persisted here, but I disagree.
+- "New Project" view, "Pile sample spec": seems if you're going to show this, then it should be editable (change to number, swap head-only, random-only, head+random toggles). Perhaps it doesn't belong here at all, but as part of the "Data Profiling".
+- "New Project" view, "Pile": selecting the pile files should also show how many rows and columns are in each file. The selection of the files should validate that they are a valid table and what kind of table file (tsv, csv, etc.). Files that are not valid tables can't be accepted.
+- "New Project" view: don't understand the purpose of "overwrite an existing project" - that should never be possible directly from this "New Project" view. Project Name should create a Project slug. That slug cannot be the same as an existing project slug. Existing projects must be explicitly deleted before a new project can use the same slug.
+- "New Project" view: "Create" is a button of it's own. Validation of the Pile and Target must occur before "Create".
+
+-----------
+
+Comments for "Dashboard" view:
+
+- "Connection Validation" section: Can be collapsed to just two "Pile Valid" and "Target Valid" confirmations. Once pile and target are validated, it's not needed to show the details again. Connection and validation details can be a link back to the "Edit Project" view.
+- "Stage Flow" section should move to the left nav column. "create" = "edit project". "oracle" and "review" should be part of "bridge synthesis"
+- "Suggested Next Step" section - first suggestion should be to "review pile profiling", next to "reveiw target profiling", then to "synthesize bridge". The CLI commands to re-profile the pile and target should be moved to the "Pile Profile" and "Target Profile" views. CLI command to synthesize bridge should be moved the "Synthesize Bridge" view.
+- "Suggested Next Step" section takes the place of the "Stage Flow" as a progress tracker. Status marker of "Done" should be moved here. Creating the project with valid connections always triggers the "analyze pile" and "analyze bridge" automatically. For those steps it's the human review that's pending.
+- "Delete Project" box should exist in the "Project Details"/"Edit" view, not the dashboard. It should also be collapsed or hidden by default, this is another rarely used feature that should not be prominent.
+
+
+Comments for Left Nav Column
+
+- "New Project" doesn't need to be a persistent fixture in left nav column. This is rarely used
+- Under the current project, nav list should be: Dashboard, Project Details, Pile Profile, Target Profile, Bridge Synthesis, Final Bundle
+- When on the "Pile Profile" and "Target Profile" view - the left nav bar should remain consistent with the nav that exists in the "Dashboard" view. 
+
+
+Comments for "Edit" view:
+
+- Make view title "Project Details" to match the left nav column.
+- "Project Details"/"Edit" view should mirror the "New Project" view
+
+
+Comment for "Pile Profile" view:
+
+- This page is essentially the pile.enhanced.html HTML playground. If possible, the HTML playground of our pile.enhanced.html should appear as an iframe here. The pile.enhanced.html should be visually formatted such that embedding it looks natural.
+- "YDATA-Profiling Report" section: link to pile.ydata-profile.html should open in a new window. If feasible, the css of the ydata output should be modified so that it looks more similar to our design so that the pop-out is not so jarring.
+- "Analyst Extension" section: Ours data profiling should not be only text, but rather include everything from the ydata and build on top of it. Here is example of an earlier version of Data Profiling - https://profiler.datacommlab.com/reports/profiling_report_20260221_152609.html
+- AI inferred observations and evidence should appear as a column commenting on each field in the table.
+- A new section should be added above "Analyst Extension" called "Nodes and Objects". This should show the following, each has a many-to-one relationship with the next item: 1) files [a list of files] -> 2) nodes [all files that share the same columns belong to the same node] -> 3) objects [nodes should be recognized by the LLM as belonging to some kind of real-world object]
+- Under "nodes and objects" sections should also be a node diagram (inspired by backoffice_node_map.html) showing the potential connections between nodes. The edges between nodes are the potential join keys.
+
+--------
+
+Comments on "Pile Profile" view:
+
+- "Re-profile the pile" - perhaps this can be collapsed or made modal instead of a persistent section. Put the link in the left nav or header. I think iterations of the Pile Profile belong in the left nav as subs-item of "Pile Profile"
+- I'd like to disguise the fact that that the "Profile Playground" is an iframe, and to the extent possible make it look seamlessly like part of the site. Avoid two scroll bars if possible, fix the left nav and header, and let the entire body be the iframe. I do like the option to "Open Full Window" on the iframe though.
+- Given that the "Profile Playground" is meant to blend with the left nav and header of the "Pile Profile" view, the Playground should not have it's own left nav column.
+- Each Pile Playground is a snapshot and specific sampling of the pile. A timestamp, fingerprint, and bundle of underlying snapshotted/sampled data should be available to download along with the playground. The Playground itself should be downloadable/exportable.
+- Column/field level analysis should flag when it appears to reference things which are not currently included in the pile, such as files or foreign keys to other tables not seen in the current pile selection.
+
+
+
+Comments on "New Project"/"Project Details"
+
+- a project may involve multiple directories. For example, the IG pile involves the posts tsv's and also a media folder with jpg's and mp4's.
+
+
+Comments on "Target Profile"
+
+- when profiling a relational DB, a node diagram and inferred objects should still be generated in addition to the ERD. The schema graph seems redundant to the ERD. Every table in the schema is node in the graph.
+
+--------
+
+Comments on "Pile Profile"
+
+- why does the "Re-profile" need to be a CLI command copy-paste? Ideally running the re-profile should be executable by button click from this UI.
+- "nodes and objects" section is the first place where the user provides review feedback. The nodes are deterministic, every unique fields list is a node, and the referenced media is a node. The naming of the nodes in LLM inferred. The Objects and node membership in each object are LLM inferred. All LLM inferred things should be editable.
+- Each inferred Object should get a short description, including reasoning. Initially supplied by LLM, but editable. Objects themselves can be deleted, new objects can be created.
+- Nodes should be draggable between Objects. Nodes should also have the option to be hidden/ignored from pile profiling.
+- Some objects will be implied by the data, but not actually represented by a real node. In the case of Instagram posts dataset, the location and author are implied in the main table, but don't have tables of their own. These implied object have implied nodes which should be labeled as such. Rather than being "from" files, the node is "from" one of the hard deterministic nodes.
+- A node could contain hundreds of fields. The list should limit wrap to two rows. Nodes may need a detail modal for showing all info and editing. In the Node detail modal, i should see all implied nodes from this node, and create/edit/delete implied nodes. Implied nodes are always anchored by one or more fields from the base node. Detail modal of an implied node refers to the Detail of the base node it came from. Nodes should also have a short description. Node and objects detail should focus on objects and node relationships, complete field detail for a node should be a different modal.
+- Color coding of the nodes can't be random as the legend explicitly defines meanings for colors. The implied nodes should use the "LLM" color. 
+- The "flagged for review" comments at the bottom of "Nodes and Objects" shouldn't have Resolved/Unresolved state. Simply list them and give me an opportunity to provide a comment or dismiss.
+- After editing the playground, the state should be saved. Each saved state should be recorded. I want to have a history of what was the original LLM inferred, and what were the human edits. Each iteration is a new run with new fingerprint, but within an iteration I can have one or more save states.
+- If I "re-profile" all edits made in the playground should become part of the prompt fed back to reprofiling
+- "Analyst Extension" section should be renamed "Tables".
+- There can be one or many tables. Each node would have a corresponding table. Please suggest how to show and navigate between many tables in this playground, each of which may have hundreds of rows.
+- A table detail modal is probably needed. Table detail would show additional info from the ydata profile for each field, this is also where the LLM observations and evidence can be edited.
+- in keeping with the playground concept, all edits in the playground should be captured in the output prompt which should be fed into a new iteration of re-profiling. The final goal should be that with my prompt feedback included, the next re-profile one-shots a profile I feel requires no further edits.
+- "Public Knowledge Enrichment" should be it's own section. Here is should list and reference the public sources which it used to gain additional context. I should be able to exclude sources which I don't like and explicitly add new sources, either as links or as file uploads.
+
+Comments on "Target Profile"
+
+- Relational DB target has an extra ERD/schema diagram, but it should still have a ydata baseline as well.
+- the "Load Mapping Reading" section is the same as the "Tables" section from "Pile Profile" view.
+
+
+Comments on "New Project"/"Project Details"
+
+- "Add Directory" should bring up a standard directory browser for me to select a directory rather than type in path.
+- The file directory types should be "Data" or "Media", rather than "Tabular" or "Media". Data may come in the form of JSON or other structured formats which may be in a directory that's mixed. Media folder should be treated as a special case.
+- After listing and validating all files in a directory, there should a "Select All"/"Unselect All"
+- A media directory could have hundreds of files, impractical to list them all for individual selection. Media may need to be a special class of directory. The tsv's are sampled, not taken in whole for pile profiling. Only the media files that are correlated to the sampled rows would be useful. If the media files were on S3 instead of local directory, they would be accessible but probably not all directly downloaded until explicitly needed.
+- I like the slim sticky horizontal toolbar for section nav you've implemented in the "Pile Profiling" view. I'd like to try using that here and on any other view where it's relevant.
+
+
+-----
+
+Comments on "Pile Profile"
+
+- in "tables" section, no point to have the "Detail" link repeated in each row when they all open the same window. Just have one "Detail" link in the table footer.
+- "Field Detail" modal for tables does not work. Modals should never have a scroll bar. I hate double scroll bars and hate horizontal scroll. Perhaps table detail needs to occupy the entire playground view until dismissed.
+- Table detail should have check box on each field for "primary key", "searchable key", "foreign key". 
+- Primary key must be completely distinct and present for each record, if a field not entirely distinct is selected as "primary key" a warning should be raised that this will dedup and truncate all records duplicating or missing this field in the sample snapshot data. Only a single field can be selected "primary key", this selection should always have a warning prompt showing the previously selected primary key. LLM should have already made a guess where there is a suitable field. While not mandatory, nodes without primary key should be flagged.
+- selecting a foreign key should also select the node to which the foreign key joins. LLM should try to discover and populate foreign key joins. FK's can be removed, removal should have a warning prompt.
+- field list can be sorted and filtered in "Field detail" view.
+- fields should be marked if they appear LLM inferred. This should also be a check box.
+- fields can be multi-selected for batch actions. Batch action would be: 1) create an implied node, 2) create composite primary key
+- "fields detail" view should give me a download link for the raw sample table data. 
+- "fields detail" view should also have the same table "overview" tab as appears in the ydata baseline profile
+
+Comments on "New Project"/"Project Details"
+
+- directory picker doesn't need custom styling, just use the directory/file picker of the OS.
+
+Comments on "Target Profile"
+
+- in "Tables" section, Target Profile should not attempt to guess relationships between the target and the pile. This linking between the pile and target is the role of the bridge synthesis step. The target tables should be profiled with no knowledge of the pile, and vice versa. 
+
+
+---------
+
+Comments on "Pile Profile"/"Target Profile" views
+
+- in the "Fields Detail" view, each field should also get a checkbox for "ignore" to exclude it from analysis or consideration in later bridge synthesis.
+- The "Pile Profile" and "Target Profile" views are really the same view "Data Profile", applied to two different data sets. When the data set is a relational DB, then there is an ERD diagram and DB tables = nodes. When the data set is file-based pile, then nodes are derived deterministically from field signatures of the pile files. These are the two variants of "Data Profile", but they are independent of "pile" or "target" designation. The "pile" could be a relational DB and the target could be file based, these are interchangeable depending on connections configuration of the bridge. All comments to date which I'll specified to "Pile Profile" (such as the "field detail" view) are actually intended for all "Data Profile" views, pile and target both. The "tables" section should be the same, the "fields detail" view should be the same. Both refer to the nodes concept which should be normalized whether from DB tables or file-based.
+- Target and Pile data profiling playgrounds should have no reference to whether it's a pile or target or the context of the bridge project it's in, it's simply a profile of the data set. A data set profile from one bridge project should be usable in another bridge project as either pile or target with no changes to the data set profile itself.
+- I should be able to bring up the "Node Detail" modal from the "fields detail" view.

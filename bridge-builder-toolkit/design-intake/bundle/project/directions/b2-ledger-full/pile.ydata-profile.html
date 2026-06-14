@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pile profile (sampled) — design-sample · ydata-profiling</title>
+<style>
+/* ydata-profiling baseline output, restyled to the bridge_builder "Ledger" surface
+   so the pop-out is not jarring. Structure (Overview + Variables) preserved. */
+:root {
+  color-scheme: dark;
+  --paper: #171512; --paper-deep: #11100d; --rail-bg: #131110;
+  --ink: #eae6dd; --ink-2: #aaa291; --ink-3: #7c7464;
+  --rule: #2f2b23; --rule-soft: #262219; --zebra: #1c1a15;
+  --accent: #d3a35a; --accent-dim: #4f3f25; --ok: #97c9a4; --bad: #dd8d95;
+  --serif: Georgia, "Times New Roman", serif;
+  --sans: system-ui, sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
+}
+html.light {
+  color-scheme: light;
+  --paper: #f5f1e8; --paper-deep: #ece7da; --rail-bg: #efeadd;
+  --ink: #2b261d; --ink-2: #6d6555; --ink-3: #98907e;
+  --rule: #d8d0bd; --rule-soft: #e3dccb; --zebra: #eee8da;
+  --accent: #a3712a; --accent-dim: #d4bb90; --ok: #3e7d52; --bad: #b04a56;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.6 var(--sans); }
+header.topbar {
+  position: sticky; top: 0; z-index: 5; background: var(--rail-bg); border-bottom: 1px solid var(--rule);
+  padding: 14px 40px; display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;
+}
+header.topbar .wm { font: 400 16px/1.2 var(--serif); }
+header.topbar .wm i { font-style: italic; color: var(--accent); }
+header.topbar .prov { font: 600 9px/1.5 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: #9aa6b8; }
+header.topbar .prov::before { content: "[ "; color: var(--ink-3); } header.topbar .prov::after { content: " ]"; color: var(--ink-3); }
+header.topbar nav { margin-left: auto; display: flex; gap: 22px; }
+header.topbar nav a { font: 600 10px/1 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); text-decoration: none; }
+header.topbar nav a:hover { color: var(--accent); }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 34px 40px 90px; }
+h1.sec { font: 400 30px/1.2 var(--serif); margin: 0 0 18px; letter-spacing: -0.01em; }
+h1.sec:not(:first-of-type) { margin-top: 48px; padding-top: 22px; border-top: 1px solid var(--rule); }
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--rule); margin-bottom: 22px; }
+.tabs .tab { font: 600 10.5px/1 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); padding: 11px 18px; border-bottom: 2px solid transparent; cursor: default; }
+.tabs .tab.on { color: var(--ink); border-bottom-color: var(--accent); }
+.tabs .tab .badge { display: inline-block; margin-left: 7px; background: var(--accent-dim); color: var(--accent); border-radius: 999px; padding: 1px 7px; font: 600 9px/1.5 var(--mono); }
+.duo { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 0 56px; align-items: start; }
+@media (max-width: 880px) { .duo { grid-template-columns: 1fr; } }
+.blk-title { font: 600 10.5px/1.5 var(--sans); letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 10px; }
+table.stat { width: 100%; border-collapse: collapse; margin-bottom: 26px; }
+table.stat td { padding: 9px 12px; font-size: 13.5px; border-bottom: 1px solid var(--rule-soft); }
+table.stat tr:nth-child(odd) td { background: var(--zebra); }
+table.stat td.k { color: var(--ink-2); font-weight: 500; }
+table.stat td.v { text-align: right; font: 13px/1.5 var(--mono); color: var(--ink); }
+.varcard { border: 1px solid var(--rule); margin-top: 18px; }
+.varcard .vc-head { display: flex; align-items: baseline; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--rule-soft); }
+.varcard .vc-name { font: 400 19px/1.2 var(--serif); color: var(--accent); }
+.varcard .vc-type { font: 11px/1 var(--mono); color: var(--ink-3); letter-spacing: 0.06em; text-transform: uppercase; }
+.varcard .vc-alert { margin-left: auto; font: 600 9px/1.5 var(--sans); letter-spacing: 0.13em; text-transform: uppercase; padding: 2px 8px; border: 1px solid; border-radius: 3px; }
+.varcard .vc-alert.unique { color: var(--ok); border-color: var(--ok); }
+.varcard .vc-alert.missing { color: var(--accent); border-color: var(--accent-dim); }
+.varcard .vc-body { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 0 40px; padding: 14px 18px; align-items: start; }
+@media (max-width: 880px) { .varcard .vc-body { grid-template-columns: 1fr; } }
+.varcard table.stat { margin: 0; }
+.bars { display: flex; flex-direction: column; gap: 9px; }
+.barrow { display: grid; grid-template-columns: 96px 1fr 46px; align-items: center; gap: 10px; font: 11.5px/1.4 var(--mono); color: var(--ink-2); }
+.barrow .track { height: 9px; background: var(--paper-deep); border: 1px solid var(--rule-soft); }
+.barrow .fill { height: 100%; background: var(--accent); display: block; }
+.barrow .pc { text-align: right; color: var(--ink-3); }
+.foot { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--rule); font: 400 12.5px/1.6 var(--serif); font-style: italic; color: var(--ink-3); }
+</style>
+<script>if (new URLSearchParams(location.search).get('theme') === 'light') { document.documentElement.classList.add('light'); }</script>
+</head>
+<body>
+<header class="topbar">
+  <span class="wm">bridge<i>_builder</i></span>
+  <span class="prov">ydata-profiling baseline</span>
+  <span style="font:12px/1.5 var(--mono); color:var(--ink-3);">pile profile (sampled) · design-sample</span>
+  <nav><a href="#overview">Overview</a><a href="#variables">Variables</a></nav>
+</header>
+<div class="wrap">
+
+  <h1 class="sec" id="overview">Overview</h1>
+  <div class="tabs">
+    <span class="tab on">Overview</span>
+    <span class="tab">Alerts <span class="badge">7</span></span>
+    <span class="tab">Reproduction</span>
+  </div>
+  <div class="duo">
+    <div>
+      <p class="blk-title">Dataset statistics</p>
+      <table class="stat">
+        <tr><td class="k">Number of variables</td><td class="v">8</td></tr>
+        <tr><td class="k">Number of observations</td><td class="v">5</td></tr>
+        <tr><td class="k">Missing cells</td><td class="v">3</td></tr>
+        <tr><td class="k">Missing cells (%)</td><td class="v">7.5%</td></tr>
+        <tr><td class="k">Duplicate rows</td><td class="v">0</td></tr>
+        <tr><td class="k">Total size in memory</td><td class="v">452.0 B</td></tr>
+        <tr><td class="k">Average record size in memory</td><td class="v">90.4 B</td></tr>
+      </table>
+    </div>
+    <div>
+      <p class="blk-title">Variable types</p>
+      <table class="stat">
+        <tr><td class="k">Text</td><td class="v">8</td></tr>
+        <tr><td class="k">Numeric</td><td class="v">0</td></tr>
+        <tr><td class="k">Categorical</td><td class="v">0</td></tr>
+      </table>
+      <p class="blk-title" style="margin-top:6px;">Note</p>
+      <p style="margin:0; font:12.5px/1.65 var(--serif); font-style:italic; color:var(--ink-3);">All columns parse as Text at the baseline; <code style="font-family:var(--mono);font-style:normal;">lat</code>/<code style="font-family:var(--mono);font-style:normal;">lng</code> are numeric-as-text. The Analyst extension reads casts &amp; mappings on top of this.</p>
+    </div>
+  </div>
+
+  <h1 class="sec" id="variables">Variables</h1>
+
+  <div class="varcard">
+    <div class="vc-head"><span class="vc-name">record_id</span><span class="vc-type">Text</span><span class="vc-alert unique">Unique</span></div>
+    <div class="vc-body">
+      <table class="stat">
+        <tr><td class="k">Distinct</td><td class="v">5</td></tr>
+        <tr><td class="k">Distinct (%)</td><td class="v">100.0%</td></tr>
+        <tr><td class="k">Missing</td><td class="v">0</td></tr>
+        <tr><td class="k">Missing (%)</td><td class="v">0.0%</td></tr>
+        <tr><td class="k">Memory size</td><td class="v">172.0 B</td></tr>
+      </table>
+      <div class="bars">
+        <div class="barrow"><span>r0001</span><span class="track"><span class="fill" style="width:20%"></span></span><span class="pc">20%</span></div>
+        <div class="barrow"><span>r0002</span><span class="track"><span class="fill" style="width:20%"></span></span><span class="pc">20%</span></div>
+        <div class="barrow"><span>r0003</span><span class="track"><span class="fill" style="width:20%"></span></span><span class="pc">20%</span></div>
+        <div class="barrow"><span>s0001</span><span class="track"><span class="fill" style="width:20%"></span></span><span class="pc">20%</span></div>
+        <div class="barrow"><span>s0002</span><span class="track"><span class="fill" style="width:20%"></span></span><span class="pc">20%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="varcard">
+    <div class="vc-head"><span class="vc-name">place</span><span class="vc-type">Text</span><span class="vc-alert missing">20% missing</span></div>
+    <div class="vc-body">
+      <table class="stat">
+        <tr><td class="k">Distinct</td><td class="v">4</td></tr>
+        <tr><td class="k">Distinct (%)</td><td class="v">80.0%</td></tr>
+        <tr><td class="k">Missing</td><td class="v">1</td></tr>
+        <tr><td class="k">Missing (%)</td><td class="v">20.0%</td></tr>
+        <tr><td class="k">Memory size</td><td class="v">98.0 B</td></tr>
+      </table>
+      <div class="bars">
+        <div class="barrow"><span>Station A</span><span class="track"><span class="fill" style="width:20%"></span></span><span class="pc">20%</span></div>
+        <div class="barrow"><span>Station B</span><span class="track"><span class="fill" style="width:20%"></span></span><span class="pc">20%</span></div>
+        <div class="barrow"><span>Station C</span><span class="track"><span class="fill" style="width:20%"></span></span><span class="pc">20%</span></div>
+        <div class="barrow"><span>Station D</span><span class="track"><span class="fill" style="width:20%"></span></span><span class="pc">20%</span></div>
+        <div class="barrow"><span>(missing)</span><span class="track"><span class="fill" style="width:20%; background:var(--bad);"></span></span><span class="pc">20%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="varcard">
+    <div class="vc-head"><span class="vc-name">source_file</span><span class="vc-type">Text</span></div>
+    <div class="vc-body">
+      <table class="stat">
+        <tr><td class="k">Distinct</td><td class="v">2</td></tr>
+        <tr><td class="k">Distinct (%)</td><td class="v">40.0%</td></tr>
+        <tr><td class="k">Missing</td><td class="v">0</td></tr>
+        <tr><td class="k">Missing (%)</td><td class="v">0.0%</td></tr>
+        <tr><td class="k">Memory size</td><td class="v">84.0 B</td></tr>
+      </table>
+      <div class="bars">
+        <div class="barrow"><span>pile.sample</span><span class="track"><span class="fill" style="width:60%"></span></span><span class="pc">60%</span></div>
+        <div class="barrow"><span>pile.sample2</span><span class="track"><span class="fill" style="width:40%"></span></span><span class="pc">40%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="foot">Showing 3 of 8 variables. This is the verbatim ydata-profiling baseline, restyled only — no statistics altered. The toolkit's reading lives in the <a href="playground-pile.html">Analyst extension</a>.</p>
+</div>
+</body>
+</html>

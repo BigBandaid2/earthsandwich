@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pile profile - design-sample</title>
+<style>
+:root { color-scheme: dark; }
+body { margin:0; font:14px/1.5 system-ui,sans-serif; background:#0f1115; color:#e6e8eb; }
+header { padding:16px 20px; border-bottom:1px solid #232732; }
+h1 { font-size:18px; margin:0; }
+main { padding:20px; display:flex; flex-direction:column; gap:16px; }
+.card { background:#161922; border:1px solid #232732; border-radius:8px; overflow:hidden; }
+.card-head { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:1px solid #232732; }
+.card-head h2 { font-size:14px; margin:0; }
+.label { font-size:11px; padding:2px 8px; border-radius:999px; background:#2a3346; color:#9fb3d8; }
+.card-body { padding:14px; }
+footer { position:sticky; bottom:0; background:#0f1115; border-top:1px solid #232732; padding:12px 20px; }
+textarea { width:100%; min-height:90px; background:#0b0d12; color:#e6e8eb; border:1px solid #232732; border-radius:6px; padding:8px; font:12px/1.4 ui-monospace,monospace; box-sizing:border-box; }
+button { margin-top:8px; padding:8px 14px; background:#3b82f6; color:#fff; border:0; border-radius:6px; cursor:pointer; }
+#copy-status { margin-left:10px; font-size:12px; color:#9fb3d8; }
+</style>
+</head>
+<body>
+<header><h1>Pile profile - design-sample</h1></header>
+<main>
+<section class="card"><div class="card-head"><h2>ydata-profiling report</h2><span class="label">ydata-profiling baseline</span></div><div class="card-body"><p>Canonical raw baseline: <a href="pile.ydata-profile.html">pile.ydata-profile.html</a> (5 rows across 2 files; sampled 5).</p></div></section>
+<section class="card"><div class="card-head"><h2>Analyst extension (ID candidates, entities, provenance, inferred fields, enrichment)</h2><span class="label">LLM-extended</span></div><div class="card-body"><pre>## ID-candidate columns
+- `record_id` - unique across both files, stable prefix-coded (r####/s####); strongest join key.
+- `attachment` - unique but derived from record_id; treat as dependent, not identity.
+
+## Entity classification
+One row = one field observation captured at a place and time, with optional photo evidence.
+
+## Pipeline-metadata vs original-source fields
+- Source: `captured_at`, `note`, `place`, `lat`, `lng`, `attachment`.
+- Pipeline-added: `source_file` (toolkit concat marker).
+
+## Likely derived/inferred fields
+- `place` may be reverse-geocoded from lat/lng for rows where coordinates exist but prose lacks a location.
+
+## AI-workflow evidence
+No explicit model-output columns present; `note` phrasing is human-authored.
+
+## Categorical slicing candidates
+- `source_file` (per-feed comparison), presence/absence of coordinates, month of `captured_at`.
+
+## Public-knowledge enrichment
+Station coordinates can be cross-checked against OpenStreetMap; place names against GeoNames (geonames.org).</pre></div></section>
+<section class="card"><div class="card-head"><h2>Sampled linked-object inspection</h2><span class="label">toolkit-novel</span></div><div class="card-body"><pre>{
+  &quot;attachment&quot;: [
+    &quot;files/r0001.jpg&quot;,
+    &quot;files/r0002.jpg&quot;,
+    &quot;files/r0003.jpg&quot;,
+    &quot;files/s0001.jpg&quot;,
+    &quot;files/s0002.jpg&quot;
+  ]
+}</pre></div></section>
+</main>
+<footer><label for="copy-payload">Copy out a prompt</label>
+<textarea id="copy-payload" readonly># Pile profile - design-sample
+Sections: ydata-profiling baseline / LLM-extended / toolkit-novel.
+
+## ID-candidate columns
+- `record_id` - unique across both files, stable prefix-coded (r####/s####); strongest join key.
+- `attachment` - unique but derived from record_id; treat as dependent, not identity.
+
+## Entity classification
+One row = one field observation captured at a place and time, with optional photo evidence.
+
+## Pipeline-metadata vs original-source fields
+- Source: `captured_at`, `note`, `place`, `lat`, `lng`, `attachment`.
+- Pipeline-added: `source_file` (toolkit concat marker).
+
+## Likely derived/inferred fields
+- `place` may be reverse-geocoded from lat/lng for rows where coordinates exist but prose lacks a location.
+
+## AI-workflow evidence
+No explicit model-output columns present; `note` phrasing is human-authored.
+
+## Categorical slicing candidates
+- `source_file` (per-feed comparison), presence/absence of coordinates, month of `captured_at`.
+
+## Public-knowledge enrichment
+Station coordinates can be cross-checked against OpenStreetMap; place names against GeoNames (geonames.org).</textarea>
+<button id="copy-btn" type="button">Copy prompt</button>
+<span id="copy-status"></span></footer>
+<script type="application/json" id="embedded-data">{"analyst_inference": {"prompt_ref": "pile_profile_analysis", "preserved_inputs": {"columns": ["record_id", "captured_at", "note", "place", "lat", "lng", "attachment", "source_file"], "row_count": 5, "sampled_rows": "record_id\tcaptured_at\tnote\tplace\tlat\tlng\tattachment\tsource_file\r\nr0001\t2024-03-01T12:00:00Z\tCalibration pass complete\tStation A\t51.5007\t-0.1246\tfiles/r0001.jpg\tpile.sample.tsv\r\nr0002\t2024-03-03T15:30:00Z\tSensor swap at north mast\tStation B\t48.8584\t2.2945\tfiles/r0002.jpg\tpile.sample.tsv\r\nr0003\t2024-03-05T09:10:00Z\tNo location recorded for this entry\t\t \t \tfiles/r0003.jpg\tpile.sample.tsv\r\ns0001\t2024-04-02T08:15:00Z\tSecondary feed first entry\tStation C\t40.6892\t-74.0445\tfiles/s0001.jpg\tpile.sample2.tsv\r\ns0002\t2024-04-04T17:45:00Z\tMaintenance window logged\tStation D\t35.6586\t139.7454\tfiles/s0002.jpg\tpile.sample2.tsv\r\n", "files": ["pile.sample.tsv", "pile.sample2.tsv"]}, "inferred": "## ID-candidate columns\n- `record_id` - unique across both files, stable prefix-coded (r####/s####); strongest join key.\n- `attachment` - unique but derived from record_id; treat as dependent, not identity.\n\n## Entity classification\nOne row = one field observation captured at a place and time, with optional photo evidence.\n\n## Pipeline-metadata vs original-source fields\n- Source: `captured_at`, `note`, `place`, `lat`, `lng`, `attachment`.\n- Pipeline-added: `source_file` (toolkit concat marker).\n\n## Likely derived/inferred fields\n- `place` may be reverse-geocoded from lat/lng for rows where coordinates exist but prose lacks a location.\n\n## AI-workflow evidence\nNo explicit model-output columns present; `note` phrasing is human-authored.\n\n## Categorical slicing candidates\n- `source_file` (per-feed comparison), presence/absence of coordinates, month of `captured_at`.\n\n## Public-knowledge enrichment\nStation coordinates can be cross-checked against OpenStreetMap; place names against GeoNames (geonames.org)."}}</script>
+<script>
+window.DATA = JSON.parse(document.getElementById('embedded-data').textContent || '{}');
+(function () {
+  var btn = document.getElementById('copy-btn');
+  var ta = document.getElementById('copy-payload');
+  var status = document.getElementById('copy-status');
+  function fallback() {
+    ta.focus();
+    ta.select();
+    status.textContent = 'Selected - press Ctrl/Cmd+C to copy.';
+  }
+  btn.addEventListener('click', function () {
+    var text = ta.value;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        function () { status.textContent = 'Copied to clipboard.'; },
+        fallback
+      );
+    } else {
+      fallback();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

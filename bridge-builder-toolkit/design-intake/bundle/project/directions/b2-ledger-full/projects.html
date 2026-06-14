@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bridge projects — bridge_builder</title>
+<link rel="stylesheet" href="style.css">
+<script>if (new URLSearchParams(location.search).get('theme') === 'light') { document.documentElement.classList.add('light'); }</script>
+</head>
+<body data-screen-label="B2 · Projects">
+<div class="shell">
+  <aside class="rail">
+    <a class="wordmark" href="projects.html">bridge<i>_builder</i></a>
+    <div class="navgroup">
+      <p class="gtitle">workspace</p>
+      <nav>
+        <a class="here" href="projects.html">Projects</a>
+      </nav>
+    </div>
+    <div class="railfoot">Local, single operator. The UI guides; stages run via the CLI.</div>
+  </aside>
+  <main class="content">
+    <div class="pagetitle">
+      <h1>Bridge projects</h1>
+      <span class="sub">1 project</span>
+      <span class="right"><a class="action" href="new.html" style="font:600 10.5px/1 system-ui,sans-serif; letter-spacing:0.12em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid var(--accent-dim); padding-bottom:2px;">+ New project</a></span>
+    </div>
+    <p class="lede">Validated bridge specifications between a file pile and a relational target.</p>
+
+    <section class="sheet first" style="margin-top:28px;">
+      <table class="list">
+        <thead>
+          <tr><th style="width:30%;">Project</th><th style="width:28%;">Pile</th><th style="width:26%;">Target env</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a class="proj" href="dashboard.html">ig-pile-to-travelogue</a></td>
+            <td class="mono">../pile-app/pile · 6 files</td>
+            <td class="mono">IG_TRAVELOGUE_TARGET_DSN</td>
+            <td><span class="status ok"><span class="tick">●</span>valid · oracle run</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="note">Credential values never appear here — only environment-variable names.</p>
+    </section>
+  </main>
+</div>
+</body>
+</html>

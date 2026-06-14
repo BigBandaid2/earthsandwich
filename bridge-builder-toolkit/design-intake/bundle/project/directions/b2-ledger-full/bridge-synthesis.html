@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bridge synthesis — ig-pile-to-travelogue — bridge_builder</title>
+<link rel="stylesheet" href="style.css">
+<script>if (new URLSearchParams(location.search).get('theme') === 'light') { document.documentElement.classList.add('light'); }</script>
+</head>
+<body data-screen-label="B2 · Bridge synthesis">
+<div class="shell">
+  <aside class="rail">
+    <a class="wordmark" href="projects.html">bridge<i>_builder</i></a>
+    <div class="navgroup">
+      <p class="gtitle">workspace</p>
+      <nav>
+        <a href="projects.html">Projects</a>
+      </nav>
+    </div>
+    <div class="navgroup">
+      <p class="gtitle proj">ig-pile-to-travelogue</p>
+      <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="edit.html">Project details</a>
+        <a href="pile-profile.html">Pile profile</a>
+        <a href="target-profile.html">Target profile</a>
+        <a class="here" href="bridge-synthesis.html">Bridge synthesis</a>
+        <a href="final-bundle.html">Final bundle</a>
+      </nav>
+    </div>
+    <div class="railfoot">Two loops iterate here: the oracle checks the spec, your review accepts it.</div>
+  </aside>
+  <main class="content">
+    <div class="pagetitle">
+      <h1>Bridge synthesis</h1>
+      <span class="sub">bridge-mapping / iteration-0</span>
+      <span class="right"><span class="status dim"><span class="tick">○</span>not yet run</span></span>
+    </div>
+
+    <section class="sheet first">
+      <div class="sheet-head"><span class="no">i.</span><h2>Synthesize the bridge</h2></div>
+      <p class="lede" style="margin:0 0 14px;">Draws the candidate join keys from both profiles and proposes a mapping spec. Run it once both profiles are reviewed.</p>
+      <div class="cmd">
+        <pre id="cmd-syn">bridge_builder synthesize bridge --project "ig-pile-to-travelogue"</pre>
+        <button class="copy" type="button" data-copy="cmd-syn">Copy</button>
+      </div>
+      <div class="alts">
+        <div class="alts-title">also available</div>
+        <div class="alt">
+          <code id="cmd-syn-oracle">bridge_builder synthesize bridge --project "ig-pile-to-travelogue" --skip-oracle</code>
+          <span class="why">draft without the oracle loop</span>
+          <button class="copy mini" type="button" data-copy="cmd-syn-oracle">Copy</button>
+        </div>
+      </div>
+      <p class="note">The UI guides — it never launches stages. Run this in the project shell, then refresh.</p>
+    </section>
+
+    <section class="sheet">
+      <div class="sheet-head"><span class="no">ii.</span><h2>Iteration loops</h2></div>
+      <div class="duo">
+        <section class="sheet first" style="margin-top:0;">
+          <div class="sheet-head"><span class="no" style="color:var(--ink-3);">a.</span><h2>Oracle loop</h2><span class="status dim">0 iter</span></div>
+          <p style="margin:0 0 12px; color:var(--ink-2);">Machine validation — the synthesized spec is executed against the target and checked for insert/read/delete consistency. Failures feed a corrected re-synthesis.</p>
+          <ol class="track" style="max-width:none;">
+            <li class="pending"><span class="tn">1</span><div class="tbody"><div class="tname">Propose mapping</div><div class="tdesc">join keys → column-level spec</div></div><span class="tstate">—</span></li>
+            <li class="pending"><span class="tn">2</span><div class="tbody"><div class="tname">Oracle check</div><div class="tdesc">dry-run insert · read-back · rollback</div></div><span class="tstate">—</span></li>
+          </ol>
+        </section>
+        <section class="sheet first" style="margin-top:0;">
+          <div class="sheet-head"><span class="no" style="color:var(--ink-3);">b.</span><h2>Review loop</h2><span class="status dim">0 sessions</span></div>
+          <p style="margin:0 0 12px; color:var(--ink-2);">Human acceptance — you read the proposed spec, accept or annotate each mapping, and request a re-synthesis where it is wrong. Review is what gates the final bundle.</p>
+          <ol class="track" style="max-width:none;">
+            <li class="pending"><span class="tn">1</span><div class="tbody"><div class="tname">Read spec</div><div class="tdesc">field-by-field mapping &amp; rationale</div></div><span class="tstate">—</span></li>
+            <li class="pending"><span class="tn">2</span><div class="tbody"><div class="tname">Accept / annotate</div><div class="tdesc">sign off or send back for re-synthesis</div></div><span class="tstate">—</span></li>
+          </ol>
+        </section>
+      </div>
+      <div class="toc-meta">
+        <span>oracle iterations <b>0</b></span>
+        <span>review sessions <b>0</b></span>
+        <span>spec status <b>not synthesized</b></span>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+(function () {
+  var btns = document.querySelectorAll('button.copy');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].addEventListener('click', function () {
+      var btn = this; var src = document.getElementById(btn.getAttribute('data-copy'));
+      function ok() { btn.classList.add('copied'); btn.textContent = 'Copied'; setTimeout(function () { btn.classList.remove('copied'); btn.textContent = 'Copy'; }, 1600); }
+      function fb() { var r = document.createRange(); r.selectNodeContents(src); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Ctrl/Cmd+C'; }
+      if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(src.textContent).then(ok, fb); } else { fb(); }
+    });
+  }
+})();
+</script>
+</body>
+</html>
